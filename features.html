@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discover AppWithAI's powerful features: AI data modeling, smart forms, workflow automation, business rules engine, enterprise security, and natural language query.">
+  <meta name="keywords" content="AI features, data modeling, workflow automation, business rules, RBAC, natural language query">
+  <title>Features - AppWithAI</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="features.html" class="nav-link active">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">🏥 Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="section section-gray" style="padding: var(--spacing-3xl) 0;">
+    <div class="container text-center">
+      <h1>Powerful Features for <span class="text-gradient">Enterprise Applications</span></h1>
+      <p class="section-subtitle">Everything you need to build, deploy, and maintain production-grade business applications without writing code.</p>
+    </div>
+  </section>
+
+  <!-- AI Data Modeling -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center;">
+        <div>
+          <span class="hero-badge">🧠 AI-Powered</span>
+          <h2>Intelligent Data Modeling</h2>
+          <p>Describe your business domain in plain English. Our AI analyzes your description and automatically extracts entities, attributes, and relationships.</p>
+          <h3>Key Capabilities:</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">✓ Automatic entity and relationship extraction</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Intelligent attribute type detection</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Human-in-the-loop review before code generation</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Support for complex relationships (one-to-many, many-to-many)</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Automatic primary key and foreign key generation</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Example AI Analysis</h4>
+          <p style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
+            Input: "We need a purchase order system with vendors, line items, products, and approval workflows."<br><br>
+            AI Extracts:<br>
+            • Entity: Vendor (name, contact, payment_terms)<br>
+            • Entity: PurchaseOrder (vendor, date, status, total)<br>
+            • Entity: POLine (po_id, product, quantity, price)<br>
+            • Entity: Product (name, sku, price, stock)<br>
+            • Relationships: Vendor → PurchaseOrder → POLine → Product
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Smart Forms -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center;">
+        <div class="card">
+          <h4>Generated Form Features</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">📝 Multi-tab document structure</li>
+            <li style="padding: var(--spacing-sm) 0;">🔢 Auto-calculated fields</li>
+            <li style="padding: var(--spacing-sm) 0;">📅 Date pickers with validation</li>
+            <li style="padding: var(--spacing-sm) 0;">💱 Currency formatting</li>
+            <li style="padding: var(--spacing-sm) 0;">🔍 Searchable lookups</li>
+            <li style="padding: var(--spacing-sm) 0;">✅ Conditional field visibility</li>
+            <li style="padding: var(--spacing-sm) 0;">📎 File upload with preview</li>
+            <li style="padding: var(--spacing-sm) 0;">🎨 Runtime customization</li>
+          </ul>
+        </div>
+        <div>
+          <span class="hero-badge">📋 Intelligent Forms</span>
+          <h2>AI-Generated Smart Forms</h2>
+          <p>Generate forms that faithfully mirror your real-world documents — purchase orders, invoices, expense claims, leave requests, work orders, contracts, and more.</p>
+          <p>The AI understands the semantic meaning of document fields and automatically determines the right input control type.</p>
+          <h3>Runtime Customization — No Code Required</h3>
+          <p>Administrators can reorder form fields by dragging and dropping, hide or make fields mandatory, and set display logic — all without code changes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Business Rules Engine -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>Business Rules & Validation Engine</h2>
+        <p class="section-subtitle">Encode your business logic directly into the application using visual flowcharts. AI translates your rules into executable code.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Field-Level Validation</h3>
+          <p>Required fields, range validation, format validation, uniqueness checks, conditional requirements, cross-field validation, and regex patterns.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Document-Level Rules</h3>
+          <p>Three-way matching, budget checking, duplicate detection, completeness checks, and complex cross-document validations.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>Relationship Integrity</h3>
+          <p>Referential integrity rules prevent orphaned records, control deletion permissions, and maintain data consistency across related entities.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>AI Hook System</h3>
+          <p>Describe business rules in natural language using visual flowcharts. AI generates executable TypeScript code organized by lifecycle events.</p>
+        </div>
+      </div>
+      <div class="card mt-5">
+        <h4>Hook Lifecycle Events</h4>
+        <div class="grid grid-3">
+          <div>
+            <strong>beforeCreate</strong>
+            <p class="text-muted text-sm">Validation, auto-populate fields, duplicate check</p>
+          </div>
+          <div>
+            <strong>afterCreate</strong>
+            <p class="text-muted text-sm">Send notifications, create child records, trigger integrations</p>
+          </div>
+          <div>
+            <strong>beforeUpdate</strong>
+            <p class="text-muted text-sm">Validate changes, check authorization</p>
+          </div>
+          <div>
+            <strong>afterUpdate</strong>
+            <p class="text-muted text-sm">Audit logging, cascade updates, notify stakeholders</p>
+          </div>
+          <div>
+            <strong>beforeDelete</strong>
+            <p class="text-muted text-sm">Prevent deletion if dependencies exist</p>
+          </div>
+          <div>
+            <strong>customValidate</strong>
+            <p class="text-muted text-sm">Complex cross-document validation</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Workflow Engine -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>Workflow & Document Routing</h2>
+        <p class="section-subtitle">AI-designed workflow engine routes documents through your organization for review, approval, escalation, and action.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>🎯 Conditional Routing</h3>
+          <p>Approval paths change based on document content:</p>
+          <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
+            <li style="padding: var(--spacing-xs) 0;">• Route to Level 1 if amount ≤ $1,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Level 2 if amount is $1,001–$10,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Finance Director if amount > $10,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Legal if contract type is "External Party"</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>⏱️ Escalation & Timeouts</h3>
+          <p>Automatic escalation rules ensure documents never stall:</p>
+          <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
+            <li style="padding: var(--spacing-xs) 0;">• Escalate if no action within 48 hours</li>
+            <li style="padding: var(--spacing-xs) 0;">• Reminder notifications at configurable intervals</li>
+            <li style="padding: var(--spacing-xs) 0;">• Escalation chains for multi-level approval</li>
+            <li style="padding: var(--spacing-xs) 0;">• SLA tracking and breach alerts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>👥 Parallel Routing</h3>
+          <p>Simultaneous approvals from multiple departments:</p>
+          <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
+            <li style="padding: var(--spacing-xs) 0;">• HR + Finance approval for new hires</li>
+            <li style="padding: var(--spacing-xs) 0;">• IT + Legal review for contracts</li>
+            <li style="padding: var(--spacing-xs) 0;">• Multi-signer requirements for large amounts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>📝 Approval Stamping & Audit</h3>
+          <p>Complete audit trail for compliance:</p>
+          <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
+            <li style="padding: var(--spacing-xs) 0;">• Who approved or rejected</li>
+            <li style="padding: var(--spacing-xs) 0;">• Timestamp of every action</li>
+            <li style="padding: var(--spacing-xs) 0;">• Comments and conditions</li>
+            <li style="padding: var(--spacing-xs) 0;">• Device and IP tracking</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enterprise Security -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>Enterprise-Grade Security</h2>
+        <p class="section-subtitle">Comprehensive, layered security model that protects your data at every level.</p>
+      </div>
+      <div class="card">
+        <h4>Security Architecture</h4>
+        <div style="background: var(--gray-50); padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-md);">
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Authentication Layer</strong>
+            <p class="text-muted">Login, Session Management, MFA-ready</p>
+          </div>
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Role Assignment Layer</strong>
+            <p class="text-muted">Users → Roles → Permissions mapping</p>
+          </div>
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Table-Level Access Control</strong>
+            <p class="text-muted">Which roles can Read/Write which tables</p>
+          </div>
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Field-Level Access Control</strong>
+            <p class="text-muted">Which fields are visible/editable per role</p>
+          </div>
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Row-Level Security (RLS)</strong>
+            <p class="text-muted">Users see only their division's records</p>
+          </div>
+          <div style="padding: var(--spacing-md);">
+            <strong>Document Status Security</strong>
+            <p class="text-muted">Approved documents locked from editing</p>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-4 mt-5">
+        <div class="card text-center">
+          <div class="stat-value text-base">SOX</div>
+          <p class="text-sm">Ready</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value text-base">GDPR</div>
+          <p class="text-sm">Compliant</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value text-base">ISO</div>
+          <p class="text-sm">27001</p>
+        </div>
+        <div class="card text-center">
+          <div class="stat-value text-base">Audit</div>
+          <p class="text-sm">Ready</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Natural Language Query -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>Natural Language Data Access</h2>
+        <p class="section-subtitle">Enable your users to ask business questions in plain English and receive instant, data-driven answers.</p>
+      </div>
+      <div class="grid grid-2" style="align-items: center;">
+        <div>
+          <h3>What Users Can Ask</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">"How many invoices are pending approval?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"What is our total spend with Vendor X this quarter?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Show me all employees who joined in the last 30 days"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Which products are below reorder level?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"List all contracts expiring in the next 90 days"</li>
+          </ul>
+          <div class="card mt-4">
+            <h4>Security Is Never Compromised</h4>
+            <ul style="list-style: none; padding: 0;">
+              <li style="padding: var(--spacing-xs) 0;">✓ Users can only query data they're authorized to see</li>
+              <li style="padding: var(--spacing-xs) 0;">✓ System administration tables are completely inaccessible</li>
+              <li style="padding: var(--spacing-xs) 0;">✓ Field-level permissions are honored</li>
+              <li style="padding: var(--spacing-xs) 0;">✓ Query complexity limits prevent system overload</li>
+              <li style="padding: var(--spacing-xs) 0;">✓ SQL injection attacks are detected and blocked</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card">
+          <h4>How It Works</h4>
+          <div style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
+            <strong>1. User Query:</strong><br>
+            "Show me all overdue purchase orders over $5,000 this month"<br><br>
+            <strong>2. AI Query Agent:</strong><br>
+            Parses intent: entity=PurchaseOrder, filter=status:'overdue', amount>5000, date=current_month<br><br>
+            <strong>3. Security Validation:</strong><br>
+            Checks: user has read access to PO table, amount field is visible, no injection risk<br><br>
+            <strong>4. Query Execution:</strong><br>
+            Constructs and executes database query<br><br>
+            <strong>5. Results Display:</strong><br>
+            Table view, chart, or narrative summary
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
+    <div class="container text-center">
+      <h2 style="color: white;">Experience These Features Live</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Schedule a demo and see AppWithAI generate a complete application in under 30 minutes.</p>
+      <a href="contact.html" class="btn btn-lg" style="background: white; color: var(--primary-600);">Schedule Your Demo</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Transform business ideas into production-ready applications with AI-powered automation.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Compliance</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI. Powered by Anthropic Claude Sonnet. All rights reserved.</p>
+        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">🏥 View Hospital Management System Demo →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

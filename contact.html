@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact AppWithAI to schedule a live demo or get started with AI-powered business application generation.">
+  <meta name="keywords" content="contact, demo, get started, sales, support, consultation">
+  <title>Contact - AppWithAI</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">🏥 Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="section section-gray" style="padding: var(--spacing-3xl) 0;">
+    <div class="container text-center">
+      <h1>Let's Build <span class="text-gradient">Something Amazing</span></h1>
+      <p class="section-subtitle">Schedule a live demo and see AppWithAI generate a complete business application in under 30 minutes.</p>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="grid grid-2" style="gap: var(--spacing-2xl);">
+        <!-- Contact Form -->
+        <div>
+          <div class="card">
+            <h2 style="margin-bottom: var(--spacing-lg);">Request Your Free Demo</h2>
+            <p class="text-muted mb-4">Fill out the form below and our team will get back to you within 24 hours.</p>
+            <form id="contactForm" onsubmit="handleSubmit(event)">
+              <div class="form-group">
+                <label for="name" class="form-label">Full Name *</label>
+                <input type="text" id="name" name="name" class="form-input" required placeholder="John Smith">
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Work Email *</label>
+                <input type="email" id="email" name="email" class="form-input" required placeholder="john@company.com">
+              </div>
+              <div class="form-group">
+                <label for="company" class="form-label">Company Name *</label>
+                <input type="text" id="company" name="company" class="form-input" required placeholder="Acme Corporation">
+              </div>
+              <div class="form-group">
+                <label for="role" class="form-label">Your Role</label>
+                <select id="role" name="role" class="form-select">
+                  <option value="">Select your role</option>
+                  <option value="executive">C-Level Executive</option>
+                  <option value="vp">VP/Director</option>
+                  <option value="manager">Manager</option>
+                  <option value="it">IT/Technical Lead</option>
+                  <option value="business">Business Analyst</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="interest" class="form-label">What are you interested in?</label>
+                <select id="interest" name="interest" class="form-select">
+                  <option value="">Select an option</option>
+                  <option value="demo">Live Demo</option>
+                  <option value="pricing">Pricing Information</option>
+                  <option value="trial">Free Trial</option>
+                  <option value="consultation">Technical Consultation</option>
+                  <option value="partnership">Partnership Inquiry</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="message" class="form-label">Tell us about your project</label>
+                <textarea id="message" name="message" class="form-textarea" placeholder="Describe the business application you want to build..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">
+                  <input type="checkbox" name="newsletter" value="yes">
+                  <span>Subscribe to product updates and news</span>
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Request Demo</button>
+            </form>
+            <div id="formSuccess" class="card mt-4" style="background: var(--success-50); border-color: var(--success-200); display: none;">
+              <h4 style="color: var(--success-700); margin-bottom: var(--spacing-sm);">Thank you!</h4>
+              <p style="margin-bottom: 0;">We've received your request and will contact you within 24 hours.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div>
+          <div class="card mb-4">
+            <h3>Why Schedule a Demo?</h3>
+            <ul style="list-style: none; padding: 0;">
+              <li style="padding: var(--spacing-sm) 0;">✓ See AppWithAI generate an application live</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Get your specific questions answered</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Discuss your unique requirements</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Receive a personalized recommendation</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Learn about implementation options</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Get accurate pricing for your use case</li>
+            </ul>
+          </div>
+
+          <div class="card mb-4">
+            <h3>What to Expect</h3>
+            <div style="border-left: 3px solid var(--primary-500); padding-left: var(--spacing-md); margin-bottom: var(--spacing-md);">
+              <strong>Before the Demo</strong>
+              <p class="text-muted text-sm">We'll send you a brief questionnaire to understand your needs better.</p>
+            </div>
+            <div style="border-left: 3px solid var(--primary-500); padding-left: var(--spacing-md); margin-bottom: var(--spacing-md);">
+              <strong>During the Demo (30 min)</strong>
+              <p class="text-muted text-sm">Live demonstration of AppWithAI building a complete application from your description.</p>
+            </div>
+            <div style="border-left: 3px solid var(--primary-500); padding-left: var(--spacing-md);">
+              <strong>After the Demo</strong>
+              <p class="text-muted text-sm">Receive a customized proposal with pricing and implementation timeline.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Other Ways to Reach Us</h3>
+            <div style="margin-top: var(--spacing-lg);">
+              <div style="margin-bottom: var(--spacing-md);">
+                <strong>Email:</strong><br>
+                <a href="mailto:contact@erdwithai.com" style="color: var(--primary-600);">contact@erdwithai.com</a>
+              </div>
+              <div style="margin-bottom: var(--spacing-md);">
+                <strong>Sales:</strong><br>
+                <a href="mailto:sales@erdwithai.com" style="color: var(--primary-600);">sales@erdwithai.com</a>
+              </div>
+              <div style="margin-bottom: var(--spacing-md);">
+                <strong>Support:</strong><br>
+                <a href="mailto:support@erdwithai.com" style="color: var(--primary-600);">support@erdwithai.com</a>
+              </div>
+              <div>
+                <strong>Business Hours:</strong><br>
+                <span class="text-muted">Monday - Friday: 9:00 AM - 6:00 PM EST</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Getting Started Section -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>Typical Onboarding Journey</h2>
+        <p class="section-subtitle">From discovery to production in just 3 weeks.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card text-center">
+          <div style="width: 60px; height: 60px; background: var(--primary-500); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-2xl); font-weight: bold; margin: 0 auto var(--spacing-md);">1</div>
+          <h3>Week 1</h3>
+          <p><strong>Discovery & First Application</strong></p>
+          <ul style="list-style: none; padding: 0; text-align: left;">
+            <li style="padding: var(--spacing-xs) 0;">• Onboarding session</li>
+            <li style="padding: var(--spacing-xs) 0;">• Identify target process</li>
+            <li style="padding: var(--spacing-xs) 0;">• Describe process to AI</li>
+            <li style="padding: var(--spacing-xs) 0;">• Review & approve data model</li>
+            <li style="padding: var(--spacing-xs) 0;">• Generate first application</li>
+          </ul>
+        </div>
+        <div class="card text-center">
+          <div style="width: 60px; height: 60px; background: var(--primary-500); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-2xl); font-weight: bold; margin: 0 auto var(--spacing-md);">2</div>
+          <h3>Week 2</h3>
+          <p><strong>Customization & Rules</strong></p>
+          <ul style="list-style: none; padding: 0; text-align: left;">
+            <li style="padding: var(--spacing-xs) 0;">• Configure field layouts</li>
+            <li style="padding: var(--spacing-xs) 0;">• Define business rules</li>
+            <li style="padding: var(--spacing-xs) 0;">• Set up approval routing</li>
+            <li style="padding: var(--spacing-xs) 0;">• Configure user roles</li>
+            <li style="padding: var(--spacing-xs) 0;">• User acceptance testing</li>
+          </ul>
+        </div>
+        <div class="card text-center">
+          <div style="width: 60px; height: 60px; background: var(--success-600); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-2xl); font-weight: bold; margin: 0 auto var(--spacing-md);">3</div>
+          <h3>Week 3</h3>
+          <p><strong>Go-Live</strong></p>
+          <ul style="list-style: none; padding: 0; text-align: left;">
+            <li style="padding: var(--spacing-xs) 0;">• Final adjustments</li>
+            <li style="padding: var(--spacing-xs) 0;">• User training (hours, not days)</li>
+            <li style="padding: var(--spacing-xs) 0;">• Production deployment</li>
+            <li style="padding: var(--spacing-xs) 0;">• Hypercare support</li>
+            <li style="padding: var(--spacing-xs) 0;">• Ongoing iteration support</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>Frequently Asked Questions</h2>
+        <p class="section-subtitle">Quick answers to common questions about AppWithAI.</p>
+      </div>
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">Do I need technical knowledge to use AppWithAI?</h4>
+          <p class="text-muted">No. AppWithAI is designed for business analysts and domain experts. Simply describe your process in plain English, and the AI handles the technical implementation.</p>
+        </div>
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">What happens if the AI doesn't understand my process correctly?</h4>
+          <p class="text-muted">Our Human-in-the-Loop approach ensures you review and approve the data model before any code is generated. You can modify, add, or remove any entities, attributes, or relationships.</p>
+        </div>
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">Do I own the generated code?</h4>
+          <p class="text-muted">Yes. You own 100% of the generated code. There's no vendor lock-in. You can modify, extend, and maintain the code independently.</p>
+        </div>
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">Can I integrate with existing systems?</h4>
+          <p class="text-muted">Yes. Generated applications include standard RESTful or OData APIs that can integrate with any modern enterprise system, including SAP, Salesforce, Dynamics, and custom systems.</p>
+        </div>
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">What about security and compliance?</h4>
+          <p class="text-muted">AppWithAI generates enterprise-grade security including role-based access control, field-level security, row-level security, complete audit trails, and support for SOX, GDPR, and ISO 27001 compliance.</p>
+        </div>
+        <div class="card mb-3">
+          <h4 style="margin-bottom: var(--spacing-sm);">How long does it take to learn?</h4>
+          <p class="text-muted">Most users are productive within hours. The interface is intuitive and designed for business users. Full training typically takes less than a day.</p>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom: var(--spacing-sm);">What if I need help after deployment?</h4>
+          <p class="text-muted">We offer comprehensive support including email, priority support for Professional plans, and dedicated success managers for Enterprise customers. We also have extensive documentation and a community forum.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
+    <div class="container text-center">
+      <h2 style="color: white;">Ready to Get Started?</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Join organizations that are transforming their business application development with AppWithAI.</p>
+      <a href="#contactForm" class="btn btn-lg" style="background: white; color: var(--primary-600);">Request Your Free Demo</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Transform business ideas into production-ready applications with AI-powered automation.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Compliance</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI. Powered by Anthropic Claude Sonnet. All rights reserved.</p>
+        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">🏥 View Hospital Management System Demo →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    function handleSubmit(event) {
+      event.preventDefault();
+      // In production, this would send the form data to a server
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+      return false;
+    }
+  </script>
+</body>
+</html>
