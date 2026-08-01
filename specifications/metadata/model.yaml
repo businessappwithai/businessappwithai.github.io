@@ -1,0 +1,28 @@
+model:
+  id: cedm
+  name: Canonical Enterprise Data Model
+  abbreviation: CEDM
+  version: 0.1.0
+  status: foundation
+  originality_statement: >-
+    CEDM is authored as an original canonical model and avoids copying proprietary
+    model structures, identifiers, definitions, or taxonomies.
+  targets:
+    entities: 700
+    enumerations: 250
+    datatypes: 120
+  source_format: yaml
+  generation_targets:
+    - postgresql
+    - typescript
+    - graphql
+    - openapi
+  ai_metadata:
+    enabled: true
+    fields:
+      - semantic_description
+      - aliases
+      - mapping_hints
+      - lineage_notes
+      - governance_tags
+      - pii_classification

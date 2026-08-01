@@ -1,0 +1,26 @@
+datatypes:
+  - id: dt.identifier
+    name: Identifier
+    base: string
+    description: Stable unique identifier within a namespace.
+  - id: dt.text.short
+    name: ShortText
+    base: string
+    max_length: 255
+    description: Human-readable short text.
+  - id: dt.text.long
+    name: LongText
+    base: string
+    description: Extended human-readable text.
+  - id: dt.timestamp.instant
+    name: InstantTimestamp
+    base: datetime
+    description: UTC instant timestamp.
+  - id: dt.measure.decimal
+    name: DecimalMeasure
+    base: decimal
+    description: Decimal numeric measurement with optional unit metadata.
+  - id: dt.money.amount
+    name: MoneyAmount
+    base: decimal
+    description: Monetary amount paired with a currency code.
