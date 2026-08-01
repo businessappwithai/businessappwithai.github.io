@@ -1,0 +1,35 @@
+enumerations:
+  - id: enum.lifecycle_status
+    name: LifecycleStatus
+    description: General lifecycle state for managed records.
+    values:
+      - code: proposed
+        label: Proposed
+      - code: active
+        label: Active
+      - code: suspended
+        label: Suspended
+      - code: retired
+        label: Retired
+  - id: enum.data_sensitivity
+    name: DataSensitivity
+    description: Governance sensitivity classification.
+    values:
+      - code: public
+        label: Public
+      - code: internal
+        label: Internal
+      - code: confidential
+        label: Confidential
+      - code: restricted
+        label: Restricted
+  - id: enum.measurement_unit_system
+    name: MeasurementUnitSystem
+    description: Unit system used for scientific or operational measurements.
+    values:
+      - code: si
+        label: SI
+      - code: customary
+        label: Customary
+      - code: domain_specific
+        label: Domain Specific

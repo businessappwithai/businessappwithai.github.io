@@ -1,0 +1,36 @@
+entities:
+  - id: ent.party
+    name: Party
+    description: Person, organization, or automated actor participating in enterprise activity.
+    attributes:
+      - name: id
+        datatype: dt.identifier
+        required: true
+      - name: display_name
+        datatype: dt.text.short
+        required: true
+      - name: lifecycle_status
+        enumeration: enum.lifecycle_status
+        required: true
+    ai_metadata:
+      semantic_description: Enterprise actor anchor for customers, suppliers, employees, labs, and systems.
+      aliases: [actor, participant, stakeholder]
+      governance_tags: [master-data]
+      pii_classification: contextual
+  - id: ent.location
+    name: Location
+    description: Physical, virtual, or logical place relevant to enterprise operations.
+    attributes:
+      - name: id
+        datatype: dt.identifier
+        required: true
+      - name: name
+        datatype: dt.text.short
+        required: true
+      - name: description
+        datatype: dt.text.long
+    ai_metadata:
+      semantic_description: Place or addressable operational context.
+      aliases: [site, facility, place]
+      governance_tags: [reference-data]
+      pii_classification: contextual

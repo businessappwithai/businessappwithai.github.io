@@ -1,0 +1,84 @@
+domain_pack:
+  id: domain.scientific_lims
+  name: Scientific and LIMS Foundation
+  description: Starter domain pack for laboratory samples, tests, results, instruments, and studies.
+  depends_on:
+    - cedm.core
+
+entities:
+  - id: ent.lims.sample
+    name: LaboratorySample
+    description: Material or specimen submitted for scientific analysis.
+    attributes:
+      - name: id
+        datatype: dt.identifier
+        required: true
+      - name: sample_code
+        datatype: dt.text.short
+        required: true
+      - name: received_at
+        datatype: dt.timestamp.instant
+      - name: lifecycle_status
+        enumeration: enum.lifecycle_status
+        required: true
+    ai_metadata:
+      semantic_description: Traceable scientific sample used in laboratory workflows.
+      aliases: [specimen, aliquot-source, lab sample]
+      mapping_hints: [sample management, chain of custody, batch analysis]
+      governance_tags: [scientific-data, lims]
+      pii_classification: contextual
+  - id: ent.lims.test_method
+    name: LaboratoryTestMethod
+    description: Defined procedure used to analyze a sample.
+    attributes:
+      - name: id
+        datatype: dt.identifier
+        required: true
+      - name: method_name
+        datatype: dt.text.short
+        required: true
+      - name: method_description
+        datatype: dt.text.long
+    ai_metadata:
+      semantic_description: Validated or draft analytical method for laboratory testing.
+      aliases: [assay, protocol, analytical method]
+      governance_tags: [scientific-data, method]
+      pii_classification: none
+  - id: ent.lims.test_result
+    name: LaboratoryTestResult
+    description: Observation, measurement, or interpretation produced by a laboratory test.
+    attributes:
+      - name: id
+        datatype: dt.identifier
+        required: true
+      - name: result_value
+        datatype: dt.measure.decimal
+      - name: recorded_at
+        datatype: dt.timestamp.instant
+    relationships:
+      - name: sample
+        target: ent.lims.sample
+        cardinality: many-to-one
+      - name: method
+        target: ent.lims.test_method
+        cardinality: many-to-one
+    ai_metadata:
+      semantic_description: Structured scientific measurement linked to sample and method context.
+      aliases: [measurement, observation, assay result]
+      mapping_hints: [result reporting, quality review, instrument output]
+      governance_tags: [scientific-data, regulated-record]
+      pii_classification: contextual
+
+enumerations:
+  - id: enum.lims.sample_condition
+    name: SampleCondition
+    description: Condition of a laboratory sample at receipt or inspection.
+    values:
+      - code: acceptable
+        label: Acceptable
+      - code: compromised
+        label: Compromised
+      - code: insufficient_quantity
+        label: Insufficient Quantity
+      - code: unknown
+        label: Unknown
