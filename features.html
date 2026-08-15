@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Discover AppWithAI's powerful features: AI data modeling, smart forms, workflow automation, business rules engine, enterprise security, and natural language query.">
-  <meta name="keywords" content="AI features, data modeling, workflow automation, business rules, RBAC, natural language query">
-  <title>Features - AppWithAI</title>
+  <meta name="description" content="AppWithAI features: AI data modeling, smart forms, visual ERD designer, workflow engine, business rules, enterprise security, natural language queries, and AI Copilot. Open source under Apache 2.0.">
+  <meta name="keywords" content="AI features, data modeling, workflow automation, business rules, RBAC, natural language query, ERD designer, CopilotKit, open source">
+  <title>Features — AppWithAI</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -27,7 +27,7 @@
           <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
           <li><a href="technology.html" class="nav-link">Technology</a></li>
           <li><a href="pricing.html" class="nav-link">Pricing</a></li>
-          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">🏥 Live Demo</a></li>
+          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
           <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
         </ul>
       </nav>
@@ -37,8 +37,9 @@
   <!-- Page Header -->
   <section class="section section-gray" style="padding: var(--spacing-3xl) 0;">
     <div class="container text-center">
-      <h1>Powerful Features for <span class="text-gradient">Enterprise Applications</span></h1>
-      <p class="section-subtitle">Everything you need to build, deploy, and maintain production-grade business applications without writing code.</p>
+      <span class="hero-badge">Open Source · Apache License 2.0</span>
+      <h1 style="margin-top: var(--spacing-lg);">Enterprise Application Features, <span class="text-gradient">Generated Automatically</span></h1>
+      <p class="section-subtitle">AppWithAI produces fully functional applications with production-grade features out of the box — without writing a single line of code.</p>
     </div>
   </section>
 
@@ -47,118 +48,151 @@
     <div class="container">
       <div class="grid grid-2" style="align-items: center;">
         <div>
-          <span class="hero-badge">🧠 AI-Powered</span>
+          <span class="hero-badge">AI-Powered</span>
           <h2>Intelligent Data Modeling</h2>
-          <p>Describe your business domain in plain English. Our AI analyzes your description and automatically extracts entities, attributes, and relationships.</p>
-          <h3>Key Capabilities:</h3>
+          <p>Describe your business domain in plain English. The Domain Analysis Agent, powered by Claude, OpenAI, or a local Ollama model, analyzes your description and automatically extracts entities, attributes, and relationships with confidence scoring.</p>
+          <h3 style="margin-top: var(--spacing-lg);">Key Capabilities</h3>
           <ul style="list-style: none; padding: 0;">
-            <li style="padding: var(--spacing-sm) 0;">✓ Automatic entity and relationship extraction</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ Intelligent attribute type detection</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ Human-in-the-loop review before code generation</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ Support for complex relationships (one-to-many, many-to-many)</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Automatic entity and relationship extraction from natural language</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Intelligent attribute type detection (string, number, date, currency, enum)</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Human-in-the-loop review gate before any code is produced</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Full support for one-to-one, one-to-many, and many-to-many relationships</li>
             <li style="padding: var(--spacing-sm) 0;">✓ Automatic primary key and foreign key generation</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Choice of AI provider — bring your own API key or run locally</li>
           </ul>
         </div>
         <div class="card">
           <h4>Example AI Analysis</h4>
-          <p style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
-            Input: "We need a purchase order system with vendors, line items, products, and approval workflows."<br><br>
-            AI Extracts:<br>
-            • Entity: Vendor (name, contact, payment_terms)<br>
-            • Entity: PurchaseOrder (vendor, date, status, total)<br>
-            • Entity: POLine (po_id, product, quantity, price)<br>
-            • Entity: Product (name, sku, price, stock)<br>
-            • Relationships: Vendor → PurchaseOrder → POLine → Product
-          </p>
+          <div style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
+            <strong>Input:</strong> "We need a purchase order system with vendors, line items, products, and approval workflows."<br><br>
+            <strong>AI Extracts:</strong><br>
+            Entity: Vendor (name, contact, payment_terms, rating)<br>
+            Entity: PurchaseOrder (vendor_id, date, status, total_amount)<br>
+            Entity: POLine (po_id, product_id, quantity, unit_price, line_total)<br>
+            Entity: Product (name, sku, price, stock_level)<br><br>
+            <strong>Relationships:</strong><br>
+            Vendor 1:N PurchaseOrder<br>
+            PurchaseOrder 1:N POLine<br>
+            Product 1:N POLine
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visual ERD Designer -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center;">
+        <div class="card">
+          <h4>Visual ERD Designer Capabilities</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">✓ Mermaid syntax editor with live validation</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Interactive React Flow graph visualization</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Real-time SQL DDL preview</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Migration script preview (Kysely)</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Entity and relationship add/edit/delete</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Cardinality visualization (Crow's Foot notation)</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Save and version ERD diagrams per project</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Natural language to ERD conversion</li>
+          </ul>
+        </div>
+        <div>
+          <span class="hero-badge">Visual Design</span>
+          <h2>Interactive ERD Designer</h2>
+          <p>The built-in visual ERD designer gives you full control over your data model before code generation. Edit Mermaid syntax directly, see changes reflected instantly in the graph visualization, and preview the exact SQL and migration scripts that will be produced.</p>
+          <p>All AI-generated ERDs flow through the designer, giving you a clear review and edit experience before any application is generated.</p>
+          <h3 style="margin-top: var(--spacing-lg);">Mermaid-Based ERDs</h3>
+          <p>AppWithAI uses the Mermaid ERD format with Crow's Foot notation — an industry-standard, human-readable, and version-control-friendly representation of your data model.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Smart Forms -->
-  <section class="section section-gray">
+  <section class="section section-white">
     <div class="container">
       <div class="grid grid-2" style="align-items: center;">
+        <div>
+          <span class="hero-badge">Intelligent Forms</span>
+          <h2>AI-Generated Smart Forms</h2>
+          <p>Generate data-driven forms that faithfully mirror real-world business documents — purchase orders, invoices, expense claims, leave requests, work orders, contracts, and any other document your business uses.</p>
+          <p>The AI understands the semantic meaning of document fields and automatically selects the appropriate input control for each field type, producing forms that reflect how your team actually works.</p>
+          <h3 style="margin-top: var(--spacing-lg);">Runtime Customization — No Code Required</h3>
+          <p>Administrators can reorder form fields by dragging and dropping, hide or make fields mandatory, set display logic, and configure field groups — all through the admin interface without touching code.</p>
+        </div>
         <div class="card">
           <h4>Generated Form Features</h4>
           <ul style="list-style: none; padding: 0;">
-            <li style="padding: var(--spacing-sm) 0;">📝 Multi-tab document structure</li>
-            <li style="padding: var(--spacing-sm) 0;">🔢 Auto-calculated fields</li>
-            <li style="padding: var(--spacing-sm) 0;">📅 Date pickers with validation</li>
-            <li style="padding: var(--spacing-sm) 0;">💱 Currency formatting</li>
-            <li style="padding: var(--spacing-sm) 0;">🔍 Searchable lookups</li>
-            <li style="padding: var(--spacing-sm) 0;">✅ Conditional field visibility</li>
-            <li style="padding: var(--spacing-sm) 0;">📎 File upload with preview</li>
-            <li style="padding: var(--spacing-sm) 0;">🎨 Runtime customization</li>
+            <li style="padding: var(--spacing-sm) 0;">Multi-tab document structure (header, lines, history)</li>
+            <li style="padding: var(--spacing-sm) 0;">Auto-calculated fields (line totals, subtotals, tax)</li>
+            <li style="padding: var(--spacing-sm) 0;">Date pickers with business-day validation</li>
+            <li style="padding: var(--spacing-sm) 0;">Currency formatting with locale support</li>
+            <li style="padding: var(--spacing-sm) 0;">Searchable lookup fields for related records</li>
+            <li style="padding: var(--spacing-sm) 0;">Conditional field visibility based on other field values</li>
+            <li style="padding: var(--spacing-sm) 0;">File attachment upload with preview</li>
+            <li style="padding: var(--spacing-sm) 0;">Schema-validated input via TanStack Form + Zod</li>
           </ul>
-        </div>
-        <div>
-          <span class="hero-badge">📋 Intelligent Forms</span>
-          <h2>AI-Generated Smart Forms</h2>
-          <p>Generate forms that faithfully mirror your real-world documents — purchase orders, invoices, expense claims, leave requests, work orders, contracts, and more.</p>
-          <p>The AI understands the semantic meaning of document fields and automatically determines the right input control type.</p>
-          <h3>Runtime Customization — No Code Required</h3>
-          <p>Administrators can reorder form fields by dragging and dropping, hide or make fields mandatory, and set display logic — all without code changes.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Business Rules Engine -->
-  <section class="section section-white">
+  <section class="section section-gray">
     <div class="container">
       <div class="section-header">
-        <h2>Business Rules & Validation Engine</h2>
-        <p class="section-subtitle">Encode your business logic directly into the application using visual flowcharts. AI translates your rules into executable code.</p>
+        <h2>Business Rules and Validation Engine</h2>
+        <p class="section-subtitle">Encode your organization's business logic using visual decision flowcharts. The GoRules Zen Engine executes DMN-based rules with high performance at runtime.</p>
       </div>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">🔒</div>
           <h3>Field-Level Validation</h3>
-          <p>Required fields, range validation, format validation, uniqueness checks, conditional requirements, cross-field validation, and regex patterns.</p>
+          <p>Required fields, range validation, format patterns, uniqueness enforcement, conditional requirements, cross-field validation, and Zod-schema rules — all generated automatically per entity.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📊</div>
           <h3>Document-Level Rules</h3>
-          <p>Three-way matching, budget checking, duplicate detection, completeness checks, and complex cross-document validations.</p>
+          <p>Three-way matching, budget threshold checking, duplicate detection, completeness checks, and complex cross-document validations driven by GoRules decision tables.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔗</div>
           <h3>Relationship Integrity</h3>
-          <p>Referential integrity rules prevent orphaned records, control deletion permissions, and maintain data consistency across related entities.</p>
+          <p>Referential integrity rules prevent orphaned records, control deletion permissions, and maintain data consistency across related entities — enforced at both the API and database levels.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">⚡</div>
-          <h3>AI Hook System</h3>
-          <p>Describe business rules in natural language using visual flowcharts. AI generates executable TypeScript code organized by lifecycle events.</p>
+          <h3>Lifecycle Hook System</h3>
+          <p>Define business rules in natural language using visual flowcharts. AppWithAI generates executable TypeScript code organized by entity lifecycle events.</p>
         </div>
       </div>
       <div class="card mt-5">
-        <h4>Hook Lifecycle Events</h4>
+        <h4>Lifecycle Hook Events</h4>
         <div class="grid grid-3">
           <div>
             <strong>beforeCreate</strong>
-            <p class="text-muted text-sm">Validation, auto-populate fields, duplicate check</p>
+            <p class="text-muted text-sm">Field auto-population, validation, duplicate detection before record creation</p>
           </div>
           <div>
             <strong>afterCreate</strong>
-            <p class="text-muted text-sm">Send notifications, create child records, trigger integrations</p>
+            <p class="text-muted text-sm">Trigger notifications, create related records, initiate workflows</p>
           </div>
           <div>
             <strong>beforeUpdate</strong>
-            <p class="text-muted text-sm">Validate changes, check authorization</p>
+            <p class="text-muted text-sm">Validate field changes, check authorization for status transitions</p>
           </div>
           <div>
             <strong>afterUpdate</strong>
-            <p class="text-muted text-sm">Audit logging, cascade updates, notify stakeholders</p>
+            <p class="text-muted text-sm">Audit logging, cascade updates to dependent records, notify stakeholders</p>
           </div>
           <div>
             <strong>beforeDelete</strong>
-            <p class="text-muted text-sm">Prevent deletion if dependencies exist</p>
+            <p class="text-muted text-sm">Block deletion if dependent records exist or document is approved</p>
           </div>
           <div>
             <strong>customValidate</strong>
-            <p class="text-muted text-sm">Complex cross-document validation</p>
+            <p class="text-muted text-sm">Complex cross-document, cross-entity validation logic</p>
           </div>
         </div>
       </div>
@@ -166,50 +200,50 @@
   </section>
 
   <!-- Workflow Engine -->
-  <section class="section section-gray">
+  <section class="section section-white">
     <div class="container">
       <div class="section-header">
-        <h2>Workflow & Document Routing</h2>
-        <p class="section-subtitle">AI-designed workflow engine routes documents through your organization for review, approval, escalation, and action.</p>
+        <h2>Workflow and Document Routing Engine</h2>
+        <p class="section-subtitle">State machine-based workflow engine routes documents through your organization for review, approval, escalation, and action — with full audit trails.</p>
       </div>
       <div class="grid grid-2">
         <div class="card">
-          <h3>🎯 Conditional Routing</h3>
-          <p>Approval paths change based on document content:</p>
+          <h3>Conditional Routing</h3>
+          <p>Approval paths adapt dynamically based on document content:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Route to Level 1 if amount ≤ $1,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Level 2 if amount is $1,001–$10,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Finance Director if amount > $10,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Legal if contract type is "External Party"</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Level 1 approver if amount is below $1,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Level 2 approver for amounts $1,001–$10,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Finance Director for amounts above $10,000</li>
+            <li style="padding: var(--spacing-xs) 0;">• Route to Legal if contract type is External Party</li>
           </ul>
         </div>
         <div class="card">
-          <h3>⏱️ Escalation & Timeouts</h3>
+          <h3>Escalation and Timeouts</h3>
           <p>Automatic escalation rules ensure documents never stall:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Escalate if no action within 48 hours</li>
+            <li style="padding: var(--spacing-xs) 0;">• Auto-escalate if no action within configurable SLA window</li>
             <li style="padding: var(--spacing-xs) 0;">• Reminder notifications at configurable intervals</li>
-            <li style="padding: var(--spacing-xs) 0;">• Escalation chains for multi-level approval</li>
-            <li style="padding: var(--spacing-xs) 0;">• SLA tracking and breach alerts</li>
+            <li style="padding: var(--spacing-xs) 0;">• Multi-level escalation chains for senior approvers</li>
+            <li style="padding: var(--spacing-xs) 0;">• SLA breach detection and alerting</li>
           </ul>
         </div>
         <div class="card">
-          <h3>👥 Parallel Routing</h3>
+          <h3>Parallel Routing</h3>
           <p>Simultaneous approvals from multiple departments:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• HR + Finance approval for new hires</li>
-            <li style="padding: var(--spacing-xs) 0;">• IT + Legal review for contracts</li>
-            <li style="padding: var(--spacing-xs) 0;">• Multi-signer requirements for large amounts</li>
+            <li style="padding: var(--spacing-xs) 0;">• HR and Finance approval for new hire requests</li>
+            <li style="padding: var(--spacing-xs) 0;">• IT and Legal review for vendor contracts</li>
+            <li style="padding: var(--spacing-xs) 0;">• Multi-signer requirements for high-value transactions</li>
           </ul>
         </div>
         <div class="card">
-          <h3>📝 Approval Stamping & Audit</h3>
-          <p>Complete audit trail for compliance:</p>
+          <h3>Approval Stamping and Audit</h3>
+          <p>Tamper-proof audit trail for compliance:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Who approved or rejected</li>
-            <li style="padding: var(--spacing-xs) 0;">• Timestamp of every action</li>
-            <li style="padding: var(--spacing-xs) 0;">• Comments and conditions</li>
-            <li style="padding: var(--spacing-xs) 0;">• Device and IP tracking</li>
+            <li style="padding: var(--spacing-xs) 0;">• Who approved, rejected, or delegated — with timestamp</li>
+            <li style="padding: var(--spacing-xs) 0;">• Approval comments and attached conditions</li>
+            <li style="padding: var(--spacing-xs) 0;">• IP address and device tracking per action</li>
+            <li style="padding: var(--spacing-xs) 0;">• Locked audit log — immutable after recording</li>
           </ul>
         </div>
       </div>
@@ -217,38 +251,38 @@
   </section>
 
   <!-- Enterprise Security -->
-  <section class="section section-white">
+  <section class="section section-gray">
     <div class="container">
       <div class="section-header">
         <h2>Enterprise-Grade Security</h2>
-        <p class="section-subtitle">Comprehensive, layered security model that protects your data at every level.</p>
+        <p class="section-subtitle">Generated applications include a comprehensive, layered security model — from authentication through to individual field visibility per user role.</p>
       </div>
       <div class="card">
-        <h4>Security Architecture</h4>
+        <h4>Security Architecture — Four Layers</h4>
         <div style="background: var(--gray-50); padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-md);">
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Authentication Layer</strong>
-            <p class="text-muted">Login, Session Management, MFA-ready</p>
+            <p class="text-muted">Session management via Better-Auth — supports OAuth providers, email/password, and MFA-ready flows</p>
           </div>
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Role Assignment Layer</strong>
-            <p class="text-muted">Users → Roles → Permissions mapping</p>
+            <p class="text-muted">Users are assigned to one or more roles. Roles aggregate granular permissions for table, field, and row access</p>
           </div>
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Table-Level Access Control</strong>
-            <p class="text-muted">Which roles can Read/Write which tables</p>
+            <p class="text-muted">Roles are granted Read, Create, Update, and Delete permissions at the table level via sys_access_role</p>
           </div>
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Field-Level Access Control</strong>
-            <p class="text-muted">Which fields are visible/editable per role</p>
+            <p class="text-muted">Individual columns can be marked visible, editable, or hidden per role — enforced at the API level via sys_access_field</p>
           </div>
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
-            <strong>Row-Level Security (RLS)</strong>
-            <p class="text-muted">Users see only their division's records</p>
+            <strong>Row-Level Security</strong>
+            <p class="text-muted">Users see only records belonging to their department, region, or organizational unit — enforced via sys_access_record policies</p>
           </div>
           <div style="padding: var(--spacing-md);">
             <strong>Document Status Security</strong>
-            <p class="text-muted">Approved documents locked from editing</p>
+            <p class="text-muted">Approved or completed documents are locked from editing, preserving the integrity of the audit trail</p>
           </div>
         </div>
       </div>
@@ -262,58 +296,119 @@
           <p class="text-sm">Compliant</p>
         </div>
         <div class="card text-center">
-          <div class="stat-value text-base">ISO</div>
-          <p class="text-sm">27001</p>
+          <div class="stat-value text-base">ISO 27001</div>
+          <p class="text-sm">Aligned</p>
         </div>
         <div class="card text-center">
           <div class="stat-value text-base">Audit</div>
-          <p class="text-sm">Ready</p>
+          <p class="text-sm">Trail Built-In</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Natural Language Query -->
+  <!-- AI Copilot -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center;">
+        <div>
+          <span class="hero-badge">Embedded AI</span>
+          <h2>AI Copilot Interface</h2>
+          <p>Every generated application includes an embedded AI assistant powered by CopilotKit. End users get a conversational interface for natural language data queries, in-context guidance, and intelligent suggestions — directly within their application.</p>
+          <h3 style="margin-top: var(--spacing-lg);">What Users Can Do</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">"How many invoices are pending approval right now?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Show me all purchase orders from Vendor X this quarter"</li>
+            <li style="padding: var(--spacing-sm) 0;">"List all employees who joined in the last 30 days"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Which products are below their reorder level?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"What contracts expire in the next 90 days?"</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Security Is Never Compromised</h4>
+          <p class="text-muted mb-4">The AI Copilot query interface honors the same security model as the rest of the application:</p>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">✓ Users can only query data they are authorized to access</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ System administration tables are inaccessible</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Field-level permissions are enforced per query</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Row-level security filters are applied automatically</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Query complexity limits prevent resource exhaustion</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ SQL injection patterns are detected and blocked</li>
+          </ul>
+          <div class="card mt-4" style="background: var(--gray-50);">
+            <h5>AI Query Pipeline</h5>
+            <div style="font-family: var(--font-mono); font-size: var(--text-xs);">
+              User query → Intent parsing → Security validation → Query construction → Result presentation
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Application Dictionary -->
   <section class="section section-gray">
     <div class="container">
       <div class="section-header">
-        <h2>Natural Language Data Access</h2>
-        <p class="section-subtitle">Enable your users to ask business questions in plain English and receive instant, data-driven answers.</p>
+        <h2>Metadata-Driven Application Dictionary</h2>
+        <p class="section-subtitle">Application behavior is driven by metadata, not hardcoded logic — enabling runtime customization without developer involvement.</p>
       </div>
       <div class="grid grid-2" style="align-items: center;">
         <div>
-          <h3>What Users Can Ask</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li style="padding: var(--spacing-sm) 0;">"How many invoices are pending approval?"</li>
-            <li style="padding: var(--spacing-sm) 0;">"What is our total spend with Vendor X this quarter?"</li>
-            <li style="padding: var(--spacing-sm) 0;">"Show me all employees who joined in the last 30 days"</li>
-            <li style="padding: var(--spacing-sm) 0;">"Which products are below reorder level?"</li>
-            <li style="padding: var(--spacing-sm) 0;">"List all contracts expiring in the next 90 days"</li>
-          </ul>
+          <h3>What Makes It Different</h3>
+          <p>When form layout, validation, and routing are driven by metadata tables, your application administrators can change application behavior directly — no code change, no deployment, no regression risk.</p>
           <div class="card mt-4">
-            <h4>Security Is Never Compromised</h4>
-            <ul style="list-style: none; padding: 0;">
-              <li style="padding: var(--spacing-xs) 0;">✓ Users can only query data they're authorized to see</li>
-              <li style="padding: var(--spacing-xs) 0;">✓ System administration tables are completely inaccessible</li>
-              <li style="padding: var(--spacing-xs) 0;">✓ Field-level permissions are honored</li>
-              <li style="padding: var(--spacing-xs) 0;">✓ Query complexity limits prevent system overload</li>
-              <li style="padding: var(--spacing-xs) 0;">✓ SQL injection attacks are detected and blocked</li>
-            </ul>
+            <h4>Traditional vs AppWithAI</h4>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="border-bottom: 2px solid var(--gray-200);">
+                <th style="text-align: left; padding: var(--spacing-sm);">Change</th>
+                <th style="text-align: left; padding: var(--spacing-sm);">Traditional</th>
+                <th style="text-align: left; padding: var(--spacing-sm);">AppWithAI</th>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: var(--spacing-sm);">Add a field to a form</td>
+                <td style="padding: var(--spacing-sm);">Hours of development</td>
+                <td style="padding: var(--spacing-sm);">Minutes in admin</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: var(--spacing-sm);">Reorder form fields</td>
+                <td style="padding: var(--spacing-sm);">Code + deploy</td>
+                <td style="padding: var(--spacing-sm);">Drag and drop</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: var(--spacing-sm);">Change validation rule</td>
+                <td style="padding: var(--spacing-sm);">Code + test + deploy</td>
+                <td style="padding: var(--spacing-sm);">Update in admin</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: var(--spacing-sm);">Modify approval routing</td>
+                <td style="padding: var(--spacing-sm);">Code change + redeploy</td>
+                <td style="padding: var(--spacing-sm);">Update workflow config</td>
+              </tr>
+              <tr>
+                <td style="padding: var(--spacing-sm);">Add a user role</td>
+                <td style="padding: var(--spacing-sm);">Code + config</td>
+                <td style="padding: var(--spacing-sm);">Create role + assign</td>
+              </tr>
+            </table>
           </div>
         </div>
         <div class="card">
-          <h4>How It Works</h4>
-          <div style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
-            <strong>1. User Query:</strong><br>
-            "Show me all overdue purchase orders over $5,000 this month"<br><br>
-            <strong>2. AI Query Agent:</strong><br>
-            Parses intent: entity=PurchaseOrder, filter=status:'overdue', amount>5000, date=current_month<br><br>
-            <strong>3. Security Validation:</strong><br>
-            Checks: user has read access to PO table, amount field is visible, no injection risk<br><br>
-            <strong>4. Query Execution:</strong><br>
-            Constructs and executes database query<br><br>
-            <strong>5. Results Display:</strong><br>
-            Table view, chart, or narrative summary
+          <h4>Dictionary-Driven Form Relationships</h4>
+          <p class="text-muted mb-3">The Application Dictionary defines not just individual forms, but how forms relate to each other across the application.</p>
+          <div style="background: var(--gray-50); padding: var(--spacing-md); border-radius: var(--radius-lg); font-size: var(--text-sm);">
+            <strong>sys_window: Purchase Order</strong><br>
+            ├─ sys_tab: Header (Vendor, Date, PO Number)<br>
+            ├─ sys_tab: Line Items<br>
+            │   └─ sys_field: Product, Quantity, Unit Price, Line Total<br>
+            ├─ sys_tab: Delivery Status<br>
+            └─ sys_tab: Approval History<br>
+            <br>
+            <strong>Result:</strong><br>
+            ✓ Master-Detail relationships rendered automatically<br>
+            ✓ Cross-document navigation built in<br>
+            ✓ Lookup relationships enforced throughout<br>
+            ✓ Admin can change layout without touching code
           </div>
         </div>
       </div>
@@ -323,8 +418,8 @@
   <!-- CTA -->
   <section class="section" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
     <div class="container text-center">
-      <h2 style="color: white;">Experience These Features Live</h2>
-      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Schedule a demo and see AppWithAI generate a complete application in under 30 minutes.</p>
+      <h2 style="color: white;">See Every Feature Live in Your Domain</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Schedule a demo and watch AppWithAI generate a complete application from your business description in under 30 minutes.</p>
       <a href="contact.html" class="btn btn-lg" style="background: white; color: var(--primary-600);">Schedule Your Demo</a>
     </div>
   </section>
@@ -335,7 +430,7 @@
       <div class="footer-grid">
         <div>
           <h4>AppWithAI</h4>
-          <p>Transform business ideas into production-ready applications with AI-powered automation.</p>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
         </div>
         <div>
           <h4>Product</h4>
@@ -358,16 +453,16 @@
         <div>
           <h4>Legal</h4>
           <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
             <li><a href="#">Privacy Policy</a></li>
             <li><a href="#">Terms of Service</a></li>
             <li><a href="#">Security</a></li>
-            <li><a href="#">Compliance</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2026 AppWithAI. Powered with ANY AI - Claude, OpenAI, and Ollama (Local LLMs). All rights reserved.</p>
-        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">🏥 View Hospital Management System Demo →</a></p>
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">View Hospital Management System Demo →</a></p>
       </div>
     </div>
   </footer>
