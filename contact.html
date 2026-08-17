@@ -52,7 +52,7 @@
           <div class="card">
             <h2 style="margin-bottom: var(--spacing-sm);">Request a Live Demo</h2>
             <p class="text-muted mb-4">Complete the form below and our team will respond within one business day.</p>
-            <form id="contactForm" action="https://formsubmit.co/admin@appwithai.org" method="POST">
+            <form id="contactForm" action="https://formsubmit.co/8231542dff796b481f23b358244de0e4" method="POST">
               <div class="form-group">
                 <label for="name" class="form-label">Full Name <span style="color: var(--error-500);">*</span></label>
                 <input type="text" id="name" name="name" class="form-input" required placeholder="Jane Smith">
@@ -320,11 +320,14 @@
 
   <script src="assets/js/main.js"></script>
   <script>
-    // Where demo requests are delivered. The form posts to the same address
-    // without JavaScript (see the form's action attribute); this endpoint is the
-    // AJAX variant, which returns JSON and sends CORS headers.
+    // Demo requests are delivered to RECIPIENT, but the endpoint is addressed by
+    // the alias the mail service issued for it, so the address is not exposed in
+    // the request URL for scrapers. The form posts to the same alias without
+    // JavaScript (see the form's action attribute); this is the AJAX variant,
+    // which returns JSON and sends CORS headers.
     const RECIPIENT = 'admin@appwithai.org';
-    const FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + RECIPIENT;
+    const FORM_ALIAS = '8231542dff796b481f23b358244de0e4';
+    const FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + FORM_ALIAS;
 
     const form = document.getElementById('contactForm');
     const emailInput = document.getElementById('email');
