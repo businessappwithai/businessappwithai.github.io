@@ -105,7 +105,9 @@
               <input type="hidden" name="_replyto" id="replyToField" value="">
               <input type="hidden" name="_template" value="table">
               <input type="hidden" name="_captcha" value="false">
-              <input type="hidden" name="_next" value="https://businessappwithai.github.io/contact.html?submitted=1">
+              <!-- Where visitors without JavaScript land after a successful post.
+                   Must be the site's canonical domain, not the github.io host. -->
+              <input type="hidden" name="_next" value="http://appwithai.org/contact.html?submitted=1">
               <!-- Spam honeypot: hidden from users, filled only by bots -->
               <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px;">
               <button type="submit" class="btn btn-primary" style="width: 100%; font-size: var(--text-lg); padding: var(--spacing-md);">Submit Request</button>
