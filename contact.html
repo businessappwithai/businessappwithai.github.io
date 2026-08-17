@@ -52,7 +52,7 @@
           <div class="card">
             <h2 style="margin-bottom: var(--spacing-sm);">Request a Live Demo</h2>
             <p class="text-muted mb-4">Complete the form below and our team will respond within one business day.</p>
-            <form id="contactForm" action="https://formspree.io/f/admin@appwithai.org" method="POST">
+            <form id="contactForm" action="https://formsubmit.co/admin@appwithai.org" method="POST">
               <div class="form-group">
                 <label for="name" class="form-label">Full Name <span style="color: var(--error-500);">*</span></label>
                 <input type="text" id="name" name="name" class="form-input" required placeholder="Jane Smith">
@@ -100,13 +100,23 @@
                   <span>Subscribe to AppWithAI release announcements and project updates</span>
                 </label>
               </div>
+              <!-- Delivery settings for the form backend -->
               <input type="hidden" name="_subject" value="AppWithAI Demo Request">
               <input type="hidden" name="_replyto" id="replyToField" value="">
+              <input type="hidden" name="_template" value="table">
+              <input type="hidden" name="_captcha" value="false">
+              <input type="hidden" name="_next" value="https://businessappwithai.github.io/contact.html?submitted=1">
+              <!-- Spam honeypot: hidden from users, filled only by bots -->
+              <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px;">
               <button type="submit" class="btn btn-primary" style="width: 100%; font-size: var(--text-lg); padding: var(--spacing-md);">Submit Request</button>
             </form>
-            <div id="formSuccess" class="card mt-4" style="background: var(--success-50); border-color: var(--success-200); display: none;">
+            <div id="formSuccess" class="card mt-4" style="background: var(--success-50); border-color: var(--success-500); display: none;">
               <h4 style="color: var(--success-700); margin-bottom: var(--spacing-sm);">Thank you for your request</h4>
               <p style="margin-bottom: 0;">We have received your submission and will contact you at the email address provided within one business day.</p>
+            </div>
+            <div id="formError" class="card mt-4" style="background: var(--error-50); border-color: var(--error-500); display: none;" role="alert">
+              <h4 style="color: var(--error-600); margin-bottom: var(--spacing-sm);">We could not submit your request</h4>
+              <p style="margin-bottom: 0;">Something went wrong on our side. Please email us directly at <a id="errorMailto" href="mailto:admin@appwithai.org" style="color: var(--primary-600);">admin@appwithai.org</a> and we will respond within one business day.</p>
             </div>
           </div>
         </div>
@@ -308,16 +318,40 @@
 
   <script src="assets/js/main.js"></script>
   <script>
+    // Where demo requests are delivered. The form posts to the same address
+    // without JavaScript (see the form's action attribute); this endpoint is the
+    // AJAX variant, which returns JSON and sends CORS headers.
+    const RECIPIENT = 'admin@appwithai.org';
+    const FORM_ENDPOINT = 'https://formsubmit.co/ajax/' + RECIPIENT;
+
     const form = document.getElementById('contactForm');
     const emailInput = document.getElementById('email');
     const replyToField = document.getElementById('replyToField');
+    const successBox = document.getElementById('formSuccess');
+    const errorBox = document.getElementById('formError');
 
-    emailInput.addEventListener('input', function() {
-      replyToField.value = this.value;
+    // Keep the reply-to address in sync, including for autofill, which does not
+    // always fire an 'input' event.
+    ['input', 'change'].forEach(function(evt) {
+      emailInput.addEventListener(evt, function() {
+        replyToField.value = this.value;
+      });
     });
+
+    // Scroll animations in main.js set .card elements to opacity 0 until they
+    // intersect, so reveal these explicitly rather than relying on the observer.
+    function reveal(el) {
+      el.style.display = 'block';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
+
+      replyToField.value = emailInput.value;
+      errorBox.style.display = 'none';
 
       const formData = new FormData(form);
       const submitBtn = form.querySelector('button[type="submit"]');
@@ -325,26 +359,64 @@
       submitBtn.disabled = true;
 
       try {
-        const response = await fetch(form.action, {
+        const response = await fetch(FORM_ENDPOINT, {
           method: 'POST',
           body: formData,
           headers: { 'Accept': 'application/json' }
         });
 
+        // The endpoint answers 200 with {"success": "true"} on delivery, so a
+        // 200 alone is not enough to report success to the visitor.
+        let delivered = response.ok;
         if (response.ok) {
+          try {
+            const result = await response.json();
+            delivered = String(result.success) === 'true';
+          } catch (parseError) {
+            // Non-JSON body from a 200 response: treat as delivered.
+          }
+        }
+
+        if (delivered) {
           form.style.display = 'none';
-          document.getElementById('formSuccess').style.display = 'block';
+          reveal(successBox);
         } else {
-          submitBtn.textContent = 'Submit Request';
-          submitBtn.disabled = false;
-          alert('There was a problem submitting your request. Please email us directly at admin@appwithai.org.');
+          showError(submitBtn, formData);
         }
       } catch (error) {
-        submitBtn.textContent = 'Submit Request';
-        submitBtn.disabled = false;
-        alert('There was a problem submitting your request. Please email us directly at admin@appwithai.org.');
+        showError(submitBtn, formData);
       }
     });
+
+    // On failure, offer a mailto fallback pre-filled with what was typed so the
+    // visitor never has to retype their request.
+    function showError(submitBtn, formData) {
+      submitBtn.textContent = 'Submit Request';
+      submitBtn.disabled = false;
+
+      const body = [
+        'Name: ' + (formData.get('name') || ''),
+        'Email: ' + (formData.get('email') || ''),
+        'Company: ' + (formData.get('company') || ''),
+        'Role: ' + (formData.get('role') || ''),
+        'Interest: ' + (formData.get('interest') || ''),
+        '',
+        formData.get('message') || ''
+      ].join('\n');
+
+      document.getElementById('errorMailto').href =
+        'mailto:' + RECIPIENT +
+        '?subject=' + encodeURIComponent('AppWithAI Demo Request') +
+        '&body=' + encodeURIComponent(body);
+
+      reveal(errorBox);
+    }
+
+    // Visitors without JavaScript are redirected back here after a successful post.
+    if (new URLSearchParams(window.location.search).get('submitted') === '1') {
+      form.style.display = 'none';
+      reveal(successBox);
+    }
   </script>
 </body>
 </html>
