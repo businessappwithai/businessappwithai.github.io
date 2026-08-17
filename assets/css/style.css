@@ -296,6 +296,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--spacing-lg);
   padding: var(--spacing-md) var(--container-padding);
   max-width: var(--container-max);
   margin: 0 auto;
@@ -854,14 +855,6 @@ a:hover {
 @media (min-width: 768px) {
   h1 { font-size: var(--text-6xl); }
 
-  .nav {
-    display: block;
-  }
-
-  .menu-toggle {
-    display: none;
-  }
-
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -876,6 +869,58 @@ a:hover {
 
   .hero-cta {
     flex-wrap: nowrap;
+  }
+}
+
+/* Desktop — the inline navigation only fits from here up */
+@media (min-width: 1024px) {
+  .nav {
+    display: block;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+}
+
+/* Narrow desktops — tighten the navigation so it clears the logo */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .nav-list {
+    gap: var(--spacing-lg);
+  }
+
+  .nav-list .btn {
+    padding: 0.65rem 1.1rem;
+    font-size: var(--text-sm);
+  }
+}
+
+/* Tablet and below — collapse the navigation behind the menu toggle */
+@media (max-width: 1023px) {
+  .nav-list {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+  }
+
+  .nav.mobile-open {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+    border-top: 1px solid var(--gray-200);
+  }
+
+  .nav.mobile-open .nav-list {
+    flex-direction: column;
+  }
+
+  .nav-list .btn {
+    margin-right: 0 !important;
   }
 }
 
@@ -909,28 +954,6 @@ a:hover {
 
   .btn {
     width: 100%;
-  }
-
-  .nav-list {
-    flex-direction: column;
-    gap: var(--spacing-md);
-  }
-
-  /* Mobile Menu */
-  .nav.mobile-open {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-lg);
-    border-top: 1px solid var(--gray-200);
-  }
-
-  .nav.mobile-open .nav-list {
-    flex-direction: column;
   }
 
   .comparison-table {
