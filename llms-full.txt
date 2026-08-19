@@ -18,6 +18,10 @@
   file disagree, that file wins.
 - **Validators** (§8): `https://appwithai.org/guide/checker.js` and
   `https://appwithai.org/guide/fixer.js`
+- **To check a model from a shell** (§1.3, §8.4) — nothing to install:
+  `curl -sO https://appwithai.org/guide/check-model.mjs` then
+  `node check-model.mjs my-business.mmd`. Exit `0` means the generator accepts
+  it; exit `1` means it does not, and the report says why.
 - **Every example in this document is a complete model that the checker accepts
   with zero errors and zero warnings.** Paste any of them into `check()` and see.
   Imitate their shape.
@@ -263,6 +267,22 @@ application, so do not promise the user behaviour that rides on them.
 The model is not finished when it is written. It is finished when the checker
 accepts it. The two modules and their API are in §8.
 
+**If you have a shell, this is the whole step** — two commands, any runtime with
+Node 18+, Bun or Deno, nothing to install:
+
+```sh
+curl -sO https://appwithai.org/guide/check-model.mjs
+node check-model.mjs my-business.mmd
+```
+
+It runs the three passes below against the published modules, prints the
+checker's own report, and exits `0` when the model is clean, `1` when the
+generator would refuse it. Fix what it lists, run it again, and do not hand the
+file over until it exits `0`. (`--write` saves the repairs it applied; §8.4 has
+the rest, and the recipes for runtimes with no shell.)
+
+Written out, that is:
+
 ```js
 import { check, formatReport } from "https://appwithai.org/guide/checker.js";
 import { checkAndFix }          from "https://appwithai.org/guide/fixer.js";
@@ -310,10 +330,6 @@ one outcome worse than not finishing.
 **Warnings are not noise.** Most describe something the generator accepts and
 quietly gets wrong — a dropped modifier, a state no enum backs, a rule that can
 decide but cannot act. Clear them, or say why you left one.
-
-**Running it is one command if you have a shell** — §8.4 has the recipe for
-every runtime, including the published `check-model.mjs`, which is §1.3 in a
-single invocation.
 
 **If you cannot reach the checker** — no network from your runtime, no JavaScript
 engine, imports blocked — that changes what you can *claim*, not what you
@@ -1137,6 +1153,11 @@ usually gets skipped. Find your row and run it.
 | A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import |
 | No network, or no JavaScript at all | Do not skip it silently: walk §10 by hand and tell the user, as §1.3 says |
 
+```sh
+curl -sO https://appwithai.org/guide/check-model.mjs
+node check-model.mjs my-business.mmd
+```
+
 **`check-model.mjs`** is the one-command form of §1.3, published beside the
 modules it runs. It finds `checker.js` and `fixer.js` — beside itself if they
 were downloaded together, otherwise from `https://appwithai.org/guide/` — runs
@@ -1323,7 +1344,8 @@ flowchart TD
 13. Exactly one file is being handed over, and it ends `.mmd` — no companion
     specification document, report or README (§1.0).
 14. `check(source)` returns `ok: true`, run three times over the file's exact
-    bytes, the last two over unchanged bytes — or you have said plainly that the
+    bytes, the last two over unchanged bytes — `node check-model.mjs <file>.mmd`
+    is those three passes and exits `0` — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
 15. Warnings are cleared, or each remaining one is explained to the user.
 16. The file the user receives is the file you validated, delivered as a

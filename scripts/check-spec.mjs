@@ -14,7 +14,7 @@
  *
  *   node scripts/check-spec.mjs
  */
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -178,6 +178,9 @@ console.log(`${pass} claims verified, ${fail} contradicted`);
 /* ------------------------------- 4. the runner §8.4 tells a model to use ---- */
 
 const runner = root + "guide/check-model.mjs";
+const specText = spec.join("\n");
+const command = "curl -sO https://appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
+
 const scratch = mkdtempSync(join(tmpdir(), "eml-spec-"));
 const clean = join(scratch, "clean.mmd");
 const broken = join(scratch, "broken.mmd");
@@ -189,6 +192,9 @@ const cleanRun = run(clean);
 const brokenRun = run(broken);
 let runnerFail = 0;
 const expect = (cond, label) => { if (cond) console.log(`ok   ${label}`); else { runnerFail++; console.log(`FAIL ${label}`); } };
+expect(specText.includes("```sh\n" + command + "\n```"), "the spec carries the two-line command as a runnable block");
+expect((specText.match(/check-model\.mjs/g) ?? []).length >= 4, "the command is reachable from the header, §1.3, §8.4 and §10");
+expect(existsSync(runner), "guide/check-model.mjs exists at the path the spec publishes");
 expect(cleanRun.status === 0, "check-model.mjs exits 0 on a clean model");
 expect(/OK — 0 errors/.test(cleanRun.stdout), "check-model.mjs prints the checker's own verdict");
 expect(brokenRun.status === 1, "check-model.mjs exits 1 when the generator would refuse the model");
