@@ -112,12 +112,12 @@
   <tbody>
     <tr>
       <td><code>checker.js</code></td>
-      <td><code>https://appwithai.org/guide/checker.js</code></td>
+      <td><code data-url="checker.js">https://appwithai.org/guide/checker.js</code></td>
       <td>Every diagnostic <code>bun language/checker.ts</code> prints, as <code>check(source)</code>.</td>
     </tr>
     <tr>
       <td><code>fixer.js</code></td>
-      <td><code>https://appwithai.org/guide/fixer.js</code></td>
+      <td><code data-url="fixer.js">https://appwithai.org/guide/fixer.js</code></td>
       <td>The five auto-repairs, plus <code>checkAndFix(source)</code> — repair and re-check in one call.</td>
     </tr>
   </tbody>
@@ -126,8 +126,8 @@
 
 <div class="code">
   <div class="code-head"><span class="tag">javascript</span></div>
-<pre><code>import { check, formatReport } from "https://appwithai.org/guide/checker.js";
-import { checkAndFix }         from "https://appwithai.org/guide/fixer.js";
+<pre><code>import { check, formatReport } from "<span data-url="checker.js">https://appwithai.org/guide/checker.js</span>";
+import { checkAndFix }         from "<span data-url="fixer.js">https://appwithai.org/guide/fixer.js</span>";
 
 const report = check(source);
 <span class="c-com">// { ok, counts: { errors, warnings, infos }, issues: [...], languageVersion }</span>
@@ -329,7 +329,7 @@ for (let pass = 2; pass &lt;= 3 &amp;&amp; report.ok; pass++) {
 </p>
 <div class="code">
   <div class="code-head"><span class="tag">url</span></div>
-<pre><code>https://appwithai.org/llms-full.txt</code></pre>
+<pre><code data-url="../llms-full.txt">https://appwithai.org/llms-full.txt</code></pre>
 </div>
 <p>
   Point a language model at it before asking for a model, and it has the language definition, the

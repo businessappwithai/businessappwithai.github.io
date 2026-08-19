@@ -251,4 +251,18 @@ for (const node of document.querySelectorAll("[data-eml-version]")) {
   node.textContent = LANGUAGE_VERSION;
 }
 
+/*
+ * Stamp the real URLs of the published modules.
+ *
+ * The specification quotes them under appwithai.org, and the page is written
+ * that way because that is what §10.3 says. But a reader looking at a staging
+ * host, a fork's github.io address or a local server would be copying a URL that
+ * does not serve them the file in front of them. So each one is resolved against
+ * this document's own origin and written in — the text always names the host
+ * that is actually answering.
+ */
+for (const node of document.querySelectorAll("[data-url]")) {
+  node.textContent = new URL(node.dataset.url, window.location.href).href;
+}
+
 await load("crm");

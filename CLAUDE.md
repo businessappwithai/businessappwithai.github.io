@@ -257,6 +257,13 @@ all deliberate and all commented at the point of change:
 | `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
 | `llms-full.txt` | The guide's chapter count in the header | It describes this site, and this site has twelve chapters |
 
+**On the published domain.** The specification quotes the validators as
+`https://appwithai.org/guide/checker.js`, and chapter 11 prints them that way. There is no `CNAME`
+file — the Pages source is GitHub Actions, which keeps a custom domain in repository settings rather
+than in the tree — so the page never trusts that string: every URL it shows carries a `data-url`
+attribute and `validator.js` resolves it against `window.location`, so the text always names the host
+that is actually answering. Keep that mechanism if you edit those URLs.
+
 ## CI/CD Pipeline
 
 ```yaml
