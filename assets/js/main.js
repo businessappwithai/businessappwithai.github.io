@@ -185,6 +185,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Absolute URLs that name the host actually serving the page.
+  //
+  // The specification and the copy-paste prompts quote this site as
+  // appwithai.org, which is right in production and wrong everywhere else — a
+  // fork's github.io address, a staging host, a local server. Each such URL
+  // carries data-url with a path relative to the page, and is rewritten here, so
+  // what a visitor copies always points at the site they are looking at.
+  document.querySelectorAll('[data-url]').forEach(node => {
+    node.textContent = new URL(node.dataset.url, window.location.href).href;
+  });
+
+  // Copy-to-clipboard for prompt blocks.
+  //
+  // The button names the element it copies with data-copy. Copying is read from
+  // the live DOM rather than a stored string, so it picks up the rewritten URLs
+  // above rather than the placeholder that was authored.
+  document.querySelectorAll('[data-copy]').forEach(button => {
+    button.addEventListener('click', async () => {
+      const source = document.getElementById(button.dataset.copy);
+      if (!source) return;
+      const label = button.textContent;
+      try {
+        await navigator.clipboard.writeText(source.innerText.trim());
+        button.textContent = 'Copied';
+      } catch (error) {
+        // Clipboard access is refused in some browsers and over http://.
+        // Selecting the text is the honest fallback: the visitor copies it.
+        const range = document.createRange();
+        range.selectNodeContents(source);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = 'Selected — press Ctrl/Cmd+C';
+      }
+      setTimeout(() => { button.textContent = label; }, 2500);
+    });
+  });
+
   console.log('AppWithAI website loaded successfully 🚀');
 });
 

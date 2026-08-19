@@ -335,6 +335,11 @@ a:hover {
   font-weight: 500;
   padding: var(--spacing-sm) 0;
   position: relative;
+  /* A navigation label is one thing to click, so it stays on one line. Without
+     this, a two-word item breaks mid-label on a narrow desktop and the bar
+     reads as twice as many items as it has. The flex gap absorbs the pressure
+     instead. */
+  white-space: nowrap;
   transition: color var(--transition-fast);
 }
 
@@ -886,7 +891,11 @@ a:hover {
 /* Narrow desktops — tighten the navigation so it clears the logo */
 @media (min-width: 1024px) and (max-width: 1279px) {
   .nav-list {
-    gap: var(--spacing-lg);
+    gap: var(--spacing-md);
+  }
+
+  .nav-list .nav-link {
+    font-size: var(--text-sm);
   }
 
   .nav-list .btn {

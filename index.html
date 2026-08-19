@@ -25,12 +25,13 @@
       <nav class="nav" id="mainNav">
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="justification.html" class="nav-link">Why AppWithAI</a></li>
           <li><a href="features.html" class="nav-link">Features</a></li>
           <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
           <li><a href="technology.html" class="nav-link">Technology</a></li>
           <li><a href="guide/index.html" class="nav-link">Guide</a></li>
           <li><a href="pricing.html" class="nav-link">Pricing</a></li>
-          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
           <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
         </ul>
       </nav>
@@ -45,7 +46,7 @@
         <h1>Transform Your Business Domain Into a <span class="text-gradient">Production-Ready Application</span> in Hours, Not Months</h1>
         <p class="hero-subtitle">Describe your business process in plain English. AppWithAI drives an intelligent multi-agent pipeline — from domain analysis and ERD design to human-in-the-loop review and complete code generation — producing a fully functional, deployable application.</p>
         <div class="hero-cta">
-          <a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent btn-lg">View Live Hospital Demo</a>
+          <a href="guide/run-in-browser.html" class="btn btn-accent btn-lg">Run a Live CRM in Your Browser</a>
           <a href="contact.html" class="btn btn-primary btn-lg">Request a Demo</a>
           <a href="how-it-works.html" class="btn btn-outline btn-lg">How It Works</a>
         </div>
@@ -194,6 +195,64 @@
     </div>
   </section>
 
+  <!-- Try it on your own business -->
+  <section class="section" id="try-it-yourself" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white;">
+    <div class="container">
+      <div class="section-header">
+        <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">No Account &middot; No Install &middot; Ten Minutes</span>
+        <h2 style="color: white;">Try It Yourself</h2>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Describe your business to an AI you already use, bring back one file, and watch a working application start in this browser. Ten minutes, start to finish.</p>
+      </div>
+
+      <div class="grid grid-3" style="margin-top: var(--spacing-2xl);">
+        <div class="card">
+          <div class="card-icon">✍️</div>
+          <h3>1. Describe your business — properly</h3>
+          <p>Not one sentence. Write what you would tell a new hire on their first day: what you sell or service, every kind of record you keep, who touches each one, the states things move through, what needs approving and by whom, and what happens when a step fails.</p>
+          <p class="text-muted text-sm">The thinner the description, the thinner the application. This is the step that decides the result.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔎</div>
+          <h3>2. Hand it to ChatGPT or Gemini Deep Research</h3>
+          <p>Give the model our machine-readable specification along with your description. It contains the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
+          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file, plus the specification it inferred so you can correct what it guessed.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">▶️</div>
+          <h3>3. Run it, here, in this browser</h3>
+          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, a real interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
+        </div>
+      </div>
+
+      <div class="card mt-5">
+        <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
+          <div>
+            <h4>The prompt — copy it as it is</h4>
+            <p class="text-muted text-sm">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://appwithai.org/llms-full.txt</span> in full, and follow section 10 — the authoring protocol — exactly.
+
+My business:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+
+Deliver a single validated &lt;business-name&gt;.mmd file I can download, the enhanced specification you inferred, and the checker result with its counts.</pre>
+            <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
+          </div>
+          <div>
+            <h4>Then bring the file back</h4>
+            <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+              <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
+              <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
+              <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
+            </div>
+            <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">Not ready to write your own? <a href="guide/run-in-browser.html">Run the seventeen-entity CRM</a> the guide builds &mdash; same page, one click, no file needed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Open Source Section -->
   <section class="section section-white">
     <div class="container">
@@ -280,48 +339,48 @@
   <section class="section section-white" style="background: linear-gradient(135deg, var(--accent-50) 0%, var(--primary-50) 100%);">
     <div class="container">
       <div class="section-header">
-        <span class="hero-badge" style="background: var(--accent-100); color: var(--accent-700);">Live Demo Available</span>
-        <h2>See AppWithAI in Action — Hospital Management System</h2>
-        <p class="section-subtitle">Experience a fully functional Hospital Management System built entirely with AppWithAI. This comprehensive application demonstrates the breadth and depth of what the platform generates.</p>
+        <span class="hero-badge" style="background: var(--accent-100); color: var(--accent-700);">Live Demo · No Sign-Up</span>
+        <h2>See AppWithAI in Action — Right Here, Right Now</h2>
+        <p class="section-subtitle">Most software demos are a recording, a sandbox someone else reset, or a calendar invite. This one is the real generated application, compiled and started inside your own browser tab while you watch.</p>
       </div>
       <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
         <div>
-          <h3 style="margin-bottom: var(--spacing-md);">What the Demo Includes</h3>
+          <h3 style="margin-bottom: var(--spacing-md);">What actually happens when you press Run</h3>
           <div class="card mb-3">
-            <h4>Hospital Management Features</h4>
+            <h4>A complete enterprise CRM, generated live</h4>
             <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-              <li style="padding: var(--spacing-sm) 0;">✓ Patient registration and record management</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Doctor and clinical staff scheduling</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Appointment booking and calendar management</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Medical history and clinical notes</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Billing and invoicing workflows</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Pharmacy and inventory management</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Multi-level approval workflows</li>
-              <li style="padding: var(--spacing-sm) 0;">✓ Role-based access control across all modules</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Seventeen entities across seven business areas</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Eight business rules as editable decision tables</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Five state machines and five multi-step processes</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Role-based access control on every operation</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Admin dictionary, audit log and per-screen help</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ A real REST API answering real HTTP requests</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ PostgreSQL 18, compiled to WebAssembly</li>
+              <li style="padding: var(--spacing-sm) 0;">✓ Roughly ten seconds from click to sign-in screen</li>
             </ul>
           </div>
           <div class="card">
-            <h4>Generated Entirely by AppWithAI</h4>
-            <p class="text-muted">This complete application was produced by describing the hospital management domain in plain English. No manual coding was required for any module.</p>
+            <h4>Generated entirely by AppWithAI</h4>
+            <p class="text-muted">Every entity, rule, workflow, screen and permission comes out of one Mermaid model file. Nothing on the screen was hand-written — including the help text.</p>
           </div>
         </div>
         <div class="card text-center" style="padding: var(--spacing-2xl);">
-          <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">🏥</div>
-          <h3 style="margin-bottom: var(--spacing-md);">Hospital Management System</h3>
-          <p class="text-muted mb-4">A production-ready hospital management application generated by AppWithAI</p>
+          <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">⚡</div>
+          <h3 style="margin-bottom: var(--spacing-md);">Enterprise CRM, in this tab</h3>
+          <p class="text-muted mb-4">The generated application runs in your browser — no server, no account, no install</p>
           <div style="background: var(--success-50); padding: var(--spacing-md); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg);">
-            <strong style="color: var(--success-700);">Live Demo Available</strong>
-            <p class="text-sm text-muted">Click below to explore the application</p>
+            <strong style="color: var(--success-700);">Nothing leaves your machine</strong>
+            <p class="text-sm text-muted">The model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab</p>
           </div>
-          <a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent btn-lg" style="width: 100%; margin-bottom: var(--spacing-md);">
-            Launch Live Demo
+          <a href="guide/run-in-browser.html" class="btn btn-accent btn-lg" style="width: 100%; margin-bottom: var(--spacing-md);">
+            Launch the Live Demo
           </a>
-          <p class="text-sm text-muted">Opens in a new tab · No sign-up required</p>
+          <p class="text-sm text-muted">Or <a href="guide/run-in-browser.html#upload">upload your own model</a> and run that instead</p>
         </div>
       </div>
       <div class="text-center mt-5">
-        <p class="text-muted" style="font-size: var(--text-lg);">AppWithAI can generate equivalent applications for any business domain.</p>
-        <a href="contact.html" class="btn btn-primary mt-3">Request a Custom Demo</a>
+        <p class="text-muted" style="font-size: var(--text-lg);">AppWithAI generates equivalent applications for any business domain — the CRM is simply the one we walk through end to end.</p>
+        <a href="contact.html" class="btn btn-primary mt-3">Request a Demo for Your Domain</a>
       </div>
     </div>
   </section>
@@ -465,7 +524,7 @@
       </div>
       <div class="footer-bottom">
         <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
-        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">View Hospital Management System Demo →</a></p>
+        <p class="mt-2"><a href="guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
       </div>
     </div>
   </footer>

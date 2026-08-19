@@ -813,4 +813,17 @@ async function findVendoredPglite() {
 }
 
 await findVendoredPglite();
-await selectChoice("crm");
+
+/*
+ * `#upload` opens this page ready for a file.
+ *
+ * The home page sends a reader here after they have had a model written for
+ * them elsewhere, and telling someone to "upload your file" and then landing
+ * them on a page showing the CRM example is a small broken promise. The hash
+ * selects the upload choice and scrolls the dropzone into view instead.
+ */
+const wantsUpload = window.location.hash === "#upload";
+await selectChoice(wantsUpload ? "upload" : "crm");
+if (wantsUpload) {
+  $("dropzone").scrollIntoView({ block: "center", behavior: "smooth" });
+}
