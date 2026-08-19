@@ -176,7 +176,7 @@ allowed to survive only as prose.
 | **Name** | `<business-name>.mmd` — lower-case, hyphenated, no spaces: `acme-dance-studio.mmd` |
 | **Count** | Exactly one file. Not one per entity, not an ERD file plus a rules file |
 | **Encoding** | UTF-8 plain text |
-| **First non-blank line** | `%%meta name: <Business Name>` |
+| **First non-blank line** | A `%%` line. A comment banner naming the business is fine; `%%meta name:` must appear before the first Mermaid keyword |
 | **Every other line** | A Mermaid statement, an EML `%%` directive, or blank |
 | **Never in the file** | Markdown headings, bullets, tables, bold, prose paragraphs, triple-backtick fences, YAML front matter, JSON wrappers, HTML comments |
 | **Anything you want to say** | Goes in the reply, or in a `%%` comment line inside the file |
@@ -189,7 +189,7 @@ The document runs top to bottom in this order — the ERD first, then each rules
 and workflow section opened by its own `%%meta`:
 
 ```
-%%meta name: <Business Name>          <- the first line of the file
+%%meta name: <Business Name>          <- before the first section keyword
 %%meta kind: erd
 %%meta version: 1.0.0
 
@@ -261,9 +261,9 @@ you hand over is `report.source`, not the draft you started from.
 **`EML004` means you fed it something that is not a model.** The checker found no
 entity, no rule and no workflow anywhere in the input. In practice that is the
 specification prose, an empty file, a path instead of its contents, or a file
-whose Mermaid never got written. Open what you passed in: if its first non-blank
-line is not `%%meta` and it has no `erDiagram`, the fault is not in the model —
-go back to §1.2 and write it.
+whose Mermaid never got written. Open what you passed in: if it has no
+`erDiagram`, no `flowchart` and no `stateDiagram-v2` in it, the fault is not in
+the model — go back to §1.2 and write it.
 
 **Run the checker at least three times.** Not ceremony — a repair can uncover a
 problem the original error was masking, so a single clean pass immediately after
@@ -347,7 +347,7 @@ Alongside the file — in the reply, never inside it — give:
   uploaded to a server.
 
 One last check before you send. Open the file you are about to attach and read
-its first non-blank line. If it is not `%%meta name:`, you are attaching the
+its first non-blank line. If it does not begin with `%%`, you are attaching the
 wrong artifact.
 
 ---
@@ -736,8 +736,14 @@ Rules the checker enforces:
 - **A terminal state is required** — `lastState --> [*]`. Missing is `EML422`,
   auto-repaired.
 - **Back the states with a `%%enum`** and bind it to the status column with
-  `%%field`. `EML426` and `EML428` check that the states and the enum agree. A
-  state no enum backs is a value the column can never legally hold.
+  `%%field`. The enum is matched by **value overlap**, not by name — the checker
+  picks whichever declared enum shares the most values with the machine's states
+  — and then three codes police the agreement: `EML428` when no enum shares a
+  single value with it, `EML426` when a state is missing from the enum that
+  matched, and `EML427`, an info, when the enum carries a value no state uses. A
+  state no enum backs is a value the column can never legally hold; an enum value
+  no state reaches is usually a transition nobody drew. Clear all three: name the
+  enum `<Entity>Status`, list exactly the machine's states, and bind it.
 
 The word after the colon is the **transition event**, and it is what `%%rbac`
 names to restrict who may make that move (§6).
@@ -986,7 +992,7 @@ really about the model at all:
 
 | Code | What it means | What to do |
 |---|---|---|
-| `EML001` | warning — no `%%meta name:` | Add one as the file's first line, naming the business |
+| `EML001` | warning — no `%%meta name:` | Declare one before the first section, naming the business |
 | `EML004` | error — **no entity, rule or workflow anywhere in the input** | Almost always the wrong bytes: a specification, a summary, an empty string, a path instead of a file's contents, or a model that was described and never written. Check what you passed in, then §1.2 |
 | `EML005` | a `%%meta` line the parser cannot read | One `%%meta <key>: <value>` per line; no Markdown around it |
 
@@ -1142,7 +1148,8 @@ flowchart TD
 **The file itself**
 
 1. There *is* a file, and it is Mermaid — not a document describing one (§1.0).
-2. Its first non-blank line is `%%meta name: <Business Name>`.
+2. Its first non-blank line begins with `%%`, and `%%meta name:` is declared
+   before the first `erDiagram` / `flowchart` / `stateDiagram-v2`.
 3. It contains no Markdown, no fences, no prose outside `%%` comment lines.
 4. It is one file, named `<business-name>.mmd`, and it renders in a Mermaid
    viewer.
