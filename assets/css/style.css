@@ -967,6 +967,12 @@ a:hover {
 }
 
 /* Utilities */
+/* Used on the marketing pages since they were written; defined here so the
+   class does what its name says rather than nothing at all. */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+
 .mt-1 { margin-top: var(--spacing-sm); }
 .mt-2 { margin-top: var(--spacing-md); }
 .mt-3 { margin-top: var(--spacing-lg); }

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Why AppWithAI exists: small software companies hold deep domain knowledge but cannot staff the full spectrum of engineering specialisms. AppWithAI moves that expertise into the platform itself.">
+  <meta name="keywords" content="AppWithAI, application engineering platform, small IT companies, domain expertise, technical debt, software architecture, database engineering, engineering multiplier, low-code alternative, application generation">
+  <title>Why AppWithAI — Professional Engineering Without the Engineering Army</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="section section-gray" style="padding: var(--spacing-3xl) 0;">
+    <div class="container text-center">
+      <span class="hero-badge">Position Paper</span>
+      <h1 style="margin-top: var(--spacing-lg);">Professional Application Engineering, <span class="text-gradient">Without the Engineering Army</span></h1>
+      <p class="section-subtitle">Small software companies rarely lack intelligence, effort, or domain knowledge. What they lack is access to the full spectrum of engineering specialisms — architecture, database design, performance, security, interface design, observability — that a large technology organization keeps on staff. AppWithAI exists to close that gap by moving those specialisms into the platform itself.</p>
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap; margin-top: var(--spacing-xl);">
+        <a href="guide/run-in-browser.html" class="btn btn-primary btn-lg">See It Work — In Your Browser</a>
+        <a href="#promise" class="btn btn-outline btn-lg">The Core Promise</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- The structural gap -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
+        <div>
+          <span class="hero-badge">The Structural Gap</span>
+          <h2>Deep Domain Knowledge, Thin Engineering Bench</h2>
+          <p>Small and mid-sized software companies are an important part of the global software ecosystem. They often hold something large technology organizations cannot easily reproduce: deep knowledge of a particular industry, close relationships with customers, specialized workflows, and products designed around real operational requirements.</p>
+          <p>They also face a structural disadvantage. A company may have excellent domain knowledge and a strong customer base, yet employ only a handful of technical people responsible for an extraordinarily broad range of work.</p>
+          <p>The organization understands the business extremely well. It simply cannot consistently reach the level of engineering specialization that professional-grade software requires.</p>
+        </div>
+        <div class="card">
+          <h4>One team, every job</h4>
+          <p class="text-muted text-sm mb-3">In a small software company, the same few people are typically expected to do all of this — often in the same week.</p>
+          <div class="grid grid-2" style="gap: var(--spacing-sm);">
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Understand requirements</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Design applications</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Manage projects</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Set the architecture</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Write the software</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Fix production issues</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Administer databases</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Design the interface</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Build integrations</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Support customers</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Maintain older products</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Help close sales</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The capability gap -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>What a Mature Engineering Organization Staffs</h2>
+        <p class="section-subtitle">A company of ten developers cannot economically reproduce this. So decisions get made by whoever is available, with the experience they happen to have.</p>
+      </div>
+      <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Discipline</th>
+              <th>Large engineering organization</th>
+              <th>Ten-person software company</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Enterprise and application architecture</td><td><span class="check">✓</span> Dedicated architects</td><td><span class="cross">✗</span> The most senior developer, between other work</td></tr>
+            <tr><td>Database architecture and tuning</td><td><span class="check">✓</span> Specialist DBAs</td><td><span class="cross">✗</span> Whoever wrote the query</td></tr>
+            <tr><td>Application performance</td><td><span class="check">✓</span> A performance team</td><td><span class="cross">✗</span> Addressed after a customer complains</td></tr>
+            <tr><td>UI, UX and accessibility</td><td><span class="check">✓</span> Designers and researchers</td><td><span class="cross">✗</span> A developer with good instincts</td></tr>
+            <tr><td>Security and access control</td><td><span class="check">✓</span> A security function</td><td><span class="cross">✗</span> Reviewed at release, if there is time</td></tr>
+            <tr><td>Observability and operations</td><td><span class="check">✓</span> Platform and SRE teams</td><td><span class="cross">✗</span> Logs added when something breaks</td></tr>
+            <tr><td>Documentation and knowledge</td><td><span class="check">✓</span> Technical writers</td><td><span class="cross">✗</span> Written last, or not at all</td></tr>
+          </tbody>
+      </table>
+      <p class="text-muted text-center mt-4">The result is software that works — but is harder to maintain, harder to scale, harder to understand, and more expensive to evolve than it needed to be.</p>
+    </div>
+  </section>
+
+  <!-- The experience gap -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>The Experience Gap Is Not a Knowledge Gap</h2>
+        <p class="section-subtitle">The hardest problem in software engineering is not knowing that something is possible. It is knowing when it is appropriate.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <h3>"Caching improves performance"</h3>
+          <p>True — and it does not follow that every frequently accessed transactional object should be cached. A cache placed over fast-changing transactional data introduces invalidation complexity, stale reads, synchronization overhead, memory pressure and difficult debugging.</p>
+          <p class="text-muted"><strong>The technology is not wrong. The decision is.</strong> The application ends up slower because it now spends its time managing the mechanism that was meant to make it faster.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🗂️</div>
+          <h3>"Indexes make queries fast"</h3>
+          <p>Also true — and every index is paid for on every write. Add enough of them and inserts, updates and deletes slow down, storage grows, and index maintenance becomes its own workload.</p>
+          <p class="text-muted"><strong>The right answer depends on the workload:</strong> read frequency against write frequency, selectivity, query shape, data volume, transaction characteristics. That is a judgement, not a rule.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What accumulates -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>These Decisions Do Not Fail Immediately. They Accumulate.</h2>
+        <p class="section-subtitle">Almost none of the following shows up in the first months of a project. Each one is a small, reasonable-looking choice that becomes a systemic problem later.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔁</div>
+          <h3>Caching that outgrew its purpose</h3>
+          <p>Developers begin spending real time working out whether the cache holds the latest transactional state — and the system that was added for speed becomes the reason things are slow.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✍️</div>
+          <h3>Write amplification</h3>
+          <p>Indexes accumulate for read performance until every write has to maintain all of them. Storage and write latency grow together, and nobody owns the trade-off.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧩</div>
+          <h3>ORM used past its limits</h3>
+          <p>A sophisticated ORM speeds development and, used carelessly, produces N+1 queries, hidden database behaviour, unoptimizable queries and performance problems that are hard to even locate.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔌</div>
+          <h3>APIs redesigned instead of hardened</h3>
+          <p>One failed request leads to a changed API contract, when the real requirement was a retry strategy, a timeout policy, an idempotency key, or a defined failure mode.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📜</div>
+          <h3>Audit data in the wrong place</h3>
+          <p>Audit rows land in the operational store because it is convenient. The transactional database grows, queries get slower, and the cost of that convenience is paid every day afterwards.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Knowledge that cannot be retrieved</h3>
+          <p>Why does this component exist? Which rule applies? What does this field mean? Productivity is lost not because the work is hard, but because the organization's own knowledge is unreachable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Not only the backend -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
+        <div class="card">
+          <h4>Where an interface quietly gives itself away</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">A process state drawn with an icon meant for a navigation tab</li>
+            <li style="padding: var(--spacing-sm) 0;">Terminology that changes between two screens describing the same thing</li>
+            <li style="padding: var(--spacing-sm) 0;">Forms whose field order follows the database, not the task</li>
+            <li style="padding: var(--spacing-sm) 0;">Validation that appears only after the user has finished</li>
+            <li style="padding: var(--spacing-sm) 0;">Visual hierarchy that gives equal weight to everything</li>
+            <li style="padding: var(--spacing-sm) 0;">Tables that cannot be searched, sorted, or made narrow</li>
+          </ul>
+          <p class="text-muted text-sm">Individually, none of these matters. Together they decide whether a product feels like enterprise software or an internal tool.</p>
+        </div>
+        <div>
+          <span class="hero-badge">Not Only the Backend</span>
+          <h2>Software Quality Is Multidimensional</h2>
+          <p>An excellent programmer may have had little occasion to learn interaction design, information architecture, enterprise UI patterns, accessibility, responsive behaviour, or the conventions for representing a workflow on a screen.</p>
+          <p>That is not a deficiency. It is specialization — the same specialization a large organization solves by hiring a designer.</p>
+          <p>A platform can solve it differently: by making the professional answer the default, so that the developer's attention goes to <em>what the user needs to accomplish</em> rather than <em>how that interaction should be represented</em>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The reframing -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
+    <div class="container text-center">
+      <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">The Insight</span>
+      <p style="color: rgba(255,255,255,0.75); font-size: var(--text-xl); margin-top: var(--spacing-lg); text-decoration: line-through;">"How can AI help a developer write code faster?"</p>
+      <h2 style="color: white; max-width: 900px; margin: var(--spacing-lg) auto 0;">"How can professional engineering be made available to organizations that cannot afford a team of specialists?"</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-lg); max-width: 800px; margin: var(--spacing-xl) auto 0;">The second question is a far larger opportunity than the first. AI becomes the intelligence layer. The platform becomes the engineering discipline layer. The developer becomes the domain expert and solution designer.</p>
+    </div>
+  </section>
+
+  <!-- What the platform encodes -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Belongs in the Platform Rather Than in Every Project</h2>
+        <p class="section-subtitle">The objective is not to remove decisions from developers. It is to stop developers from repeatedly re-deciding what mature engineering organizations settled long ago.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🏛️</div>
+          <h3>Application Architecture</h3>
+          <p>Application structure, domain organization, service boundaries, dependency management, configuration, error handling and transaction boundaries — established rather than reinvented per project.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗄️</div>
+          <h3>Database Engineering</h3>
+          <p>Schema design, relationships, constraints, indexing, transactions, query patterns, data lifecycle and migrations — treated as a first-class architectural concern, not a by-product of the code.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Performance by Design</h3>
+          <p>Pagination, controlled concurrency, transaction boundaries, connection management, retry and timeout policies, idempotency — chosen against workload characteristics rather than fashion, and present from the start rather than added at the end.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Interface and Interaction</h3>
+          <p>One coherent design system: layout, typography, forms, tables, search, filtering, navigation, dialogs, validation, status, accessibility and responsive behaviour — consistent across every application generated.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔀</div>
+          <h3>Workflow as a First-Class Concept</h3>
+          <p>Most enterprise applications are workflow systems. States, transitions, actors, permissions, conditions, actions, escalations, timeouts and audit events belong in the model — not scattered through application logic.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧾</div>
+          <h3>Audit and Observability</h3>
+          <p>Who did what, when, from what to what, in which business event — built in, rather than added the first time a customer asks. Business audit and technical tracing kept distinct, because they answer different questions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>Documentation as Organizational Memory</h3>
+          <p>Entities, fields, relationships, rules, workflows, APIs, permissions and architectural decisions described as part of the application and evolving with it — so knowledge survives the departure of the person who holds it.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <h3>Security and Access Control</h3>
+          <p>Authentication, roles, table, field and row-level permissions, and locked records for completed documents — a layered model applied uniformly instead of assembled per application.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The shift -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>From Code Generation to Application Generation</h2>
+        <p class="section-subtitle">Most AI coding assistance operates at the level of <em>prompt → code</em>. That is a genuinely useful thing, and it is not the same thing.</p>
+      </div>
+      <div class="grid grid-2" style="align-items: start; gap: var(--spacing-2xl);">
+        <div class="card">
+          <h4>Prompt → Code</h4>
+          <p class="text-muted">A developer describes a fragment; a model returns a fragment. Whether that fragment fits the architecture, the data model, the permissions and the workflow around it remains the developer's problem — which is exactly the problem a small team is least equipped to solve.</p>
+        </div>
+        <div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <h3>Business requirement</h3>
+              <p class="text-muted">Stated by the person who understands the industry.</p>
+            </div>
+            <div class="timeline-item">
+              <h3>Domain model, rules and workflow</h3>
+              <p class="text-muted">Entities, relationships, decisions and processes — reviewed by a human before anything is produced.</p>
+            </div>
+            <div class="timeline-item">
+              <h3>Data model, APIs, interface, security</h3>
+              <p class="text-muted">Derived together, so they agree with one another by construction.</p>
+            </div>
+            <div class="timeline-item">
+              <h3>Audit, observability, documentation</h3>
+              <p class="text-muted">Present from the first version, not retrofitted under pressure.</p>
+            </div>
+            <div class="timeline-item">
+              <h3>A coherent application</h3>
+              <p class="text-muted">The output is a software system, not a pile of files. <a href="how-it-works.html">See the pipeline &rarr;</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The developer's role -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>The Developer's Role Changes — It Does Not Disappear</h2>
+        <p class="section-subtitle">The work that gets removed is the work nobody was hired for.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Time reclaimed</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">✗ Boilerplate and CRUD implementation</li>
+            <li style="padding: var(--spacing-sm) 0;">✗ Standard APIs and UI plumbing</li>
+            <li style="padding: var(--spacing-sm) 0;">✗ Database plumbing and migrations by hand</li>
+            <li style="padding: var(--spacing-sm) 0;">✗ Logging and audit infrastructure</li>
+            <li style="padding: var(--spacing-sm) 0;">✗ Repetitive validation and configuration</li>
+            <li style="padding: var(--spacing-sm) 0;">✗ Documentation maintained separately from the code</li>
+          </ul>
+        </div>
+        <div class="card" style="border-color: var(--primary-200); background: var(--primary-50);">
+          <h3>Time returned</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">✓ Understanding customers and their operations</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Domain modelling and business rules</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ The problems that are genuinely hard in this industry</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Integrations with the systems customers already run</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Product differentiation</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Innovation the domain expertise makes possible</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Worked example -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
+        <div>
+          <span class="hero-badge">A Worked Example</span>
+          <h2>A Container Depot Company</h2>
+          <p>Its people understand containers, yards, blocks and bays, equipment, repairs, gate operations, shipping lines, billing and the operational workflow that ties them together. That knowledge is the company's real asset, and no platform supplies it.</p>
+          <p>What the company does not have is a database architect, a workflow engineer, a UI designer, a performance specialist and an observability team.</p>
+          <p>So it describes what it knows:</p>
+          <div class="card" style="background: white; margin-top: var(--spacing-md);">
+            <p style="margin: 0; font-style: italic;">"A container enters the depot, is inspected, is assigned to a yard location, may undergo repair, and is eventually released."</p>
+          </div>
+        </div>
+        <div class="card">
+          <h4>What the platform supplies</h4>
+          <div class="grid grid-2" style="gap: var(--spacing-sm);">
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Domain entities</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Relationships and keys</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Business rules</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Workflow states</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Screens and forms</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">REST APIs</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Database schema</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Roles and permissions</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Audit events</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Notifications</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Per-screen help</div>
+            <div class="text-sm" style="padding: var(--spacing-xs) 0;">Living documentation</div>
+          </div>
+          <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">The domain expert keeps control of what the business means. The platform supplies the engineering machinery. <a href="guide/index.html">The guide does exactly this for a CRM &rarr;</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who it is for -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>Who This Is For</h2>
+        <p class="section-subtitle">Organizations whose constraint is engineering capacity rather than domain understanding.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">🏢</div>
+          <h3>Small IT services companies</h3>
+          <p>Deliver higher-quality solutions without a proportional increase in headcount.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h3>Industry-specific vendors</h3>
+          <p>Deep domain expertise, limited engineering capacity. Stay focused on the industry.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🚀</div>
+          <h3>SaaS startups</h3>
+          <p>Establish an architectural foundation before you can afford the team that would normally provide it.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🏛️</div>
+          <h3>Internal IT departments</h3>
+          <p>Build business applications without depending entirely on external consultants.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧑‍💻</div>
+          <h3>Independent consultants</h3>
+          <p>Increase delivery capacity substantially without subcontracting the engineering.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔄</div>
+          <h3>Modernization teams</h3>
+          <p>Move legacy systems forward while holding architectural consistency across them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Boundaries -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
+        <div>
+          <span class="hero-badge">Honest Boundaries</span>
+          <h2>What AppWithAI Does Not Attempt to Replace</h2>
+          <p>A platform that claimed to replace engineering judgement entirely would be making the same mistake this page is about: applying a capable technology without asking where it is appropriate.</p>
+          <p>Some decisions will always need a person, and the platform is better for saying so plainly.</p>
+        </div>
+        <div class="card">
+          <h4>Still yours</h4>
+          <ul style="list-style: none; padding: 0;">
+            <li style="padding: var(--spacing-sm) 0;">Business and product strategy</li>
+            <li style="padding: var(--spacing-sm) 0;">Regulatory interpretation</li>
+            <li style="padding: var(--spacing-sm) 0;">Genuinely complex domain decisions</li>
+            <li style="padding: var(--spacing-sm) 0;">Organizational priorities and trade-offs</li>
+            <li style="padding: var(--spacing-sm) 0;">Customer and commercial relationships</li>
+            <li style="padding: var(--spacing-sm) 0;">High-risk architectural decisions</li>
+            <li style="padding: var(--spacing-sm) 0;">The exceptional technical scenario nobody anticipated</li>
+          </ul>
+          <p class="text-muted text-sm">The objective is not that AI replaces engineers. It is that engineering standards and AI together amplify the engineers you have.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Economics -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>A Different Economic Model</h2>
+        <p class="section-subtitle">Traditional software economics depend on repeatedly buying specialized human time. The alternative is to encode that expertise once.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>Pay repeatedly for expertise</h3>
+          <p class="text-muted">Every project needs an architect, a database specialist, a UI specialist, a security reviewer and an operations engineer — or it goes without them and pays later, in maintenance.</p>
+        </div>
+        <div class="card" style="border-color: var(--primary-200); background: var(--primary-50);">
+          <h3>Encode expertise once, reuse it</h3>
+          <p class="text-muted">The standards live in the platform and apply to every application it produces. A ten-person team operates with the engineering consistency normally associated with a much larger organization.</p>
+        </div>
+      </div>
+      <p class="text-center mt-5"><a href="pricing.html" class="btn btn-outline">See what that changes commercially &rarr;</a></p>
+    </div>
+  </section>
+
+  <!-- The promise -->
+  <section class="section" id="promise" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
+    <div class="container text-center">
+      <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">The Core Promise</span>
+      <h2 style="color: white; max-width: 900px; margin: var(--spacing-lg) auto var(--spacing-lg);">You should not need to hire a specialized engineering organization merely to build a professional business application.</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-lg); max-width: 800px; margin: 0 auto var(--spacing-2xl);">Bring your industry knowledge, your customer knowledge, your business processes and your product ideas. AppWithAI supplies the engineering foundation that turns them into professional software — and you keep the code, the model and the domain expertise.</p>
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <a href="guide/run-in-browser.html" class="btn btn-lg" style="background: white; color: var(--primary-600);">Watch It Build an Application</a>
+        <a href="contact.html" class="btn btn-lg btn-outline" style="border-color: white; color: white;">Talk to Us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="justification.html">Why AppWithAI</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">View Hospital Management System Demo →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
