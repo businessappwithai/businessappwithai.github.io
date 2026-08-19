@@ -43,6 +43,9 @@ businessappwithai.github.io/
 │   ├── models/               # Example EML models the chapters load
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── llms-full.txt             # EML language specification, for language models
+├── scripts/
+│   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js
+│   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── features.html             # Product features detail
@@ -339,8 +342,15 @@ thing a language model has to produce is a model file.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at.
 - **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
-  and zero warnings.** That claim is made in the file's own header, so it has to stay true. Verify after
-  editing by extracting each block and running it through `guide/checker.js`.
+  and zero warnings.** That claim is made in the file's own header, so it has to stay true.
+- **Verify after every edit with `node scripts/check-spec.mjs`.** It extracts each fenced `mermaid`
+  block and runs it through `guide/checker.js`, then re-tests the claims the prose makes — every type
+  alias, modifier, cardinality operator, hook type, action type, step contract, `%%meta` key and
+  state-machine code — against the same engine. It exits non-zero on any contradiction, and it is how
+  the §5.3 step table and the §5.2 enum codes were found to be wrong. No dependencies; Node only.
+- **`node scripts/check-model.mjs <file.mmd>`** audits a delivered model against the mechanical half of
+  §1.2's file contract and §10's checklist — shape, keys, enum bindings, state machines, rbac, and the
+  three checker passes over its own bytes. `guide/models/crm.eml.mmd` passes it 18/18.
 
 **On the published domain.** The specification quotes the validators as
 `https://appwithai.org/guide/checker.js`, and chapter 11 prints them that way. There is no `CNAME`
