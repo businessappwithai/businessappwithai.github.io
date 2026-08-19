@@ -41,6 +41,7 @@
       <span class="hero-badge">Open Source · Apache License 2.0</span>
       <h1 style="margin-top: var(--spacing-lg);">Enterprise Application Features, <span class="text-gradient">Generated Automatically</span></h1>
       <p class="section-subtitle">AppWithAI produces fully functional applications with production-grade features out of the box — without writing a single line of code.</p>
+      <p class="section-subtitle" style="margin-top: var(--spacing-md);">Every example on this page is taken from one real model: the seventeen-entity CRM the <a href="guide/index.html" style="color: var(--primary-600);">hands-on guide</a> builds. Nothing here is illustrative — you can <a href="guide/run-in-browser.html" style="color: var(--primary-600);">run that application in your browser</a> and check any claim against it.</p>
     </div>
   </section>
 
@@ -63,19 +64,21 @@
           </ul>
         </div>
         <div class="card">
-          <h4>Example AI Analysis</h4>
+          <h4>The CRM, as the AI first saw it</h4>
           <div style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
-            <strong>Input:</strong> "We need a purchase order system with vendors, line items, products, and approval workflows."<br><br>
+            <strong>Input:</strong> "Marketing runs campaigns that produce leads. A qualified lead becomes an account with a contact and an opportunity. We quote the opportunity, contract the win, and support the customer afterwards."<br><br>
             <strong>AI Extracts:</strong><br>
-            Entity: Vendor (name, contact, payment_terms, rating)<br>
-            Entity: PurchaseOrder (vendor_id, date, status, total_amount)<br>
-            Entity: POLine (po_id, product_id, quantity, unit_price, line_total)<br>
-            Entity: Product (name, sku, price, stock_level)<br><br>
+            Entity: Lead (company_name, lead_source, employee_count, annual_revenue, score, rating, status)<br>
+            Entity: Account (name, account_type, tier, industry, health_score, territory_id)<br>
+            Entity: Opportunity (account_id, amount, stage, probability, forecast_category, expected_close_date)<br>
+            Entity: Quote (opportunity_id, subtotal, discount_percent, grand_total, status, valid_until)<br><br>
             <strong>Relationships:</strong><br>
-            Vendor 1:N PurchaseOrder<br>
-            PurchaseOrder 1:N POLine<br>
-            Product 1:N POLine
+            Campaign 1:N Lead<br>
+            Account 1:N Opportunity<br>
+            Opportunity 1:N Quote<br>
+            Quote 1:N QuoteLineItem
           </div>
+          <p class="text-sm text-muted" style="margin-top: var(--spacing-md);">Seventeen entities in all, in seven dashboard groups. <a href="guide/01-data-model.html">Chapter 01 &rarr;</a></p>
         </div>
       </div>
     </div>
@@ -117,23 +120,25 @@
         <div>
           <span class="hero-badge">Intelligent Forms</span>
           <h2>AI-Generated Smart Forms</h2>
-          <p>Generate data-driven forms that faithfully mirror real-world business documents — purchase orders, invoices, expense claims, leave requests, work orders, contracts, and any other document your business uses.</p>
+          <p>Generate data-driven forms that faithfully mirror real-world business documents — quotes with priced line items, contracts, support cases, purchase orders, invoices, expense claims, and any other document your business uses.</p>
           <p>The AI understands the semantic meaning of document fields and automatically selects the appropriate input control for each field type, producing forms that reflect how your team actually works.</p>
           <h3 style="margin-top: var(--spacing-lg);">Runtime Customization — No Code Required</h3>
           <p>Administrators can reorder form fields by dragging and dropping, hide or make fields mandatory, set display logic, and configure field groups — all through the admin interface without touching code.</p>
         </div>
         <div class="card">
-          <h4>Generated Form Features</h4>
+          <h4>The generated New Lead form</h4>
+          <p class="text-muted text-sm mb-3">Nothing below was designed by hand. Every control comes from the column's type and its dictionary row — this is the form as the CRM actually renders it.</p>
           <ul style="list-style: none; padding: 0;">
-            <li style="padding: var(--spacing-sm) 0;">Multi-tab document structure (header, lines, history)</li>
-            <li style="padding: var(--spacing-sm) 0;">Auto-calculated fields (line totals, subtotals, tax)</li>
-            <li style="padding: var(--spacing-sm) 0;">Date pickers with business-day validation</li>
-            <li style="padding: var(--spacing-sm) 0;">Currency formatting with locale support</li>
-            <li style="padding: var(--spacing-sm) 0;">Searchable lookup fields for related records</li>
-            <li style="padding: var(--spacing-sm) 0;">Conditional field visibility based on other field values</li>
-            <li style="padding: var(--spacing-sm) 0;">File attachment upload with preview</li>
+            <li style="padding: var(--spacing-sm) 0;"><strong>17 fields, 7 required</strong> — counted and stated at the top of the form</li>
+            <li style="padding: var(--spacing-sm) 0;">Fields grouped into <em>General</em> and <em>Details</em>, in dictionary sequence</li>
+            <li style="padding: var(--spacing-sm) 0;">Each field badged with the control its type earned — Text, Integer, Amount, Date/Time, Direct Lookup</li>
+            <li style="padding: var(--spacing-sm) 0;"><code>campaign_id</code> and <code>owner_id</code> become lookups that resolve to names, not identifiers</li>
+            <li style="padding: var(--spacing-sm) 0;"><code>annual_revenue</code> is an Amount, <code>converted_at</code> a date-time picker — from the column type alone</li>
+            <li style="padding: var(--spacing-sm) 0;">A help icon on every field, carrying text the generator wrote from the model</li>
+            <li style="padding: var(--spacing-sm) 0;">Required markers on exactly the columns the model did not mark OPTIONAL</li>
             <li style="padding: var(--spacing-sm) 0;">Schema-validated input via TanStack Form + Zod</li>
           </ul>
+          <p class="text-sm text-muted" style="margin-top: var(--spacing-md);"><a href="guide/05-application.html">Chapter 05 &rarr;</a></p>
         </div>
       </div>
     </div>
@@ -144,58 +149,60 @@
     <div class="container">
       <div class="section-header">
         <h2>Business Rules and Validation Engine</h2>
-        <p class="section-subtitle">Encode your organization's business logic using visual decision flowcharts. The GoRules Zen Engine executes DMN-based rules with high performance at runtime.</p>
+        <p class="section-subtitle">Encode your organization's business logic using visual decision flowcharts. The GoRules Zen Engine executes DMN-based rules with high performance at runtime. The CRM model declares eight; the generated application ships twenty-five, because every entity also gets a validation rule of its own.</p>
       </div>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">🔒</div>
           <h3>Field-Level Validation</h3>
-          <p>Required fields, range validation, format patterns, uniqueness enforcement, conditional requirements, cross-field validation, and Zod-schema rules — all generated automatically per entity.</p>
+          <p>Required fields, ranges, formats, uniqueness, conditional requirements and cross-field checks — one validation rule generated per entity. In the CRM that is seventeen of the twenty-five, and they are why <code>account_number</code>, <code>quote_number</code> and <code>case_number</code> stay unique without anyone writing a check.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📊</div>
-          <h3>Document-Level Rules</h3>
-          <p>Three-way matching, budget threshold checking, duplicate detection, completeness checks, and complex cross-document validations driven by GoRules decision tables.</p>
+          <h3>Policy Gates</h3>
+          <p>Thresholds an operations person owns, not a developer. The CRM's discount policy auto-approves up to 15%, holds 15–25% for a sales manager, 25–40% for a VP, and refuses anything above 40% outright — as a decision table, editable in the running app.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🔗</div>
           <h3>Relationship Integrity</h3>
-          <p>Referential integrity rules prevent orphaned records, control deletion permissions, and maintain data consistency across related entities — enforced at both the API and database levels.</p>
+          <p>Referential rules prevent orphaned records and control deletion — enforced at the API and in the database. In the CRM, <code>blockDeleteWithOpenBusiness</code> refuses to delete an account that still has open opportunities, and it runs before the delete, not after.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">⚡</div>
           <h3>Lifecycle Hook System</h3>
-          <p>Define business rules in natural language using visual flowcharts. AppWithAI generates executable TypeScript code organized by entity lifecycle events.</p>
+          <p>Draw a decision as a flowchart and bind it to an event. AppWithAI generates executable TypeScript organised by lifecycle event — the CRM binds thirty-eight hooks this way, and each one names the field it guards.</p>
         </div>
       </div>
       <div class="card mt-5">
-        <h4>Lifecycle Hook Events</h4>
+        <h4>Lifecycle Hook Events — as the CRM uses them</h4>
+        <p class="text-muted text-sm mb-3">Every handler named below is in the model. None of them is a placeholder.</p>
         <div class="grid grid-3">
           <div>
             <strong>beforeCreate</strong>
-            <p class="text-muted text-sm">Field auto-population, validation, duplicate detection before record creation</p>
+            <p class="text-muted text-sm"><code>leadScoring</code> grades a lead on firmographics, source and revenue before the row exists; <code>normalizeAccountName</code> and <code>assignAccountNumber</code> mint an account's identity</p>
           </div>
           <div>
             <strong>afterCreate</strong>
-            <p class="text-muted text-sm">Trigger notifications, create related records, initiate workflows</p>
+            <p class="text-muted text-sm"><code>leadRouting</code> sends the scored lead to the partner desk, strategic accounts, enterprise, mid-market or the SMB queue; <code>seedAccountTeam</code> populates the selling team</p>
           </div>
           <div>
             <strong>beforeUpdate</strong>
-            <p class="text-muted text-sm">Validate field changes, check authorization for status transitions</p>
+            <p class="text-muted text-sm"><code>leadQualification</code> gates conversion; <code>opportunityCloseGate</code> refuses a closed-won deal that has no accepted quote; <code>quoteDiscountApproval</code> applies the discount policy</p>
           </div>
           <div>
             <strong>afterUpdate</strong>
-            <p class="text-muted text-sm">Audit logging, cascade updates to dependent records, notify stakeholders</p>
+            <p class="text-muted text-sm"><code>syncToMarketingPlatform</code> fires when a contact's <code>email_opt_out</code> changes — consent propagates without anyone remembering to propagate it</p>
           </div>
           <div>
             <strong>beforeDelete</strong>
-            <p class="text-muted text-sm">Block deletion if dependent records exist or document is approved</p>
+            <p class="text-muted text-sm"><code>blockDeleteWithOpenBusiness</code> refuses to delete an account that still has open opportunities or live contracts</p>
           </div>
           <div>
             <strong>customValidate</strong>
-            <p class="text-muted text-sm">Complex cross-document, cross-entity validation logic</p>
+            <p class="text-muted text-sm"><code>ensureAccountNumberUnique</code> and <code>ensureUniqueEmail</code> — the cross-record checks a column constraint cannot express on its own</p>
           </div>
         </div>
+        <p class="text-sm text-muted" style="margin-top: var(--spacing-md);">Thirty-eight hooks across the CRM. <a href="guide/02-business-rules.html">Chapter 02 &rarr;</a></p>
       </div>
     </div>
   </section>
@@ -205,48 +212,84 @@
     <div class="container">
       <div class="section-header">
         <h2>Workflow and Document Routing Engine</h2>
-        <p class="section-subtitle">State machine-based workflow engine routes documents through your organization for review, approval, escalation, and action — with full audit trails.</p>
+        <p class="section-subtitle">A state-machine engine routes documents through your organization for review, approval, escalation and action — with full audit trails. The CRM declares ten processes: five state machines and five multi-step sagas.</p>
       </div>
       <div class="grid grid-2">
         <div class="card">
           <h3>Conditional Routing</h3>
-          <p>Approval paths adapt dynamically based on document content:</p>
+          <p>Approval paths adapt to document content. The CRM's discount policy, exactly as the model states it:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Route to Level 1 approver if amount is below $1,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Level 2 approver for amounts $1,001–$10,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Finance Director for amounts above $10,000</li>
-            <li style="padding: var(--spacing-xs) 0;">• Route to Legal if contract type is External Party</li>
+            <li style="padding: var(--spacing-xs) 0;">• Up to 15% — auto-approved within rep authority</li>
+            <li style="padding: var(--spacing-xs) 0;">• 15–25% — held for a sales manager, 24-hour review window</li>
+            <li style="padding: var(--spacing-xs) 0;">• 25–40% — held for a VP, 48-hour review window</li>
+            <li style="padding: var(--spacing-xs) 0;">• Above 40% — refused outright; the quote must be repriced</li>
           </ul>
+          <p class="text-sm text-muted" style="margin-top: var(--spacing-md);">Lead routing branches the same way, on partner source, revenue above $50M, headcount above 500, then rating.</p>
         </div>
         <div class="card">
           <h3>Escalation and Timeouts</h3>
-          <p>Automatic escalation rules ensure documents never stall:</p>
+          <p>Nothing stalls because nobody looked. The CRM's scheduled triggers, from the model:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Auto-escalate if no action within configurable SLA window</li>
-            <li style="padding: var(--spacing-xs) 0;">• Reminder notifications at configurable intervals</li>
-            <li style="padding: var(--spacing-xs) 0;">• Multi-level escalation chains for senior approvers</li>
-            <li style="padding: var(--spacing-xs) 0;">• SLA breach detection and alerting</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>checkSlaBreaches</code> on support cases — every 15 minutes</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>expireStaleQuotes</code> daily at 06:00; <code>nudgeStalledOpportunities</code> at 07:00</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>openRenewalWindows</code> on contracts daily at 08:00</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>recycleStaleLeads</code> every Monday at 07:00</li>
           </ul>
+          <p class="text-sm text-muted" style="margin-top: var(--spacing-md);">A critical case escalates to an executive bridge with a 15-minute response target; high goes to a support manager at 60 minutes.</p>
         </div>
         <div class="card">
-          <h3>Parallel Routing</h3>
-          <p>Simultaneous approvals from multiple departments:</p>
+          <h3>Multi-Step Processes</h3>
+          <p>Sagas write across entities in one transaction, with compensation if a step fails. The CRM declares five:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• HR and Finance approval for new hire requests</li>
-            <li style="padding: var(--spacing-xs) 0;">• IT and Legal review for vendor contracts</li>
-            <li style="padding: var(--spacing-xs) 0;">• Multi-signer requirements for high-value transactions</li>
+            <li style="padding: var(--spacing-xs) 0;">• <strong>LeadConversion</strong> — one qualified lead becomes an account, a contact and an opening opportunity, sized by score</li>
+            <li style="padding: var(--spacing-xs) 0;">• <strong>QuoteApprovalEscalation</strong> — raises the approval task and holds the quote</li>
+            <li style="padding: var(--spacing-xs) 0;">• <strong>CriticalCaseEscalation</strong> — escalates, raises a task, and posts to an external bridge</li>
+            <li style="padding: var(--spacing-xs) 0;">• <strong>ClosedWonHandoff</strong> — opens the contract and books the onboarding kickoff</li>
+            <li style="padding: var(--spacing-xs) 0;">• <strong>RenewalPlaybook</strong> — grades renewal risk and opens the renewal opportunity</li>
           </ul>
         </div>
         <div class="card">
           <h3>Approval Stamping and Audit</h3>
-          <p>Tamper-proof audit trail for compliance:</p>
+          <p>The Quote entity carries its own approval record, and the audit log carries the rest:</p>
           <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
-            <li style="padding: var(--spacing-xs) 0;">• Who approved, rejected, or delegated — with timestamp</li>
-            <li style="padding: var(--spacing-xs) 0;">• Approval comments and attached conditions</li>
-            <li style="padding: var(--spacing-xs) 0;">• IP address and device tracking per action</li>
-            <li style="padding: var(--spacing-xs) 0;">• Locked audit log — immutable after recording</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>approved_by_id</code>, <code>approved_at</code> and <code>approval_notes</code> — who, when, and on what terms</li>
+            <li style="padding: var(--spacing-xs) 0;">• <code>version_number</code> — a renegotiated quote is a new version, not an overwrite</li>
+            <li style="padding: var(--spacing-xs) 0;">• Every rule and workflow run recorded in <code>sys_workflow_runs</code></li>
+            <li style="padding: var(--spacing-xs) 0;">• Append-only audit log, generated for every audited entity</li>
           </ul>
         </div>
+      </div>
+
+      <div class="card mt-5">
+        <h4>The CRM's five state machines</h4>
+        <p class="text-muted text-sm mb-3">Each one is a <code>stateDiagram-v2</code> in the model. The generated application applies the states, guards every transition by role, and refuses a move the diagram does not draw.</p>
+        <div class="grid grid-3">
+          <div>
+            <strong>Lead</strong>
+            <p class="text-muted text-sm">new → working → nurturing → qualified → converted, with disqualification from three of them</p>
+          </div>
+          <div>
+            <strong>Opportunity</strong>
+            <p class="text-muted text-sm">prospecting → qualification → needs_analysis → proposal → negotiation → closed_won, and closed_lost from four stages</p>
+          </div>
+          <div>
+            <strong>Quote</strong>
+            <p class="text-muted text-sm">draft → in_review → approved → presented → accepted, with reject, revise, renegotiate and lapse</p>
+          </div>
+          <div>
+            <strong>Support Case</strong>
+            <p class="text-muted text-sm">new → assigned → in_progress → resolved → closed, with waiting_on_customer, escalate and reopen</p>
+          </div>
+          <div>
+            <strong>Contract</strong>
+            <p class="text-muted text-sm">draft → in_approval → active → expiring → renewed, with terminate and lapse</p>
+          </div>
+          <div>
+            <strong>Guarded by role</strong>
+            <p class="text-muted text-sm">Only a sales manager may <code>close_won</code>; only an administrator may <code>terminate</code> a contract</p>
+          </div>
+        </div>
+        <p class="text-sm text-muted" style="margin-top: var(--spacing-md);"><a href="guide/03-workflows.html">Chapter 03 &rarr;</a> &middot; <a href="guide/07-it-runs.html">watch one run &rarr;</a></p>
       </div>
     </div>
   </section>
@@ -287,6 +330,20 @@
           </div>
         </div>
       </div>
+      <div class="card mt-5">
+        <h4>Access control, as the CRM declares it</h4>
+        <p class="text-muted text-sm mb-3">Fifteen <code>%%rbac</code> restrictions in the model. They <em>restrict</em> — an operation no directive names stays open, which is why the ones that matter are named explicitly.</p>
+        <div style="font-family: var(--font-mono); font-size: var(--text-sm); background: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg);">
+          %%rbac role:sales_manager|sales_ops on Lead.convert<br>
+          %%rbac role:sales_manager on Opportunity.close_won<br>
+          %%rbac role:sales_manager|sales_ops on Quote.approve<br>
+          %%rbac role:support_manager on SupportCase.escalate<br>
+          %%rbac role:administrator on Contract.terminate
+        </div>
+        <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Seven roles across the model — <code>sales_rep</code>, <code>account_executive</code>, <code>sales_manager</code>, <code>sales_ops</code>, <code>support_agent</code>, <code>support_manager</code>, <code>administrator</code> — seeded into the Role screen and enforced on every request. Contact records also run <code>enforceFieldLevelSecurity</code> on read and <code>maskPersonalData</code> on phone and mobile, so a role without the permission never receives the value in the first place.</p>
+        <p class="text-sm text-muted" style="margin-top: var(--spacing-md);"><a href="guide/06-dictionary.html">Chapter 06 &rarr;</a></p>
+      </div>
+
       <div class="grid grid-4 mt-5">
         <div class="card text-center">
           <div class="stat-value text-base">SOX</div>
@@ -318,11 +375,11 @@
           <p>Every generated application includes an embedded AI assistant powered by CopilotKit. End users get a conversational interface for natural language data queries, in-context guidance, and intelligent suggestions — directly within their application.</p>
           <h3 style="margin-top: var(--spacing-lg);">What Users Can Do</h3>
           <ul style="list-style: none; padding: 0;">
-            <li style="padding: var(--spacing-sm) 0;">"How many invoices are pending approval right now?"</li>
-            <li style="padding: var(--spacing-sm) 0;">"Show me all purchase orders from Vendor X this quarter"</li>
-            <li style="padding: var(--spacing-sm) 0;">"List all employees who joined in the last 30 days"</li>
-            <li style="padding: var(--spacing-sm) 0;">"Which products are below their reorder level?"</li>
-            <li style="padding: var(--spacing-sm) 0;">"What contracts expire in the next 90 days?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"How many quotes are sitting in review right now?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Show me every opportunity in negotiation above $100,000"</li>
+            <li style="padding: var(--spacing-sm) 0;">"Which leads scored hot this week and who owns them?"</li>
+            <li style="padding: var(--spacing-sm) 0;">"List the critical support cases still open past their SLA"</li>
+            <li style="padding: var(--spacing-sm) 0;">"What contracts enter their renewal window in the next 90 days?"</li>
           </ul>
         </div>
         <div class="card">
@@ -382,7 +439,7 @@
                 <td style="padding: var(--spacing-sm);">Update in admin</td>
               </tr>
               <tr style="border-bottom: 1px solid var(--gray-100);">
-                <td style="padding: var(--spacing-sm);">Modify approval routing</td>
+                <td style="padding: var(--spacing-sm);">Change the discount approval threshold</td>
                 <td style="padding: var(--spacing-sm);">Code change + redeploy</td>
                 <td style="padding: var(--spacing-sm);">Update workflow config</td>
               </tr>
@@ -396,21 +453,23 @@
         </div>
         <div class="card">
           <h4>Dictionary-Driven Form Relationships</h4>
-          <p class="text-muted mb-3">The Application Dictionary defines not just individual forms, but how forms relate to each other across the application.</p>
+          <p class="text-muted mb-3">The Application Dictionary defines not just individual forms, but how forms relate to each other. This is the CRM's Opportunity window as the generated application stores it.</p>
           <div style="background: var(--gray-50); padding: var(--spacing-md); border-radius: var(--radius-lg); font-size: var(--text-sm);">
-            <strong>sys_window: Purchase Order</strong><br>
-            ├─ sys_tab: Header (Vendor, Date, PO Number)<br>
-            ├─ sys_tab: Line Items<br>
-            │   └─ sys_field: Product, Quantity, Unit Price, Line Total<br>
-            ├─ sys_tab: Delivery Status<br>
-            └─ sys_tab: Approval History<br>
+            <strong>sys_window: Opportunity</strong> &nbsp;<span class="text-muted">(1 tab · 17 fields)</span><br>
+            └─ sys_tab: Opportunity<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;├─ Id &nbsp;&nbsp;&rarr; <code>id</code> &nbsp;· seq 10 · displayed: No<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;├─ Account Id &rarr; <code>account_id</code> · seq 20 · lookup<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;├─ Amount &rarr; <code>amount</code> · seq 70<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;├─ Stage &rarr; <code>stage</code> · seq 90<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;└─ … eleven more, each with sequence, displayed, read-only and active<br>
             <br>
             <strong>Result:</strong><br>
-            ✓ Master-Detail relationships rendered automatically<br>
-            ✓ Cross-document navigation built in<br>
-            ✓ Lookup relationships enforced throughout<br>
-            ✓ Admin can change layout without touching code
+            ✓ Sequence numbers step by ten, so a field can be slotted between two<br>
+            ✓ <code>id</code> exists as a field but is never displayed<br>
+            ✓ Foreign keys resolve to names, not identifiers<br>
+            ✓ Twenty-three windows in all — seventeen entities plus six admin screens
           </div>
+          <p class="text-sm text-muted" style="margin-top: var(--spacing-md);"><a href="guide/06-dictionary.html">Chapter 06 &rarr;</a></p>
         </div>
       </div>
     </div>
@@ -419,9 +478,12 @@
   <!-- CTA -->
   <section class="section" style="background: linear-gradient(135deg, var(--primary-600) 0%, var(--secondary-600) 100%); color: white;">
     <div class="container text-center">
-      <h2 style="color: white;">See Every Feature Live in Your Domain</h2>
-      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Schedule a demo and watch AppWithAI generate a complete application from your business description in under 30 minutes.</p>
-      <a href="contact.html" class="btn btn-lg" style="background: white; color: var(--primary-600);">Schedule Your Demo</a>
+      <h2 style="color: white;">Check Any of This Yourself</h2>
+      <p style="color: rgba(255,255,255,0.9); font-size: var(--text-xl); margin-bottom: var(--spacing-xl);">Every feature on this page is on one page of the guide, and the whole CRM runs in your browser — no install, no signup, nothing sent anywhere.</p>
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <a href="guide/run-in-browser.html" class="btn btn-lg" style="background: white; color: var(--primary-600);">Run the CRM in Your Browser</a>
+        <a href="contact.html" class="btn btn-lg btn-outline" style="border-color: white; color: white;">Schedule a Demo</a>
+      </div>
     </div>
   </section>
 
