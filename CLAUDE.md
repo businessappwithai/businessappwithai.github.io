@@ -307,6 +307,20 @@ They are built in the generator repository by `bun run build:language-tools` fro
 only a front end for them — never add validation logic to it, or a model could pass here and fail in the
 generator.
 
+Two behaviours in that front end are deliberate, and both are presentation of what the published
+modules already returned — not decisions of their own:
+
+- **The `EML004` note.** When the checker returns that code, the page adds a line saying the document
+  looks like prose about a model rather than a model. It is the diagnostic readers arrive with: a
+  language model answers with an *enhanced specification*, the fixer inserts `%%meta name:` (`EML001`),
+  and `EML004` remains. The note renders only when the code is in the report — it never inspects the
+  document itself.
+- **"Download as .mmd" appears only when a run has no errors**, whether it needed repairs or not, and
+  the file is named from `%%meta name:` per §1.2 (lower-cased, hyphenated). Handing someone a file the
+  generator would refuse is the failure this page exists to catch; and the reader whose model arrived
+  as a fenced block in a chat report gets a real `.mmd` out of the paste box, which is the path the
+  home page now points them at.
+
 ## Vendored files
 
 Everything under `assets/vendor/`, plus `assets/js/erdwithai-*.js`, `assets/js/run-*.js`,
@@ -334,9 +348,13 @@ thing a language model has to produce is a model file.
 - **§1.0 states the deliverable**, and it is there for one reason: the observed failure is a model
   answering with an *enhanced specification* — headings, entity glossary, lifecycle prose — and never
   writing the Mermaid. The checker scores such a document `EML004`, *empty document*. §1.0 (the
-  deliverable), §1.2 (the file contract: first line `%%meta name:`, every other line Mermaid or a `%%`
+  deliverable), §1.2 (the file contract: opens on a `%%` line, every line Mermaid or a `%%`
   directive), §1.3 (validate the file's bytes, and what `EML004` really means) and §10 (the checklist)
   all carry that rule. Do not soften them back into "the first output is not Mermaid".
+- **§1.0 also says exactly one file leaves the model's hands**, and §1.4 says what a surface that can
+  only produce a document must do instead — open the document with the model in its first fenced
+  block. That is there because the failure recurred with a *second* model that had plainly written a
+  model and still handed over only the prose about it. Two files means the reader opens the wrong one.
 - **Three places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
   page's prompt block, and the three "Try It Yourself" cards.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
