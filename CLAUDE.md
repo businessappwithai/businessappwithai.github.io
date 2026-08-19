@@ -44,6 +44,7 @@ businessappwithai.github.io/
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── llms-full.txt             # Machine-readable specification, for language models
 ├── index.html                # Home/landing page
+├── justification.html        # Position paper: why the platform exists
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -100,6 +101,7 @@ Deployment is fully automatic:
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
+| `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. Linked from the home page, Features, How It Works, Pricing and every footer; deliberately not in the primary nav, which is already full. |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
