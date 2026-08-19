@@ -207,6 +207,14 @@ console.log(formatReport(report));</code></pre>
   often skipped, and skipping it is what produces a schema that validates and a business that does not
   run.
 </p>
+<p>
+  <b>The deliverable is one file — <code>&lt;business-name&gt;.mmd</code>, every byte of it Mermaid.</b>
+  Steps 1, 3 and 4 exist to make that file correct; only step 2 produces it. A reply that
+  <i>describes</i> the model instead — headings, an entity glossary, a lifecycle drawn as an arrow in a
+  sentence — is not a model however thorough it is. Paste one into the checker above and it answers
+  <code>EML004</code>, <i>empty document: no entities, rules, or workflows found</i>, because to the
+  parser it is empty.
+</p>
 
 <ol class="steps">
   <li>
@@ -217,7 +225,11 @@ console.log(formatReport(report));</code></pre>
       waitlists, or what happens to a class when its instructor calls in sick — and every one of those
       is a table, a rule or a workflow.
     </p>
-    <p>So the first output is not Mermaid. It is an enhanced specification, stated back to the user, covering all five of:</p>
+    <p>
+      So think the business through before writing a byte of Mermaid: an enhanced specification, stated
+      back to the user in the reply. It is analysis, not the artifact — it never becomes the file, and
+      it never carries the <code>.mmd</code> name. It covers all five of:
+    </p>
     <ul>
       <li><b>The entity model</b> — every entity the business needs, not only the ones named, with types, modifiers, keys, foreign keys and cardinalities, including the reference and lookup entities the described flow silently depends on.</li>
       <li><b>Each entity's workflow</b> — the states a record moves through, the event on each edge, and who may make each move. An entity with a <code>status</code> field has a state machine whether or not anyone drew it.</li>
@@ -227,11 +239,13 @@ console.log(formatReport(report));</code></pre>
     </ul>
     <p>
       State assumptions as assumptions. Where the description leaves a genuine fork — two plausible
-      businesses, materially different models — ask rather than picking silently.
+      businesses, materially different models — name the fork, model the reading you recommend, and say
+      what changes if the other was meant. A question raised instead of a file leaves the reader with
+      nothing to correct; raised beside one they can already run, it costs them a sentence to answer.
     </p>
   </li>
   <li>
-    <h3>Write the model</h3>
+    <h3>Write the model file</h3>
     <p>
       Only now write the document: the ERD section, the rules sections, the workflow sections, and the
       directives that give them meaning. Every entity from step 1 appears; every rule is a
@@ -240,7 +254,13 @@ console.log(formatReport(report));</code></pre>
     </p>
     <p>
       Name the file after the business — <code>acme-dance-studio.mmd</code>, lower-case, hyphenated, one
-      file. Check a directive's <code>status</code> before relying on it: <code>%%entity</code>,
+      file. Its first non-blank line is <code>%%meta name:</code>, and every line after it is a Mermaid
+      statement, an EML <code>%%</code> directive, or blank: no Markdown headings, no bullets, no fences,
+      no prose. Everything the language adds already rides in Mermaid comments, so anything you want to
+      say goes in the reply or in a <code>%%</code> line.
+    </p>
+    <p>
+      Check a directive's <code>status</code> before relying on it: <code>%%entity</code>,
       <code>%%rule</code> and <code>%%trigger</code> are validated but not compiled, so do not promise
       behaviour that rides on them.
     </p>
@@ -262,7 +282,8 @@ console.log(formatReport(report));</code></pre>
     <h3>Deliver</h3>
     <p>
       Hand back the finished <code>&lt;business-name&gt;.mmd</code> as a <b>downloadable file</b>, not a
-      fenced block someone has to copy out of a chat log. Alongside it: the enhanced specification from
+      fenced block someone has to copy out of a chat log — and the file that was validated, not a draft
+      of it. Alongside it, in the reply rather than inside the file: the enhanced specification from
       step 1, so the user can correct what you inferred; the final checker result with counts; and
       anything you assumed or left unresolved.
     </p>

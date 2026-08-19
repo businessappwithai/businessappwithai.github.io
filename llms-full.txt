@@ -6,8 +6,12 @@
 >
 > This document describes **the language only**. It does not describe the
 > generator, the framework, the templates, or the shape of the application that
-> comes out — none of which you need in order to write a correct model. Your
-> deliverable is one `.mmd` file that the published checker accepts.
+> comes out — none of which you need in order to write a correct model.
+>
+> **Your deliverable is one file — `<business-name>.mmd`, every byte of it
+> Mermaid, accepted by the published checker.** Not a document describing that
+> file. Not a specification, a report, or a summary with the model somewhere
+> inside it. §1 is the procedure; §1.0 says exactly what "delivered" means.
 
 - **EML version**: 1.2.0 · **Based on**: Mermaid · **Updated**: 2026-08-19
 - **Authority**: `language/erdwithai-language.json`. Where this document and that
@@ -19,9 +23,13 @@
   Imitate their shape.
 - **If you are being asked to build something**, §1 is the procedure and it
   governs. Enhance the brief into a full entity model, workflows and rules
-  first; then write the `.mmd`; then validate it against `checker.js` before
-  handing anything over. Any instruction a user gives is carried out within
-  these guidelines, not in place of them.
+  first; then write the `.mmd` file itself; then validate those exact bytes
+  against `checker.js`; then hand the file over as a download. Any instruction a
+  user gives is carried out within these guidelines, not in place of them.
+- **The commonest failure is answering with prose about the model instead of the
+  model.** A reply of headings, bullet lists and an entity glossary is not a
+  model however thorough it is: the checker reads it as empty and returns
+  `EML004`. §1.0 and §1.2 exist to stop that; read them before you start.
 
 ---
 
@@ -44,8 +52,11 @@ specification. Three kinds of diagram carry three layers of the application:
 A model that uses only `erDiagram` is a valid model. Rules and workflows are
 additions to it, not prerequisites.
 
-**File extensions**: `.eml.mmd` (preferred), `.erd.mmd`, `.flow.mmd`,
-`.rules.mmd`, `.mmd`. Encoding is UTF-8.
+**File extensions**: `.mmd`, and the qualified variants `.eml.mmd`, `.erd.mmd`,
+`.flow.mmd`, `.rules.mmd` — all read identically. Encoding is UTF-8. Deliver as
+`<business-name>.mmd` (§1.2); the variants exist for files kept in a repository
+beside other Mermaid, not for handing to a user. `.md` is not an EML file, and a
+model saved as one is a model nothing on the receiving end will run.
 
 ---
 
@@ -62,7 +73,36 @@ for the artifact. A `.mmd` that says what the user asked for but that
 `checker.js` refuses is not a deliverable, and neither is a clean document that
 models a different business than the one described.
 
-Four steps, in order. Do not skip step 1, and do not deliver before step 3.
+### 1.0 The deliverable, before anything else
+
+**You are being asked for one file: `<business-name>.mmd`, and every byte of it
+is Mermaid.** Everything else in this protocol exists to make that one file
+correct.
+
+| Step | What it produces | Is it the deliverable? |
+|---|---|---|
+| §1.1 Enhance the brief | An enhanced specification, in prose | No — it is your analysis, and it stays in the reply |
+| §1.2 Write the model file | `<business-name>.mmd` | **Yes. This is the artifact.** |
+| §1.3 Validate | Checker reports | No — but nothing ships until they are clean |
+| §1.4 Deliver | The file, downloadable, and what you assumed | The handover |
+
+**The one failure this protocol exists to prevent** is answering with a document
+that *describes* the model instead of a document that *is* the model — headings,
+bullet lists, an entity glossary, a lifecycle written as `draft → approved →
+closed` in a sentence, and a closing line saying "the resulting artifact is
+`orders.mmd`". That is a description of an artifact, not the artifact. Prose is
+not the deliverable in any wrapper: not as `.md`, not as a report, not as a file
+carrying the `.mmd` name whose contents are English. Give the checker such a file
+and it answers `EML004` — *empty document: no entities, rules, or workflows
+found* — because to the parser it is empty however many pages it runs to.
+
+So: an entity is not a bullet describing a table, it is an entity block inside
+`erDiagram`. A lifecycle is not an arrow drawn in a sentence, it is a
+`stateDiagram-v2`. A rule is not a paragraph, it is a `flowchart` with
+`%%action` directives. If you have written the specification and not the Mermaid,
+you are half finished — go to §1.2 and write the file.
+
+Do not skip step 1, do not stop after it, and do not deliver before step 3.
 
 ### 1.1 Enhance the brief before modelling it
 
@@ -73,8 +113,11 @@ instructor calls in sick — and every one of those is a table, a rule or a
 workflow. Writing the ERD straight from their sentence produces a schema that
 validates and a business that does not run.
 
-So the first output is not Mermaid. It is an **enhanced specification**, derived
-from the description and stated back to the user, covering all five of these:
+So think the business through first, covering all five of the headings below.
+This is analysis, not the answer: it is text in your reply (§1.4), it is never
+the file, and it never carries the `.mmd` name. Keep it tight — lists rather than
+essays, a page or so — because the exhaustive artifact is the model, not the
+prose about it.
 
 1. **The entity model.** Every entity the business needs, not only the ones
    named. For each: its attributes with EML types and modifiers, its primary
@@ -107,22 +150,82 @@ from the description and stated back to the user, covering all five of these:
    application that cannot fulfil anything. Model these as `kind: saga` with
    `%%step` nodes (§5.3).
 
-State assumptions as assumptions. Where the description leaves a genuine fork —
-two plausible businesses, materially different models — ask, rather than picking
-silently. Where it leaves an ordinary gap, fill it the way a careful analyst
-would and say what you filled.
+State assumptions as assumptions. Where it leaves an ordinary gap, fill it the
+way a careful analyst would and say what you filled. Where it leaves a genuine
+fork — two plausible businesses, materially different models — name the fork,
+model the reading you recommend, and say what changes if they meant the other.
 
-### 1.2 Write the model
+What this step must never do is stop the work. A question raised instead of a
+file leaves the user with nothing to correct; a question raised beside a file
+they can already run costs them one sentence to answer. Deliver the file either
+way.
+
+### 1.2 Write the model file
 
 Only now write the document, following §2 to §7 in full: the ERD section, the
 rules sections, the workflow sections, and the directives that give them
-meaning. Every entity from 1.1 appears; every rule from 1.1 is a `%%rule`
-flowchart or an `%%action`; every cross-entity effect from 1.1 is a hook, an
-action or a step; every multi-step flow is a saga.
+meaning. Every entity from §1.1 appears; every rule from §1.1 is a `%%rule`
+flowchart or an `%%action`; every cross-entity effect from §1.1 is a hook, an
+action or a step; every multi-step flow is a saga. Nothing you listed in §1.1 is
+allowed to survive only as prose.
 
-Name the file after the business: **`<business-name>.mmd`** — lower-case,
-hyphenated, no spaces (`acme-dance-studio.mmd`). One file. Every EML document is
-valid Mermaid (§0), so it must render in any Mermaid viewer as well as compile.
+**The file contract.** Every line of it is checkable in seconds, so check it:
+
+| | |
+|---|---|
+| **Name** | `<business-name>.mmd` — lower-case, hyphenated, no spaces: `acme-dance-studio.mmd` |
+| **Count** | Exactly one file. Not one per entity, not an ERD file plus a rules file |
+| **Encoding** | UTF-8 plain text |
+| **First non-blank line** | `%%meta name: <Business Name>` |
+| **Every other line** | A Mermaid statement, an EML `%%` directive, or blank |
+| **Never in the file** | Markdown headings, bullets, tables, bold, prose paragraphs, triple-backtick fences, YAML front matter, JSON wrappers, HTML comments |
+| **Anything you want to say** | Goes in the reply, or in a `%%` comment line inside the file |
+
+Everything the language adds already rides in Mermaid comments (§0), so no
+content you could legitimately need is Markdown. A note to a future reader is a
+`%%` line and renders as nothing.
+
+The document runs top to bottom in this order — the ERD first, then each rules
+and workflow section opened by its own `%%meta`:
+
+```
+%%meta name: <Business Name>          <- the first line of the file
+%%meta kind: erd
+%%meta version: 1.0.0
+
+%%enum <StatusName>: a, b, c          <- one per status column
+erDiagram
+    <Entity> {
+        string id PK
+        ...
+    }
+    <Entity> ||--o{ <Other> : "verb"   <- every relationship, with a real verb
+%%field <Entity>.status enum: <StatusName>
+%%index <Entity>(<column>)
+
+%%meta name: <Rule Name>              <- a new section starts at its own %%meta
+%%meta kind: rules
+%%rule <ruleName> on <Entity> event: beforeCreate priority: 10
+flowchart TD
+    ...
+    %%action <name> validation-error when: <expr> message: ...
+
+%%meta name: <Lifecycle Name>
+%%meta kind: workflow
+%%workflow <Name> entity: <Entity> kind: state
+stateDiagram-v2
+    [*] --> <first>
+    ...
+    <last> --> [*]
+    %%rbac role:<role> on <Entity>.<transition>
+```
+
+§9 is that skeleton filled in — a complete, checker-clean document with every
+construct in it. It is the shape of what you deliver; imitate it.
+
+Every EML document is valid Mermaid (§0), so the finished file must render in a
+Mermaid viewer as well as compile. That is a free second opinion: a viewer that
+refuses the file is telling you the bytes are not what you think they are.
 
 Check a directive's `status` (§7) before relying on it. `%%entity`, `%%rule` and
 `%%trigger` are validated but not compiled — they will not change a generated
@@ -137,7 +240,7 @@ accepts it. The two modules and their API are in §8.
 import { check, formatReport } from "https://appwithai.org/guide/checker.js";
 import { checkAndFix }          from "https://appwithai.org/guide/fixer.js";
 
-let model = /* the .mmd you just wrote */;
+let model = /* the exact bytes of the .mmd you just wrote */;
 
 // Pass 1 — repair the five auto-fixable codes, then re-check what survived.
 let report = checkAndFix(model);
@@ -148,6 +251,19 @@ for (let pass = 2; pass <= 3 && report.ok; pass++) {
   report = { ...check(model), source: model };
 }
 ```
+
+**Validate the file, not your message.** `check()` takes the contents of the
+`.mmd` and nothing else — not your summary of it, not the reply with the model
+quoted inside it, not the enhanced specification. A report on the wrong bytes is
+not a report on your deliverable, and if the repairs change anything, the file
+you hand over is `report.source`, not the draft you started from.
+
+**`EML004` means you fed it something that is not a model.** The checker found no
+entity, no rule and no workflow anywhere in the input. In practice that is the
+specification prose, an empty file, a path instead of its contents, or a file
+whose Mermaid never got written. Open what you passed in: if its first non-blank
+line is not `%%meta` and it has no `erDiagram`, the fault is not in the model —
+go back to §1.2 and write it.
 
 **Run the checker at least three times.** Not ceremony — a repair can uncover a
 problem the original error was masking, so a single clean pass immediately after
@@ -168,15 +284,47 @@ one outcome worse than not finishing.
 quietly gets wrong — a dropped modifier, a state no enum backs, a rule that can
 decide but cannot act. Clear them, or say why you left one.
 
+**If you cannot reach the checker** — no network from your runtime, no JavaScript
+engine, imports blocked — that changes what you can *claim*, not what you
+deliver. Walk §10 by hand instead, item by item, then hand over the file with one
+plain sentence: the checker could not be run here, this is what was verified by
+hand, and the user can validate it in their own browser in a few seconds at
+`https://appwithai.org/guide/11-check-a-model.html`, which runs these same two
+modules with nothing to install. An unvalidated `.mmd` is still the deliverable.
+A specification handed over in place of one never is.
+
 ### 1.4 Deliver
 
-Hand back the finished `<business-name>.mmd` as a **downloadable file**, not as a
-fenced block the user has to copy out of a chat log. Alongside it, give:
+Hand back the finished `<business-name>.mmd` as **a file the user can download**,
+not as something they must reconstruct out of a chat log.
 
-- the enhanced specification from 1.1, so the user can see what you inferred and
+- If you can write to a filesystem, write it there under that exact name and
+  attach it.
+- If your surface has a file, download or artifact mechanism, use it, with the
+  `.mmd` extension intact — not `.txt`, not `.md`.
+- **Only if the surface truly cannot carry a file**: print the document inside a
+  single triple-backtick `mermaid` fence, the file name on the line above it, the
+  file's bytes and nothing else between the fences, and nothing left out. No
+  elisions, no "unchanged from above", no splitting one model across two blocks,
+  no commentary between sections. The user saves that block verbatim as
+  `<business-name>.mmd`.
+
+Alongside the file — in the reply, never inside it — give:
+
+- the enhanced specification from §1.1, so the user can see what you inferred and
   correct you where you guessed wrong;
-- the final checker result — errors, warnings and infos, with counts;
-- anything you assumed, and anything still unresolved.
+- the final checker result — errors, warnings and infos, with counts — or the
+  plain statement from §1.3 that it could not be run, and what you checked by
+  hand;
+- anything you assumed, and anything still unresolved;
+- what to do next: upload the file at
+  `https://appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
+  running application in the browser tab, with nothing installed and nothing
+  uploaded to a server.
+
+One last check before you send. Open the file you are about to attach and read
+its first non-blank line. If it is not `%%meta name:`, you are attaching the
+wrong artifact.
 
 ---
 
@@ -639,11 +787,21 @@ operation the workflow is bound to.
 |---|---|---|---|
 | `CreateEntity` | `entity`, `fields` | `as` | Insert a row; `as` publishes its id for later steps |
 | `UpdateEntity` | `field`, and one of `source` / `value` | `entity`, `targetField`, `targetSource` | Write one column, on this record or a related one |
-| `DeleteEntity` | `entity` | `targetField`, `targetSource` | Remove related rows |
-| `Formula` | `target`, `source`, `operation` | `operand` | Compute a value and publish it under `target` |
+| `DeleteEntity` | — | `entity`, `targetField`, `targetSource`, `hard` | Remove the triggering record, or related rows. Soft by default — `hard: true` really deletes |
+| `Formula` | `target`, `operation`, and what that operation needs | — | Compute a value and publish it under `target` |
 | `Decision` | `decisionTable` **or** `rule` | `publish` | Evaluate a decision table inline, or a named rule |
-| `REST` | `url`, `method` | `bodyTemplate` | Call an external endpoint |
-| `Agent` | — | — | Hand the step to an AI agent |
+| `REST` | `url` | `method`, `bodyTemplate` | Call an external endpoint |
+| `Agent` | `agentId` | — | Hand the step to an AI agent |
+
+`Formula`'s operation decides the rest of its keys: `add`, `subtract`,
+`multiply` and `divide` need `source` and `operand`; `set` needs `value` — the
+only way to hand text to a later step; `copy` needs `source`. Omitting one is
+`EML262`.
+
+`Agent` is a **placeholder pending the agent runtime**: the executor logs the
+step and skips it. `agentId` is still required, and the step is still the right
+way to say "a model decides this" in the model — just do not promise a user that
+it runs today.
 
 **Steps share a context**: the triggering record's columns, plus every variable a
 previous step published. `CreateEntity` publishes the new row's id under `as`;
@@ -651,7 +809,7 @@ previous step published. `CreateEntity` publishes the new row's id under `as`;
 `source` or `targetSource` — that is how a step reaches a row an earlier step
 created.
 
-Two mechanical rules that cause most saga failures:
+Three mechanical rules that cause most saga failures:
 
 1. **`fields` carries JSON and must be the last key on the line.** A value runs
    to the next `<key>:` token, so JSON in the middle swallows what follows.
@@ -659,6 +817,12 @@ Two mechanical rules that cause most saga failures:
    `entity` alone is refused rather than guessed: `targetSource` holds a context
    key with the row id, `targetField` is a foreign key matched against the
    triggering row.
+3. **Close a URL up against its key: `url:https://host/path`, no space.** A
+   value ends at the next `<key>:` token and `https:` is one, so
+   `url: https://host/path` — with the space — parses as an empty `url` plus an
+   unknown property `https`: `EML262` and `EML268` together, for a line that
+   looks perfectly correct. The space is the whole fault; without it the value
+   runs to the end. Put `bodyTemplate` last, because it too carries JSON.
 
 ---
 
@@ -788,6 +952,20 @@ Both modules also attach themselves to `globalThis` as `EMLChecker` and
 | `EML4xx` | Workflow sections |
 | `EML5xx` | Cross-section consistency — the halves of the document disagreeing |
 
+Three `EML0xx` codes account for most first attempts, and one of them is not
+really about the model at all:
+
+| Code | What it means | What to do |
+|---|---|---|
+| `EML001` | warning — no `%%meta name:` | Add one as the file's first line, naming the business |
+| `EML004` | error — **no entity, rule or workflow anywhere in the input** | Almost always the wrong bytes: a specification, a summary, an empty string, a path instead of a file's contents, or a model that was described and never written. Check what you passed in, then §1.2 |
+| `EML005` | a `%%meta` line the parser cannot read | One `%%meta <key>: <value>` per line; no Markdown around it |
+
+`EML004` is worth dwelling on, because it is the diagnostic a careful, thorough,
+entirely wrong answer produces. A long document of headings and bullet lists that
+describes twelve entities perfectly contains zero entities as far as the parser is
+concerned. The fix is never to edit the prose — it is to write the `.mmd`.
+
 ### 8.3 The five auto-repairs
 
 These, and only these, `checkAndFix` will repair without being told what was
@@ -809,8 +987,10 @@ customer's brand rather than its first entity.
 
 ## 9. A complete worked example
 
-Every construct in this specification, in one checker-clean document. This is
-the shape of what you deliver.
+Every construct in this specification, in one checker-clean document. These
+bytes, saved as `acme-dance-studio.mmd`, are a finished deliverable: no headings,
+no prose, no explanation outside the language itself. This is the shape of what
+you hand over — imitate it exactly, at whatever size the business needs.
 
 ```mermaid
 %%meta name: Acme Dance Studio
@@ -930,16 +1110,32 @@ flowchart TD
 
 ## 10. Before you deliver — the checklist
 
-1. Every entity from the enhanced specification (§1.1) is in the document.
-2. Every entity has a primary key you chose.
-3. Every foreign key ends `_id` **and** has a matching relationship line.
-4. Every status column has a `%%enum` and a `%%field … enum:` binding it.
-5. Every entity with a status has a `kind: state` workflow, with an initial
+**The file itself**
+
+1. There *is* a file, and it is Mermaid — not a document describing one (§1.0).
+2. Its first non-blank line is `%%meta name: <Business Name>`.
+3. It contains no Markdown, no fences, no prose outside `%%` comment lines.
+4. It is one file, named `<business-name>.mmd`, and it renders in a Mermaid
+   viewer.
+
+**The model**
+
+5. Every entity from the enhanced specification (§1.1) is in the document.
+6. Every entity has a primary key you chose.
+7. Every foreign key ends `_id` **and** has a matching relationship line.
+8. Every status column has a `%%enum` and a `%%field … enum:` binding it.
+9. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
-6. Every rule that must *do* something has an `%%action` — not just a flowchart.
-7. Every cross-entity effect is a hook, an action, or a saga step.
-8. Every restricted operation and transition has a `%%rbac` directive.
-9. `check(source)` returns `ok: true`, run three times, the last two over
-   unchanged bytes.
-10. Warnings are cleared, or each remaining one is explained to the user.
-11. The file is named `<business-name>.mmd` and delivered as a file.
+10. Every rule that must *do* something has an `%%action` — not just a flowchart.
+11. Every cross-entity effect is a hook, an action, or a saga step.
+12. Every restricted operation and transition has a `%%rbac` directive.
+
+**The handover**
+
+13. `check(source)` returns `ok: true`, run three times over the file's exact
+    bytes, the last two over unchanged bytes — or you have said plainly that the
+    checker could not be run and walked this list by hand instead (§1.3).
+14. Warnings are cleared, or each remaining one is explained to the user.
+15. The file the user receives is the file you validated, delivered as a
+    download, with the enhanced specification and the checker counts beside it in
+    the reply — not inside the file (§1.4).
