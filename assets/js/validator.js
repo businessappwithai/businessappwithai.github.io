@@ -1,7 +1,7 @@
 /**
  * The published EML validators, wired to a page.
  *
- * `guide/checker.js` and `guide/fixer.js` are the two files §10.3 of the
+ * `guide/checker.js` and `guide/fixer.js` are the two files §1.3 and §8 of the
  * specification tells a language model to import before handing a model to
  * anyone. They are bundled from `language/checker.ts` and `language/fixer.ts` —
  * the same engines the command line runs, not a lighter web edition — and this
@@ -204,7 +204,7 @@ $("fix").addEventListener("click", () => {
 /**
  * Hand the repaired document back as a file.
  *
- * §10.4 asks for a file rather than a fenced block someone has to copy out of a
+ * §1.4 asks for a file rather than a fenced block someone has to copy out of a
  * chat log, and the same courtesy applies here.
  */
 $("download-fixed").addEventListener("click", () => {
@@ -255,7 +255,7 @@ for (const node of document.querySelectorAll("[data-eml-version]")) {
  * Stamp the real URLs of the published modules.
  *
  * The specification quotes them under appwithai.org, and the page is written
- * that way because that is what §10.3 says. But a reader looking at a staging
+ * that way because that is what §8 says. But a reader looking at a staging
  * host, a fork's github.io address or a local server would be copying a URL that
  * does not serve them the file in front of them. So each one is resolved against
  * this document's own origin and written in — the text always names the host
