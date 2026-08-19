@@ -13,9 +13,36 @@ businessappwithai.github.io/
 │       └── static.yml        # GitHub Actions: auto-deploy to GitHub Pages on push to main
 ├── assets/
 │   ├── css/
-│   │   └── style.css         # Main stylesheet (Lunaris Design System, ~976 lines)
-│   └── js/
-│       └── main.js           # Main JS (scroll animations, nav, forms, ~236 lines)
+│   │   ├── style.css         # Main stylesheet (Lunaris Design System, ~976 lines)
+│   │   ├── guide.css         # Documentation layer for the "Build a CRM" guide
+│   │   └── guide-demo.css    # Scoped styles for the three interactive chapters
+│   ├── js/
+│   │   ├── main.js               # Main JS (scroll animations, nav, forms)
+│   │   ├── guide.js              # Guide chapter nav and screenshot lightbox
+│   │   ├── coi.js                # Registers the cross-origin isolation worker (ch. 10)
+│   │   ├── run-in-browser.js     # Controller for chapter 09
+│   │   ├── run-real-stack.js     # Controller for chapter 10
+│   │   ├── validator.js          # Controller for chapter 11
+│   │   ├── erdwithai-wasm.js     # Vendored: browser generator (parser + compilers)
+│   │   └── erdwithai-fullstack.js# Vendored: full NestJS/TanStack generator
+│   └── vendor/                   # Third-party payloads, served from this origin
+│       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
+│       ├── webcontainer/         # @webcontainer/api, unbundled ESM
+│       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
+│       └── stack-templates.json  # 310 stack templates for chapter 10
+├── guide/                    # "Build a CRM" guide (chapters 00–11)
+│   ├── index.html            # 00 · Overview
+│   ├── 01-…08-reference.html # Chapters 01–08
+│   ├── run-in-browser.html   # 09 · Run it in your browser
+│   ├── run-real-stack.html   # 10 · Run the real stack
+│   ├── 11-check-a-model.html # 11 · Check a model
+│   ├── checker.js            # Published EML checker (ES module)
+│   ├── fixer.js              # Published EML fixer (ES module)
+│   ├── coi-sw.js             # Service Worker that isolates chapter 10
+│   ├── img/                  # Screenshots used by the chapters
+│   ├── models/               # Example EML models the chapters load
+│   └── wasm-app/sw.js        # Service Worker that hosts the generated app
+├── llms-full.txt             # Machine-readable specification, for language models
 ├── index.html                # Home/landing page
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
@@ -73,6 +100,11 @@ Deployment is fully automatic:
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
+| `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
+| `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
+| `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
+| `guide/11-check-a-model.html` | Chapter 11: the authoring protocol, and the published validators running live |
+| `llms-full.txt` | The machine-readable specification language models are pointed at |
 
 ## Design System (Lunaris)
 
@@ -156,6 +188,74 @@ utils.setCookie(name, value, days)
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
 10. **Accessible markup** — maintain ARIA labels, semantic structure, and sufficient color contrast (design system colors are pre-validated).
+
+## The In-Browser Demo (Chapter 09)
+
+`guide/run-in-browser.html` compiles a Mermaid model into a complete application and runs it in the
+visitor's tab. It is the only page on the site with moving parts, so it has its own rules.
+
+**How it works**
+
+1. `assets/js/run-in-browser.js` (an ES module) reads a model from `guide/models/`, or from a file the
+   visitor picks, and compiles it with `assets/js/erdwithai-wasm.js` — the generator bundled for the browser.
+2. The generated files are posted to the Service Worker at `guide/wasm-app/sw.js`, which serves them
+   from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
+3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
+   the visitor's IndexedDB. **The chapter makes no request to any other host.**
+
+**Constraints to respect**
+
+- The page must be served over `http://` or `https://` — a Service Worker cannot register from `file://`.
+- Paths in `run-in-browser.js` are resolved against the page URL (`models/…`, `wasm-app/…`), so the page,
+  `guide/models/` and `guide/wasm-app/` must stay siblings.
+- `guide-demo.css` is scoped entirely to `.guide-demo` so that the demo's own `.btn`, `.card`, `.stage`
+  and similar names never collide with the Lunaris classes. Its palette is a token bridge onto the
+  design system variables — change the bridge, not the individual rules.
+
+## Chapter 10 — the real stack in a WebContainer
+
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 406 files — and
+runs it in a WebContainer. It needs two things chapter 09 does not.
+
+- **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
+  `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on the
+  document. GitHub Pages cannot send headers, so `guide/coi-sw.js` adds them: `assets/js/coi.js`
+  registers it and reloads once. **The worker rewrites that one document and passes everything else
+  through** — do not widen it. Isolation is a constraint, not an upgrade, and the other chapters must
+  stay outside it.
+- **The network.** The WebContainer runtime comes from StackBlitz and the packages from npm. Everything
+  else — the API, the 310 templates, the fonts — is served from `assets/vendor/`.
+
+The nine binary font templates cannot travel in `stack-templates.json` (it is JSON), so they are shipped
+in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` before it is mounted.
+
+`stack-templates.json` is rebuilt in the generator repository with `bun run build:stack-templates`
+(it is gitignored there) and copied here.
+
+## Chapter 11 — the published validators
+
+`guide/checker.js` and `guide/fixer.js` are the ES modules that §10.3 of `llms-full.txt` tells language
+models to import, at exactly those URLs. **Do not move or rename them** — the specification, published
+here as `llms-full.txt`, hard-codes `https://appwithai.org/guide/checker.js` and `…/fixer.js`.
+
+They are built in the generator repository by `bun run build:language-tools` from
+`language/browser/*.entry.ts`, and they are the same engines the CLI runs. `assets/js/validator.js` is
+only a front end for them — never add validation logic to it, or a model could pass here and fail in the
+generator.
+
+## Vendored files
+
+Everything under `assets/vendor/`, plus `assets/js/erdwithai-*.js`, `assets/js/run-*.js`,
+`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llms-full.txt`, comes from
+`businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand. The local deltas,
+all deliberate and all commented at the point of change:
+
+| File | Local change | Why |
+|---|---|---|
+| `assets/js/run-in-browser.js` | Probes `assets/vendor/pglite/` and mounts a re-export shim at the app's `vendor/pglite/index.js` | This site vendors PGlite, so no CDN is ever reached |
+| `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
+| `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
+| `llms-full.txt` | The guide's chapter count in the header | It describes this site, and this site has twelve chapters |
 
 ## CI/CD Pipeline
 

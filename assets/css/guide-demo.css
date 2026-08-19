@@ -1,0 +1,530 @@
+/* ==========================================================================
+   AppWithAI — "Run it here" demo layer
+   The chapter that generates and runs a complete application inside the
+   reader's browser tab. Everything here is scoped to `.guide-demo` so that the
+   demo's own component names (.btn, .choice, .stage, .log …) can never collide
+   with the Lunaris classes used by the marketing pages.
+   Load it after assets/css/style.css and assets/css/guide.css.
+   ========================================================================== */
+
+/* ---- token bridge -------------------------------------------------------
+   The demo was authored against its own palette. Rather than restyle every
+   rule, the palette is re-pointed at Lunaris tokens, so the demo inherits the
+   site's colours, radii and shadows and stays in step with them.
+   -------------------------------------------------------------------------- */
+
+.guide-demo {
+  --bg: white;
+  --bg-soft: var(--gray-50);
+  --bg-sunken: var(--gray-100);
+  --surface: white;
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --text: var(--gray-900);
+  --text-soft: var(--gray-600);
+  --text-faint: var(--gray-500);
+
+  --accent: var(--accent-600);
+  --accent-soft: var(--accent-50);
+  --teal: var(--primary-600);
+  --teal-soft: var(--primary-50);
+  --violet: var(--secondary-600);
+  --violet-soft: var(--secondary-50);
+  --red: var(--error-600);
+  --red-soft: var(--error-50);
+  --green: var(--success-600);
+  --green-soft: var(--success-50);
+
+  --code-bg: var(--guide-code-bg);
+  --code-text: var(--guide-code-text);
+  --code-dim: var(--guide-code-dim);
+  --code-key: var(--guide-code-key);
+  --code-str: var(--guide-code-str);
+  --code-num: var(--guide-code-num);
+
+  --shadow: var(--shadow-md);
+  --radius: var(--radius-lg);
+}
+
+/* ---- a wider column than the guide's prose chapters ----------------------
+   The running application is embedded on this page, and it lays itself out for
+   a phone below 800px — which is what a documentation reading measure gives it.
+   An application shown in its mobile layout is a fair demonstration of the
+   mobile layout and a poor one of the application.
+   -------------------------------------------------------------------------- */
+
+.guide-content-wide {
+  max-width: 1240px;
+}
+
+.guide-demo [hidden] { display: none !important; }
+
+/*
+ * A wider column than the guide's prose pages.
+ *
+ * The running application is embedded here, and it lays itself out for a phone
+ * below 800px — which is what the reading width of a documentation page gives
+ * it. An application demonstrated in its mobile layout is a fair demonstration
+ * of the mobile layout and a poor one of the application.
+ */
+.guide-demo .stage { margin-inline: -20px; }
+.guide-demo .flow-step__body > * { max-width: none; }
+
+/*
+ * Named `flow`, not `steps`: guide.css already uses `.steps` for a numbered
+ * list and caps it at the reading measure, which silently squeezed the running
+ * application into a 656px column and made it render its phone layout.
+ */
+.guide-demo .flow { display: grid; gap: 26px; margin: 32px 0 0; max-width: none; }
+
+.guide-demo .flow-step {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.guide-demo .flow-step[data-state="idle"] { opacity: 0.55; }
+.guide-demo .flow-step[data-state="idle"] .flow-step__body { display: none; }
+
+.guide-demo .flow-step__head {
+  display: flex; gap: 14px; align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-soft);
+}
+.guide-demo .flow-step__num {
+  width: 28px; height: 28px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-size: 13px; font-weight: 700;
+}
+.guide-demo .flow-step[data-state="idle"] .flow-step__num { background: var(--border-strong); color: var(--text-faint); }
+.guide-demo .flow-step[data-state="done"] .flow-step__num { background: var(--green); }
+.guide-demo .flow-step__title { margin: 0; font-size: 16px; font-weight: 650; }
+.guide-demo .flow-step__hint { margin: 2px 0 0; font-size: 13px; color: var(--text-soft); }
+.guide-demo .flow-step__body { padding: 20px; }
+
+/* ---- choosing a model --------------------------------------------------- */
+
+.guide-demo .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+.guide-demo .choice {
+  text-align: left; font: inherit; color: inherit; cursor: pointer;
+  border: 1.5px solid var(--border); border-radius: var(--radius);
+  background: var(--bg-soft); padding: 16px 18px;
+  display: grid; gap: 5px;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.guide-demo .choice:hover { border-color: var(--border-strong); }
+.guide-demo .choice[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.guide-demo .choice__name { font-weight: 640; display: flex; align-items: center; gap: 8px; }
+.guide-demo .choice__desc { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+.guide-demo .choice__meta { font-size: 12px; color: var(--text-faint); font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+.guide-demo .dropzone {
+  margin-top: 14px;
+  border: 1.5px dashed var(--border-strong); border-radius: var(--radius);
+  padding: 22px; text-align: center; color: var(--text-soft); font-size: 14px;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+.guide-demo .dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
+.guide-demo .dropzone input[type="file"] { display: none; }
+
+.guide-demo .model-summary {
+  margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  font-size: 13px; color: var(--text-soft);
+}
+.guide-demo .model-summary code { font-size: 12.5px; }
+
+.guide-demo details.preview { margin-top: 12px; }
+.guide-demo details.preview > summary {
+  cursor: pointer; font-size: 13px; color: var(--text-soft);
+  padding: 6px 0; user-select: none;
+}
+.guide-demo details.preview pre {
+  max-height: 320px; overflow: auto; margin: 8px 0 0;
+  background: var(--code-bg); color: var(--code-text);
+  border-radius: var(--radius); padding: 14px 16px;
+  font-size: 12px; line-height: 1.6;
+}
+
+/* ---- options ------------------------------------------------------------ */
+
+.guide-demo .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+.guide-demo .opt { display: grid; gap: 5px; align-content: start; }
+.guide-demo .opt label { font-size: 12.5px; font-weight: 620; color: var(--text-soft); }
+.guide-demo .opt input {
+  font: inherit; font-size: 14px; padding: 8px 11px;
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+}
+.guide-demo .opt input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.guide-demo .opt small { font-size: 11.5px; color: var(--text-faint); }
+
+/* ---- actions ------------------------------------------------------------ */
+
+.guide-demo .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+
+.guide-demo .btn {
+  font: inherit; font-size: 14.5px; font-weight: 600;
+  padding: 10px 20px; border-radius: 9px; cursor: pointer;
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+  transition: filter 0.12s ease, background 0.12s ease;
+}
+.guide-demo .btn:hover:not(:disabled) { background: var(--bg-sunken); }
+.guide-demo .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.guide-demo .btn--primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.guide-demo .btn--primary:hover:not(:disabled) { filter: brightness(1.07); background: var(--accent); }
+.guide-demo .btn--go { background: var(--teal); border-color: var(--teal); color: #fff; }
+.guide-demo .btn--go:hover:not(:disabled) { filter: brightness(1.1); background: var(--teal); }
+/* ---- results ------------------------------------------------------------ */
+
+.guide-demo .result { margin-top: 18px; display: none; }
+.guide-demo .result.is-shown { display: block; }
+
+.guide-demo .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+.guide-demo .chip {
+  font-size: 12px; padding: 3px 9px; border-radius: 999px;
+  background: var(--bg-sunken); border: 1px solid var(--border);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.guide-demo .chip--rule { background: var(--violet-soft); border-color: transparent; color: var(--violet); }
+.guide-demo .chip--flow { background: var(--teal-soft); border-color: transparent; color: var(--teal); }
+
+.guide-demo .tally { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.guide-demo .tally__cell { background: var(--bg-sunken); border-radius: 9px; padding: 12px 14px; }
+.guide-demo .tally__value { display: block; font-size: 22px; font-weight: 680; line-height: 1.2; }
+.guide-demo .tally__label { font-size: 11.5px; color: var(--text-soft); }
+
+.guide-demo .result h4 { margin: 20px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); }
+
+.guide-demo .warnings {
+  margin-top: 16px; border-left: 3px solid var(--accent);
+  background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 12px 14px;
+  font-size: 13px;
+}
+.guide-demo .warnings ul { margin: 6px 0 0; padding-left: 18px; }
+
+.guide-demo .failure {
+  margin-top: 16px; border-left: 3px solid var(--red);
+  background: var(--red-soft); border-radius: 0 8px 8px 0; padding: 12px 14px; font-size: 13.5px;
+}
+.guide-demo .failure code { font-size: 12.5px; }
+
+.guide-demo .filelist {
+  max-height: 260px; overflow: auto; margin: 8px 0 0;
+  border: 1px solid var(--border); border-radius: 9px;
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px;
+}
+.guide-demo .filelist div { display: flex; justify-content: space-between; gap: 16px; padding: 4px 12px; }
+.guide-demo .filelist div:nth-child(odd) { background: var(--bg-soft); }
+.guide-demo .filelist span:last-child { color: var(--text-faint); }
+
+/* ---- the running application -------------------------------------------- */
+
+.guide-demo .stage { margin-top: 18px; display: none; }
+.guide-demo .stage.is-shown { display: block; }
+
+.guide-demo .stage__bar {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  padding: 9px 12px;
+  background: var(--bg-sunken);
+  border: 1px solid var(--border); border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.guide-demo .stage__dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); flex: none; }
+.guide-demo .stage__url {
+  flex: 1; min-width: 160px;
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--text-soft);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.guide-demo .stage__bar .btn { padding: 5px 11px; font-size: 12.5px; }
+
+.guide-demo .stage iframe {
+  display: block; width: 100%; height: min(78vh, 860px);
+  border: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius);
+  background: var(--bg);
+}
+
+.guide-demo .credentials {
+  margin-top: 12px; font-size: 13px; color: var(--text-soft);
+  background: var(--teal-soft); border-radius: 8px; padding: 10px 13px;
+}
+.guide-demo .credentials b { color: var(--text); }
+
+/* ---- log ---------------------------------------------------------------- */
+
+.guide-demo .log {
+  margin-top: 14px; max-height: 190px; overflow: auto;
+  background: var(--code-bg); color: var(--code-dim);
+  border-radius: 9px; padding: 11px 14px;
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; line-height: 1.75;
+}
+.guide-demo .log b { color: var(--code-text); font-weight: 500; }
+.guide-demo .log .ok { color: var(--code-str); }
+.guide-demo .log .bad { color: #ff8a7a; }
+
+.guide-demo .working { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 7px;
+  border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%;
+  animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) { .guide-demo .working { animation-duration: 0.01ms; } }
+
+/* ---- the build monitor -------------------------------------------------- */
+/*
+   One bar for the whole build, from reading the model to the application
+   answering requests. It appears when a model is loaded and stays put — a
+   progress bar that scrolls away during the ten seconds it is describing is
+   worse than none, so it sits above the steps rather than inside one.
+*/
+
+.guide-demo .build {
+  margin: 28px 0 0; padding: 16px 18px 14px;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow);
+  max-width: none;
+}
+.guide-demo .build__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.guide-demo .build__label { font-weight: 640; font-size: 14px; }
+.guide-demo .build__pct {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px; color: var(--text-soft); font-variant-numeric: tabular-nums;
+}
+.guide-demo .build[data-state="failed"] .build__label,
+.guide-demo .build[data-state="failed"] .build__pct { color: var(--red); }
+.guide-demo .build[data-state="done"] .build__label { color: var(--green); }
+
+.guide-demo .build__track {
+  margin-top: 9px; height: 7px; border-radius: 99px;
+  background: var(--bg-soft); border: 1px solid var(--border); overflow: hidden;
+}
+.guide-demo .build__fill {
+  height: 100%; width: 0; border-radius: 99px; background: var(--accent);
+  transition: width 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.guide-demo .build[data-state="done"] .build__fill { background: var(--green); }
+.guide-demo .build[data-state="failed"] .build__fill { background: var(--red); }
+
+.guide-demo .build__phases {
+  display: flex; flex-wrap: wrap; gap: 6px 18px;
+  margin: 12px 0 0; padding: 0; list-style: none;
+}
+.guide-demo .build__phase {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--text-faint);
+}
+.guide-demo .build__tick {
+  width: 9px; height: 9px; border-radius: 50%; flex: none;
+  border: 1.5px solid var(--border-strong); background: transparent;
+}
+.guide-demo .build__phase[data-state="active"] { color: var(--text); font-weight: 600; }
+.guide-demo .build__phase[data-state="active"] .build__tick {
+  border-color: var(--accent); background: var(--accent);
+  animation: build-pulse 1.1s ease-in-out infinite;
+}
+.guide-demo .build__phase[data-state="done"] { color: var(--text-soft); }
+.guide-demo .build__phase[data-state="done"] .build__tick { border-color: var(--green); background: var(--green); }
+.guide-demo .build__phase[data-state="failed"] { color: var(--red); font-weight: 600; }
+.guide-demo .build__phase[data-state="failed"] .build__tick { border-color: var(--red); background: var(--red); }
+
+.guide-demo .build__detail {
+  margin-top: 9px; min-height: 16px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11.5px; color: var(--text-soft);
+}
+
+@keyframes build-pulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) {
+  .guide-demo .build__fill { transition: none; }
+  .guide-demo .build__phase[data-state="active"] .build__tick { animation: none; }
+}
+
+/* ---- checker + fixer findings ------------------------------------------- */
+
+.guide-demo .diagnostics {
+  margin-top: 14px; padding: 13px 15px;
+  border: 1px solid var(--border); border-left-width: 3px; border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.guide-demo .diagnostics[data-state="ok"] { border-left-color: var(--green); }
+.guide-demo .diagnostics[data-state="failed"] { border-left-color: var(--red); background: var(--red-soft); }
+
+.guide-demo .diag__head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 13.5px; }
+.guide-demo .diag__head span { font-size: 12px; color: var(--text-soft); }
+
+.guide-demo .diags { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.guide-demo .diag {
+  display: grid; grid-template-columns: 58px 62px auto; gap: 3px 9px;
+  align-items: baseline; font-size: 12.5px; line-height: 1.5;
+}
+.guide-demo .diag__sev {
+  grid-column: 1; justify-self: start;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; background: var(--border); color: var(--text-soft);
+}
+.guide-demo .diag--error .diag__sev { background: var(--red); color: #fff; }
+.guide-demo .diag--warning .diag__sev { background: var(--accent); color: #fff; }
+.guide-demo .diag--fixed .diag__sev { background: var(--green); color: #fff; }
+.guide-demo .diag__code,
+.guide-demo .diag__line {
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; color: var(--text-faint);
+}
+.guide-demo .diag__line { grid-column: 3; justify-self: start; }
+.guide-demo .diag__msg { grid-column: 3; color: var(--text); }
+.guide-demo .diag__hint { grid-column: 3; font-size: 12px; color: var(--text-soft); }
+.guide-demo .diag__more { margin-top: 10px; font-size: 12.5px; }
+.guide-demo .diag__more summary { cursor: pointer; color: var(--text-soft); }
+.guide-demo .diag__foot { margin: 11px 0 0; font-size: 12.5px; color: var(--text-soft); }
+
+@media (max-width: 620px) {
+  .guide-demo .diag { grid-template-columns: 58px auto; }
+  .guide-demo .diag__code { grid-column: 2; }
+  .guide-demo .diag__line,
+.guide-demo .diag__msg,
+.guide-demo .diag__hint { grid-column: 1 / -1; }
+}
+
+
+/* ==========================================================================
+   Chapter 10 — "Run the real stack"
+   The few things that chapter has and chapter 09 does not. Everything else —
+   the flow steps, the build monitor, the diagnostics, the log — is shared
+   above, because they are the same page doing different work and should not
+   look like two products.
+   ========================================================================== */
+
+.guide-demo .result__note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.guide-demo .compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 20px 0 0;
+  max-width: none;
+}
+.guide-demo .compare__col {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.guide-demo .compare__col h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.guide-demo .compare__col ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+.guide-demo .compare__col b {
+  color: var(--text);
+}
+
+/* ---- the environment notice ---------------------------------------------
+   Chapter 10's two requirements, answered before the reader presses anything.
+   -------------------------------------------------------------------------- */
+
+.guide-demo .environment {
+  margin: 24px 0 0;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-soft);
+  max-width: none;
+}
+
+.guide-demo .environment b { color: var(--text); }
+.guide-demo .environment code { font-size: 12.5px; }
+
+.guide-demo .environment[data-state="ok"] {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border));
+  background: var(--green-soft);
+}
+
+.guide-demo .environment[data-state="blocked"] {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: var(--accent-soft);
+}
+
+/* ==========================================================================
+   Chapter 11 — the published validators, running on the page
+   ========================================================================== */
+
+.guide-demo .model-editor {
+  width: 100%;
+  min-height: 320px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  tab-size: 2;
+  resize: vertical;
+}
+
+.guide-demo .model-editor:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* The one-line answer, before the counts and the list of findings. */
+.guide-demo .verdict {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 550;
+}
+
+.guide-demo .verdict code { font-weight: 400; font-size: 12.5px; }
+
+.guide-demo .verdict--ok {
+  background: var(--green-soft);
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border));
+  color: var(--green);
+}
+
+.guide-demo .verdict--warn {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  color: var(--text);
+  font-weight: 450;
+}
+
+.guide-demo .verdict--bad {
+  background: var(--red-soft);
+  border-color: color-mix(in srgb, var(--red) 35%, var(--border));
+  color: var(--red);
+}
+
+.guide-demo pre.report {
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-width: none;
+}

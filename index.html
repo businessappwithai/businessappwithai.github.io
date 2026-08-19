@@ -316,7 +316,7 @@
   <section class="section section-gray">
     <div class="container">
       <div class="section-header">
-        <span class="hero-badge">Hands-on Guide · Nine Chapters</span>
+        <span class="hero-badge">Hands-on Guide · Twelve Chapters</span>
         <h2>Watch a Complete CRM Get Built, One Layer at a Time</h2>
         <p class="section-subtitle">Follow a single model file all the way to a running enterprise CRM — data model, business rules, workflows, generation, and the finished application. Every screenshot in the guide comes from the application it builds.</p>
       </div>
@@ -354,12 +354,17 @@
             <li style="padding: var(--spacing-sm) 0;">✓ Status lifecycles with role guards on every transition</li>
             <li style="padding: var(--spacing-sm) 0;">✓ Multi-step processes that write across tables</li>
             <li style="padding: var(--spacing-sm) 0;">✓ The admin dictionary, the audit log and per-screen help</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ The same application generated and run in your browser, with nothing to install</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ A published checker and fixer any page or agent can import</li>
           </ul>
-          <a href="guide/index.html" class="btn btn-primary btn-lg">Read the CRM Guide</a>
+          <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+            <a href="guide/index.html" class="btn btn-primary btn-lg">Read the CRM Guide</a>
+            <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg">Run It in Your Browser</a>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-4 mt-5">
+      <div class="grid grid-3 mt-5">
         <a href="guide/01-data-model.html" class="card">
           <div class="card-icon">🗂️</div>
           <h3>The Data Model</h3>
@@ -375,10 +380,20 @@
           <h3>Workflows</h3>
           <p>Status lifecycles, lifecycle hooks, and multi-step sagas that create and update across entities.</p>
         </a>
+        <a href="guide/06-dictionary.html" class="card">
+          <div class="card-icon">📖</div>
+          <h3>Application Dictionary</h3>
+          <p>Windows, tabs and fields, the rule and workflow editors, the audit log and per-screen help.</p>
+        </a>
         <a href="guide/07-it-runs.html" class="card">
           <div class="card-icon">▶️</div>
           <h3>Watch It Run</h3>
           <p>Qualify a lead and follow the rule, the action, the saga and the three rows it creates.</p>
+        </a>
+        <a href="guide/run-in-browser.html" class="card">
+          <div class="card-icon">⚡</div>
+          <h3>Run It in Your Browser</h3>
+          <p>Generate the application from the model and run it in the page — PostgreSQL in WebAssembly, no server, no install.</p>
         </a>
       </div>
     </div>
