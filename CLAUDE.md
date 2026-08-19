@@ -42,7 +42,7 @@ businessappwithai.github.io/
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
-├── llms-full.txt             # Machine-readable specification, for language models
+├── llms-full.txt             # EML language specification, for language models
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── features.html             # Product features detail
@@ -106,7 +106,7 @@ Deployment is fully automatic:
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
 | `guide/11-check-a-model.html` | Chapter 11: the authoring protocol, and the published validators running live |
-| `llms-full.txt` | The machine-readable specification language models are pointed at |
+| `llms-full.txt` | The EML language specification language models are pointed at — the language only, deliberately not the generator or the framework |
 
 ## Design System (Lunaris)
 
@@ -225,9 +225,10 @@ action, and it spans four files. If you change one, check the others.
 1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
    visitor copies a link to the host they are actually on. The copy button is
    `[data-copy]` pointing at `#research-prompt`. Both are handled by `main.js`.
-2. **`llms-full.txt`** is what that prompt tells the model to read. Its §10 is the
+2. **`llms-full.txt`** is what that prompt tells the model to read. Its §1 is the
    authoring protocol; the three steps on the page are a plain-English retelling of it.
-   If §10 changes upstream, the three cards should change with it.
+   If §1 changes, the three cards should change with it — and so should the section
+   number quoted in the prompt block.
 3. **`guide/run-in-browser.html#upload`** is where the reader lands with their model.
    The hash is honoured in `run-in-browser.js`: it selects the upload choice and scrolls
    the dropzone into view instead of showing the CRM example.
@@ -294,7 +295,7 @@ in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` b
 
 ## Chapter 11 — the published validators
 
-`guide/checker.js` and `guide/fixer.js` are the ES modules that §10.3 of `llms-full.txt` tells language
+`guide/checker.js` and `guide/fixer.js` are the ES modules that §1.3 and §8 of `llms-full.txt` tell language
 models to import, at exactly those URLs. **Do not move or rename them** — the specification, published
 here as `llms-full.txt`, hard-codes `https://appwithai.org/guide/checker.js` and `…/fixer.js`.
 
@@ -306,7 +307,7 @@ generator.
 ## Vendored files
 
 Everything under `assets/vendor/`, plus `assets/js/erdwithai-*.js`, `assets/js/run-*.js`,
-`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llms-full.txt`, comes from
+`guide/wasm-app/sw.js`, `guide/checker.js` and `guide/fixer.js` comes from
 `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand. The local deltas,
 all deliberate and all commented at the point of change:
 
@@ -315,7 +316,23 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | Probes `assets/vendor/pglite/` and mounts a re-export shim at the app's `vendor/pglite/index.js` | This site vendors PGlite, so no CDN is ever reached |
 | `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
 | `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
-| `llms-full.txt` | The guide's chapter count in the header | It describes this site, and this site has twelve chapters |
+
+## `llms-full.txt` is authored here, not vendored
+
+It began as a copy of the generator repository's `llmtext/llms-full.txt`, which documents the whole
+system — repository topology, the generator pipeline, the templates, the generated application, the
+modelling tool. **It is now a different document**: the EML language and nothing else, because the only
+thing a language model has to produce is a model file.
+
+- **Do not overwrite it from upstream.** Re-copying loses the rewrite. Take language changes across by
+  hand, and use `language/erdwithai-language.json` in the generator repository as the authority.
+- **§1 is the authoring protocol** — the four steps a model follows to answer "build me an app for X".
+  The home page's prompt block quotes that section number.
+- **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
+  `guide/fixer.js` are actually published at.
+- **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
+  and zero warnings.** That claim is made in the file's own header, so it has to stay true. Verify after
+  editing by extracting each block and running it through `guide/checker.js`.
 
 **On the published domain.** The specification quotes the validators as
 `https://appwithai.org/guide/checker.js`, and chapter 11 prints them that way. There is no `CNAME`

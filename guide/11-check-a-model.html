@@ -324,9 +324,11 @@ for (let pass = 2; pass &lt;= 3 &amp;&amp; report.ok; pass++) {
 
 <h2 id="spec">The specification, for machines</h2>
 <p>
-  The full machine-readable specification — the language, the pipeline, the templates, the shape of the
-  application that comes out, and the authoring protocol above in its authoritative form — is published
-  as a single file:
+  The full machine-readable specification of the modelling language — every directive, type, modifier,
+  cardinality, hook, step and diagnostic, plus the authoring protocol above in its authoritative form —
+  is published as a single file. It describes the language and nothing else: a model is all you need to
+  produce, so the generator, the framework and the shape of the emitted application are deliberately
+  left out of it.
 </p>
 <div class="code">
   <div class="code-head"><span class="tag">url</span></div>
