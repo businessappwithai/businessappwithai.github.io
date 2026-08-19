@@ -215,7 +215,7 @@
           <div class="card-icon">🔎</div>
           <h3>2. Hand it to ChatGPT or Gemini Deep Research</h3>
           <p>Give the model our machine-readable specification along with your description. It contains the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
-          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file, plus the specification it inferred so you can correct what it guessed.</p>
+          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the model itself, not a document describing it — plus the specification it inferred so you can correct what it guessed.</p>
         </div>
         <div class="card">
           <div class="card-icon">▶️</div>
@@ -235,7 +235,9 @@
 My business:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
 
-Deliver a single validated &lt;business-name&gt;.mmd file I can download, the enhanced specification you inferred, and the checker result with its counts.</pre>
+Deliver one file I can download: &lt;business-name&gt;.mmd. Its first line must be %%meta name:, and every line after it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
+
+Then, in your reply and not inside the file: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>

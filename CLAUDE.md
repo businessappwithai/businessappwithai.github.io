@@ -328,6 +328,14 @@ thing a language model has to produce is a model file.
   hand, and use `language/erdwithai-language.json` in the generator repository as the authority.
 - **§1 is the authoring protocol** — the four steps a model follows to answer "build me an app for X".
   The home page's prompt block quotes that section number.
+- **§1.0 states the deliverable**, and it is there for one reason: the observed failure is a model
+  answering with an *enhanced specification* — headings, entity glossary, lifecycle prose — and never
+  writing the Mermaid. The checker scores such a document `EML004`, *empty document*. §1.0 (the
+  deliverable), §1.2 (the file contract: first line `%%meta name:`, every other line Mermaid or a `%%`
+  directive), §1.3 (validate the file's bytes, and what `EML004` really means) and §10 (the checklist)
+  all carry that rule. Do not soften them back into "the first output is not Mermaid".
+- **Three places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
+  page's prompt block, and the three "Try It Yourself" cards.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at.
 - **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
