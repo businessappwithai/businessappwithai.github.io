@@ -13,7 +13,7 @@ businessappwithai.github.io/
 │       └── static.yml        # GitHub Actions: auto-deploy to GitHub Pages on push to main
 ├── assets/
 │   ├── css/
-│   │   ├── style.css         # Main stylesheet (Lunaris Design System, ~976 lines)
+│   │   ├── style.css         # Main stylesheet (Lunaris Design System, ~1,010 lines)
 │   │   ├── guide.css         # Documentation layer for the "Build a CRM" guide
 │   │   └── guide-demo.css    # Scoped styles for the three interactive chapters
 │   ├── js/
@@ -95,7 +95,7 @@ Deployment is fully automatic:
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing page: hero, stats, problem/solution, feature previews, demo showcase |
+| `index.html` | Landing page: hero, stats, problem/solution, feature previews, the **Try It Yourself** section, the live in-browser demo, and the CRM guide preview |
 | `features.html` | Detailed feature breakdown (AI modeling, forms, workflows, security, analytics) |
 | `how-it-works.html` | Step-by-step AI pipeline with multi-agent architecture diagram |
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
@@ -136,19 +136,36 @@ The CSS is organized as a complete design system. Use existing classes — do no
 
 **Navigation:** `.header`, `.nav`, `.nav-link`, `.logo`, `.menu-toggle`
 
+**Badges and stats:** `.hero-badge`, `.stats-grid`, `.stat-card`, `.stat-value`, `.stat-label`
+
+**Grids:** `.features-grid` (auto-fit feature cards), `.grid` + `.grid-2/3/4`
+
 **Timeline:** `.timeline`, `.timeline-item`
 
 **Comparison:** `.comparison-table` with `.check` / `.cross` marker classes
 
 **Pricing:** `.pricing-card`, `.pricing-card.popular`, `.pricing-badge`, `.pricing-features`
 
-**Utilities:** `.mt-1` through `.mt-5`, `.mb-1` through `.mb-5`
+**Utilities:** `.mt-1` through `.mt-5`, `.mb-1` through `.mb-5`,
+`.text-xs` / `.text-sm` / `.text-base`, `.text-center` / `.text-left` / `.text-right`,
+`.text-muted`, `.text-gradient`, `.container-narrow`, `.container-wide`
+
+> The font-size utilities were used across the marketing pages long before they were
+> defined, so they silently did nothing. They are defined now — if you change them,
+> six pages change with them.
 
 ### Responsive Breakpoints
 
-- Mobile: `max-width: 767px`
-- Tablet/Desktop: `min-width: 768px`
-- Design is desktop-first with mobile overrides
+| Query | What it governs |
+|---|---|
+| `min-width: 768px` | Desktop type scale and multi-column grids |
+| `min-width: 1024px` | The full navigation appears; the menu toggle is hidden |
+| `1024px–1279px` | Narrow desktops: the nav gap and type size tighten so seven items plus two buttons still fit |
+| `max-width: 1023px` | Navigation collapses behind the menu toggle |
+| `max-width: 767px` | Single-column layouts, full-width buttons, scrollable comparison tables |
+
+Design is desktop-first with mobile overrides. Test any new section at **767px** and
+any navigation change at **1024px**.
 
 ## JavaScript Conventions
 
@@ -160,6 +177,14 @@ The CSS is organized as a complete design system. Use existing classes — do no
 - **Form validation:** Red border on empty required fields on blur; blue border on focus
 - **Stats counter:** Animated number increment on scroll into view
 - **External links:** Automatically get `target="_blank"` + `rel="noopener noreferrer"`
+- **`[data-url]`:** The element's text is replaced with `data-url` resolved against
+  `window.location`. Use it for any absolute URL shown to a reader — the site is
+  written as `appwithai.org` but must also be correct on a fork, a staging host or a
+  local server. Never hard-code the production hostname in visible text.
+- **`[data-copy]`:** A button copies the text of the element whose id it names.
+  It reads the live DOM, so it picks up the resolved `[data-url]` values rather than
+  the placeholder in the source. Falls back to selecting the text where the clipboard
+  API is refused (private windows, plain `http://`).
 
 Utility functions available globally via the `utils` object:
 ```js
@@ -192,6 +217,23 @@ hosted Hospital Management System demo at a raw IP over plain `http://`; it has
 been removed site-wide and the CRM is the one worked example the whole site uses.
 Do not reintroduce a demo the site cannot serve itself.
 
+## "Try It Yourself" — the conversion path
+
+The section on the home page (`index.html#try-it-yourself`) is the site's main call to
+action, and it spans four files. If you change one, check the others.
+
+1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
+   visitor copies a link to the host they are actually on. The copy button is
+   `[data-copy]` pointing at `#research-prompt`. Both are handled by `main.js`.
+2. **`llms-full.txt`** is what that prompt tells the model to read. Its §10 is the
+   authoring protocol; the three steps on the page are a plain-English retelling of it.
+   If §10 changes upstream, the three cards should change with it.
+3. **`guide/run-in-browser.html#upload`** is where the reader lands with their model.
+   The hash is honoured in `run-in-browser.js`: it selects the upload choice and scrolls
+   the dropzone into view instead of showing the CRM example.
+4. **`how-it-works.html`** carries a pointer section that links back to the home page
+   rather than duplicating the steps. Keep it a pointer.
+
 ## Key Conventions for AI Assistants
 
 1. **No build step** — changes to HTML/CSS/JS are applied directly. Do not introduce npm, bundlers, or frameworks.
@@ -222,6 +264,8 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 **Constraints to respect**
 
 - The page must be served over `http://` or `https://` — a Service Worker cannot register from `file://`.
+- `#upload` in the URL opens the chapter with the upload choice selected. The home page's
+  "Try It Yourself" section links here that way — do not break the hash.
 - Paths in `run-in-browser.js` are resolved against the page URL (`models/…`, `wasm-app/…`), so the page,
   `guide/models/` and `guide/wasm-app/` must stay siblings.
 - `guide-demo.css` is scoped entirely to `.guide-demo` so that the demo's own `.btn`, `.card`, `.stage`
@@ -293,7 +337,10 @@ Steps:
   4. actions/deploy-pages@v4
 ```
 
-Concurrency is configured so that a new deploy cancels any in-progress deploy (not queued).
+Concurrency is `group: pages` with **`cancel-in-progress: false`** — a running deploy
+is allowed to finish, and only the most recent queued run follows it. A merge therefore
+takes a minute or two to appear; that is the workflow behaving correctly, not a stuck
+deploy.
 
 ## Product Context
 
@@ -308,7 +355,10 @@ Concurrency is configured so that a new deploy cancels any in-progress deploy (n
 
 **Generated app tech stacks offered:**
 
-- **Modern Web Stack:** Next.js 14+ / React 18 / Shadcn UI / TailwindCSS / TanStack (Table, Form, Query) / NestJS 10+ / Fastify / Knex.js / PostgreSQL
+- **Modern Web Stack:** TanStack Start / React 19+ / Shadcn UI / TailwindCSS / TanStack
+  (Table, Form, Query) / NestJS / Fastify / Kysely / PostgreSQL — plus Mastra.ai,
+  GoRules and Better-Auth. This is what `technology.html` and the guide describe, and
+  what chapter 10 actually assembles.
 - **Enterprise Stack:** OpenUI5 / OData protocol / PostgreSQL
 
 **Key value propositions:**
