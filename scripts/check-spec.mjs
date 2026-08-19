@@ -14,7 +14,10 @@
  *
  *   node scripts/check-spec.mjs
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { check, AUTO_FIXABLE, LANGUAGE_VERSION } from "../guide/checker.js";
 
@@ -143,5 +146,52 @@ t("rbac on an unknown target raises EML214", state("    [*] --> draft\n    draft
 t("enum, field, index, category", `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live\n%%category name: Core; description: The things; icon: Box; entities: Thing\nerDiagram\n    Thing {\n        string id PK\n        string status\n        string code\n    }\n%%field Thing.status enum: ThingStatus\n%%index Thing(status)\n%%index Thing(code) unique\n`);
 t("%%field naming a missing enum raises EML501", `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: Nowhere\n`, "EML501");
 
+/* --------------------------------- 3. the traps the spec now warns about ---- */
+
+// §5.2 — the machine tracks a column called status / state / stage (EML500).
+const machine = (entity, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string ${entity}\n    }\n${extra}\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`;
+t("a lifecycle column called status is accepted", machine("status", "%%field Thing.status enum: ThingStatus"));
+t("a lifecycle column called approval_status raises EML500", machine("approval_status", "%%field Thing.approval_status enum: ThingStatus"), "EML500");
+
+// §5.3 — UpdateEntity naming another entity must say which row (EML265).
+const target = (step) => `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string name\n    }\n    Other {\n        string id PK\n        string thing_id FK\n        string name\n    }\n    Thing ||--o{ Other : "spawns"\n\n%%meta name: Audit Saga\n%%meta kind: workflow\n%%workflow AuditSaga entity: Thing kind: saga\nflowchart TD\n    A([Start]) --> B[Create]\n    B --> C[Write]\n    C --> Z([End])\n\n    %%step B CreateEntity entity: Other as: newOtherId fields: {"thing_id":"id","name":"name"}\n${step}\n`;
+t("UpdateEntity on another entity with no target raises EML265", target("    %%step C UpdateEntity entity: Other field: name value: x"), "EML265");
+t("UpdateEntity reading back an earlier step's as: id", target("    %%step C UpdateEntity entity: Other targetSource: newOtherId field: name value: x"));
+t("UpdateEntity matching a foreign key", target("    %%step C UpdateEntity entity: Other targetField: thing_id field: name value: x"));
+t("UpdateEntity on the triggering record names no entity", target("    %%step C UpdateEntity field: name value: x"));
+
+// §3.5 — person columns resolve to User only by the documented list (EML502).
+const person = (column) => `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    User {\n        string id PK\n        string full_name\n    }\n    Thing {\n        string id PK\n        string ${column} FK\n    }\n    User ||--o{ Thing : "owns"\n`;
+for (const column of ["approved_by_id", "created_by_id", "owner_id", "user_id", "manager_id"])
+  t(`person column ${column} resolves to User`, person(column));
+for (const column of ["approver_id", "assigned_to_id"])
+  t(`person column ${column} does not resolve — EML502`, person(column), "EML502");
+t("assigned_to is recognised but does not end _id — EML114", person("assigned_to"), "EML114");
+
+// §7 — %%meta stack takes one of two values (EML003).
+for (const stack of ["tanstack-start-nestjs", "openui5-odatav4"])
+  t(`%%meta stack: ${stack}`, `%%meta name: Audit\n%%meta kind: erd\n%%meta stack: ${stack}\nerDiagram\n    Thing {\n        string id PK\n    }\n`);
+t("%%meta stack carrying anything else raises EML003", `%%meta name: Audit\n%%meta kind: erd\n%%meta stack: AppWithAI EML 1.2.0\nerDiagram\n    Thing {\n        string id PK\n    }\n`, "EML003");
+
 console.log(`${pass} claims verified, ${fail} contradicted`);
-process.exit(exampleFailures + fail === 0 ? 0 : 1);
+
+/* ------------------------------- 4. the runner §8.4 tells a model to use ---- */
+
+const runner = root + "guide/check-model.mjs";
+const scratch = mkdtempSync(join(tmpdir(), "eml-spec-"));
+const clean = join(scratch, "clean.mmd");
+const broken = join(scratch, "broken.mmd");
+writeFileSync(clean, "%%meta name: Runner Check\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string name\n    }\n");
+writeFileSync(broken, "%%meta name: Runner Check\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string name\n    }\n%%index Missing(name)\n");
+
+const run = (file) => spawnSync(process.execPath, [runner, file, "--base", root + "guide/", "--quiet"], { encoding: "utf8" });
+const cleanRun = run(clean);
+const brokenRun = run(broken);
+let runnerFail = 0;
+const expect = (cond, label) => { if (cond) console.log(`ok   ${label}`); else { runnerFail++; console.log(`FAIL ${label}`); } };
+expect(cleanRun.status === 0, "check-model.mjs exits 0 on a clean model");
+expect(/OK — 0 errors/.test(cleanRun.stdout), "check-model.mjs prints the checker's own verdict");
+expect(brokenRun.status === 1, "check-model.mjs exits 1 when the generator would refuse the model");
+expect(spawnSync(process.execPath, [runner], { encoding: "utf8" }).status === 2, "check-model.mjs exits 2 when it cannot run");
+
+process.exit(exampleFailures + fail + runnerFail === 0 ? 0 : 1);

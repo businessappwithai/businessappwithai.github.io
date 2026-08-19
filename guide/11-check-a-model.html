@@ -80,7 +80,8 @@
           <div class="guide-sidebar-foot">
             The checker and fixer on this page are the published modules at
             <code>/guide/checker.js</code> and <code>/guide/fixer.js</code> — the same engines
-            the command line runs.
+            the command line runs. For a shell, <code>/guide/check-model.mjs</code> runs them
+            in one command.
             <br><br>
             EML <span data-eml-version>1.2.0</span>
           </div>
@@ -341,6 +342,23 @@ for (let pass = 2; pass &lt;= 3 &amp;&amp; report.ok; pass++) {
   <b>Warnings are not noise.</b> Most describe something the generator accepts and quietly gets wrong —
   a dropped modifier, a state no enum backs, a rule that can decide but cannot act. Clear them, or be
   able to say why you left one.
+</p>
+
+<h2 id="command-line">The same check, from a command line</h2>
+<p>
+  This page is one way in. If you have a shell — or you are a language model with one — the same three
+  passes run in a single command, against the same two modules:
+</p>
+<pre><code>curl -sO <span data-url="check-model.mjs">https://appwithai.org/guide/check-model.mjs</span>
+node check-model.mjs my-business.mmd</code></pre>
+<p>
+  It finds <code>checker.js</code> and <code>fixer.js</code> — beside itself if all three were
+  downloaded together, otherwise from this site — runs <code>checkAndFix</code> and then two
+  <code>check</code> passes over the repaired bytes, prints the report, and exits <code>0</code> when
+  the model is clean and <code>1</code> when the generator would refuse it. <code>--write</code> saves
+  the repaired document back over the input. It is a runner, not a second checker: every diagnostic it
+  prints comes from the published modules, which is the same reason this page has no validation logic
+  of its own.
 </p>
 
 <h2 id="spec">The specification, for machines</h2>
