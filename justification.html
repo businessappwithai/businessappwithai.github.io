@@ -132,6 +132,35 @@
           <p class="text-muted"><strong>The right answer depends on the workload:</strong> read frequency against write frequency, selectivity, query shape, data volume, transaction characteristics. That is a judgement, not a rule.</p>
         </div>
       </div>
+
+      <div class="card mt-5">
+        <div class="grid grid-2" style="gap: var(--spacing-2xl); align-items: start;">
+          <div>
+            <div class="card-icon">🧠</div>
+            <h3 style="margin-top: var(--spacing-md);">"The garbage collector handles memory"</h3>
+            <p>In C, memory is a decision you cannot avoid making. Every <code>malloc</code> has to be matched by a <code>free</code>, so the cost of an allocation is visible in the code that causes it — and a developer learns what their program actually asks the machine for.</p>
+            <p>A managed runtime removes that ceremony. It does not remove the decision; it hides it. Allocation becomes free to <em>write</em>, so it stops being something anyone thinks about, and code starts allocating in places where nobody would have chosen to call <code>malloc</code>.</p>
+            <p class="text-muted">The question has not gone away. It has changed from <em>"when do I free this?"</em> to <em>"how much am I allocating, and how long does it live?"</em> — and the new question is invisible unless you already know to ask it.</p>
+          </div>
+          <div>
+            <h4>What the expert knows that the runtime does not tell you</h4>
+            <ul style="list-style: none; padding: 0; margin-top: var(--spacing-md);">
+              <li style="padding: var(--spacing-sm) 0;"><strong>Most objects die young</strong> — and the heap is divided into generations around exactly that fact.</li>
+              <li style="padding: var(--spacing-sm) 0;"><strong>Allocation rate drives collection rate.</strong> A hot loop churning short-lived objects turns a cheap young-generation sweep into a constant one.</li>
+              <li style="padding: var(--spacing-sm) 0;"><strong>Surviving is expensive.</strong> An object that lives long enough is promoted to the old generation, where collecting it costs far more — so a careless cache does not merely risk stale data, it converts short-lived garbage into permanent heap pressure.</li>
+              <li style="padding: var(--spacing-sm) 0;"><strong>A leak is no longer unfreed memory.</strong> It is an unwanted reference — a collection nobody empties, a listener nobody removes.</li>
+              <li style="padding: var(--spacing-sm) 0;"><strong>The collector is configurable.</strong> Heap size, generation ratios and the choice of collector are settings with right answers for a given workload, not defaults to be left alone — and a latency-sensitive service and a batch job want opposite ones.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-5" style="border-left: 4px solid var(--accent-500);">
+        <h3>Why the third example is the one that matters here</h3>
+        <p>The first two are mistakes of application: a good technique used where it does not belong. The third is different, and it is the pattern this whole page is about.</p>
+        <p>Garbage collection was a genuine advance. It removed an entire category of catastrophic bug and made most developers more productive. What it did <strong>not</strong> do was remove the need to understand memory — it moved the question from <em>"when do I free this?"</em> to <em>"how much am I allocating, and how long does it live?"</em>, and made that second question invisible unless you already knew to ask it.</p>
+        <p class="text-muted">That is the honest shape of every abstraction, including this one. <strong>AppWithAI removes ceremony too.</strong> A platform that generated applications and quietly encouraged people to believe that architecture, indexing, transaction boundaries and access control had stopped mattering would be repeating exactly the mistake described above. Which is the argument for putting the standards <em>into</em> the platform rather than trusting that they will not be needed: the decisions do not go away when the ceremony does. Someone still has to get them right — and it should not have to be a specialist the customer cannot afford to hire.</p>
+      </div>
     </div>
   </section>
 
