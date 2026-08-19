@@ -101,7 +101,7 @@ Deployment is fully automatic:
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
-| `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. Linked from the home page, Features, How It Works, Pricing and every footer; deliberately not in the primary nav, which is already full. |
+| `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
@@ -177,6 +177,20 @@ utils.setCookie(name, value, days)
 - All external links: include `target="_blank"` and `rel="noopener noreferrer"`
 - Meta tags required on every page: `charset`, `viewport`, `description`, `keywords`
 - Keep navigation consistent across all pages (copy from an existing page)
+
+## Navigation and the Live Demo
+
+The primary nav carries seven items plus two buttons and fits on one line down to
+1024px, below which it collapses behind the menu toggle. `.nav-link` is
+`white-space: nowrap` so a two-word label never breaks mid-item; the narrow-desktop
+media query (1024–1279px) tightens the gap and type size instead. **Adding an
+eighth nav item will not fit** — check at 1024px before you do.
+
+**"Live Demo" points at `guide/run-in-browser.html`**, the in-browser CRM. It is
+same-origin, so it carries no `target="_blank"`. There was formerly an externally
+hosted Hospital Management System demo at a raw IP over plain `http://`; it has
+been removed site-wide and the CRM is the one worked example the whole site uses.
+Do not reintroduce a demo the site cannot serve itself.
 
 ## Key Conventions for AI Assistants
 
