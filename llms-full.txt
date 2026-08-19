@@ -293,6 +293,30 @@ hand, and the user can validate it in their own browser in a few seconds at
 modules with nothing to install. An unvalidated `.mmd` is still the deliverable.
 A specification handed over in place of one never is.
 
+§10 asks whether the model is *right*. The table below is the other half — the
+mechanical faults the checker catches by reading, which a human eye slides past.
+Each row names the diagnostic it prevents, so a report you get later is
+traceable to the line you did not check.
+
+| Read your file and confirm | Code it prevents |
+|---|---|
+| There is an `erDiagram` with at least one entity block | `EML004` |
+| `%%meta name:` is present | `EML001` |
+| Every entity declares exactly one `PK` | `EML117` |
+| Every foreign key column ends `_id` | `EML114` |
+| Every foreign key's prefix resolves to a declared entity **by name** — `purchase_order_line_id` finds `PurchaseOrderLine`, and finds nothing if the entity is called `POLine` | `EML502` |
+| Every foreign key has a matching relationship line | `EML502` |
+| Every modifier is one of `PK` `FK` `UK` `UNIQUE` `OPTIONAL` `NULL` | `EML118` |
+| Every type appears in the §3.2 table | `EML115` |
+| Every `%%field … enum:` names a declared `%%enum` | `EML501` |
+| Every state machine has `[*] --> <first>` and `<last> --> [*]` | `EML421` `EML422` |
+| Every state is a value of the enum bound to that status column | `EML426` `EML428` |
+| Every `%%rbac` / `%%rule` / `%%workflow` / `%%hook` / `%%step` names a declared entity | `EML213` `EML251` `EML242` `EML202` `EML266` |
+| Every `%%rbac` target is a CRUD operation or a transition that machine declares | `EML214` |
+| Every `kind: saga` marked `trigger: rule` is named by some `%%action` | `EML286` |
+| Every `%%rule` is bound with `on <Entity> event: <hookType>` | `EML506` |
+| `fields:` is the last key on its `%%step` line | — |
+
 ### 1.4 Deliver
 
 Hand back the finished `<business-name>.mmd` as **a file the user can download**,
@@ -481,6 +505,11 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
 
 - A foreign key that does not end `_id` cannot be resolved: `EML114`, and the
   fixer appends the suffix.
+- **The prefix has to match the entity's name as the parser derives it.**
+  `purchase_order_line_id` finds `PurchaseOrderLine`. It does not find `POLine`,
+  because `po_line` reads back as `PoLine` — an entity whose name runs two
+  capitals together cannot be reached by a foreign key. Name such an entity
+  `PurchaseOrderLine` rather than trying to spell the column around it.
 - Columns ending `_by` (`created_by`, `approved_by`) resolve to the user entity.
 - Declare the matching relationship line as well as the column. A `FK` with no
   relationship raises `EML502`, and the generated interface loses the navigation
