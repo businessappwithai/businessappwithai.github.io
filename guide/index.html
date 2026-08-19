@@ -69,6 +69,11 @@
             <li><a href="07-it-runs.html"><span class="guide-num">07</span> Watch it run</a></li>
             <li><a href="08-reference.html"><span class="guide-num">08</span> Reference</a></li>
             <li><a href="run-in-browser.html"><span class="guide-num">09</span> Run it in your browser</a></li>
+            <li><a href="run-real-stack.html"><span class="guide-num">10</span> Run the real stack</a></li>
+          </ul>
+          <div class="guide-toc-heading">Author your own</div>
+          <ul class="guide-nav">
+            <li><a href="11-check-a-model.html"><span class="guide-num">11</span> Check a model</a></li>
           </ul>
           <div class="guide-sidebar-foot">
             Every screenshot on these pages comes from the CRM built in this guide, running locally.
@@ -314,6 +319,16 @@
     <h3>Run it in your browser</h3>
     <p>Generate the application from the model and run it in this tab &mdash; Postgres in WebAssembly, no server, nothing to install.</p>
   </a>
+  <a class="guide-card" href="run-real-stack.html">
+    <div class="guide-card-num">Chapter 10</div>
+    <h3>Run the real stack</h3>
+    <p>The four hundred files the CLI writes, installed and started by a WebContainer &mdash; real Node, real NestJS, the real Vite build.</p>
+  </a>
+  <a class="guide-card" href="11-check-a-model.html">
+    <div class="guide-card-num">Chapter 11</div>
+    <h3>Check a model</h3>
+    <p>The published checker and fixer, running on the page, and the authoring protocol that gets a business description to a model the generator accepts.</p>
+  </a>
 </div>
 
 <h2>Before you start</h2>
@@ -367,6 +382,17 @@ bun run dev                            <span class="c-com"># API :4001, web :400
   <a href="01-data-model.html">chapter 01</a>. If you want to watch the whole chain fire before you read a
   line of EML, jump to <a href="07-it-runs.html">chapter 07</a>.
 </p>
+
+<div class="note win">
+  <div class="note-title">Writing a model of your own?</div>
+  <p>
+    <a href="11-check-a-model.html"><strong>Chapter 11</strong></a> is the procedure — how to turn a
+    business description into a model a generator will accept, and how to prove it. The checker and
+    fixer it runs are published as ES modules at
+    <code>/guide/checker.js</code> and <code>/guide/fixer.js</code>, and the whole specification,
+    written for language models, is one file at <a href="../llms-full.txt">llms-full.txt</a>.
+  </p>
+</div>
 
 <div class="note tip">
   <div class="note-title">Where this guide sits</div>

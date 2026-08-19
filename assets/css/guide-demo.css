@@ -386,3 +386,145 @@
 .guide-demo .diag__msg,
 .guide-demo .diag__hint { grid-column: 1 / -1; }
 }
+
+
+/* ==========================================================================
+   Chapter 10 — "Run the real stack"
+   The few things that chapter has and chapter 09 does not. Everything else —
+   the flow steps, the build monitor, the diagnostics, the log — is shared
+   above, because they are the same page doing different work and should not
+   look like two products.
+   ========================================================================== */
+
+.guide-demo .result__note {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+.guide-demo .compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin: 20px 0 0;
+  max-width: none;
+}
+.guide-demo .compare__col {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.guide-demo .compare__col h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.guide-demo .compare__col ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+.guide-demo .compare__col b {
+  color: var(--text);
+}
+
+/* ---- the environment notice ---------------------------------------------
+   Chapter 10's two requirements, answered before the reader presses anything.
+   -------------------------------------------------------------------------- */
+
+.guide-demo .environment {
+  margin: 24px 0 0;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-soft);
+  max-width: none;
+}
+
+.guide-demo .environment b { color: var(--text); }
+.guide-demo .environment code { font-size: 12.5px; }
+
+.guide-demo .environment[data-state="ok"] {
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border));
+  background: var(--green-soft);
+}
+
+.guide-demo .environment[data-state="blocked"] {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: var(--accent-soft);
+}
+
+/* ==========================================================================
+   Chapter 11 — the published validators, running on the page
+   ========================================================================== */
+
+.guide-demo .model-editor {
+  width: 100%;
+  min-height: 320px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  tab-size: 2;
+  resize: vertical;
+}
+
+.guide-demo .model-editor:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* The one-line answer, before the counts and the list of findings. */
+.guide-demo .verdict {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 550;
+}
+
+.guide-demo .verdict code { font-weight: 400; font-size: 12.5px; }
+
+.guide-demo .verdict--ok {
+  background: var(--green-soft);
+  border-color: color-mix(in srgb, var(--green) 35%, var(--border));
+  color: var(--green);
+}
+
+.guide-demo .verdict--warn {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  color: var(--text);
+  font-weight: 450;
+}
+
+.guide-demo .verdict--bad {
+  background: var(--red-soft);
+  border-color: color-mix(in srgb, var(--red) 35%, var(--border));
+  color: var(--red);
+}
+
+.guide-demo pre.report {
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  max-width: none;
+}

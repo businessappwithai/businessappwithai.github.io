@@ -43,6 +43,7 @@ const state = {
   summary: null,
   registration: null,
   review: null,
+  pgliteUrl: null,
 };
 
 /* ---------------------------------------------------------------- progress */
@@ -585,11 +586,25 @@ async function run(fresh) {
     const registration = await ensureServiceWorker();
     say("Service Worker active", "ok");
 
+    /*
+     * The application's first candidate for PGlite is `vendor/pglite/index.js`
+     * beside itself, which the CLI writes there with `--vendor-pglite` and a
+     * browser build cannot: eighteen megabytes will not travel through a
+     * postMessage. Serving a re-export at that path costs one line and spares
+     * every run a 404 on a file that is, in substance, present.
+     *
+     * Added to what is mounted rather than to `state.files`, so the file count
+     * and the download stay the generator's output rather than ours.
+     */
+    const files = state.pgliteUrl
+      ? { ...state.files, "vendor/pglite/index.js": `export * from ${JSON.stringify(state.pgliteUrl)};\n` }
+      : state.files;
+
     say(`Mounting ${Object.keys(state.files).length} files at ${BASE}`);
     const mounted = await ask(registration.active, {
       type: "mount",
       basePath: BASE,
-      files: state.files,
+      files,
     });
     if (!mounted.ok) throw new Error(mounted.error || "the Service Worker refused the files");
     say(`Mounted ${mounted.files} files`, "ok");
@@ -775,11 +790,27 @@ function escapeHtml(value) {
 
 const titleCase = (value) => value.replace(/\b\w/g, (character) => character.toUpperCase());
 
-/*
- * The upstream copy of this file probes for a locally vendored PGlite before
- * falling back to the CDN. This site does not vendor one — seventeen megabytes
- * of WebAssembly does not belong in a marketing repository — so the probe is
- * removed rather than left to 404 on every page load. The CDN default stands.
+/**
+ * Find the PostgreSQL build this site ships.
+ *
+ * The generated application looks for PGlite in three places, in order: beside
+ * itself, at whatever URL it was generated with, and finally jsDelivr. This site
+ * vendors its own copy under `assets/vendor/pglite/`, so the first two are made
+ * to hit that and the CDN is never reached — the chapter works on a network that
+ * blocks third-party hosts, and it keeps working if jsDelivr does not.
+ *
+ * Probed rather than assumed: if the copy is ever missing the page still runs,
+ * it just falls back the way upstream does.
  */
+async function findVendoredPglite() {
+  try {
+    const url = new URL("../assets/vendor/pglite/index.js", window.location.href).href;
+    const response = await fetch(url, { method: "HEAD" });
+    if (response.ok) state.pgliteUrl = url;
+  } catch {
+    // Left unset: the generated application falls back to the CDN on its own.
+  }
+}
 
+await findVendoredPglite();
 await selectChoice("crm");

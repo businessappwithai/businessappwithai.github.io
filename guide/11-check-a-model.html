@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Check an EML model against the published validators — the same engines the command line runs — and follow the authoring protocol that turns a business description into a model a generator will accept.">
+  <meta name="keywords" content="AppWithAI, EML checker, EML fixer, model validation, authoring protocol, Mermaid model, ERD, business rules, BPMN workflow, saga, code generation, LLM specification, llms-full.txt">
+  <title>11 · Check a model — Build a CRM with AppWithAI</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/guide.css">
+  <link rel="stylesheet" href="../assets/css/guide-demo.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="../index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="../index.html" class="nav-link">Home</a></li>
+          <li><a href="../features.html" class="nav-link">Features</a></li>
+          <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="../technology.html" class="nav-link">Technology</a></li>
+          <li><a href="index.html" class="nav-link active">Guide</a></li>
+          <li><a href="../pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="../contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="guide-shell">
+    <aside class="guide-sidebar">
+      <div class="guide-eyebrow-label">Hands-on guide</div>
+      <div class="guide-sidebar-title">Build a CRM, end to end</div>
+      <details class="guide-toc" id="guideToc" open>
+        <summary class="guide-toc-summary">
+          <span>Chapters</span>
+          <span class="guide-toc-current">11 · Check a model</span>
+        </summary>
+        <div class="guide-toc-body">
+          <div class="guide-toc-heading">Start here</div>
+          <ul class="guide-nav">
+            <li><a href="index.html"><span class="guide-num">00</span> Overview</a></li>
+          </ul>
+          <div class="guide-toc-heading">Write the model</div>
+          <ul class="guide-nav">
+            <li><a href="01-data-model.html"><span class="guide-num">01</span> The data model</a></li>
+            <li><a href="02-business-rules.html"><span class="guide-num">02</span> Business rules</a></li>
+            <li><a href="03-workflows.html"><span class="guide-num">03</span> Workflows</a></li>
+          </ul>
+          <div class="guide-toc-heading">Generate and run</div>
+          <ul class="guide-nav">
+            <li><a href="04-generate.html"><span class="guide-num">04</span> Generate the app</a></li>
+            <li><a href="05-application.html"><span class="guide-num">05</span> Tour the app</a></li>
+            <li><a href="06-dictionary.html"><span class="guide-num">06</span> Application Dictionary</a></li>
+          </ul>
+          <div class="guide-toc-heading">Prove it</div>
+          <ul class="guide-nav">
+            <li><a href="07-it-runs.html"><span class="guide-num">07</span> Watch it run</a></li>
+            <li><a href="08-reference.html"><span class="guide-num">08</span> Reference</a></li>
+            <li><a href="run-in-browser.html"><span class="guide-num">09</span> Run it in your browser</a></li>
+            <li><a href="run-real-stack.html"><span class="guide-num">10</span> Run the real stack</a></li>
+          </ul>
+          <div class="guide-toc-heading">Author your own</div>
+          <ul class="guide-nav">
+            <li><a href="11-check-a-model.html" aria-current="page"><span class="guide-num">11</span> Check a model</a></li>
+          </ul>
+          <div class="guide-sidebar-foot">
+            The checker and fixer on this page are the published modules at
+            <code>/guide/checker.js</code> and <code>/guide/fixer.js</code> — the same engines
+            the command line runs.
+            <br><br>
+            EML <span data-eml-version>1.2.0</span>
+          </div>
+        </div>
+      </details>
+    </aside>
+
+    <main class="guide-main">
+      <article class="guide-content guide-content-wide guide-demo">
+
+<span class="eyebrow">Chapter 11</span>
+<h1>Check a model before you ship it</h1>
+<p class="lede">
+  A model is not finished when it is written. It is finished when the checker accepts it. This chapter
+  is the procedure for getting there — and the checker itself, running on this page, so you can put a
+  document through it without installing anything.
+</p>
+
+<h2 id="validators">The published validators</h2>
+<p>
+  Two ES modules are published at fixed URLs on this site. They are bundled from
+  <code>language/checker.ts</code> and <code>language/fixer.ts</code> by
+  <code>scripts/build-language-tools.ts</code> — the same engines the command line runs, not a lighter
+  web edition — so a document that passes here is a document <code>erdwithai</code> will accept.
+</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Module</th><th>URL</th><th>What it gives you</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>checker.js</code></td>
+      <td><code>https://appwithai.org/guide/checker.js</code></td>
+      <td>Every diagnostic <code>bun language/checker.ts</code> prints, as <code>check(source)</code>.</td>
+    </tr>
+    <tr>
+      <td><code>fixer.js</code></td>
+      <td><code>https://appwithai.org/guide/fixer.js</code></td>
+      <td>The five auto-repairs, plus <code>checkAndFix(source)</code> — repair and re-check in one call.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="code">
+  <div class="code-head"><span class="tag">javascript</span></div>
+<pre><code>import { check, formatReport } from "https://appwithai.org/guide/checker.js";
+import { checkAndFix }         from "https://appwithai.org/guide/fixer.js";
+
+const report = check(source);
+<span class="c-com">// { ok, counts: { errors, warnings, infos }, issues: [...], languageVersion }</span>
+
+console.log(formatReport(report));</code></pre>
+</div>
+
+<p>
+  Both also attach themselves to <code>globalThis</code> as <code>EMLChecker</code> and
+  <code>EMLFixer</code>, so a page that loaded them with a bare <code>import</code> and no bindings can
+  still call them. They are built against EML <span data-eml-version>1.2.0</span>, and every report says
+  which version produced it.
+</p>
+
+<h2 id="try">Check a model now</h2>
+<p>
+  Everything below runs in this tab, against those two modules at those two URLs. Nothing is uploaded.
+</p>
+
+<div class="flow">
+  <section class="flow-step" data-state="active">
+    <header class="flow-step__head">
+      <span class="flow-step__num">1</span>
+      <div>
+        <h2 class="flow-step__title">The document</h2>
+        <p class="flow-step__hint">Start from an example, break one on purpose, or paste your own.</p>
+      </div>
+    </header>
+    <div class="flow-step__body">
+      <div class="choices">
+        <button type="button" class="choice" id="choice-crm" aria-pressed="true">
+          <span class="choice__name">The CRM model</span>
+          <span class="choice__desc">The seventeen-entity model this guide builds. It comes back clean — which is the point of showing it.</span>
+          <span class="choice__meta">crm.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-drug" aria-pressed="false">
+          <span class="choice__name">The drug-discovery model</span>
+          <span class="choice__desc">A regulated-lab model — compounds, experiments, deviations, CAPAs.</span>
+          <span class="choice__meta">drug-discovery.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-broken" aria-pressed="false">
+          <span class="choice__name">A broken model</span>
+          <span class="choice__desc">Four faults on purpose: one error the fixer cannot touch, and three warnings it can. Press Check, then Check and repair.</span>
+          <span class="choice__meta">tiny-shop.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-paste" aria-pressed="false">
+          <span class="choice__name">Your own</span>
+          <span class="choice__desc">Paste it below, or choose a file. It is read in this tab and uploaded nowhere.</span>
+          <span class="choice__meta">.mmd · .eml.mmd · .md</span>
+        </button>
+      </div>
+
+      <label class="dropzone" for="file">
+        <input type="file" id="file" accept=".mmd,.md,.txt,text/plain">
+        <b>Choose a file</b> instead of pasting
+      </label>
+
+      <textarea id="model" class="model-editor" spellcheck="false" autocomplete="off"
+                aria-label="The EML model to check"></textarea>
+
+      <div class="actions">
+        <button type="button" class="btn btn--primary" id="check">Check</button>
+        <button type="button" class="btn btn--go" id="fix">Check and repair</button>
+        <button type="button" class="btn" id="download-fixed" hidden>Download the repaired model</button>
+      </div>
+
+      <div class="result" id="check-result"></div>
+    </div>
+  </section>
+</div>
+
+<h2 id="protocol">The authoring protocol</h2>
+<p>
+  This is the procedure the specification asks anyone — person or model — to follow when someone
+  describes a business and asks for an application. Four steps, in order. The first is the one most
+  often skipped, and skipping it is what produces a schema that validates and a business that does not
+  run.
+</p>
+
+<ol class="steps">
+  <li>
+    <h3>Enhance the brief before modelling it</h3>
+    <p>
+      A business description is always thinner than the model it implies. Someone who asks for “a
+      booking system for a dance studio” has not mentioned instructors, rooms, cancellation windows,
+      waitlists, or what happens to a class when its instructor calls in sick — and every one of those
+      is a table, a rule or a workflow.
+    </p>
+    <p>So the first output is not Mermaid. It is an enhanced specification, stated back to the user, covering all five of:</p>
+    <ul>
+      <li><b>The entity model</b> — every entity the business needs, not only the ones named, with types, modifiers, keys, foreign keys and cardinalities, including the reference and lookup entities the described flow silently depends on.</li>
+      <li><b>Each entity's workflow</b> — the states a record moves through, the event on each edge, and who may make each move. An entity with a <code>status</code> field has a state machine whether or not anyone drew it.</li>
+      <li><b>The business rules</b> — what decides what, the inputs each reads, and whether it merely <i>decides</i> or must also <i>act</i>. A rule that must act needs <code>%%action</code>.</li>
+      <li><b>Cross-entity effects</b> — where changing one entity must create or update another: an order line decrementing stock, an approval writing a ledger entry, a cancellation releasing a slot. These are the ones most often missed.</li>
+      <li><b>The multi-step workflows</b> — any flow spanning more than one entity or actor, end to end, including what happens when a step fails and what compensates a step already taken.</li>
+    </ul>
+    <p>
+      State assumptions as assumptions. Where the description leaves a genuine fork — two plausible
+      businesses, materially different models — ask rather than picking silently.
+    </p>
+  </li>
+  <li>
+    <h3>Write the model</h3>
+    <p>
+      Only now write the document: the ERD section, the rules sections, the workflow sections, and the
+      directives that give them meaning. Every entity from step 1 appears; every rule is a
+      <code>%%rule</code> flowchart or an <code>%%action</code>; every cross-entity effect is a hook, an
+      action or a step; every multi-step flow is a saga.
+    </p>
+    <p>
+      Name the file after the business — <code>acme-dance-studio.mmd</code>, lower-case, hyphenated, one
+      file. Check a directive's <code>status</code> before relying on it: <code>%%entity</code>,
+      <code>%%rule</code> and <code>%%trigger</code> are validated but not compiled, so do not promise
+      behaviour that rides on them.
+    </p>
+  </li>
+  <li>
+    <h3>Validate — three runs, three repairs</h3>
+    <p>
+      Run the checker <b>at least three times</b>. Not ceremony: a repair can uncover a problem the
+      original error was masking, so a single clean pass immediately after an edit describes a document
+      that no longer exists. The third pass over unchanged bytes is what makes “clean” mean clean.
+    </p>
+    <p>
+      If it fails, correct the cause in the model — not the symptom in the text — and re-run, up to
+      three correction attempts. Do not deliver a document that still has errors after three. Deliver
+      the best version you have, say plainly which diagnostics remain, and let the user decide.
+    </p>
+  </li>
+  <li>
+    <h3>Deliver</h3>
+    <p>
+      Hand back the finished <code>&lt;business-name&gt;.mmd</code> as a <b>downloadable file</b>, not a
+      fenced block someone has to copy out of a chat log. Alongside it: the enhanced specification from
+      step 1, so the user can correct what you inferred; the final checker result with counts; and
+      anything you assumed or left unresolved.
+    </p>
+  </li>
+</ol>
+
+<div class="code">
+  <div class="code-head"><span class="tag">javascript</span></div>
+<pre><code><span class="c-com">// Pass 1 — repair the five auto-fixable codes, then re-check what survived.</span>
+let report = checkAndFix(model);
+model = report.source;
+
+<span class="c-com">// Passes 2 and 3 — check the repaired bytes, and confirm they are stable.</span>
+for (let pass = 2; pass &lt;= 3 &amp;&amp; report.ok; pass++) {
+  report = { ...check(model), source: model };
+}</code></pre>
+</div>
+
+<div class="note warn">
+  <div class="note-title">Never hand over a model you have not checked</div>
+  <p>
+    Silently shipping a model that fails validation is the one outcome worse than not finishing. If it
+    does not come clean in three attempts, say so, with the diagnostics that remain and what you tried.
+  </p>
+</div>
+
+<h2 id="diagnostics">Reading a diagnostic</h2>
+<p>
+  Every finding carries a <code>code</code>, a <code>line</code> and a <code>hint</code>, and the codes
+  are banded so the band alone tells you where the fault is.
+</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Band</th><th>Where the fault is</th></tr></thead>
+  <tbody>
+    <tr><td><code>EML0xx</code></td><td>The document — its structure, its sections, its metadata.</td></tr>
+    <tr><td><code>EML1xx</code></td><td>Entities — attributes, types, keys, relationships.</td></tr>
+    <tr><td><code>EML2xx</code></td><td>Directive-declared hooks, rules and workflows.</td></tr>
+    <tr><td><code>EML3xx</code></td><td>Rule flowcharts.</td></tr>
+    <tr><td><code>EML4xx</code></td><td>Workflow sections.</td></tr>
+    <tr><td><code>EML5xx</code></td><td>Cross-section consistency — the two halves of the document disagreeing.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Five codes can be repaired without being told what was meant, and the fixer repairs exactly those:
+  <code>EML001</code>, <code>EML114</code>, <code>EML117</code>, <code>EML421</code> and
+  <code>EML422</code>. Everything else needs a decision, which is why <code>checkAndFix</code> reports
+  what it could not touch rather than guessing.
+</p>
+
+<p>
+  <b>Warnings are not noise.</b> Most describe something the generator accepts and quietly gets wrong —
+  a dropped modifier, a state no enum backs, a rule that can decide but cannot act. Clear them, or be
+  able to say why you left one.
+</p>
+
+<h2 id="spec">The specification, for machines</h2>
+<p>
+  The full machine-readable specification — the language, the pipeline, the templates, the shape of the
+  application that comes out, and the authoring protocol above in its authoritative form — is published
+  as a single file:
+</p>
+<div class="code">
+  <div class="code-head"><span class="tag">url</span></div>
+<pre><code>https://appwithai.org/llms-full.txt</code></pre>
+</div>
+<p>
+  Point a language model at it before asking for a model, and it has the language definition, the
+  directive table, the checker codes and this protocol without having to guess at any of them. When that
+  file and <code>language/erdwithai-language.json</code> disagree, the definition wins; when the
+  definition and a shipped compiler disagree, the compiler wins and the definition is the bug.
+</p>
+
+<nav class="pager">
+  <a href="run-real-stack.html"><span class="dir">Previous</span><div class="ttl">← 10 · Run the real stack</div></a>
+  <a class="next" href="index.html"><span class="dir">Back to</span><div class="ttl">00 · Overview →</div></a>
+</nav>
+
+      </article>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="../features.html">Features</a></li>
+            <li><a href="../how-it-works.html">How It Works</a></li>
+            <li><a href="../technology.html">Technology</a></li>
+            <li><a href="index.html">Build a CRM Guide</a></li>
+            <li><a href="../pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="../contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source &mdash; <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="http://148.135.137.110/" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">View Hospital Management System Demo &rarr;</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/guide.js"></script>
+  <script type="module" src="../assets/js/validator.js"></script>
+</body>
+</html>

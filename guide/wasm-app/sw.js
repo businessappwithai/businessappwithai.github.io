@@ -178,8 +178,21 @@ self.addEventListener("fetch", (event) => {
 });
 
 async function serve(request) {
-  const cached = await caches.match(request, { cacheName: CACHE, ignoreSearch: true });
-  if (cached) return cached;
+  // `ignoreMethod` because the Cache API matches GET requests only, and the
+  // generated application probes for optional files with HEAD before importing
+  // them. Without it every such probe escapes to the network and 404s against a
+  // file this worker is, in fact, serving. A HEAD answer carries the headers
+  // without the body, the way a real server replies.
+  const cached = await caches.match(request, {
+    cacheName: CACHE,
+    ignoreSearch: true,
+    ignoreMethod: true,
+  });
+  if (cached) {
+    return request.method === "HEAD"
+      ? new Response(null, { status: cached.status, headers: cached.headers })
+      : cached;
+  }
   try {
     return await fetch(request);
   } catch {
