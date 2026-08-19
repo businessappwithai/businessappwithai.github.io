@@ -537,7 +537,8 @@ identically in the diagram. `EML118` warns about it. Read that warning.
 
 ### 3.4 Relationships and cardinality
 
-All eight Mermaid ER operators compile:
+Mermaid's ER grammar lets you pair any left marker with any right marker. **EML
+reads these eight spellings, and only these eight:**
 
 | Operator | Kind | Example |
 |---|---|---|
@@ -549,6 +550,16 @@ All eight Mermaid ER operators compile:
 | `}\|--\|\|` | many to one | `OrderItem }\|--\|\| Order : belongs_to` |
 | `}o--o{` | many to many | `Student }o--o{ Course : enrolls` |
 | `}\|--\|{` | many to many | `Author }\|--\|{ Book : writes` |
+
+**A relationship spelled any other way is dropped in silence.** `Appointment
+||--o| Consultation : "becomes"` is valid Mermaid and renders exactly as drawn,
+but no relationship reaches the model — and nothing points at the line. What you
+get instead is `EML502` on a foreign key whose parent "has no relationship", or
+`EML503` on an entity that now looks isolated. When a diagnostic denies a
+relationship you know you drew, check its operator against the eight above before
+anything else. Optional-on-the-many-side is `||--o{`; optional one-to-one is
+`|o--o|`; there is no eight-operator spelling for "exactly zero or one child", so
+model it as one-to-many and let the rule enforce the rest.
 
 The label after the colon is the verb of the relationship and appears in the
 generated interface. Write a real one — `"places"`, `"employs"`, `"hosts"` — not

@@ -95,6 +95,12 @@ t("unknown modifier raises EML118", erd(`    Thing {\n        string id PK\n    
 for (const op of ["||--||","|o--o|","||--o{","||--|{","}o--||","}|--||","}o--o{","}|--|{"])
   t(`cardinality ${op}`, erd(`    Alpha {\n        string id PK\n    }\n    Beta {\n        string id PK\n    }\n    Alpha ${op} Beta : "relates"`));
 
+// §3.4 — a spelling outside those eight is dropped, and only EML502 shows it.
+const related = (op) => erd(`    Alpha {\n        string id PK\n    }\n    Beta {\n        string id PK\n        string alpha_id FK\n    }\n    Alpha ${op} Beta : "relates"`);
+t("a recognised operator registers the relationship", related("||--o{"));
+for (const op of ["||--o|", "|o--|{", "}o--|{", "}|--o{"])
+  t(`the Mermaid-legal but unread operator ${op} loses the relationship — EML502`, related(op), "EML502");
+
 // --- 5. §5.1 the thirteen hook types ---------------------------------------
 const HOOKS = ["beforeCreate","afterCreate","beforeUpdate","afterUpdate","beforeDelete","afterDelete",
   "beforeRead","afterRead","beforeList","afterList","beforeQuery","afterQuery","customValidate"];
