@@ -13,9 +13,21 @@ businessappwithai.github.io/
 │       └── static.yml        # GitHub Actions: auto-deploy to GitHub Pages on push to main
 ├── assets/
 │   ├── css/
-│   │   └── style.css         # Main stylesheet (Lunaris Design System, ~976 lines)
+│   │   ├── style.css         # Main stylesheet (Lunaris Design System, ~976 lines)
+│   │   ├── guide.css         # Documentation layer for the "Build a CRM" guide
+│   │   └── guide-demo.css    # Scoped styles for the in-browser demo chapter
 │   └── js/
-│       └── main.js           # Main JS (scroll animations, nav, forms, ~236 lines)
+│       ├── main.js           # Main JS (scroll animations, nav, forms, ~236 lines)
+│       ├── guide.js          # Guide chapter nav and screenshot lightbox
+│       ├── run-in-browser.js # Demo controller for guide/run-in-browser.html
+│       └── erdwithai-wasm.js # Vendored generator bundle (parser + compilers)
+├── guide/                    # "Build a CRM" guide (chapters 00–09)
+│   ├── index.html            # 00 · Overview
+│   ├── 01-…08-reference.html # Chapters 01–08
+│   ├── run-in-browser.html   # 09 · Run it in your browser (live demo)
+│   ├── img/                  # Screenshots used by the chapters
+│   ├── models/               # Example EML models the demo loads
+│   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── index.html                # Home/landing page
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
@@ -73,6 +85,8 @@ Deployment is fully automatic:
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
+| `guide/index.html` | "Build a CRM" guide overview, chapters 00–09 |
+| `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 
 ## Design System (Lunaris)
 
@@ -156,6 +170,32 @@ utils.setCookie(name, value, days)
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
 10. **Accessible markup** — maintain ARIA labels, semantic structure, and sufficient color contrast (design system colors are pre-validated).
+
+## The In-Browser Demo (Chapter 09)
+
+`guide/run-in-browser.html` compiles a Mermaid model into a complete application and runs it in the
+visitor's tab. It is the only page on the site with moving parts, so it has its own rules.
+
+**How it works**
+
+1. `assets/js/run-in-browser.js` (an ES module) reads a model from `guide/models/`, or from a file the
+   visitor picks, and compiles it with `assets/js/erdwithai-wasm.js` — the generator bundled for the browser.
+2. The generated files are posted to the Service Worker at `guide/wasm-app/sw.js`, which serves them
+   from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
+3. PostgreSQL is PGlite, fetched once from a CDN and cached by the browser, and the database lives in
+   the visitor's IndexedDB. Nothing the visitor loads is uploaded anywhere.
+
+**Constraints to respect**
+
+- The page must be served over `http://` or `https://` — a Service Worker cannot register from `file://`.
+- Paths in `run-in-browser.js` are resolved against the page URL (`models/…`, `wasm-app/…`), so the page,
+  `guide/models/` and `guide/wasm-app/` must stay siblings.
+- `erdwithai-wasm.js` and `run-in-browser.js` are vendored from the generator repository. Re-copy them
+  rather than editing by hand; the only local change is the removal of the vendored-PGlite probe, which
+  this site does not ship.
+- `guide-demo.css` is scoped entirely to `.guide-demo` so that the demo's own `.btn`, `.card`, `.stage`
+  and similar names never collide with the Lunaris classes. Its palette is a token bridge onto the
+  design system variables — change the bridge, not the individual rules.
 
 ## CI/CD Pipeline
 

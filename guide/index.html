@@ -68,6 +68,7 @@
           <ul class="guide-nav">
             <li><a href="07-it-runs.html"><span class="guide-num">07</span> Watch it run</a></li>
             <li><a href="08-reference.html"><span class="guide-num">08</span> Reference</a></li>
+            <li><a href="run-in-browser.html"><span class="guide-num">09</span> Run it in your browser</a></li>
           </ul>
           <div class="guide-sidebar-foot">
             Every screenshot on these pages comes from the CRM built in this guide, running locally.
@@ -105,6 +106,16 @@
   <div class="stat"><div class="n">5</div><div class="l">state machines</div></div>
   <div class="stat"><div class="n">5</div><div class="l">multi-step sagas</div></div>
   <div class="stat"><div class="n">403</div><div class="l">generated files</div></div>
+</div>
+
+<div class="note tip">
+  <div class="note-title">Rather see it than read about it?</div>
+  <p>
+    <a href="run-in-browser.html"><strong>Chapter 09 runs the whole thing in your browser</strong></a>.
+    Pick the CRM model below, press Generate, press Run, and a complete application starts in the page
+    &mdash; PostgreSQL compiled to WebAssembly, the generated server on a worker thread, no install and
+    no server anywhere.
+  </p>
 </div>
 
 <h2>The one idea worth understanding first</h2>
@@ -298,6 +309,11 @@
     <h3>Reference</h3>
     <p>Every directive, type, modifier, cardinality, hook and step type on one page.</p>
   </a>
+  <a class="guide-card" href="run-in-browser.html">
+    <div class="guide-card-num">Chapter 09</div>
+    <h3>Run it in your browser</h3>
+    <p>Generate the application from the model and run it in this tab &mdash; Postgres in WebAssembly, no server, nothing to install.</p>
+  </a>
 </div>
 
 <h2>Before you start</h2>
@@ -363,7 +379,7 @@ bun run dev                            <span class="c-com"># API :4001, web :400
 </div>
 
 <nav class="pager">
-  <a href="08-reference.html"><span class="dir">Jump to</span><div class="ttl">Reference sheet</div></a>
+  <a href="run-in-browser.html"><span class="dir">Jump to</span><div class="ttl">Run it in your browser</div></a>
   <a class="next" href="01-data-model.html"><span class="dir">Next</span><div class="ttl">01 · The data model →</div></a>
 </nav>
 
