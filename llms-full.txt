@@ -81,7 +81,7 @@ correct.
 
 | Step | What it produces | Is it the deliverable? |
 |---|---|---|
-| §1.1 Enhance the brief | An enhanced specification, in prose | No — it is your analysis, and it stays in the reply |
+| §1.1 Enhance the brief | An enhanced specification, in prose | No — it is your analysis, and it stays in the reply as text |
 | §1.2 Write the model file | `<business-name>.mmd` | **Yes. This is the artifact.** |
 | §1.3 Validate | Checker reports | No — but nothing ships until they are clean |
 | §1.4 Deliver | The file, downloadable, and what you assumed | The handover |
@@ -104,6 +104,32 @@ you are half finished — go to §1.2 and write the file.
 
 Do not skip step 1, do not stop after it, and do not deliver before step 3.
 
+**Exactly one file leaves your hands, and it ends `.mmd`.** Not two — not the
+model plus a specification document, a report, a README, an outline or a
+summary. Where your surface writes files, it writes one; where it attaches
+files, it attaches one. Everything you want to say about the model is text in
+the same reply, and none of it is a file. Hand someone two files and they will
+open the wrong one, because the wrong one is longer and looks more like an
+answer.
+
+**The failure has a signature**, and it is worth memorising, because it comes
+back looking like progress:
+
+```
+1 auto-fix applied · 1 error
+fixed   EML001   Inserted %%meta name: EML Model at line 1.
+error   EML004   Empty document: no entities, rules, or workflows found.
+```
+
+`EML001` repaired plus `EML004` remaining means one thing, every time: the fixer
+put a name on a document that has nothing to name. What was checked is prose.
+No further repair will help, because the model was never written.
+
+**Write the file before you write the reply.** The five headings in §1.1 are
+thinking, and thinking is not the deliverable. Assemble the reply last, out of a
+file that already exists and has already passed §1.3. If you find yourself
+drafting the summary and the `.mmd` does not exist yet, stop and go to §1.2.
+
 ### 1.1 Enhance the brief before modelling it
 
 **A business description is always thinner than the model it implies.** Someone
@@ -114,10 +140,11 @@ workflow. Writing the ERD straight from their sentence produces a schema that
 validates and a business that does not run.
 
 So think the business through first, covering all five of the headings below.
-This is analysis, not the answer: it is text in your reply (§1.4), it is never
-the file, and it never carries the `.mmd` name. Keep it tight — lists rather than
-essays, a page or so — because the exhaustive artifact is the model, not the
-prose about it.
+This is analysis, not the answer: it is text in your reply (§1.4), it is never a
+file of its own, and it never carries the `.mmd` name. Keep it short — lists
+rather than essays, twenty to forty lines — and write it *from the finished
+model*, naming the entities the file actually declares. A specification longer
+than the model it describes is a sign the effort went into the wrong artifact.
 
 1. **The entity model.** Every entity the business needs, not only the ones
    named. For each: its attributes with EML types and modifiers, its primary
@@ -174,7 +201,7 @@ allowed to survive only as prose.
 | | |
 |---|---|
 | **Name** | `<business-name>.mmd` — lower-case, hyphenated, no spaces: `acme-dance-studio.mmd` |
-| **Count** | Exactly one file. Not one per entity, not an ERD file plus a rules file |
+| **Count** | Exactly one file — this one. Not one per entity, not an ERD file plus a rules file, and no companion `.md`, report, README or archive |
 | **Encoding** | UTF-8 plain text |
 | **First non-blank line** | A `%%` line. A comment banner naming the business is fine; `%%meta name:` must appear before the first Mermaid keyword |
 | **Every other line** | A Mermaid statement, an EML `%%` directive, or blank |
@@ -332,6 +359,16 @@ not as something they must reconstruct out of a chat log.
   elisions, no "unchanged from above", no splitting one model across two blocks,
   no commentary between sections. The user saves that block verbatim as
   `<business-name>.mmd`.
+- **If your surface only ever produces a document** — a research report, a
+  canvas, one long markdown answer — then that document *opens* with the model:
+  the file name, then the single fenced block above, then one line telling the
+  reader to save it as `<business-name>.mmd`. Your prose goes after it. A report
+  whose first fenced block is the whole model is recoverable in ten seconds; a
+  report that describes the model is the failure in §1.0 wearing a different
+  extension.
+- **Do not offer the by-products.** An outline, a draft, a specification, a
+  second attempt: if your surface wrote them to files, leave them behind. One
+  attachment.
 
 Alongside the file — in the reply, never inside it — give:
 
@@ -1168,10 +1205,12 @@ flowchart TD
 
 **The handover**
 
-13. `check(source)` returns `ok: true`, run three times over the file's exact
+13. Exactly one file is being handed over, and it ends `.mmd` — no companion
+    specification document, report or README (§1.0).
+14. `check(source)` returns `ok: true`, run three times over the file's exact
     bytes, the last two over unchanged bytes — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
-14. Warnings are cleared, or each remaining one is explained to the user.
-15. The file the user receives is the file you validated, delivered as a
+15. Warnings are cleared, or each remaining one is explained to the user.
+16. The file the user receives is the file you validated, delivered as a
     download, with the enhanced specification and the checker counts beside it in
     the reply — not inside the file (§1.4).
