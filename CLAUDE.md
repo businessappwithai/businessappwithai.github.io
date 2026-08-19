@@ -38,6 +38,7 @@ businessappwithai.github.io/
 │   ├── 11-check-a-model.html # 11 · Check a model
 │   ├── checker.js            # Published EML checker (ES module)
 │   ├── fixer.js              # Published EML fixer (ES module)
+│   ├── check-model.mjs       # Site-authored CLI runner for both of the above
 │   ├── coi-sw.js             # Service Worker that isolates chapter 10
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load
@@ -307,7 +308,14 @@ They are built in the generator repository by `bun run build:language-tools` fro
 only a front end for them — never add validation logic to it, or a model could pass here and fail in the
 generator.
 
-Two behaviours in that front end are deliberate, and both are presentation of what the published
+`guide/check-model.mjs` is the command-line way in, and it is **authored here, not vendored**: a
+runner that locates `checker.js` and `fixer.js` (beside itself, or from the published site), performs
+§1.3's three passes, prints `formatReport`, and exits 0 / 1 / 2. It exists because Node removed network
+imports, so a language model with a shell needs four lines where Bun and Deno need one — and skips the
+step. `scripts/check-spec.mjs` asserts its exit codes, and §8.4 of `llms-full.txt` documents it. Keep it
+a runner: no diagnostic may originate in it.
+
+Two behaviours in the page's front end are deliberate, and both are presentation of what the published
 modules already returned — not decisions of their own:
 
 - **The `EML004` note.** When the checker returns that code, the page adds a line saying the document
@@ -366,6 +374,8 @@ thing a language model has to produce is a model file.
   alias, modifier, cardinality operator, hook type, action type, step contract, `%%meta` key and
   state-machine code — against the same engine. It exits non-zero on any contradiction, and it is how
   the §5.3 step table and the §5.2 enum codes were found to be wrong. No dependencies; Node only.
+- **`node guide/check-model.mjs <file.mmd>`** is the published runner: §1.3's three passes and the
+  checker's own report, exit 0/1/2. It is what §8.4 tells a language model to `curl`.
 - **`node scripts/check-model.mjs <file.mmd>`** audits a delivered model against the mechanical half of
   §1.2's file contract and §10's checklist — shape, keys, enum bindings, state machines, rbac, and the
   three checker passes over its own bytes. `guide/models/crm.eml.mmd` passes it 18/18.

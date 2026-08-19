@@ -311,6 +311,10 @@ one outcome worse than not finishing.
 quietly gets wrong — a dropped modifier, a state no enum backs, a rule that can
 decide but cannot act. Clear them, or say why you left one.
 
+**Running it is one command if you have a shell** — §8.4 has the recipe for
+every runtime, including the published `check-model.mjs`, which is §1.3 in a
+single invocation.
+
 **If you cannot reach the checker** — no network from your runtime, no JavaScript
 engine, imports blocked — that changes what you can *claim*, not what you
 deliver. Walk §10 by hand instead, item by item, then hand over the file with one
@@ -547,7 +551,20 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
   because `po_line` reads back as `PoLine` — an entity whose name runs two
   capitals together cannot be reached by a foreign key. Name such an entity
   `PurchaseOrderLine` rather than trying to spell the column around it.
-- Columns ending `_by` (`created_by`, `approved_by`) resolve to the user entity.
+- **Columns naming a person resolve to `User`, but only by an exact list.**
+  Anything ending `_by` or `_by_id` — `created_by_id`, `approved_by_id`,
+  `received_by_id` — plus these names: `assigned_to`, `author_id`,
+  `lab_manager_id`, `manager_id`, `owner_id`, `pi_id`, `remediation_owner`,
+  `remediation_owner_id`, `user_id`. Nothing else. `approver_id` derives
+  `Approver` and `assigned_to_id` derives `AssignedTo` — entities nobody
+  declared, so both raise `EML502` while looking entirely reasonable. Name person
+  columns `<verb>_by_id` (`approved_by_id`) or use `owner_id`.
+- **Two names on that list are traps**: `assigned_to` and `remediation_owner` are
+  recognised, but they do not end `_id`, so they raise `EML114` — and the repair
+  renames them to `assigned_to_id` and `remediation_owner_id`, which are *not* on
+  the list, so `EML502` appears where a warning was cleared. It is the one repair
+  that can leave a new diagnostic behind. Do not use those two names; write
+  `owner_id`.
 - Declare the matching relationship line as well as the column. A `FK` with no
   relationship raises `EML502`, and the generated interface loses the navigation
   the relationship would have given it.
@@ -768,6 +785,16 @@ stateDiagram-v2
 
 Rules the checker enforces:
 
+- **The entity needs a column called `status`, `state` or `stage`**, and the
+  machine tracks that one column. No other name is recognised: an entity whose
+  lifecycle column is `approval_status` or `fulfillment_status` gets `EML500`,
+  and the generated application has a machine with nothing to write to. Name the
+  column `status`; keep any second, descriptive enum column beside it.
+- **One state machine per entity.** Two machines bound to the same entity are
+  two lifecycles competing for one column — the second belongs on the entity
+  that actually lives it: approval on the approval record, receiving on the
+  delivery, payment on the invoice. If both really describe the same row, merge
+  them into one lifecycle with more states.
 - **An initial transition is required** — `[*] --> firstState`. Missing is
   `EML421`, auto-repaired.
 - **A terminal state is required** — `lastState --> [*]`. Missing is `EML422`,
@@ -781,6 +808,12 @@ Rules the checker enforces:
   state no enum backs is a value the column can never legally hold; an enum value
   no state reaches is usually a transition nobody drew. Clear all three: name the
   enum `<Entity>Status`, list exactly the machine's states, and bind it.
+- **Give each machine a vocabulary of its own.** Because the match is by overlap,
+  two machines whose states are both `pending, approved, rejected` tie, and a tie
+  goes to whichever enum was declared first — so one machine silently borrows the
+  other's enum and reports `EML426` or `EML427` about states it never had. An
+  order that is `pending_approval` while its approval task is `pending` costs
+  nothing and removes the ambiguity.
 
 The word after the colon is the **transition event**, and it is what `%%rbac`
 names to restrict who may make that move (§6).
@@ -858,8 +891,8 @@ operation the workflow is bound to.
 | Step | Required | Optional | Purpose |
 |---|---|---|---|
 | `CreateEntity` | `entity`, `fields` | `as` | Insert a row; `as` publishes its id for later steps |
-| `UpdateEntity` | `field`, and one of `source` / `value` | `entity`, `targetField`, `targetSource` | Write one column, on this record or a related one |
-| `DeleteEntity` | — | `entity`, `targetField`, `targetSource`, `hard` | Remove the triggering record, or related rows. Soft by default — `hard: true` really deletes |
+| `UpdateEntity` | `field`, and one of `source` / `value`; **plus `targetSource` or `targetField` whenever `entity` is set** | `entity` | Write one column, on this record or a related one |
+| `DeleteEntity` | **`targetSource` or `targetField` whenever `entity` is set** | `entity`, `hard` | Remove the triggering record, or related rows. Soft by default — `hard: true` really deletes |
 | `Formula` | `target`, `operation`, and what that operation needs | — | Compute a value and publish it under `target` |
 | `Decision` | `decisionTable` **or** `rule` | `publish` | Evaluate a decision table inline, or a named rule |
 | `REST` | `url` | `method`, `bodyTemplate` | Call an external endpoint |
@@ -886,9 +919,29 @@ Three mechanical rules that cause most saga failures:
 1. **`fields` carries JSON and must be the last key on the line.** A value runs
    to the next `<key>:` token, so JSON in the middle swallows what follows.
 2. **Targeting another entity needs `targetSource` or `targetField`.** Naming
-   `entity` alone is refused rather than guessed: `targetSource` holds a context
-   key with the row id, `targetField` is a foreign key matched against the
-   triggering row.
+   `entity` alone is `EML265` — refused rather than guessed, because "update the
+   ApprovalRequest" does not say *which* ApprovalRequest. Three ways out, and one
+   of them is almost always right:
+
+   - the row an earlier step created — `CreateEntity … as: approvalId` publishes
+     its id, and the later step reads it back with `targetSource: approvalId`;
+   - a row that points at the triggering record — `targetField: purchase_order_id`
+     matches that foreign key against the row the saga is running for;
+   - **the triggering record itself — then drop `entity` entirely.** A step that
+     names no entity writes the row the saga was started for, which is what
+     `%%step E UpdateEntity field: status value: matching` means in a saga bound
+     to `Invoice`. Adding `entity: Invoice` to that line does not clarify it; it
+     turns it into `EML265`.
+
+   ```
+   %%step B CreateEntity entity: ApprovalRequest as: approvalId fields: {"purchase_order_id":"id","status":"pending"}
+   %%step C UpdateEntity entity: ApprovalRequest targetSource: approvalId field: status value: approved
+   %%step D UpdateEntity field: status value: approved
+   ```
+
+   B creates the row, C writes to *that* row, D writes to the record the saga is
+   running for. Every `as:` you declare should be read back by a later step —
+   an unused one usually means a step that meant to say `targetSource`.
 3. **Close a URL up against its key: `url:https://host/path`, no space.** A
    value ends at the next `<key>:` token and `https:` is one, so
    `url: https://host/path` — with the space — parses as an empty `url` plus an
@@ -955,6 +1008,16 @@ the table audited today.
 
 `%%meta` keys: `name` (required), `kind` (`erd` / `rules` / `workflow`),
 `version`, `entity`, `stack`.
+
+Two of them are misread often enough to be worth stating plainly:
+
+- **`version` is your model's version, not the language's.** `1.0.0` on a first
+  delivery. Writing the EML version here says the model has been revised
+  1.2.0 times.
+- **`stack` names the technology the application is generated onto**, and it has
+  exactly two legal values: `tanstack-start-nestjs` and `openui5-odatav4`.
+  Anything else is `EML003`. It is not a place for the language version or the
+  product name — and if you have no reason to choose, leave the key out.
 
 ---
 
@@ -1054,6 +1117,58 @@ meant. Everything else needs a decision, which is why it is handed back untouche
 Prefer fixing these yourself. The repair is mechanical and cannot know that the
 primary key should have been a composite, or that the document's name is the
 customer's brand rather than its first entity.
+
+`EML114` is the one repair that can leave a new diagnostic behind: renaming
+`assigned_to` to `assigned_to_id` clears the warning and takes the column off the
+list of names that resolve to `User` (§3.5), so an `EML502` info appears in its
+place. Re-read the report after a repair; do not assume the count only falls.
+
+### 8.4 Running the checker where you are
+
+The modules are ES modules on a public URL. Loading them is one line on some
+runtimes and four on others, and that difference is where the validation step
+usually gets skipped. Find your row and run it.
+
+| What you have | What to do |
+|---|---|
+| A shell with Node 18+, Bun or Deno | `curl -sO https://appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
+| Bun or Deno, writing the code yourself | `import { check } from "https://appwithai.org/guide/checker.js"` — a URL import works as it stands |
+| Node, writing the code yourself | Node has no network imports: fetch both files, write them into one directory, `import()` them from there (below) |
+| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import |
+| No network, or no JavaScript at all | Do not skip it silently: walk §10 by hand and tell the user, as §1.3 says |
+
+**`check-model.mjs`** is the one-command form of §1.3, published beside the
+modules it runs. It finds `checker.js` and `fixer.js` — beside itself if they
+were downloaded together, otherwise from `https://appwithai.org/guide/` — runs
+`checkAndFix` and then two `check` passes over the repaired bytes, prints the
+report, and exits `0` when the model is clean, `1` when the generator would
+refuse it, `2` when it could not run at all. `--write` saves the repaired
+document back over the input; `--base <url>` points it at a different host. It
+is a runner, not a second checker: every diagnostic it prints comes from the
+published modules.
+
+In Node, written by hand:
+
+```js
+import { writeFileSync, mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+
+const dir = mkdtempSync(join(tmpdir(), "eml-"));
+for (const name of ["checker.js", "fixer.js"]) {
+  const response = await fetch(`https://appwithai.org/guide/${name}`);
+  writeFileSync(join(dir, name), await response.text());
+}
+const { check, formatReport } = await import(pathToFileURL(join(dir, "checker.js")).href);
+const { checkAndFix } = await import(pathToFileURL(join(dir, "fixer.js")).href);
+
+const report = checkAndFix(readFileSync("my-business.mmd", "utf8"));
+console.log(formatReport(check(report.source)));
+```
+
+Both files must land in the same directory: `fixer.js` imports `checker.js` from
+beside itself.
 
 ---
 
