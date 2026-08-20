@@ -181,7 +181,50 @@ t("%%meta stack carrying anything else raises EML003", `%%meta name: Audit\n%%me
 
 console.log(`${pass} claims verified, ${fail} contradicted`);
 
-/* ------------------------------- 4. the runner §8.4 tells a model to use ---- */
+/* ------------- 4. §3.7: what the Application Dictionary makes of the ERD ---- */
+
+/* These claims are about the generator, not the checker, so they are tested
+   against the bundled generator the browser chapter runs. */
+const claimsBefore = pass;
+const failuresBefore = fail;
+const { generateFromSource } = await import("../assets/js/erdwithai-wasm.js");
+const REFERENCE = { 10: "String", 12: "Amount", 13: "ID", 14: "Text", 15: "Date", 16: "DateTime",
+  19: "Table Direct", 20: "Yes-No", 24: "URL", 27: "Color", 28: "JSON", 29: "Password", 30: "Email", 31: "Phone" };
+
+const dictionary = (body, extra = "") => {
+  const source = `%%meta name: Dictionary Probe\n%%meta kind: erd\n%%enum OrderStatus: draft, placed, shipped\nerDiagram\n    Vendor {\n        string id PK\n        string name\n    }\n    Order {\n        string id PK\n${body}\n    }\n    Vendor ||--o{ Order : "supplies"\n${extra}`;
+  const built = generateFromSource({ source, name: "Probe" });
+  const order = JSON.parse(built.files["app/model.json"]).entities.find((entity) => entity.name === "Order");
+  return Object.fromEntries(order.attributes.map((attr) => [attr.name, attr.referenceId]));
+};
+
+const reference = (label, column, expected, extra = "") => {
+  const refs = dictionary(`        ${column}`, extra);
+  const name = column.trim().split(/\s+/)[1];
+  const got = refs[name];
+  const shown = REFERENCE[got] ?? (got >= 1000 ? "List" : got);
+  if (shown === expected) pass++;
+  else { fail++; console.log(`FAIL ${label} — expected ${expected}, dictionary recorded ${shown}`); }
+};
+
+reference("FK modifier plus _id makes a Table Direct lookup", "string vendor_id FK", "Table Direct");
+reference("the same column without FK is downgraded to String", "string vendor_id", "String");
+reference("a bound enumerated column becomes a List", "string status", "List", "%%field Order.status enum: OrderStatus\n");
+reference("an unbound status column is free text", "string status", "String");
+reference("the email alias reaches the dictionary", "email contact_email", "Email");
+reference("the phone alias reaches the dictionary", "phone contact_phone", "Phone");
+reference("text becomes a memo", "text notes", "Text");
+reference("boolean becomes Yes-No", "boolean is_rush", "Yes-No");
+reference("money becomes an Amount", "money total", "Amount");
+reference("json becomes a JSON editor", "json payload", "JSON");
+
+const silent = check(`%%meta name: Dictionary Probe\n%%meta kind: erd\nerDiagram\n    Vendor {\n        string id PK\n    }\n    Order {\n        string id PK\n        string vendor_id\n        string status\n    }\n    Vendor ||--o{ Order : "supplies"\n`);
+say(silent.counts.errors === 0 && silent.counts.warnings === 0,
+  `§3.7's warning holds: an unmarked reference column and an unbound status check clean (${silent.counts.errors}e/${silent.counts.warnings}w)`);
+
+console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - failuresBefore} contradicted`);
+
+/* ------------------------------- 5. the runner §8.4 tells a model to use ---- */
 
 const runner = root + "guide/check-model.mjs";
 const specText = spec.join("\n");

@@ -153,7 +153,10 @@ than the model it describes is a sign the effort went into the wrong artifact.
 1. **The entity model.** Every entity the business needs, not only the ones
    named. For each: its attributes with EML types and modifiers, its primary
    key, its foreign keys, and its relationships with cardinality. Include the
-   reference and lookup entities the described flow silently depends on.
+   reference and lookup entities the described flow silently depends on. Say
+   which columns point at another entity and which hold a closed vocabulary —
+   those two answers are what the Application Dictionary turns into lookups and
+   dropdowns (§3.7), and a column you leave unclassified becomes a text box.
 
 2. **Each entity's workflow.** What states a record of it moves through from
    creation to its terminal state, what event moves it along each edge, and who
@@ -616,6 +619,64 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
   index is paid for on every write.
 - **`%%category`** groups entities on the generated dashboard. `name` is the only
   required key; `entities` is a comma-separated list. Only `;` separates keys.
+
+### 3.7 What the Application Dictionary makes of your ERD
+
+The generated application does not hard-code its forms. Every table, column,
+tab, field and lookup is a row in an **Application Dictionary** — `sys_table`,
+`sys_column`, `sys_field`, `sys_tab`, `sys_window`, `sys_category`,
+`sys_reference`, `sys_ref_list` — and the running interface reads those rows at
+runtime, which is why a field can be added to a live application without a
+deployment.
+
+**You never write dictionary rows, and there is no `%%dictionary` directive.**
+The dictionary is derived, one way, from the ERD you declare — so "populating the
+dictionary" means declaring the ERD precisely enough for the derivation to be
+right.
+
+The property that decides what a user actually sees is the column's **reference
+type**:
+
+| What you write | Reference recorded | What the user gets |
+|---|---|---|
+| the entity's `PK` | `ID` | the key, hidden in forms |
+| `string vendor_id FK` — the `FK` modifier **and** a name ending `_id` or `_by` | **`Table Direct`** | a lookup on the parent table |
+| a column bound by `%%field <E>.<col> enum: <Enum>` | `List`, plus one `sys_ref_list` row per value | a dropdown of exactly those values |
+| `email` `phone` `url` `password` `color` aliases (§3.2) | `Email` `Phone` `URL` `Password` `Color` | the matching input control |
+| `text` | `Text` | a memo box |
+| `boolean` | `Yes-No` | a switch |
+| `decimal` / `money` | `Amount` | a right-aligned amount |
+| `date` / `datetime` | `Date` / `DateTime` | the matching picker |
+| `json` | `JSON` | a JSON editor |
+| anything else | `String` | a plain text box |
+
+**Two mistakes silently downgrade a column to `String`, and both check clean** —
+no error, no warning, nothing to read. They are the reason a generated
+application comes back with raw ids in text boxes:
+
+1. **A reference column without the `FK` modifier.** `string vendor_id` and
+   `string vendor_id FK` parse into the same column, and only the second becomes
+   `Table Direct`. Without the modifier the dictionary records `String`, and the
+   form shows a bare uuid where the vendor lookup should be. The name must end
+   `_id` or `_by` as well (§3.5) — both conditions, every time.
+2. **An enumerated column with no `%%field` binding.** Declaring `%%enum` does
+   nothing to a column on its own. Without
+   `%%field Order.status enum: OrderStatus` the dictionary records `String`, and
+   a user gets a free-text box where the state machine expects one of five
+   values.
+
+The rest of the dictionary follows the same way: each entity becomes a
+`sys_table` with a window and a tab, its attributes become fields **in the order
+you declared them**, `%%index` becomes real indexes, and `%%category` (§3.6)
+becomes the dashboard grouping — a model that declares none gets a single
+"General" group holding everything. `%%entity` keys such as `label` and `icon`
+are validated but not yet compiled (§7), so do not promise a user an icon that
+directive alone will not produce.
+
+So there is no second artifact to write. A dictionary that comes out right is
+four habits in the ERD: **mark every reference column `FK`**, **bind every
+enumerated column with `%%field`**, prefer the specific type alias over the
+canonical name, and group the entities with `%%category`.
 
 ---
 
@@ -1342,8 +1403,12 @@ flowchart TD
 
 5. Every entity from the enhanced specification (§1.1) is in the document.
 6. Every entity has a primary key you chose.
-7. Every foreign key ends `_id` **and** has a matching relationship line.
-8. Every status column has a `%%enum` and a `%%field … enum:` binding it.
+7. Every foreign key ends `_id`, **carries the `FK` modifier**, and has a
+   matching relationship line — the modifier is what makes it a `Table Direct`
+   lookup in the Application Dictionary rather than a text box (§3.7).
+8. Every status column, and every other column with a closed vocabulary, has a
+   `%%enum` **and** a `%%field … enum:` binding it — without the binding the
+   dictionary records free text (§3.7).
 9. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
 10. Every rule that must *do* something has an `%%action` — not just a flowchart.
