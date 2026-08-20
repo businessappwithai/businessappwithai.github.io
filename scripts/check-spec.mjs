@@ -20,6 +20,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { check, AUTO_FIXABLE, LANGUAGE_VERSION } from "../guide/checker.js";
+import { checkAndFix } from "../guide/fixer.js";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
@@ -61,9 +62,14 @@ const say = (cond, label) => { if (cond) pass++; else { fail++; console.log("FAI
 const erd = (body, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n${extra}erDiagram\n${body}\n`;
 
 // --- 1. version and auto-fixable list (header + §8.3) -----------------------
-const expectedFixable = ["EML001", "EML114", "EML117", "EML421", "EML422"];
+const expectedFixable = ["EML001", "EML103", "EML112", "EML114", "EML117", "EML421", "EML422"];
 say(LANGUAGE_VERSION === "1.2.0", `header states EML version 1.2.0 (checker says ${LANGUAGE_VERSION})`);
-say(AUTO_FIXABLE.join(",") === expectedFixable.join(","), `section 8.3 lists the five auto-repairs (checker says ${AUTO_FIXABLE.join(", ")})`);
+say(AUTO_FIXABLE.join(",") === expectedFixable.join(","), `section 8.3 lists the seven auto-repairs (checker says ${AUTO_FIXABLE.join(", ")})`);
+/* The heading counts them in words, so it goes stale silently otherwise. */
+const specBody = spec.join("\n");
+say(spec.includes("### 8.3 The seven auto-repairs"), "section 8.3's heading names the right number");
+for (const code of expectedFixable)
+  say(new RegExp(`^\\| \`${code}\` \\|.*\\|$`, "m").test(specBody), `section 8.3's table carries a row for ${code}`);
 
 // --- 2. §3.2 types: every alias the doc lists must not raise EML115 ---------
 const ALIASES = {
@@ -240,6 +246,21 @@ for (const column of ["created_at", "updated_at", "version", "deleted_by"])
   t(`declaring ${column} is reported as EML103`,
     `%%meta name: Managed Probe\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        datetime ${column}\n    }\n`,
     "EML103");
+/* §8.3: both duplicate faults are repaired, and the repair keeps the stronger
+   declaration rather than whichever came last. */
+{
+  const duplicated = `%%meta name: Duplicate Probe\n%%meta kind: erd\nerDiagram\n    Course {\n        string id PK\n        string title\n        string title OPTIONAL\n        string code OPTIONAL\n        string code UK\n        datetime created_at\n    }\n`;
+  const fixed = checkAndFix(duplicated);
+  say(fixed.repaired === true, "checkAndFix repairs a duplicated column and a managed one");
+  say(fixed.counts.errors === 0 && fixed.counts.warnings === 0,
+    `the repaired document is clean (${fixed.counts.errors}e/${fixed.counts.warnings}w)`);
+  const body = fixed.source;
+  say((body.match(/^\s*string\s+title\b/gm) ?? []).length === 1, "the duplicate title is gone");
+  say(/^\s*string\s+title\s*$/m.test(body), "title stayed required — OPTIONAL did not win");
+  say(/^\s*string\s+code\s+UK\s*$/m.test(body), "code kept the UK the second line promised");
+  say(!/created_at/.test(body), "the generator's own created_at was removed from the document");
+}
+
 t("a column the generator does not manage stays quiet",
   `%%meta name: Managed Probe\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        datetime started_at\n    }\n`);
 
