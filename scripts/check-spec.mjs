@@ -266,6 +266,33 @@ t("a column the generator does not manage stays quiet",
 
 t("a state column that no machine tracks stays quiet", `%%meta name: Address Probe\n%%meta kind: erd\nerDiagram\n    Address {\n        string id PK\n        string state\n        string city\n    }\n`);
 
+/* §3.7: what a reference shows in place of its uuid — the dictionary's
+   identifier columns, in declared order. Asserted against the generator rather
+   than the prose, because the table in the spec is a promise about behaviour. */
+const identifiersOf = (body) => {
+  const source = `%%meta name: Identifier Probe\n%%meta kind: erd\nerDiagram\n    Thing {\n${body}\n    }\n`;
+  const built = generateFromSource({ source, name: "Probe" });
+  const model = JSON.parse(built.files["app/model.json"]);
+  return model.dictionary.columns
+    .filter((column) => column.isIdentifier)
+    .sort((a, b) => a.seqNo - b.seqNo)
+    .map((column) => column.columnName);
+};
+
+const identifierCases = [
+  ["a name column names the record", "        string id PK\n        string name", ["name"]],
+  ["title is used when there is no name", "        string id PK\n        string title", ["title"]],
+  ["a person is both their names", "        string id PK\n        string first_name\n        string last_name", ["first_name", "last_name"]],
+  ["name wins over a code", "        string id PK\n        string code\n        string name", ["name"]],
+  ["a code identifies when no name exists", "        string id PK\n        string code", ["code"]],
+  ["failing all of those, the first text column", "        string id PK\n        string billing_city\n        integer size", ["billing_city"]],
+  ["the key is never an identifier", "        string id PK\n        integer size", []],
+];
+for (const [label, body, expected] of identifierCases) {
+  const got = identifiersOf(body);
+  say(got.join(",") === expected.join(","), `${label} (expected ${JSON.stringify(expected)}, got ${JSON.stringify(got)})`);
+}
+
 /* §3.6 and §3.7: help text is compiled, and reaches sys_column / sys_table. */
 const helped = generateFromSource({
   source: `%%meta name: Help Probe\n%%meta kind: erd\nerDiagram\n    Vendor {\n        string id PK\n        string name\n    }\n%%entity Vendor help: A company that supplies us.\n%%field Vendor.name help: The name on the invoice, not the trading name.\n`,
