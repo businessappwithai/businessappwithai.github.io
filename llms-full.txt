@@ -501,6 +501,28 @@ Entity names are `PascalCase` or `SNAKE_CASE`; attribute names are `snake_case`.
 declaring one yourself is better — `EML117` warns when you do not, and the repair
 prepends `string id PK`, which may not be the column you wanted.
 
+**Seven column names are the generator's — do not declare them.** Every
+generated table carries them already, in both stacks:
+
+```
+id  version  created_at  updated_at  created_by  updated_by  deleted_at  deleted_by
+```
+
+Writing `datetime created_at` in an entity block says something the generator
+already guarantees. `EML103` reports the line, `checkAndFix` deletes it (§8.3),
+and the generator keeps its own definition regardless. Until it learned to, the duplicate reached
+PostgreSQL as a `CREATE TABLE` naming one column twice — which is rejected
+outright, so the *application failed to open*, with a message
+(`column "created_at" specified more than once`) that named no model line at
+all. Model what your business knows; the record-keeping columns are already
+there.
+
+The `_id` spelling is a different column and a legitimate one:
+`created_by` is the generator's audit stamp — a bare UUID with no lookup —
+while `created_by_id FK` is a reference you modelled, and it resolves to your
+`User` entity with a lookup on it (§3.5). If you want the author of a record to
+be selectable and shown by name, declare `created_by_id FK`, not `created_by`.
+
 ### 3.2 Types
 
 Eight canonical types. Everything else normalises into one of them; an unknown
@@ -1171,7 +1193,7 @@ a document the generator will accept.
 | Module | URL | What it gives you |
 |---|---|---|
 | `checker.js` | `https://appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
-| `fixer.js` | `https://appwithai.org/guide/fixer.js` | The five auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
+| `fixer.js` | `https://appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
 
 ### 8.1 The API
 
@@ -1242,7 +1264,7 @@ entirely wrong answer produces. A long document of headings and bullet lists tha
 describes twelve entities perfectly contains zero entities as far as the parser is
 concerned. The fix is never to edit the prose — it is to write the `.mmd`.
 
-### 8.3 The five auto-repairs
+### 8.3 The seven auto-repairs
 
 These, and only these, `checkAndFix` will repair without being told what was
 meant. Everything else needs a decision, which is why it is handed back untouched.
@@ -1250,10 +1272,24 @@ meant. Everything else needs a decision, which is why it is handed back untouche
 | Code | Fault | Repair |
 |---|---|---|
 | `EML001` | No `%%meta name:` | Inserts one |
+| `EML103` | A column the generator adds anyway | Deletes the line |
+| `EML112` | The same column declared twice | Deletes the later line, keeping the stronger constraints |
 | `EML114` | Foreign key not ending `_id` | Appends the suffix |
 | `EML117` | Entity with no primary key | Prepends `string id PK` |
 | `EML421` | State machine with no initial transition | Adds `[*] --> <first>` |
 | `EML422` | State machine with no terminal state | Adds `<last> --> [*]` |
+
+`EML103` and `EML112` are repaired rather than reported-and-left because both
+produced the same fatal outcome: a `CREATE TABLE` naming one column twice, which
+PostgreSQL refuses, so the generated application never opened. The duplicate
+carries no information the surviving line does not, which is what makes the
+repair safe to make unasked.
+
+**A duplicate keeps the strongest of the two declarations, never the last one.**
+`string title` followed by `string title OPTIONAL` leaves `string title`: the
+column stays required, because relaxing a mandatory column is invisible in the
+diagram and surfaces much later as missing data. `UK` and `FK` carry over the
+same way — if either line promised one, the survivor keeps it.
 
 Prefer fixing these yourself. The repair is mechanical and cannot know that the
 primary key should have been a composite, or that the document's name is the
@@ -1455,7 +1491,10 @@ flowchart TD
 **The model**
 
 5. Every entity from the enhanced specification (§1.1) is in the document.
-6. Every entity has a primary key you chose.
+6. Every entity has a primary key you chose, declares each column once
+   (`EML112`), and declares none of the seven the generator adds — `id` aside,
+   `version`, the audit pair and the soft-delete pair are already there
+   (§3.1, `EML103`).
 7. Every foreign key ends `_id`, **carries the `FK` modifier**, and has a
    matching relationship line — the modifier is what makes it a `Table Direct`
    lookup in the Application Dictionary rather than a text box (§3.7).
