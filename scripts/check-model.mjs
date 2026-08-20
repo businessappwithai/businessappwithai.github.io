@@ -58,6 +58,28 @@ const pkCount = (src.match(/\bPK\b/g) || []).length;
 say(pkCount >= entities.length, `every entity declares a primary key (${pkCount} PK columns)`);
 const fks = [...src.matchAll(/^\s+\w+\s+(\w+)\s+FK\b/gm)].map((m) => m[1]);
 say(fks.every((f) => f.endsWith("_id")), `every FK ends _id (${fks.length} foreign keys)`);
+/* §3.7 — the two silent downgrades. Both check clean, and both leave the
+   generated application showing a text box where a lookup or a dropdown
+   belongs, so a delivery audit is the last place to catch them. */
+const referenceCols = [...src.matchAll(/^\s+\w+\s+(\w+(?:_id|_by))\b([^\n]*)$/gm)]
+  .filter(([, name]) => name !== "id");
+const unmarked = referenceCols.filter(([, , rest]) => !/\bFK\b/.test(rest)).map(([, name]) => name);
+say(unmarked.length === 0,
+  `every reference column carries the FK modifier — Table Direct, not String${unmarked.length ? " — missing on " + [...new Set(unmarked)].slice(0, 4).join(", ") : ""}`);
+
+const enumBound = new Set([...src.matchAll(/^\s*%%field\s+(\w+)\.(\w+)\s+enum:/gm)].map((m) => `${m[1]}.${m[2]}`));
+const unboundStatus = [];
+let currentEntity = null;
+for (const line of lines) {
+  const entity = line.match(/^\s{4}([A-Za-z][A-Za-z0-9_]*)\s*\{/);
+  if (entity) { currentEntity = entity[1]; continue; }
+  if (/^\s{4}\}/.test(line)) { currentEntity = null; continue; }
+  const column = currentEntity && line.match(/^\s+\w+\s+(status|state|stage)\b/);
+  if (column && !enumBound.has(`${currentEntity}.${column[1]}`)) unboundStatus.push(`${currentEntity}.${column[1]}`);
+}
+say(unboundStatus.length === 0,
+  `every status column is bound to an enum — List, not free text${unboundStatus.length ? " — unbound: " + unboundStatus.slice(0, 4).join(", ") : ""}`);
+
 const statusCols = [...src.matchAll(/^\s+\w+\s+(status|state|stage)\b/gm)].length;
 const fieldEnums = (src.match(/^\s*%%field .+ enum: /gm) || []).length;
 say(fieldEnums >= statusCols, `status columns bound to enums (${statusCols} status columns, ${fieldEnums} %%field enum bindings)`);
