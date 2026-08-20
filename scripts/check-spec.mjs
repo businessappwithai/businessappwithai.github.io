@@ -218,9 +218,20 @@ reference("boolean becomes Yes-No", "boolean is_rush", "Yes-No");
 reference("money becomes an Amount", "money total", "Amount");
 reference("json becomes a JSON editor", "json payload", "JSON");
 
-const silent = check(`%%meta name: Dictionary Probe\n%%meta kind: erd\nerDiagram\n    Vendor {\n        string id PK\n    }\n    Order {\n        string id PK\n        string vendor_id\n        string status\n    }\n    Vendor ||--o{ Order : "supplies"\n`);
-say(silent.counts.errors === 0 && silent.counts.warnings === 0,
-  `§3.7's warning holds: an unmarked reference column and an unbound status check clean (${silent.counts.errors}e/${silent.counts.warnings}w)`);
+/* The two downgrades are diagnostics now (EML119, EML146), and the retired
+   access-rule spelling is EML223. These assert that the vendored checker
+   actually reports what §3.7, §6 and §7 say it reports. */
+const dictionaryDiagnostics = `%%meta name: Dictionary Probe\n%%meta kind: erd\n%%enum ThingStatus: draft, live\nerDiagram\n    Vendor {\n        string id PK\n    }\n    Order {\n        string id PK\n        string vendor_id\n        string status\n    }\n    Vendor ||--o{ Order : "supplies"\n`;
+t("an unmarked reference column is reported as EML119", dictionaryDiagnostics, "EML119");
+t("an unbound status column is reported as EML146", dictionaryDiagnostics, "EML146");
+t("a %%guard written as an access rule is reported as EML223",
+  `%%meta name: Guard Probe\n%%meta kind: erd\n%%enum ThingStatus: draft, live\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Thing Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> [*]\n\n    %%guard role:manager on Thing.publish\n`,
+  "EML223");
+t("a state column that no machine tracks stays quiet", `%%meta name: Address Probe\n%%meta kind: erd\nerDiagram\n    Address {\n        string id PK\n        string state\n        string city\n    }\n`);
+
+const silent = check(dictionaryDiagnostics);
+say(silent.counts.errors === 0 && silent.counts.warnings === 2,
+  `both downgrades are warnings, not errors — the generator still runs (${silent.counts.errors}e/${silent.counts.warnings}w)`);
 
 console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - failuresBefore} contradicted`);
 
