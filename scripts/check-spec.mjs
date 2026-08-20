@@ -213,6 +213,13 @@ reference("a bound enumerated column becomes a List", "string status", "List", "
 reference("an unbound status column is free text", "string status", "String");
 reference("the email alias reaches the dictionary", "email contact_email", "Email");
 reference("the phone alias reaches the dictionary", "phone contact_phone", "Phone");
+reference("the url alias reaches the dictionary", "url tracking_link", "URL");
+reference("the password alias reaches the dictionary", "password portal_secret", "Password");
+reference("the color alias reaches the dictionary", "color label_colour", "Color");
+/* All five normalise to `string`, so this is what proves the alias is what the
+   dictionary reads and not the column's name — §3.2 tells the reader to write
+   `email email` rather than `string email` on the strength of it. */
+reference("a string column named like an alias is not one", "string password_hint", "String");
 reference("text becomes a memo", "text notes", "Text");
 reference("boolean becomes Yes-No", "boolean is_rush", "Yes-No");
 reference("money becomes an Amount", "money total", "Amount");
@@ -228,6 +235,19 @@ t("a %%guard written as an access rule is reported as EML223",
   `%%meta name: Guard Probe\n%%meta kind: erd\n%%enum ThingStatus: draft, live\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Thing Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> [*]\n\n    %%guard role:manager on Thing.publish\n`,
   "EML223");
 t("a state column that no machine tracks stays quiet", `%%meta name: Address Probe\n%%meta kind: erd\nerDiagram\n    Address {\n        string id PK\n        string state\n        string city\n    }\n`);
+
+/* §3.6 and §3.7: help text is compiled, and reaches sys_column / sys_table. */
+const helped = generateFromSource({
+  source: `%%meta name: Help Probe\n%%meta kind: erd\nerDiagram\n    Vendor {\n        string id PK\n        string name\n    }\n%%entity Vendor help: A company that supplies us.\n%%field Vendor.name help: The name on the invoice, not the trading name.\n`,
+  name: "Help Probe",
+});
+const helpModel = JSON.parse(helped.files["app/model.json"]);
+const helpTable = helpModel.dictionary.tables.find((table) => table.tableName === "bus_vendor");
+const helpColumn = helpModel.dictionary.columns.find((column) => column.columnName === "name");
+say(helpTable?.description === "A company that supplies us.",
+  `%%entity help: becomes sys_table.description (${JSON.stringify(helpTable?.description)})`);
+say(helpColumn?.description === "The name on the invoice, not the trading name.",
+  `%%field help: becomes sys_column.description (${JSON.stringify(helpColumn?.description)})`);
 
 const silent = check(dictionaryDiagnostics);
 say(silent.counts.errors === 0 && silent.counts.warnings === 2,

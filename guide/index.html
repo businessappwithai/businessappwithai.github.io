@@ -25,8 +25,8 @@
       </button>
       <nav class="nav" id="mainNav">
         <ul class="nav-list">
-          <li><a href="../index.html" class="nav-link">Home</a></li>
           <li><a href="../justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="../try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
           <li><a href="../features.html" class="nav-link">Features</a></li>
           <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
           <li><a href="../technology.html" class="nav-link">Technology</a></li>
@@ -98,11 +98,11 @@
 </p>
 
 <figure>
-  <img src="img/08-crm-dashboard.png" alt="The generated CRM dashboard, showing seven groups of entities: Accounts and Contacts, Activities, Customer Service, Demand Generation, People and Teams, Quotes and Contracts, Sales Pipeline, plus the Application Dictionary.">
   <figcaption>
     <b>The finished application.</b> Seventeen entities in seven groups, each group's name and description
     taken straight from the model. Nothing on this screen was hand-written — including the wording.
   </figcaption>
+  <img src="img/08-crm-dashboard.png" alt="The generated CRM dashboard, showing seven groups of entities: Accounts and Contacts, Activities, Customer Service, Demand Generation, People and Teams, Quotes and Contracts, Sales Pipeline, plus the Application Dictionary.">
 </figure>
 
 <div class="stats">
@@ -188,12 +188,12 @@
 
 <div class="fig-row">
   <figure>
-    <img src="img/42-crm-opportunities.png" alt="The Opportunities list in the generated CRM.">
     <figcaption><b>Sales pipeline.</b> Opportunities with stage, amount and forecast category.</figcaption>
+    <img src="img/42-crm-opportunities.png" alt="The Opportunities list in the generated CRM.">
   </figure>
   <figure>
-    <img src="img/44-crm-support-cases.png" alt="The Support Cases list in the generated CRM.">
     <figcaption><b>Service.</b> Support cases with priority, SLA targets and origin.</figcaption>
+    <img src="img/44-crm-support-cases.png" alt="The Support Cases list in the generated CRM.">
   </figure>
 </div>
 
@@ -213,48 +213,48 @@
 </p>
 
 <figure>
-  <img src="img/30-crm-workflow-editor-leadconversion.png" alt="The LeadConversion workflow open in the editor, showing its trigger card, three rule gates, numbered steps, and a details sidebar listing the entity, trigger operation, run mode, step count, linked rules and recent runs.">
   <figcaption>
     <b>A workflow editor, populated.</b> The lead-conversion saga as the running application renders it:
     the trigger, the three rules that gate it, its six steps in order, and the runs it has performed —
     all compiled from <code>%%step</code> directives in the model. <a href="03-workflows.html">Chapter 03</a>.
   </figcaption>
+  <img src="img/30-crm-workflow-editor-leadconversion.png" alt="The LeadConversion workflow open in the editor, showing its trigger card, three rule gates, numbered steps, and a details sidebar listing the entity, trigger operation, run mode, step count, linked rules and recent runs.">
 </figure>
 
 <div class="fig-row">
   <figure>
-    <img src="img/50-crm-audit-log.png" alt="The audit log showing auth login, entity create and entity update events with timestamp, user, action, entity, the columns that changed, the source and a verify action.">
     <figcaption>
       <b>An audit trail you cannot forget to switch on.</b> One entry per insert, update and delete, written
       by the same transaction as the change, holding the before and after value of every column that moved.
       Append-only, and each entry independently verifiable. <a href="06-dictionary.html">Chapter 06</a>.
     </figcaption>
+    <img src="img/50-crm-audit-log.png" alt="The audit log showing auth login, entity create and entity update events with timestamp, user, action, entity, the columns that changed, the source and a verify action.">
   </figure>
   <figure>
-    <img src="img/19-crm-help-entity.png" alt="The Lead help dialog with a window overview, a tabs section and a fields section listing each field and its help text.">
     <figcaption>
       <b>Help on every screen, written from the model.</b> It names the required fields, says which columns
       are lookups, names the entities that point back, and explains the draft-to-final save cycle — then
       lists every field with its own rule. <a href="05-application.html">Chapter 05</a>.
     </figcaption>
+    <img src="img/19-crm-help-entity.png" alt="The Lead help dialog with a window overview, a tabs section and a fields section listing each field and its help text.">
   </figure>
 </div>
 
 <div class="fig-row">
   <figure>
-    <img src="img/12-crm-business-rules.png" alt="The Business Rules screen listing 25 active rules across 17 entities, each with its entity and the operation it fires on.">
     <figcaption>
       <b>Twenty-five decision tables, editable.</b> The eight rules from the model plus a validation rule per
       entity — each one a table an operations person can change without a deploy.
       <a href="02-business-rules.html">Chapter 02</a>.
     </figcaption>
+    <img src="img/12-crm-business-rules.png" alt="The Business Rules screen listing 25 active rules across 17 entities, each with its entity and the operation it fires on.">
   </figure>
   <figure>
-    <img src="img/51-crm-roles.png" alt="The Role Management screen listing Administrator as a master role and Analyst, Manager and User as standard roles, each active with a description.">
     <figcaption>
       <b>Roles, seeded and enforced.</b> A transition your state machine guards with <code>[Manager]</code>
       is a permission check against this table at runtime. <a href="06-dictionary.html">Chapter 06</a>.
     </figcaption>
+    <img src="img/51-crm-roles.png" alt="The Role Management screen listing Administrator as a master role and Analyst, Manager and User as standard roles, each active with a description.">
   </figure>
 </div>
 

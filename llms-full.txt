@@ -518,9 +518,13 @@ type falls back to `string` and raises `EML115`.
 | `json` | `json` `jsonb` `object` `array` |
 
 The alias you choose is not cosmetic even though it normalises: `email`, `phone`,
-`url`, `password` and `color` all become `string`, and they carry a semantic hint
-the generated interface uses to pick an input control. Prefer the specific alias
-over the canonical name wherever one fits.
+`url`, `password` and `color` all become `string` in SQL, and the word you wrote
+is kept — it is what the Application Dictionary records as the column's reference
+type, and therefore what decides the control the user gets (§3.7). Write
+`email email`, `phone mobile`, `url website`, `password secret` and
+`color brand_colour`; a column declared `string` gets a plain text box even when
+its name says otherwise. Prefer the specific alias over the canonical name
+wherever one fits.
 
 ### 3.3 Modifiers
 
@@ -604,6 +608,8 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
 ```
 %%enum LeadStatus: new, working, qualified, converted, disqualified
 %%field Lead.status enum: LeadStatus
+%%field Lead.score help: 0-100, set by the scoring rule. Anything over 70 routes to a salesperson.
+%%entity Lead help: Someone who has shown interest but is not yet an account.
 %%index Lead(campaign_id, status)
 %%index Contact(email) unique
 %%category name: Sales; description: Leads and the deals they become; icon: TrendingUp; color: #0ea5e9; entities: Lead, Opportunity
@@ -612,8 +618,16 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
 - **`%%enum`** declares a closed vocabulary. Reference it from a column with
   `%%field`, and from a state machine's states (§5.2).
 - **`%%field <E>.<attr> enum: <Name>`** binds a column to an enum. The enum must
-  exist — `EML501` otherwise. `enum:` is the key that compiles; other keys are
-  accepted and validated only.
+  exist — `EML501` otherwise.
+- **`%%field <E>.<attr> help: <sentence>`** is the help text for the column. It
+  becomes `sys_column.description`, which the generated form prints under the
+  control and the Application Dictionary shows beside the column. `enum:` and
+  `help:` are the two `%%field` keys that compile; the others (`ui`, `default`,
+  `min`, `max`, `format`) are accepted and validated only.
+- **`%%entity <Name> help: <sentence>`** — or `description:`, the same key — is
+  the sentence that explains the entity. It becomes `sys_table.description`.
+  Write both kinds of help as you model: they are the only part of the
+  application that says *why* a field exists, and nobody adds them later.
 - **`%%index <E>(<a>[, <b>]) [unique]`** becomes a real index. Add one for every
   column combination the business searches or filters on, and no more — every
   index is paid for on every write.
@@ -642,7 +656,7 @@ type**:
 | the entity's `PK` | `ID` | the key, hidden in forms |
 | `string vendor_id FK` — the `FK` modifier **and** a name ending `_id` or `_by` | **`Table Direct`** | a lookup on the parent table |
 | a column bound by `%%field <E>.<col> enum: <Enum>` | `List`, plus one `sys_ref_list` row per value | a dropdown of exactly those values |
-| `email` `phone` `url` `password` `color` aliases (§3.2) | `Email` `Phone` `URL` `Password` `Color` | the matching input control |
+| a column declared with the `email` `phone` `url` `password` `color` alias (§3.2) | `Email` `Phone` `URL` `Password` `Color` | the matching input control — an e-mail keyboard, a masked box, a link |
 | `text` | `Text` | a memo box |
 | `boolean` | `Yes-No` | a switch |
 | `decimal` / `money` | `Amount` | a right-aligned amount |
@@ -667,17 +681,36 @@ report is the only place they show:
    a user gets a free-text box where the state machine expects one of five
    values.
 
+**The help text is part of the dictionary, and only you can write it.** A
+column's `sys_column.description` is what the form prints under the control, and
+a table's `sys_table.description` is what the dictionary and the entity's screen
+show beside it. Both come from directives, and from nowhere else:
+
+```
+%%entity Contact help: A person at an account. Deals and cases hang off the contact you actually deal with.
+%%field Contact.account_id help: The company this person works for. Leave empty for a personal contact.
+%%field Contact.owner_id help: The salesperson responsible. Reassign when the territory changes.
+```
+
+Write the sentence a new joiner needs, not a restatement of the column name:
+"The company this person works for" earns its place; "The account id" does not.
+Cover every entity, and every column whose meaning a reader could get wrong — a
+reference, a status, an amount whose currency or period is not obvious, a
+boolean whose `true` is not self-evident. Leave the rest alone: help on
+`first_name` is noise.
+
 The rest of the dictionary follows the same way: each entity becomes a
 `sys_table` with a window and a tab, its attributes become fields **in the order
 you declared them**, `%%index` becomes real indexes, and `%%category` (§3.6)
 becomes the dashboard grouping — a model that declares none gets a single
-"General" group holding everything. `%%entity` keys such as `label` and `icon`
-are validated but not yet compiled (§7), so do not promise a user an icon that
-directive alone will not produce.
+"General" group holding everything. The other `%%entity` keys — `label`, `icon`,
+`prefix`, `softDelete`, `audited` — are validated but not yet compiled (§7), so
+do not promise a user an icon that directive alone will not produce.
 
 So there is no second artifact to write. A dictionary that comes out right is
-four habits in the ERD: **mark every reference column `FK`**, **bind every
-enumerated column with `%%field`**, prefer the specific type alias over the
+five habits in the ERD: **mark every reference column `FK`**, **bind every
+enumerated column with `%%field … enum:`**, **write `help:` on every entity and
+every column that needs explaining**, prefer the specific type alias over the
 canonical name, and group the entities with `%%category`.
 
 ---
@@ -1088,7 +1121,7 @@ the checker reads it.
 |---|---|---|
 | `%%meta` | `%%meta <key>: <value>` | compiled |
 | `%%enum` | `%%enum <Name>: a, b, c` | compiled |
-| `%%field` | `%%field <E>.<attr> <k>: <v>` | compiled *(`enum:` key only)* |
+| `%%field` | `%%field <E>.<attr> <k>: <v>` | compiled *(`enum:` and `help:` keys)* |
 | `%%index` | `%%index <E>(<a>[, <b>]) [unique]` | compiled |
 | `%%category` | `%%category name: X; icon: Y; entities: A, B` | compiled |
 | `%%workflow` | `%%workflow <Name> entity: <E> kind: <hook\|state\|saga>` | compiled |
@@ -1098,7 +1131,7 @@ the checker reads it.
 | `%%rbac` | `%%rbac <roleExpr> on <E>.<op>` | compiled |
 | `%%guard` | `%%guard <field> <operator> <jsonValue>` | compiled *(see below)* |
 | `%%loop` | `%%loop <id> while: <f> <op> <v> max: <n>` | compiled |
-| `%%entity` | `%%entity <E> <k>: <v>` | **validated** |
+| `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`; the rest **validated**)* |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
 
@@ -1111,7 +1144,8 @@ condition — `%%guard status eq "open"`.
 
 **Do not tell a user a directive "will do X" without checking its status.**
 `%%entity Order audited: true` is validated but not compiled: it will not make
-the table audited today.
+the table audited today. `%%entity Order help: …` on the same entity *is*
+compiled, and reaches the screen.
 
 `%%meta` keys: `name` (required), `kind` (`erd` / `rules` / `workflow`),
 `version`, `entity`, `stack`.
@@ -1428,21 +1462,24 @@ flowchart TD
 8. Every status column, and every other column with a closed vocabulary, has a
    `%%enum` **and** a `%%field … enum:` binding it — without the binding the
    dictionary records free text (§3.7).
-9. Every entity with a status has a `kind: state` workflow, with an initial
+9. Every entity carries `%%entity <E> help:`, and every column whose meaning a
+   reader could get wrong carries `%%field <E>.<col> help:` — that text is the
+   whole of the application's help, and no later pass adds it (§3.7).
+10. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
-10. Every rule that must *do* something has an `%%action` — not just a flowchart.
-11. Every cross-entity effect is a hook, an action, or a saga step.
-12. Every restricted operation and transition has a `%%rbac` directive.
+11. Every rule that must *do* something has an `%%action` — not just a flowchart.
+12. Every cross-entity effect is a hook, an action, or a saga step.
+13. Every restricted operation and transition has a `%%rbac` directive.
 
 **The handover**
 
-13. Exactly one file is being handed over, and it ends `.mmd` — no companion
+14. Exactly one file is being handed over, and it ends `.mmd` — no companion
     specification document, report or README (§1.0).
-14. `check(source)` returns `ok: true`, run three times over the file's exact
+15. `check(source)` returns `ok: true`, run three times over the file's exact
     bytes, the last two over unchanged bytes — `node check-model.mjs <file>.mmd`
     is those three passes and exits `0` — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
-15. Warnings are cleared, or each remaining one is explained to the user.
-16. The file the user receives is the file you validated, delivered as a
+16. Warnings are cleared, or each remaining one is explained to the user.
+17. The file the user receives is the file you validated, delivered as a
     download, with the enhanced specification and the checker counts beside it in
     the reply — not inside the file (§1.4).

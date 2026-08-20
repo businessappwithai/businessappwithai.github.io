@@ -25,8 +25,8 @@
       </button>
       <nav class="nav" id="mainNav">
         <ul class="nav-list">
-          <li><a href="../index.html" class="nav-link">Home</a></li>
           <li><a href="../justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="../try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
           <li><a href="../features.html" class="nav-link">Features</a></li>
           <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
           <li><a href="../technology.html" class="nav-link">Technology</a></li>
@@ -134,8 +134,8 @@ select count(*) from bus_opportunity;   <span class="c-com">-- 4</span></code></
       table reads, and an owner, which every created row inherits. Status starts at <code>new</code>.
     </p>
     <figure>
-      <img src="img/10-crm-lead-new-form.png" alt="The New Lead form filled in for Dana Whitfield at Northwind Trading, with employee count 2500 and annual revenue 75,000,000.">
       <figcaption><b>A new lead.</b> Seventeen fields, seven required. The form knows which is which from the model's <code>OPTIONAL</code> modifiers.</figcaption>
+      <img src="img/10-crm-lead-new-form.png" alt="The New Lead form filled in for Dana Whitfield at Northwind Trading, with employee count 2500 and annual revenue 75,000,000.">
     </figure>
   </li>
 
@@ -158,22 +158,22 @@ select status from bus_lead where email = <span class="c-str">'dana.whitfield@no
 </ol>
 
 <figure>
-  <img src="img/28-crm-account-created-by-saga.png" alt="The Accounts list now showing Northwind Trading with account type prospect, tier strategic and industry technology alongside the four seeded accounts.">
   <figcaption>
     <b>The account the saga created.</b> Type <em>prospect</em>, tier <strong>strategic</strong> —
     the decision table's answer for a score of 88 — and the industry carried across from the lead.
     Account Number is blank because a <code>beforeCreate</code> hook mints it, and that hook is yours to
     write.
   </figcaption>
+  <img src="img/28-crm-account-created-by-saga.png" alt="The Accounts list now showing Northwind Trading with account type prospect, tier strategic and industry technology alongside the four seeded accounts.">
 </figure>
 
 <figure>
-  <img src="img/27-crm-lead-converted.png" alt="The lead detail view for Dana Whitfield after conversion.">
   <figcaption>
     <b>And the lead itself.</b> Marked converted by step F, in the same transaction that created the three
     rows. If any step had failed, none of this would exist and the lead would still read
     <em>qualified</em>.
   </figcaption>
+  <img src="img/27-crm-lead-converted.png" alt="The lead detail view for Dana Whitfield after conversion.">
 </figure>
 
 <h2>The receipt</h2>
@@ -232,11 +232,11 @@ select status from bus_lead where email = <span class="c-str">'dana.whitfield@no
 </p>
 
 <figure>
-  <img src="img/33-crm-workflow-view-renewalplaybook.png" alt="The RenewalPlaybook workflow open in the designer, showing its trigger, steps and details.">
   <figcaption>
     <b>Any definition, opened.</b> RenewalPlaybook is the automatic counterpart: it runs on every contract
     update rather than waiting for a rule, and it is the one saga that deletes as well as creates.
   </figcaption>
+  <img src="img/33-crm-workflow-view-renewalplaybook.png" alt="The RenewalPlaybook workflow open in the designer, showing its trigger, steps and details.">
 </figure>
 
 <h2>When the chain does not fire</h2>

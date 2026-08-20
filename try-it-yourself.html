@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Describe your business to an AI you already use, bring back one Mermaid .mmd model file, and run the application it generates in this browser. The prompt, the language it produces, the checker, and the upload — all on one page.">
+  <meta name="keywords" content="AppWithAI, try it yourself, EML, Mermaid model, erDiagram, .mmd, application generator, ChatGPT, Gemini Deep Research, model checker, in-browser demo">
+  <title>Try It Yourself — Describe Your Business, Run the Application</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="try-it-yourself.html" class="nav-link active">Try It Yourself</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-3xl) 0;">
+    <div class="container text-center">
+      <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">No Account &middot; No Install &middot; Ten Minutes</span>
+      <h1 style="margin-top: var(--spacing-lg); color: white;">Describe Your Business. <span style="color: var(--accent-300);">Run the Application.</span></h1>
+      <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Tell an AI you already use what your business does, bring back one file, and watch a working application start in this browser — database, API, forms, rules and workflows.</p>
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap; margin-top: var(--spacing-xl);">
+        <a href="#the-prompt" class="btn btn-accent btn-lg">Start with the prompt &darr;</a>
+        <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.6); color: white;">Or run the ready-made CRM</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Three steps -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>Three steps, in this order</h2>
+        <p class="section-subtitle">This is section 1 of the specification — the authoring protocol — in plain English. The model you prompt reads the same four steps in machine-readable form.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">&#9997;&#65039;</div>
+          <h3>1. Describe your business — properly</h3>
+          <p>Not one sentence. Write what you would tell a new hire on their first day: what you sell or service, every kind of record you keep, who touches each one, the states things move through, what needs approving and by whom, and what happens when a step fails.</p>
+          <p class="text-muted text-sm">The thinner the description, the thinner the application. This is the step that decides the result.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128270;</div>
+          <h3>2. Hand it to ChatGPT or Gemini Deep Research</h3>
+          <p>Give the model our machine-readable specification along with your description. It carries the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
+          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the model itself, not a document describing it — plus the specification it inferred, so you can correct what it guessed.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9654;&#65039;</div>
+          <h3>3. Run it, here, in this browser</h3>
+          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, a real interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The prompt -->
+  <section class="section section-gray" id="the-prompt">
+    <div class="container">
+      <div class="section-header">
+        <h2>The prompt — copy it as it is</h2>
+        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
+      </div>
+
+      <div class="card">
+        <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
+          <div>
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+
+My business:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+
+Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
+
+Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
+
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
+            <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
+          </div>
+          <div>
+            <h4>Then bring the file back</h4>
+            <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
+            <p class="text-muted text-sm">Got a report instead of a file? Some models can only answer with a document. Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download a real <code>.mmd</code> from there.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+              <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
+              <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
+              <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What comes back -->
+  <section class="section section-white">
+    <div class="container">
+      <div class="section-header">
+        <h2>What comes back, and how to read it</h2>
+        <p class="section-subtitle">The file is Mermaid — the diagram language — with a small set of <code>%%</code> directives that Mermaid treats as comments and our generator treats as meaning. You can read it, and a Mermaid viewer can draw it.</p>
+      </div>
+
+      <div class="container-narrow">
+        <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">%%meta name: Field Service
+%%meta kind: erd
+
+%%enum JobStatus: scheduled, dispatched, on_site, complete, cancelled
+
+erDiagram
+    Customer {
+        string id PK
+        string name
+        email  email UK
+        phone  phone OPTIONAL
+    }
+    Engineer {
+        string id PK
+        string first_name
+        string last_name
+    }
+    Job {
+        string   id PK
+        string   customer_id FK
+        string   engineer_id FK
+        string   status
+        datetime scheduled_for
+        money    quoted_total
+    }
+    Customer ||--o{ Job : "raises"
+    Engineer ||--o{ Job : "works"
+
+%%entity Job help: A visit an engineer makes to a customer site.
+%%field Job.status enum: JobStatus
+%%field Job.quoted_total help: What the customer was quoted, before parts used on site.
+%%rbac role:dispatcher on Job.update</pre>
+
+        <div class="grid grid-2 mt-5">
+          <div class="card">
+            <h4>Every line does one job</h4>
+            <ul class="footer-links" style="line-height: 1.9;">
+              <li><code>%%meta name:</code> — names the model. The file opens with it.</li>
+              <li><code>erDiagram</code> — your entities and their columns.</li>
+              <li><code>PK</code> <code>FK</code> <code>UK</code> <code>OPTIONAL</code> — the four modifiers that matter.</li>
+              <li><code>%%enum</code> + <code>%%field … enum:</code> — a closed vocabulary, bound to a column.</li>
+              <li><code>%%entity … help:</code> and <code>%%field … help:</code> — the help a user reads on screen.</li>
+              <li><code>%%rbac</code> — who may do what.</li>
+              <li><code>stateDiagram-v2</code> — the lifecycle a record moves through.</li>
+              <li><code>flowchart</code> + <code>%%action</code> — a business rule that decides something.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h4>Four things worth checking yourself</h4>
+            <p class="text-sm">The generated application reads a live <strong>Application Dictionary</strong> — one row per table, column, tab and lookup — and it is derived from this file alone. Four habits decide whether the screens come out usable:</p>
+            <ul class="footer-links" style="line-height: 1.9;">
+              <li>Every reference column ends <code>_id</code> and carries <code>FK</code> — that is what makes it a dropdown instead of a box asking for a UUID.</li>
+              <li>Every status column has a <code>%%field … enum:</code> binding — without it the field is free text.</li>
+              <li>Types are specific: <code>email</code>, <code>phone</code>, <code>url</code>, <code>money</code>, <code>date</code> — each one picks its own input control.</li>
+              <li>Entities and non-obvious columns carry <code>help:</code> — it is the only help your users will ever get.</li>
+            </ul>
+            <p class="text-muted text-sm">The checker reports all four. <a href="llms-full.txt">Section 3.7</a> explains why each one matters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Check it -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>Check the file before you trust it</h2>
+        <p class="section-subtitle">The same checker the generator runs is published as a module and as a one-command runner. A model that passes here is a model the generator will accept.</p>
+      </div>
+
+      <div class="grid grid-2" style="align-items: start;">
+        <div class="card">
+          <div class="card-icon">&#9000;</div>
+          <h4>In a terminal — two lines</h4>
+          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/check-model.mjs">https://appwithai.org/guide/check-model.mjs</span>
+node check-model.mjs my-business.mmd</pre>
+          <p class="text-muted text-sm">It runs the three passes the protocol asks for, prints the checker's own report, and exits <code>0</code> when the file is clean, <code>1</code> when the generator would refuse it.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128269;</div>
+          <h4>In this browser — paste or drop the file</h4>
+          <p>The checker page runs the published <code>checker.js</code> and <code>fixer.js</code> in your tab, repairs what is repairable, explains what is not, and hands back a downloadable <code>.mmd</code> once the run is clean.</p>
+          <p class="text-muted text-sm">It is the way in if your model arrived as a fenced block inside a chat report rather than as a file.</p>
+          <a href="guide/11-check-a-model.html" class="btn btn-outline mt-3">Open the checker &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Next -->
+  <section class="section section-white">
+    <div class="container text-center">
+      <div class="section-header">
+        <h2>Not ready to write your own?</h2>
+        <p class="section-subtitle">The guide builds a seventeen-entity CRM from an empty file to a running application, one chapter at a time — and chapter 9 runs it in your browser with no file needed.</p>
+      </div>
+      <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap;">
+        <a href="guide/run-in-browser.html" class="btn btn-accent btn-lg">Run the CRM in your browser</a>
+        <a href="guide/index.html" class="btn btn-outline btn-lg">Read the guide</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="justification.html">Why AppWithAI</a></li>
+            <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
