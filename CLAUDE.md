@@ -392,6 +392,13 @@ thing a language model has to produce is a model file.
   derivation table against `erdwithai-wasm.js` and asserts that the three codes fire;
   `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
   where an older checker is vendored.
+- **§3.7 also carries the display value** — what a reference shows in place of its uuid. The dictionary
+  derives it from `sys_column.is_identifier`: a `name`-ish column, else `first_name` + `last_name`, else
+  a `code`, else — for a **join entity**, two or more `FK` columns and no name of its own — its first two
+  parents resolved through *their* labels (`Spring Promo — Omar Kowalski`), else the first text column,
+  else the uuid. The key is never an identifier. Only the first two parents, only one level deep, and
+  names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
+  all of it against `erdwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at.
 - **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
