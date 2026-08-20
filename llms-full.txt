@@ -650,9 +650,11 @@ type**:
 | `json` | `JSON` | a JSON editor |
 | anything else | `String` | a plain text box |
 
-**Two mistakes silently downgrade a column to `String`, and both check clean** —
-no error, no warning, nothing to read. They are the reason a generated
-application comes back with raw ids in text boxes:
+**Two mistakes downgrade a column to `String`**, and they are the reason a
+generated application comes back with raw ids in text boxes. Both were silent
+until the checker learned to report them — `EML119` for the first, `EML146` for
+the second — and both still render exactly as drawn in a Mermaid viewer, so the
+report is the only place they show:
 
 1. **A reference column without the `FK` modifier.** `string vendor_id` and
    `string vendor_id FK` parse into the same column, and only the second becomes
@@ -914,6 +916,9 @@ executable step, and **the flowchart's edges give the running order**.
 ```mermaid
 %%meta name: Lead Conversion
 %%meta kind: erd
+
+%%enum LeadStatus: new, working, qualified, converted, disqualified
+
 erDiagram
     Lead {
         string  id PK
@@ -941,6 +946,8 @@ erDiagram
     Account ||--o{ Contact : "employs"
     User    ||--o{ Lead : "owns"
     User    ||--o{ Account : "owns"
+
+%%field Lead.status enum: LeadStatus
 
 %%meta name: Lead Qualification
 %%meta kind: rules
@@ -1058,6 +1065,11 @@ transition event from that entity's `stateDiagram-v2` (§5.2).
 Put `%%rbac` directives inside the workflow section whose transitions they
 govern, and beside the ERD for CRUD restrictions.
 
+**Write `%%rbac`, never `%%guard`.** The role form was spelled `%%guard` until
+that keyword was needed for automation conditions (§7). A `%%guard role:… on …`
+line still parses, and does nothing: the restriction is not compiled and the
+operation stays open. `EML223` reports it.
+
 Validation here is strict, and nearly every code is an **error** rather than a
 warning: `EML210` syntax, `EML211` no role named, `EML213` undeclared entity,
 `EML214` a target that is neither an operation nor a transition. A `%%rbac` rule
@@ -1084,11 +1096,18 @@ the checker reads it.
 | `%%step` | `%%step <nodeId> <stepType> <k>: <v> …` | compiled |
 | `%%action` | `%%action <name> <type> when: <expr> …` | compiled |
 | `%%rbac` | `%%rbac <roleExpr> on <E>.<op>` | compiled |
-| `%%guard` | `%%guard <field> <operator> <jsonValue>` | compiled |
+| `%%guard` | `%%guard <field> <operator> <jsonValue>` | compiled *(see below)* |
 | `%%loop` | `%%loop <id> while: <f> <op> <v> max: <n>` | compiled |
 | `%%entity` | `%%entity <E> <k>: <v>` | **validated** |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
+
+**`%%guard` used to mean access control**, and a model written from an older
+example still spells it `%%guard role:manager on Order.approve`. That sense moved
+to `%%rbac`: a guard shaped like the old one is *skipped*, so the operation it
+appears to restrict is open to any authenticated caller. `EML223` reports it and
+prints the `%%rbac` line to write instead. A `%%guard` today is an automation
+condition — `%%guard status eq "open"`.
 
 **Do not tell a user a directive "will do X" without checking its status.**
 `%%entity Order audited: true` is validated but not compiled: it will not make

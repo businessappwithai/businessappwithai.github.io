@@ -365,14 +365,18 @@ thing a language model has to produce is a model file.
   model and still handed over only the prose about it. Two files means the reader opens the wrong one.
 - **Three places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
   page's prompt block, and the three "Try It Yourself" cards.
-- **§3.7 is the Application Dictionary**, and it is there because a model can check clean and still
+- **§3.7 is the Application Dictionary**, and it is there because a model could check clean and still
   generate an application full of text boxes. The generated app is metadata-driven: `sys_table`,
   `sys_column`, `sys_reference`, `sys_ref_list` and the rest are derived from the ERD, and the column's
-  *reference type* decides the control. Two mistakes downgrade a column to `String` with no diagnostic
-  at all — a reference column without the `FK` modifier (both generators require `isForeignKey` **and** a
-  name ending `_id`/`_by` for `Table Direct`), and an enumerated column with no `%%field … enum:`
-  binding. `scripts/check-spec.mjs` asserts the whole derivation table against `erdwithai-wasm.js`, and
-  `scripts/check-model.mjs` fails a delivery that carries either mistake.
+  *reference type* decides the control. Two mistakes downgrade a column to `String` — a reference column
+  without the `FK` modifier (both generators require `isForeignKey` **and** a name ending `_id`/`_by` for
+  `Table Direct`), and an enumerated column with no `%%field … enum:` binding. Both are diagnostics now,
+  `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
+  with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
+  retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
+  derivation table against `erdwithai-wasm.js` and asserts that the three codes fire;
+  `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
+  where an older checker is vendored.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at.
 - **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
