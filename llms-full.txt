@@ -714,6 +714,7 @@ concatenated in declared order:
 | `name` — or `full_name`, `display_name`, `title`, `label`, `subject` | that column |
 | `first_name` **and** `last_name` | both, joined — `Omar Kowalski` |
 | `code`, `reference` or `number` | that column — `CON2026-0001` |
+| **two or more `FK` columns and no name of its own** | its first two parents, resolved and joined — `Spring Promo — Omar Kowalski` |
 | none of those | the first plain `string`/`text` column you declared |
 | no text column at all | the uuid, which is the outcome to avoid |
 
@@ -723,6 +724,30 @@ without one renders as whatever text column happens to come first — a billing
 city, a status — and a reader has no way to tell one record from another. The
 primary key is never an identifier: a display value beginning with a uuid is the
 thing this mechanism exists to prevent.
+
+**A join entity is the exception, and it needs nothing from you.** An entity
+whose identity *is* the pair of records it joins — `CampaignMember`,
+`OrderLine`, `QuoteLineItem` — has no name to give it, and the row above it
+would have picked whatever text column came first: `member_status`, so every
+campaign member read *invited, invited, responded*. Two or more `FK` columns and
+no name of its own is the shape the dictionary recognises, and it labels the
+record by resolving its first two parents through *their* labels:
+
+```
+    CampaignMember {
+        string id PK
+        string campaign_id FK
+        string contact_id FK
+        string member_status
+    }
+```
+
+renders as `Spring Promo — Omar Kowalski`. Only the first two, and only one
+level deep: a label assembled from four grandparents is not a name anybody
+reads. **Declare the two parents first** if the entity has more than two
+references — `CampaignMember` pointing at a campaign, a lead *and* a contact
+labels itself from the first two in declared order, which is the only say you
+have in it.
 
 **The help text is part of the dictionary, and only you can write it.** A
 column's `sys_column.description` is what the form prints under the control, and

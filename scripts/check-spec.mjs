@@ -287,6 +287,23 @@ const identifierCases = [
   ["a code identifies when no name exists", "        string id PK\n        string code", ["code"]],
   ["failing all of those, the first text column", "        string id PK\n        string billing_city\n        integer size", ["billing_city"]],
   ["the key is never an identifier", "        string id PK\n        integer size", []],
+  /* A join entity names itself from the records it joins. Without this the
+     first text column won, and every campaign member read "invited". */
+  ["a join entity is its two parents",
+    "        string id PK\n        string campaign_id FK\n        string contact_id FK\n        string member_status",
+    ["campaign_id", "contact_id"]],
+  ["only the first two parents, never four",
+    "        string id PK\n        string order_id FK\n        string product_id FK\n        string warehouse_id FK",
+    ["order_id", "product_id"]],
+  ["an entity that names itself is not a join",
+    "        string id PK\n        string name\n        string account_id FK\n        string owner_id FK",
+    ["name"]],
+  ["a person with two references is still a person",
+    "        string id PK\n        string account_id FK\n        string owner_id FK\n        string first_name\n        string last_name",
+    ["first_name", "last_name"]],
+  ["one reference is not a join, so the text column beside it wins",
+    "        string id PK\n        string contact_id FK\n        string street",
+    ["street"]],
 ];
 for (const [label, body, expected] of identifierCases) {
   const got = identifiersOf(body);
