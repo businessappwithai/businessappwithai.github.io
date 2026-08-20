@@ -703,6 +703,27 @@ report is the only place they show:
    a user gets a free-text box where the state machine expects one of five
    values.
 
+**Give every referenced entity a name column.** A reference stores a uuid, and
+every screen that shows one has to turn it back into something a person
+recognises — the lookup dropdown, and the grid cell. The dictionary decides what
+a record is *called* from its **identifier columns** (`sys_column.is_identifier`),
+concatenated in declared order:
+
+| What the entity declares | What a reference to it shows |
+|---|---|
+| `name` — or `full_name`, `display_name`, `title`, `label`, `subject` | that column |
+| `first_name` **and** `last_name` | both, joined — `Omar Kowalski` |
+| `code`, `reference` or `number` | that column — `CON2026-0001` |
+| none of those | the first plain `string`/`text` column you declared |
+| no text column at all | the uuid, which is the outcome to avoid |
+
+So an entity that will be pointed at wants a name. `Account` with a `name`
+renders as *Northwind Systems* everywhere it is referenced; the same entity
+without one renders as whatever text column happens to come first — a billing
+city, a status — and a reader has no way to tell one record from another. The
+primary key is never an identifier: a display value beginning with a uuid is the
+thing this mechanism exists to prevent.
+
 **The help text is part of the dictionary, and only you can write it.** A
 column's `sys_column.description` is what the form prints under the control, and
 a table's `sys_table.description` is what the dictionary and the entity's screen
@@ -730,10 +751,11 @@ becomes the dashboard grouping — a model that declares none gets a single
 do not promise a user an icon that directive alone will not produce.
 
 So there is no second artifact to write. A dictionary that comes out right is
-five habits in the ERD: **mark every reference column `FK`**, **bind every
-enumerated column with `%%field … enum:`**, **write `help:` on every entity and
-every column that needs explaining**, prefer the specific type alias over the
-canonical name, and group the entities with `%%category`.
+six habits in the ERD: **mark every reference column `FK`**, **bind every
+enumerated column with `%%field … enum:`**, **give every referenced entity a
+name column**, **write `help:` on every entity and every column that needs
+explaining**, prefer the specific type alias over the canonical name, and group
+the entities with `%%category`.
 
 ---
 
@@ -1495,30 +1517,32 @@ flowchart TD
    (`EML112`), and declares none of the seven the generator adds — `id` aside,
    `version`, the audit pair and the soft-delete pair are already there
    (§3.1, `EML103`).
-7. Every foreign key ends `_id`, **carries the `FK` modifier**, and has a
+7. Every entity that something references has a `name`, `title` or `code`
+   column — that is what a lookup and a grid show in place of the uuid (§3.7).
+8. Every foreign key ends `_id`, **carries the `FK` modifier**, and has a
    matching relationship line — the modifier is what makes it a `Table Direct`
    lookup in the Application Dictionary rather than a text box (§3.7).
-8. Every status column, and every other column with a closed vocabulary, has a
+9. Every status column, and every other column with a closed vocabulary, has a
    `%%enum` **and** a `%%field … enum:` binding it — without the binding the
    dictionary records free text (§3.7).
-9. Every entity carries `%%entity <E> help:`, and every column whose meaning a
+10. Every entity carries `%%entity <E> help:`, and every column whose meaning a
    reader could get wrong carries `%%field <E>.<col> help:` — that text is the
    whole of the application's help, and no later pass adds it (§3.7).
-10. Every entity with a status has a `kind: state` workflow, with an initial
+11. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
-11. Every rule that must *do* something has an `%%action` — not just a flowchart.
-12. Every cross-entity effect is a hook, an action, or a saga step.
-13. Every restricted operation and transition has a `%%rbac` directive.
+12. Every rule that must *do* something has an `%%action` — not just a flowchart.
+13. Every cross-entity effect is a hook, an action, or a saga step.
+14. Every restricted operation and transition has a `%%rbac` directive.
 
 **The handover**
 
-14. Exactly one file is being handed over, and it ends `.mmd` — no companion
+15. Exactly one file is being handed over, and it ends `.mmd` — no companion
     specification document, report or README (§1.0).
-15. `check(source)` returns `ok: true`, run three times over the file's exact
+16. `check(source)` returns `ok: true`, run three times over the file's exact
     bytes, the last two over unchanged bytes — `node check-model.mjs <file>.mmd`
     is those three passes and exits `0` — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
-16. Warnings are cleared, or each remaining one is explained to the user.
-17. The file the user receives is the file you validated, delivered as a
+17. Warnings are cleared, or each remaining one is explained to the user.
+18. The file the user receives is the file you validated, delivered as a
     download, with the enhanced specification and the checker counts beside it in
     the reply — not inside the file (§1.4).
