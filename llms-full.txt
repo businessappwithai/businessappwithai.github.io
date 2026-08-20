@@ -501,6 +501,28 @@ Entity names are `PascalCase` or `SNAKE_CASE`; attribute names are `snake_case`.
 declaring one yourself is better — `EML117` warns when you do not, and the repair
 prepends `string id PK`, which may not be the column you wanted.
 
+**Seven column names are the generator's — do not declare them.** Every
+generated table carries them already, in both stacks:
+
+```
+id  version  created_at  updated_at  created_by  updated_by  deleted_at  deleted_by
+```
+
+Writing `datetime created_at` in an entity block says something the generator
+already guarantees. `EML103` reports the line, and the generator keeps its own
+definition and drops yours. Until it learned to, the duplicate reached
+PostgreSQL as a `CREATE TABLE` naming one column twice — which is rejected
+outright, so the *application failed to open*, with a message
+(`column "created_at" specified more than once`) that named no model line at
+all. Model what your business knows; the record-keeping columns are already
+there.
+
+The `_id` spelling is a different column and a legitimate one:
+`created_by` is the generator's audit stamp — a bare UUID with no lookup —
+while `created_by_id FK` is a reference you modelled, and it resolves to your
+`User` entity with a lookup on it (§3.5). If you want the author of a record to
+be selectable and shown by name, declare `created_by_id FK`, not `created_by`.
+
 ### 3.2 Types
 
 Eight canonical types. Everything else normalises into one of them; an unknown
@@ -1455,7 +1477,9 @@ flowchart TD
 **The model**
 
 5. Every entity from the enhanced specification (§1.1) is in the document.
-6. Every entity has a primary key you chose.
+6. Every entity has a primary key you chose, and declares none of the seven
+   columns the generator adds — `id` aside, `version`, the audit pair and the
+   soft-delete pair are already there (§3.1, `EML103`).
 7. Every foreign key ends `_id`, **carries the `FK` modifier**, and has a
    matching relationship line — the modifier is what makes it a `Table Direct`
    lookup in the Application Dictionary rather than a text box (§3.7).

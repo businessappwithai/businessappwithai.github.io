@@ -234,6 +234,15 @@ t("an unbound status column is reported as EML146", dictionaryDiagnostics, "EML1
 t("a %%guard written as an access rule is reported as EML223",
   `%%meta name: Guard Probe\n%%meta kind: erd\n%%enum ThingStatus: draft, live\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Thing Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> [*]\n\n    %%guard role:manager on Thing.publish\n`,
   "EML223");
+/* §3.1: the columns the generator adds are its own, and declaring one is
+   reported rather than carried into a CREATE TABLE that PostgreSQL refuses. */
+for (const column of ["created_at", "updated_at", "version", "deleted_by"])
+  t(`declaring ${column} is reported as EML103`,
+    `%%meta name: Managed Probe\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        datetime ${column}\n    }\n`,
+    "EML103");
+t("a column the generator does not manage stays quiet",
+  `%%meta name: Managed Probe\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        datetime started_at\n    }\n`);
+
 t("a state column that no machine tracks stays quiet", `%%meta name: Address Probe\n%%meta kind: erd\nerDiagram\n    Address {\n        string id PK\n        string state\n        string city\n    }\n`);
 
 /* §3.6 and §3.7: help text is compiled, and reaches sys_column / sys_table. */
