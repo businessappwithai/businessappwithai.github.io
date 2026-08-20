@@ -30,7 +30,8 @@ businessappwithai.github.io/
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
 │       └── stack-templates.json  # 310 stack templates for chapter 10
-├── guide/                    # "Build a CRM" guide (chapters 00–11)
+├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
+│                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
 │   ├── 01-…08-reference.html # Chapters 01–08
 │   ├── run-in-browser.html   # 09 · Run it in your browser
@@ -49,6 +50,7 @@ businessappwithai.github.io/
 │   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
+├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -106,6 +108,7 @@ Deployment is fully automatic:
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
+| `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
@@ -212,8 +215,11 @@ utils.setCookie(name, value, days)
 The primary nav carries seven items plus two buttons and fits on one line down to
 1024px, below which it collapses behind the menu toggle. `.nav-link` is
 `white-space: nowrap` so a two-word label never breaks mid-item; the narrow-desktop
-media query (1024–1279px) tightens the gap and type size instead. **Adding an
-eighth nav item will not fit** — check at 1024px before you do.
+media query (1024–1279px) tightens the gap and type size instead. **Seven is the
+ceiling** — an eighth item overflows the header at every desktop width, measured.
+"Try It Yourself" was added by dropping "Home": the logo links home from every
+page, which is where a reader looks for it anyway. **Adding another item means
+removing one** — check at 1024px before you do.
 
 **"Live Demo" points at `guide/run-in-browser.html`**, the in-browser CRM. It is
 same-origin, so it carries no `target="_blank"`. There was formerly an externally
@@ -224,7 +230,9 @@ Do not reintroduce a demo the site cannot serve itself.
 ## "Try It Yourself" — the conversion path
 
 The section on the home page (`index.html#try-it-yourself`) is the site's main call to
-action, and it spans four files. If you change one, check the others.
+action, and `try-it-yourself.html` is the same path with room to explain itself — the
+nav points at the page, the home page keeps the short version and links to it. Between
+them the path spans five files. If you change one, check the others.
 
 1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
    visitor copies a link to the host they are actually on. The copy button is
@@ -236,8 +244,13 @@ action, and it spans four files. If you change one, check the others.
 3. **`guide/run-in-browser.html#upload`** is where the reader lands with their model.
    The hash is honoured in `run-in-browser.js`: it selects the upload choice and scrolls
    the dropzone into view instead of showing the CRM example.
-4. **`how-it-works.html`** carries a pointer section that links back to the home page
+4. **`how-it-works.html`** carries a pointer section that links to `try-it-yourself.html`
    rather than duplicating the steps. Keep it a pointer.
+5. **`try-it-yourself.html`** repeats the three cards and the prompt block, and then goes
+   further than the home page can: a complete `Field Service` model with every line
+   explained, the four dictionary habits, and both ways to run the checker. **Its example
+   model is checker-clean** — `node guide/check-model.mjs` it after any edit, the same way
+   `llms-full.txt`'s examples are held to.
 
 ## Key Conventions for AI Assistants
 
@@ -363,14 +376,16 @@ thing a language model has to produce is a model file.
   only produce a document must do instead — open the document with the model in its first fenced
   block. That is there because the failure recurred with a *second* model that had plainly written a
   model and still handed over only the prose about it. Two files means the reader opens the wrong one.
-- **Three places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
-  page's prompt block, and the three "Try It Yourself" cards.
+- **Four places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
+  page's prompt block, the three "Try It Yourself" cards, and `try-it-yourself.html`.
 - **§3.7 is the Application Dictionary**, and it is there because a model could check clean and still
   generate an application full of text boxes. The generated app is metadata-driven: `sys_table`,
   `sys_column`, `sys_reference`, `sys_ref_list` and the rest are derived from the ERD, and the column's
   *reference type* decides the control. Two mistakes downgrade a column to `String` — a reference column
   without the `FK` modifier (both generators require `isForeignKey` **and** a name ending `_id`/`_by` for
-  `Table Direct`), and an enumerated column with no `%%field … enum:` binding. Both are diagnostics now,
+  `Table Direct`), and an enumerated column with no `%%field … enum:` binding. §3.7 also carries the help
+  contract: `%%field <E>.<c> help:` and `%%entity <E> help:` are compiled into `sys_column.description`
+  and `sys_table.description`, and they are the only help the generated application has. Both are diagnostics now,
   `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
   with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the

@@ -25,8 +25,8 @@
       </button>
       <nav class="nav" id="mainNav">
         <ul class="nav-list">
-          <li><a href="../index.html" class="nav-link">Home</a></li>
           <li><a href="../justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="../try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
           <li><a href="../features.html" class="nav-link">Features</a></li>
           <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
           <li><a href="../technology.html" class="nav-link">Technology</a></li>
@@ -99,22 +99,22 @@
 <h2>Signing in</h2>
 <div class="fig-row">
   <figure>
-    <img src="img/07-crm-login.png" alt="The generated CRM sign-in screen, titled Welcome Back, with email, password, remember me and a note that accounts are created by an administrator.">
     <figcaption><b>Sign in.</b> Accounts are administrator-created by design; there is no self-service signup in a generated back-office app.</figcaption>
+    <img src="img/07-crm-login.png" alt="The generated CRM sign-in screen, titled Welcome Back, with email, password, remember me and a note that accounts are created by an administrator.">
   </figure>
   <figure>
-    <img src="img/41-crm-accounts.png" alt="The Accounts list showing account number, type, tier, industry, website and phone columns.">
     <figcaption><b>An entity list.</b> Columns, order and labels all come from the dictionary's field definitions.</figcaption>
+    <img src="img/41-crm-accounts.png" alt="The Accounts list showing account number, type, tier, industry, website and phone columns.">
   </figure>
 </div>
 
 <h2>The dashboard is your categories</h2>
 <figure>
-  <img src="img/08-crm-dashboard.png" alt="The CRM dashboard with seven category blocks and an Application Dictionary block.">
   <figcaption>
     <b>Seven blocks, seven <code>%%category</code> directives.</b> Heading, description and membership are
     the model's; the eighth block, Application Dictionary, is the generator's own admin surface.
   </figcaption>
+  <img src="img/08-crm-dashboard.png" alt="The CRM dashboard with seven category blocks and an Application Dictionary block.">
 </figure>
 
 <div class="note tip">
@@ -133,22 +133,22 @@
 
 <div class="fig-row">
   <figure>
-    <img src="img/42-crm-opportunities.png" alt="The Opportunities list.">
     <figcaption><b>Opportunities.</b> Amount, stage, probability and expected close date.</figcaption>
+    <img src="img/42-crm-opportunities.png" alt="The Opportunities list.">
   </figure>
   <figure>
-    <img src="img/46-crm-contracts.png" alt="The Contracts list.">
     <figcaption><b>Contracts.</b> Term, annual value, auto-renew and the renewal notice period.</figcaption>
+    <img src="img/46-crm-contracts.png" alt="The Contracts list.">
   </figure>
 </div>
 <div class="fig-row">
   <figure>
-    <img src="img/44-crm-support-cases.png" alt="The Support Cases list.">
     <figcaption><b>Support cases.</b> Priority, origin, type and SLA timestamps.</figcaption>
+    <img src="img/44-crm-support-cases.png" alt="The Support Cases list.">
   </figure>
   <figure>
-    <img src="img/49-crm-activities.png" alt="The Activities list.">
     <figcaption><b>Activities.</b> The one entity that points at almost everything else — account, contact, lead, opportunity, case and contract.</figcaption>
+    <img src="img/49-crm-activities.png" alt="The Activities list.">
   </figure>
 </div>
 
@@ -161,32 +161,32 @@
 
 <div class="fig-row">
   <figure>
-    <img src="img/09-crm-lead-list.png" alt="The Leads list showing first name, last name, company name, email, phone, job title and industry columns, with search and a New button.">
     <figcaption><b>Leads.</b> The marketing end of the model — seven columns, each sortable, with the same search box and Help chip as every other screen.</figcaption>
+    <img src="img/09-crm-lead-list.png" alt="The Leads list showing first name, last name, company name, email, phone, job title and industry columns, with search and a New button.">
   </figure>
   <figure>
-    <img src="img/43-crm-contacts.png" alt="The Contacts list showing account id, first name, last name, email, phone, mobile and job title columns.">
     <figcaption><b>Contacts.</b> Account Id leads the row, because a contact belongs to an account and the ERD says so.</figcaption>
+    <img src="img/43-crm-contacts.png" alt="The Contacts list showing account id, first name, last name, email, phone, mobile and job title columns.">
   </figure>
 </div>
 <div class="fig-row">
   <figure>
-    <img src="img/45-crm-quotes.png" alt="The Quotes list showing quote number, opportunity id, account id, name, status, version number and valid until columns.">
     <figcaption><b>Quotes.</b> Three references on a single row — opportunity, account and the quote's own name — alongside a status, a version number and a validity date.</figcaption>
+    <img src="img/45-crm-quotes.png" alt="The Quotes list showing quote number, opportunity id, account id, name, status, version number and valid until columns.">
   </figure>
   <figure>
-    <img src="img/47-crm-campaigns.png" alt="The Campaigns list showing name, campaign type, status, start date, end date, budgeted cost and actual cost columns.">
     <figcaption><b>Campaigns.</b> Dates render as dates and costs as decimals because the model said <code>date</code> and <code>decimal</code> — nothing here was formatted by hand.</figcaption>
+    <img src="img/47-crm-campaigns.png" alt="The Campaigns list showing name, campaign type, status, start date, end date, budgeted cost and actual cost columns.">
   </figure>
 </div>
 
 <figure>
-  <img src="img/48-crm-products.png" alt="The Products list showing product code, name, description, family, list price, unit cost and billing frequency columns.">
   <figcaption>
     <b>Products.</b> The catalogue every opportunity line item and quote line item points at. Seven columns,
     a search box, sortable headers, a New button — the same furniture as Leads, because it is the same
     template reading a different row of the dictionary.
   </figcaption>
+  <img src="img/48-crm-products.png" alt="The Products list showing product code, name, description, family, list price, unit cost and billing frequency columns.">
 </figure>
 
 <div class="note win">
@@ -205,12 +205,12 @@
 </p>
 
 <figure>
-  <img src="img/26-crm-reference-lookups.png" alt="The New Opportunity form showing Account Id, Contact Id and Campaign Id as Direct Lookup selects, Name as Text, Description as Long Text and Amount as Amount.">
   <figcaption>
     <b>New Opportunity.</b> <em>Direct Lookup</em> on the three foreign keys, each showing the referenced
     record's display name rather than its id. <em>Text</em>, <em>Long Text</em> and <em>Amount</em> on the
     scalar columns. Required fields carry a red asterisk, and the header counts them: 16 fields, 5 required.
   </figcaption>
+  <img src="img/26-crm-reference-lookups.png" alt="The New Opportunity form showing Account Id, Contact Id and Campaign Id as Direct Lookup selects, Name as Text, Description as Long Text and Amount as Amount.">
 </figure>
 
 <div class="table-wrap">
@@ -229,11 +229,11 @@
 </div>
 
 <figure>
-  <img src="img/32-crm-enum-dropdowns.png" alt="The Lead form with Lead Source, Rating and Status rendered as Dropdown selects while Score stays an integer input and Owner Id stays a Direct Lookup.">
   <figcaption>
     <b>Enums and lookups side by side.</b> Three dropdowns from <code>%%field … enum:</code>, one integer,
     two lookups. The difference between a dropdown and a text box here is one line in the model.
   </figcaption>
+  <img src="img/32-crm-enum-dropdowns.png" alt="The Lead form with Lead Source, Rating and Status rendered as Dropdown selects while Score stays an integer input and Owner Id stays a Direct Lookup.">
 </figure>
 
 <h2>From the list to the record</h2>
@@ -245,12 +245,12 @@
 
 <div class="fig-row">
   <figure>
-    <img src="img/09-crm-lead-list.png" alt="The Leads list showing four leads with first name, last name, company name, email, phone, job title and industry columns, a search box, and Search, New and Save buttons.">
     <figcaption><b>1 · The list.</b> Search, sortable columns, a Help chip, and <em>New</em>.</figcaption>
+    <img src="img/09-crm-lead-list.png" alt="The Leads list showing four leads with first name, last name, company name, email, phone, job title and industry columns, a search box, and Search, New and Save buttons.">
   </figure>
   <figure>
-    <img src="img/10-crm-lead-new-form.png" alt="The New Lead form with its fields laid out and required fields marked, showing the field and required counts in the header.">
     <figcaption><b>2 · The form.</b> Controls chosen by field type, required fields marked, the counts in the header.</figcaption>
+    <img src="img/10-crm-lead-new-form.png" alt="The New Lead form with its fields laid out and required fields marked, showing the field and required counts in the header.">
   </figure>
 </div>
 
@@ -262,12 +262,12 @@
 </p>
 
 <figure>
-  <img src="img/11-crm-lead-created.png" alt="A Lead detail view for Dana Whitfield showing a FINAL badge, 17 fields with 7 required, grouped into General and Details.">
   <figcaption>
     <b>3 · The record.</b> The <em>FINAL</em> badge means every rule and workflow bound to Lead ran and
     succeeded. Fields are grouped — General carries the identifying columns, Details the rest — and the
     record counter lets you page through the list without going back to it.
   </figcaption>
+  <img src="img/11-crm-lead-created.png" alt="A Lead detail view for Dana Whitfield showing a FINAL badge, 17 fields with 7 required, grouped into General and Details.">
 </figure>
 
 <div class="note">
@@ -287,11 +287,11 @@
 </p>
 
 <figure>
-  <img src="img/25-crm-opportunity-list-references.png" alt="The Opportunity list with account and contact columns resolved to names.">
   <figcaption>
     <b>References resolve to names.</b> A foreign key column shows the referenced record's label, not its
     UUID — in lists as well as forms. That resolution is what a declared relationship buys you.
   </figcaption>
+  <img src="img/25-crm-opportunity-list-references.png" alt="The Opportunity list with account and contact columns resolved to names.">
 </figure>
 
 <h2>Help on every screen</h2>
@@ -301,12 +301,12 @@
 </p>
 
 <figure>
-  <img src="img/19-crm-help-entity.png" alt="The Lead help dialog with a window overview, a tabs section and a fields section listing each field and its help text.">
   <figcaption>
     <b>Help for Lead.</b> Written from the model: it names the seven required fields, says Campaign is a
     lookup, notes that Campaign Member and Activity refer back to Lead, and explains the draft-to-final
     cycle. Field help lists every column and its rule.
   </figcaption>
+  <img src="img/19-crm-help-entity.png" alt="The Lead help dialog with a window overview, a tabs section and a fields section listing each field and its help text.">
 </figure>
 
 <div class="note tip">
@@ -339,6 +339,7 @@
           <h4>Product</h4>
           <ul class="footer-links">
             <li><a href="../justification.html">Why AppWithAI</a></li>
+            <li><a href="../try-it-yourself.html">Try It Yourself</a></li>
             <li><a href="../features.html">Features</a></li>
             <li><a href="../how-it-works.html">How It Works</a></li>
             <li><a href="../technology.html">Technology</a></li>

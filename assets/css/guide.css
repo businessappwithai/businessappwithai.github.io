@@ -294,8 +294,11 @@
   cursor: zoom-in;
 }
 
+/* The caption sits *above* its image: a reader should know what they are about
+   to look at before they look at it, rather than scrolling past a screenshot
+   and finding out afterwards what it was showing. */
 .guide-content figcaption {
-  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
   font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--gray-500);
