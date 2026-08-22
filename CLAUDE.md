@@ -23,6 +23,7 @@ businessappwithai.github.io/
 │   │   ├── run-in-browser.js     # Controller for chapter 09
 │   │   ├── run-real-stack.js     # Controller for chapter 10
 │   │   ├── validator.js          # Controller for chapter 11
+│   │   ├── zip.js                # Dependency-free ZIP writer (the deployable download)
 │   │   ├── erdwithai-wasm.js     # Vendored: browser generator (parser + compilers)
 │   │   └── erdwithai-fullstack.js# Vendored: full NestJS/TanStack generator
 │   └── vendor/                   # Third-party payloads, served from this origin
@@ -279,6 +280,16 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
    the visitor's IndexedDB. **The chapter makes no request to any other host.**
 
+**Roles — what the reader is meant to notice**
+
+The generated application seeds one account per functional role the model
+declares, and its sign-in screen lists every one with the number of entities
+that role can see. That is the point of the CRM example declaring eight
+functional roles: signing in as `support.agent@…` gives you five entities of
+seventeen, `marketing.manager@…` six, and the administrator all of them. None of
+that logic is on this site — `guide/models/crm.eml.mmd` declares the roles with
+`%%rbac … .read` lines and the vendored generator does the rest.
+
 **Sample data — the `#sample-records` control**
 
 The page asks for **10 rows per entity** by default, and that number is a deliberate choice rather than
@@ -301,6 +312,29 @@ exactly that reason.
   the schema wants. The generator's own default is 0, so the page is the thing asking.
 - **"Start over with a fresh database" re-seeds**, because the reset is a fresh first boot. The button
   used to say *empty*, which stopped being true.
+
+**The deployable zip — `#download-stack`**
+
+The same model produces two applications, and the page now hands over both. The
+browser application is the one running in the frame; *Download the deployable
+app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
+source, 415 files, with a `docker-compose.yml` so `docker compose up --build`
+brings up PostgreSQL, the API and the web front end.
+
+- **It is chapter 10's machinery, used differently.** `erdwithai-fullstack.js`
+  and `assets/vendor/stack-templates.json` are what `run-real-stack.html`
+  already loads; here the file map is zipped instead of mounted in a
+  WebContainer. Both are imported **lazily, on the click** — three quarters of a
+  megabyte and nearly two more — because a reader who came for the browser
+  application should not pay for either.
+- **`assets/js/zip.js` is the archive writer, and it has no dependency.**
+  Compression is `CompressionStream("deflate-raw")`, which is the browser's own
+  zlib and exactly what a ZIP's method 8 wants; where it is missing an entry is
+  stored uncompressed instead. No ZIP64 — four hundred small text files are
+  three orders of magnitude from the ceilings.
+- **The nine fonts are restored the same way chapter 10 restores them**, from
+  `assets/vendor/app-fonts/`, because `stack-templates.json` is JSON and they
+  are binary. A font that will not fetch is not worth failing a download for.
 
 **Constraints to respect**
 
@@ -401,6 +435,12 @@ thing a language model has to produce is a model file.
   model and still handed over only the prose about it. Two files means the reader opens the wrong one.
 - **Four places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
   page's prompt block, the three "Try It Yourself" cards, and `try-it-yourself.html`.
+- **§6 is access control, and it carries the functional-role rule** — name the roles a
+  business has, then give every entity a `%%rbac … .read` directive naming the roles
+  that work with it. `read` is the only operation that changes what a role *sees*;
+  every other one merely refuses a write. §1.1 gained a sixth heading for it, §10 a
+  checklist item, and the worked example in §9 declares roles of its own so the spec
+  follows its own rule.
 - **§3.7 is the Application Dictionary**, and it is there because a model could check clean and still
   generate an application full of text boxes. The generated app is metadata-driven: `sys_table`,
   `sys_column`, `sys_reference`, `sys_ref_list` and the rest are derived from the ERD, and the column's

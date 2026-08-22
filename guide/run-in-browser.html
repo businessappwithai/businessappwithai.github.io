@@ -238,7 +238,18 @@
       <div class="actions">
         <button type="button" class="btn btn--primary" id="generate">Generate</button>
         <button type="button" class="btn" id="download" disabled>Download as files</button>
+        <button type="button" class="btn" id="download-stack" disabled>Download the deployable app (.zip)</button>
       </div>
+      <p class="hint" id="download-stack-hint">
+        <b>Two different applications, from the one model.</b> <i>Download as files</i> writes out the
+        browser application above &mdash; the one running in the frame, no install and no build.
+        <i>Download the deployable app</i> assembles the other one: the real NestJS and TanStack Start
+        source the command-line generator writes, about four hundred files, with a
+        <code>docker-compose.yml</code> beside them. Unzip it and
+        <code>docker compose up --build</code> brings up PostgreSQL, the API and the web front end.
+        It is assembled here in your browser when you press the button, which takes a few seconds and
+        fetches the stack templates from this site.
+      </p>
 
       <div class="result" id="result"></div>
     </div>

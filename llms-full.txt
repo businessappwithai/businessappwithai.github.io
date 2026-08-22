@@ -184,6 +184,16 @@ than the model it describes is a sign the effort went into the wrong artifact.
    application that cannot fulfil anything. Model these as `kind: saga` with
    `%%step` nodes (§5.3).
 
+6. **The functional roles, and which entities each one works with.** Every
+   business has jobs in it — a salesperson, a dispatcher, a ward clerk, a
+   claims assessor — and each of them works with a *part* of the model, not all
+   of it. Name the roles, then assign **every entity** to at least one of them.
+   The result is not a note: §6 turns it into one `%%rbac … .read` line per
+   entity, and the generated application seeds one signed-in account per role,
+   so the reader can open the application as a dispatcher and see the
+   dispatcher's application. An application where every role sees all forty
+   tables is the same application four times.
+
 State assumptions as assumptions. Where it leaves an ordinary gap, fill it the
 way a careful analyst would and say what you filled. Where it leaves a genuine
 fork — two plausible businesses, materially different models — name the fork,
@@ -749,6 +759,18 @@ references — `CampaignMember` pointing at a campaign, a lead *and* a contact
 labels itself from the first two in declared order, which is the only say you
 have in it.
 
+**The dictionary also decides what the sample rows look like.** A generated
+application is seeded with rows so it can be opened and used — ten per entity by
+default — and the values come from faker.js, but *which* faker generator a
+column gets is read off the dictionary rather than guessed from the column's
+type. A column whose reference type is `EMAIL` holds an address, one bound to a
+`%%enum` holds one of that enum's declared values, and a `Table Direct` column
+holds the id of a row that exists, because entities are seeded parents-first.
+This is the second reason the two mistakes above matter: a reference column
+downgraded to `String` is seeded with words rather than with a record, so the
+first thing you see on opening the application is a lookup that resolves to
+nothing.
+
 **The help text is part of the dictionary, and only you can write it.** A
 column's `sys_column.description` is what the form prints under the control, and
 a table's `sys_table.description` is what the dictionary and the entity's screen
@@ -1167,6 +1189,50 @@ transition event from that entity's `stateDiagram-v2` (§5.2).
 Put `%%rbac` directives inside the workflow section whose transitions they
 govern, and beside the ERD for CRUD restrictions.
 
+### Group every entity under a functional role
+
+**This is the part most models skip, and it is the difference between an
+application and a schema with a menu.** A business has jobs in it — a
+salesperson, a dispatcher, a ward clerk, a claims assessor — and each works with
+a *part* of the model. Name those roles in §1.1, then give every entity a
+`read` restriction naming the roles that work with it:
+
+```
+%%rbac role:sales_rep|sales_manager|support_agent on Account.read
+%%rbac role:sales_rep|sales_manager on Opportunity.read
+%%rbac role:support_agent|support_manager on SupportCase.read
+%%rbac role:marketing_manager on Campaign.read
+```
+
+**`read` is the operation that decides ownership, and it is the only one that
+changes what a role sees.** An entity a role may not read does not appear in
+that role's navigation at all — no menu entry, no dashboard card, no lookup.
+Every other operation only refuses the write: restricting `Order.delete` to
+administrators protects deletion and leaves the Order screen where it was, which
+is what its author meant. Do not reach for `.\*` to express ownership; it
+restricts creating, updating and deleting to the same list, and it merges with —
+rather than overrides — the narrower `update` rules you wrote elsewhere.
+
+Three consequences worth knowing before you write the lines:
+
+- **Every role named anywhere must be able to read what it acts on.** A rule
+  letting `sales_manager` run the `close_won` transition on `Opportunity` is
+  useless if the `Opportunity.read` line does not name `sales_manager` — the
+  manager cannot open the record the transition applies to.
+- **Overlap is normal and is one line.** `Account` belongs to sales, marketing
+  and support in most businesses; name all three on the one directive. Two
+  directives on the same target merge, so either spelling works.
+- **The generated application seeds one account per role.** Administrator, an
+  account holding no functional role at all, and one for each role your
+  directives name — so `%%rbac` is something the reader can *see* rather than
+  read about. The administrator bypasses every restriction, which is what makes
+  it the account to compare the others against.
+
+An entity no `read` line names stays visible to everyone, and a model that
+declares no `read` restrictions anywhere behaves exactly as models did before
+this section existed. That is the fallback, not the target: if a role in your
+enhanced specification has no entities, you have not finished §1.1.
+
 **Write `%%rbac`, never `%%guard`.** The role form was spelled `%%guard` until
 that keyword was needed for automation conditions (§7). A `%%guard role:… on …`
 line still parses, and does nothing: the restriction is not compiled and the
@@ -1416,6 +1482,15 @@ you hand over — imitate it exactly, at whatever size the business needs.
 %%category name: Scheduling; description: Classes, the rooms that host them and who teaches; icon: CalendarClock; entities: DanceClass, Room, Instructor
 %%category name: Membership; description: Members and their bookings; icon: Users; default: true; entities: Member, Booking
 
+%% Every entity belongs to a functional role. `read` is what decides it, so
+%% signing in as reception gives you the desk's application rather than the
+%% studio's. `manager` reads everything because managing is that job.
+%%rbac role:reception|manager|instructor on DanceClass.read
+%%rbac role:reception|manager on Room.read
+%%rbac role:manager|instructor on Instructor.read
+%%rbac role:reception|manager on Member.read
+%%rbac role:reception|manager|instructor on Booking.read
+
 %%enum ClassStatus: scheduled, running, completed, cancelled
 %%enum BookingStatus: requested, confirmed, attended, cancelled, no_show
 %%enum MemberTier: trial, standard, unlimited
@@ -1558,16 +1633,20 @@ flowchart TD
 12. Every rule that must *do* something has an `%%action` — not just a flowchart.
 13. Every cross-entity effect is a hook, an action, or a saga step.
 14. Every restricted operation and transition has a `%%rbac` directive.
+15. Every entity is named by at least one `%%rbac … .read` directive, so it
+   belongs to a functional role — and every role that may act on an entity can
+   also read it (§6). A model where one role sees all forty tables is the same
+   application once, not four times.
 
 **The handover**
 
-15. Exactly one file is being handed over, and it ends `.mmd` — no companion
+16. Exactly one file is being handed over, and it ends `.mmd` — no companion
     specification document, report or README (§1.0).
-16. `check(source)` returns `ok: true`, run three times over the file's exact
+17. `check(source)` returns `ok: true`, run three times over the file's exact
     bytes, the last two over unchanged bytes — `node check-model.mjs <file>.mmd`
     is those three passes and exits `0` — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
-17. Warnings are cleared, or each remaining one is explained to the user.
-18. The file the user receives is the file you validated, delivered as a
+18. Warnings are cleared, or each remaining one is explained to the user.
+19. The file the user receives is the file you validated, delivered as a
     download, with the enhanced specification and the checker counts beside it in
     the reply — not inside the file (§1.4).
