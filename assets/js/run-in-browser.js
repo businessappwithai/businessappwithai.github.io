@@ -423,6 +423,10 @@ $("generate").addEventListener("click", () => {
         adminPassword: $("admin-password").value || "admin",
         adminName: ($("admin-email").value.split("@")[0] || "admin").trim(),
         pgliteUrl: state.pgliteUrl,
+        sampleRecords: sampleRecords(),
+        /* The seed is the application's name, so two readers who leave the
+           field alone see the same records and can talk about row four. */
+        sampleSeed: $("app-name").value.trim() || "Generated App",
       });
 
       state.files = result.files;
@@ -433,7 +437,8 @@ $("generate").addEventListener("click", () => {
       setStep("step-run", "active");
       build.done(
         "compile",
-        `${result.summary.fileCount} files · ${(result.summary.bytes / 1024).toFixed(0)}KB`
+        `${result.summary.fileCount} files · ${(result.summary.bytes / 1024).toFixed(0)}KB` +
+          (result.summary.sampleRows ? ` · ${result.summary.sampleRows} sample rows` : "")
       );
     } catch (error) {
       // A ModelCheckError carries the findings; anything else is a compiler
@@ -455,6 +460,20 @@ $("generate").addEventListener("click", () => {
   });
 });
 
+/**
+ * How many rows per entity the reader asked for.
+ *
+ * Ten by default, and the default is the point: an application whose lists are
+ * all empty cannot be looked at, which is the one thing this page exists to let
+ * someone do. `None` is offered because a reader who brought their own model may
+ * want to see the schema rather than a demonstration — the generator's own
+ * default is zero, so that choice costs nothing to honour.
+ */
+function sampleRecords() {
+  const chosen = Number.parseInt($("sample-records").value, 10);
+  return Number.isFinite(chosen) && chosen >= 0 ? chosen : 10;
+}
+
 function showResult(result) {
   const { summary, warnings } = result;
   const box = $("result");
@@ -469,6 +488,7 @@ function showResult(result) {
       ${cell(summary.accessRules, "Access rules")}
       ${cell(summary.fileCount, "Files")}
       ${cell(`${(summary.bytes / 1024).toFixed(0)}KB`, "Size")}
+      ${cell(summary.sampleRows, "Sample rows")}
     </div>
 
     <h4>Entities</h4>
@@ -633,7 +653,10 @@ async function run(fresh) {
       `with the password <b>${escapeHtml($("admin-password").value || "admin")}</b>. ` +
       (fresh
         ? "This run uses a fresh in-memory database."
-        : "The database persists in this browser, so a reload picks up where you left off.");
+        : "The database persists in this browser, so a reload picks up where you left off.") +
+      (state.summary?.sampleRows
+        ? ` It opens with ${state.summary.sampleRows} sample records already in it.`
+        : "");
 
     setStep("step-run", "done");
     $("stage").scrollIntoView({ behavior: "smooth", block: "start" });
