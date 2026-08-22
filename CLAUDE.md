@@ -290,6 +290,14 @@ seventeen, `marketing.manager@…` six, and the administrator all of them. None 
 that logic is on this site — `guide/models/crm.eml.mmd` declares the roles with
 `%%rbac … .read` lines and the vendored generator does the rest.
 
+**Delete all records** — the dashboard of the running application carries an
+administrator-only control that empties every business table and leaves the
+application itself in place. It is there because the chapter seeds 170 rows so
+the app can be looked at, and a reader who wants to put their own data in should
+not have to delete ten rows per entity seventeen times. Two-step rather than a
+`confirm()`: the app runs in an iframe here, where a modal dialog is not
+guaranteed to appear.
+
 **Sample data — the `#sample-records` control**
 
 The page asks for **10 rows per entity** by default, and that number is a deliberate choice rather than
