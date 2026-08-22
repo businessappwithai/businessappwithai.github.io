@@ -110,10 +110,22 @@
   deletion rather than a rewrite.
 </p>
 
+<p>
+  And it arrives with <b>records in it</b>. An application whose every list says <i>No entries</i> is an
+  application you cannot look at: nothing to sort, nothing to open, and every reference dropdown empty.
+  So the generator writes ten rows per entity into the model bundle and the runtime seeds them on first
+  boot. The values come from <b>faker.js</b>, but which value a column gets is decided by the
+  Application Dictionary rather than by faker — a column's reference type picks the generator, so an
+  <code>EMAIL</code> holds an address, a <code>%%enum</code> holds one of its declared values, and a
+  <code>TABLE_DIRECT</code> holds the id of a row that exists. Entities are written parents-first for
+  exactly that reason: a lookup that opens on a real record is the difference between sample data and
+  noise. Set it to <i>None</i> in step 2 if you would rather start from empty tables.
+</p>
+
 <p class="note">
   Nothing you load here leaves your browser, and nothing is fetched from anywhere but this site. The
-  model is parsed in this tab, the application is assembled in this tab, and the database it fills lives
-  in this tab's IndexedDB.
+  model is parsed in this tab, the application is assembled in this tab, the sample rows are invented in
+  this tab, and the database it all fills lives in this tab's IndexedDB.
 </p>
 
 <!--
@@ -211,12 +223,33 @@
           <input id="admin-password" type="text" value="admin" autocomplete="off">
           <small>The database is yours — there is nobody to keep it from.</small>
         </div>
+        <div class="opt">
+          <label for="sample-records">Sample data</label>
+          <select id="sample-records">
+            <option value="10" selected>10 rows per entity</option>
+            <option value="25">25 rows per entity</option>
+            <option value="50">50 rows per entity</option>
+            <option value="0">None — empty tables</option>
+          </select>
+          <small>Generated with faker.js and seeded on first boot.</small>
+        </div>
       </div>
 
       <div class="actions">
         <button type="button" class="btn btn--primary" id="generate">Generate</button>
         <button type="button" class="btn" id="download" disabled>Download as files</button>
+        <button type="button" class="btn" id="download-stack" disabled>Download the deployable app (.zip)</button>
       </div>
+      <p class="hint" id="download-stack-hint">
+        <b>Two different applications, from the one model.</b> <i>Download as files</i> writes out the
+        browser application above &mdash; the one running in the frame, no install and no build.
+        <i>Download the deployable app</i> assembles the other one: the real NestJS and TanStack Start
+        source the command-line generator writes, about four hundred files, with a
+        <code>docker-compose.yml</code> beside them. Unzip it and
+        <code>docker compose up --build</code> brings up PostgreSQL, the API and the web front end.
+        It is assembled here in your browser when you press the button, which takes a few seconds and
+        fetches the stack templates from this site.
+      </p>
 
       <div class="result" id="result"></div>
     </div>
@@ -228,13 +261,13 @@
       <span class="flow-step__num">3</span>
       <div>
         <h2 class="flow-step__title">Run it</h2>
-        <p class="flow-step__hint">Postgres starts, the dictionary seeds itself, and the application comes up.</p>
+        <p class="flow-step__hint">Postgres starts, the dictionary and the sample records seed themselves, and the application comes up.</p>
       </div>
     </header>
     <div class="flow-step__body">
       <div class="actions">
         <button type="button" class="btn btn--go" id="run">Run the application</button>
-        <button type="button" class="btn" id="reset" hidden>Start over with an empty database</button>
+        <button type="button" class="btn" id="reset" hidden>Start over with a fresh database</button>
       </div>
 
       <div class="credentials" id="credentials" hidden></div>
@@ -266,7 +299,18 @@
 <p>
   The <b>run</b> step handed those files to a Service Worker, which now serves them as if they had come
   off a web server, and started a worker thread that opened Postgres, applied the schema, seeded the
-  Application Dictionary from your model and began answering <code>/api</code> requests.
+  Application Dictionary from your model, inserted the sample records and began answering
+  <code>/api</code> requests.
+</p>
+<p>
+  Those records were written at <b>generate</b> time, not at <b>run</b> time — they travel inside
+  <code>model.json</code>, and the runtime inserts them the first time it opens a database that has none.
+  It is worth saying what that costs and what it buys. It costs a larger <code>model.json</code>. It buys
+  a seed that ran through the schema your model actually describes: a row rejected by a
+  <code>NOT NULL</code> or a foreign key is a row you do not get, so an application that comes up full is
+  itself a statement about the model. Regenerating the same model gives the same records, because the
+  generator seeds faker from the application's name — a screenshot of row four stays a screenshot of
+  row four.
 </p>
 <p>
   The same output can be written to disk and served anywhere static:

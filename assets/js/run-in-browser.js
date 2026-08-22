@@ -20,6 +20,7 @@
  */
 
 import { generateFromSource, reviewModel } from "./erdwithai-wasm.js";
+import { createZip } from "./zip.js";
 
 const BASE = new URL("wasm-app/run/", window.location.href).pathname;
 const SW_URL = new URL("wasm-app/sw.js", window.location.href).pathname;
@@ -223,6 +224,7 @@ function setModel(source, label) {
   state.review = null;
 
   $("download").disabled = true;
+  $("download-stack").disabled = true;
   $("result").className = "result";
   $("result").innerHTML = "";
   $("diagnostics").hidden = true;
@@ -423,17 +425,23 @@ $("generate").addEventListener("click", () => {
         adminPassword: $("admin-password").value || "admin",
         adminName: ($("admin-email").value.split("@")[0] || "admin").trim(),
         pgliteUrl: state.pgliteUrl,
+        sampleRecords: sampleRecords(),
+        /* The seed is the application's name, so two readers who leave the
+           field alone see the same records and can talk about row four. */
+        sampleSeed: $("app-name").value.trim() || "Generated App",
       });
 
       state.files = result.files;
       state.summary = result.summary;
       showResult(result);
       $("download").disabled = false;
+      $("download-stack").disabled = false;
       setStep("step-generate", "done");
       setStep("step-run", "active");
       build.done(
         "compile",
-        `${result.summary.fileCount} files · ${(result.summary.bytes / 1024).toFixed(0)}KB`
+        `${result.summary.fileCount} files · ${(result.summary.bytes / 1024).toFixed(0)}KB` +
+          (result.summary.sampleRows ? ` · ${result.summary.sampleRows} sample rows` : "")
       );
     } catch (error) {
       // A ModelCheckError carries the findings; anything else is a compiler
@@ -455,6 +463,20 @@ $("generate").addEventListener("click", () => {
   });
 });
 
+/**
+ * How many rows per entity the reader asked for.
+ *
+ * Ten by default, and the default is the point: an application whose lists are
+ * all empty cannot be looked at, which is the one thing this page exists to let
+ * someone do. `None` is offered because a reader who brought their own model may
+ * want to see the schema rather than a demonstration — the generator's own
+ * default is zero, so that choice costs nothing to honour.
+ */
+function sampleRecords() {
+  const chosen = Number.parseInt($("sample-records").value, 10);
+  return Number.isFinite(chosen) && chosen >= 0 ? chosen : 10;
+}
+
 function showResult(result) {
   const { summary, warnings } = result;
   const box = $("result");
@@ -469,6 +491,7 @@ function showResult(result) {
       ${cell(summary.accessRules, "Access rules")}
       ${cell(summary.fileCount, "Files")}
       ${cell(`${(summary.bytes / 1024).toFixed(0)}KB`, "Size")}
+      ${cell(summary.sampleRows, "Sample rows")}
     </div>
 
     <h4>Entities</h4>
@@ -561,6 +584,134 @@ $("download").addEventListener("click", () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 
+/* --------------------------------------------- the deployable application */
+
+/*
+ * The *other* application this model produces, as one archive.
+ *
+ * Chapter 09 runs the browser stack — a runtime that is the same bytes for
+ * every model, reading a compiled `model.json`. That is what makes it boot in a
+ * tab, and it is also the thing a reader cannot deploy or open in an editor:
+ * there is no controller and no service per entity to read.
+ *
+ * The command-line generator writes the other one: four hundred files of NestJS
+ * and TanStack Start source, which is the application you would actually run.
+ * Chapter 10 assembles it and boots it in a WebContainer. Here it is assembled
+ * and handed over instead, which is the shorter path to the same artifact and
+ * the one that survives closing the tab.
+ *
+ * Both halves are lazy on purpose. `erdwithai-fullstack.js` is three quarters
+ * of a megabyte and the stack templates are close to two, and a reader who came
+ * to look at the browser application should not pay for either.
+ */
+const STACK_TEMPLATES_URL = new URL("../vendor/stack-templates.json", import.meta.url).href;
+const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
+const FONTS_DIR = "frontend/public/fonts";
+const FONTS = [
+  "inter-400-latin.woff2",
+  "inter-500-latin.woff2",
+  "inter-600-latin.woff2",
+  "inter-700-latin.woff2",
+  "jetbrains-mono-400-latin.woff2",
+  "jetbrains-mono-600-latin.woff2",
+  "newsreader-400-latin.woff2",
+  "newsreader-400-italic-latin.woff2",
+  "newsreader-600-latin.woff2",
+];
+
+/** Loaded once per page, because both are large and neither changes. */
+const stackCache = { module: null, templates: null };
+
+/**
+ * The nine typefaces `stack-templates.json` cannot carry.
+ *
+ * The bundle is JSON and they are binary, so they travel beside it and are put
+ * back here. A font that will not fetch is not worth failing a download for —
+ * the application still builds and runs, it just falls back to a system face.
+ */
+async function withFonts(files) {
+  const loaded = await Promise.all(
+    FONTS.map(async (name) => {
+      try {
+        const response = await fetch(FONTS_BASE + name);
+        if (!response.ok) return null;
+        return [`${FONTS_DIR}/${name}`, new Uint8Array(await response.arrayBuffer())];
+      } catch {
+        return null;
+      }
+    })
+  );
+  return Object.fromEntries(loaded.filter(Boolean));
+}
+
+$("download-stack").addEventListener("click", async () => {
+  if (!state.source) return;
+
+  const button = $("download-stack");
+  const original = button.textContent;
+  button.disabled = true;
+  button.innerHTML = '<span class="working"></span>Assembling';
+
+  const name =
+    ($("app-name").value.trim() || "generated-app")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "generated-app";
+
+  try {
+    if (!stackCache.module) {
+      button.innerHTML = '<span class="working"></span>Fetching the generator';
+      stackCache.module = await import("./erdwithai-fullstack.js");
+    }
+    if (!stackCache.templates) {
+      button.innerHTML = '<span class="working"></span>Fetching the stack templates';
+      stackCache.templates = await stackCache.module.loadTemplates(STACK_TEMPLATES_URL);
+    }
+
+    button.innerHTML = '<span class="working"></span>Writing 400 files';
+    const result = await stackCache.module.generateFullStack({
+      source: state.source,
+      templates: stackCache.templates,
+      name: $("app-name").value.trim() || "Generated App",
+      description: "Generated by ERDwithAI",
+    });
+
+    button.innerHTML = '<span class="working"></span>Packing the archive';
+    /* Prefixed with the project name so unzipping into a downloads folder
+       produces one directory rather than four hundred loose files. */
+    const fonts = await withFonts(result.files);
+    const tree = { ...result.files, ...fonts };
+    const zip = await createZip(
+      Object.fromEntries(Object.entries(tree).map(([path, body]) => [`${name}/${path}`, body]))
+    );
+
+    const url = URL.createObjectURL(zip);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${name}.zip`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    $("download-stack-hint").innerHTML =
+      `<b>${Object.keys(tree).length} files</b>, ${(zip.size / 1024 / 1024).toFixed(1)}MB. ` +
+      `Unzip it and run <code>docker compose up --build</code> in <code>${escapeHtml(name)}/</code> — ` +
+      `PostgreSQL, the NestJS API and the TanStack Start front end come up together, and the ` +
+      `application is on <code>http://localhost:4000</code>. Sign in with any of the accounts the ` +
+      `seed prints; they are the same roles this page just showed you.`;
+    $("download-stack-hint").classList.add("hint--done");
+  } catch (error) {
+    /* A checker failure here would already have stopped step 2, so anything
+       reaching this is the assembly itself — usually a template bundle that did
+       not download. Say which, rather than "failed". */
+    $("download-stack-hint").innerHTML =
+      `<b>The deployable application could not be assembled.</b> ${escapeHtml(error.message)}`;
+    $("download-stack-hint").classList.add("hint--bad");
+  } finally {
+    button.disabled = false;
+    button.textContent = original;
+  }
+});
+
 /* ------------------------------------------------------------------ step 3 */
 
 $("run").addEventListener("click", () => run(false));
@@ -633,7 +784,10 @@ async function run(fresh) {
       `with the password <b>${escapeHtml($("admin-password").value || "admin")}</b>. ` +
       (fresh
         ? "This run uses a fresh in-memory database."
-        : "The database persists in this browser, so a reload picks up where you left off.");
+        : "The database persists in this browser, so a reload picks up where you left off.") +
+      (state.summary?.sampleRows
+        ? ` It opens with ${state.summary.sampleRows} sample records already in it.`
+        : "");
 
     setStep("step-run", "done");
     $("stage").scrollIntoView({ behavior: "smooth", block: "start" });
