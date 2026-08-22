@@ -784,10 +784,26 @@ show beside it. Both come from directives, and from nowhere else:
 
 Write the sentence a new joiner needs, not a restatement of the column name:
 "The company this person works for" earns its place; "The account id" does not.
-Cover every entity, and every column whose meaning a reader could get wrong — a
-reference, a status, an amount whose currency or period is not obvious, a
-boolean whose `true` is not self-evident. Leave the rest alone: help on
-`first_name` is noise.
+Cover every entity and every column: the bar is *say something the name does
+not*, and a column you cannot say anything about is usually a column that should
+not be there.
+
+**The generated manual is the second reader of that text, and it is why
+"every column" is not too many.** The last thing generation does is write
+`manual.html` beside the application — one self-contained HTML page with a
+contents menu, a section per entity, and inside each a table of every field with
+its control type, its constraints, its enumerated values and its help text,
+followed by the entity's relationships, its state machine, the rules that fire
+on it and the roles that may see it. The application's dashboard carries a
+**Manual** button pointing at it. Both generators write it, so it also travels
+in the downloadable `.zip`.
+
+The manual is derived from the model, so it cannot describe an entity that does
+not exist or miss one that does — but it can only report the help you wrote.
+Where a column has none it prints a dash, and where an entity has none at all it
+says so in place of the description. That is what an unhelped model looks like
+to whoever is handed the application: a complete, accurate list of fields that
+explains none of them.
 
 The rest of the dictionary follows the same way: each entity becomes a
 `sys_table` with a window and a tab, its attributes become fields **in the order
@@ -1625,9 +1641,9 @@ flowchart TD
 9. Every status column, and every other column with a closed vocabulary, has a
    `%%enum` **and** a `%%field … enum:` binding it — without the binding the
    dictionary records free text (§3.7).
-10. Every entity carries `%%entity <E> help:`, and every column whose meaning a
-   reader could get wrong carries `%%field <E>.<col> help:` — that text is the
-   whole of the application's help, and no later pass adds it (§3.7).
+10. Every entity carries `%%entity <E> help:` and every column carries
+   `%%field <E>.<col> help:` — that text is the whole of the application's help
+   *and* the whole of its generated manual, and no later pass adds it (§3.7).
 11. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
 12. Every rule that must *do* something has an `%%action` — not just a flowchart.

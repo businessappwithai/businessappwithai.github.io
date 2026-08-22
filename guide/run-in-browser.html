@@ -313,6 +313,24 @@
   row four.
 </p>
 <p>
+  The dashboard of the running application opens on a <b>Manual</b> button, and what it points at was
+  written by the same generation run. <code>manual.html</code> is one self-contained page &mdash; a
+  contents menu, then a section per entity giving every field with the control it becomes, its
+  constraints, its enumerated values and its help text, followed by that entity's relationships, its
+  state machine, the rules that fire on it and the roles allowed to see it. It is derived from the
+  parsed model, the same source the schema and the guards come from, so it cannot describe an entity
+  that does not exist or miss one that does.
+</p>
+<p>
+  What it <i>can</i> miss is the prose, and that is the point worth taking away: the &ldquo;what it is
+  for&rdquo; column is your model's <code>%%field &lt;E&gt;.&lt;col&gt; help:</code> text and nothing
+  else. Where a model has none, the manual prints a dash and says so &mdash; a complete, accurate list
+  of fields that explains none of them. The CRM model this chapter loads carries help on every entity
+  and every column, which is what makes its manual readable, and is the argument for writing them as
+  you model rather than intending to later.
+</p>
+
+<p>
   The same output can be written to disk and served anywhere static:
 </p>
 <div class="code">
@@ -366,6 +384,7 @@ bun run wasm serve ./crm</code></pre>
         <div>
           <h4>AppWithAI</h4>
           <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
         </div>
         <div>
           <h4>Product</h4>

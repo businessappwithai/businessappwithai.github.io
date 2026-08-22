@@ -344,6 +344,26 @@ brings up PostgreSQL, the API and the web front end.
   `assets/vendor/app-fonts/`, because `stack-templates.json` is JSON and they
   are binary. A font that will not fetch is not worth failing a download for.
 
+**The generated manual**
+
+The application that boots in the frame carries a **Manual** button on its dashboard, and it points at
+`manual.html` — a file the generation run wrote, not a screen the runtime renders. One self-contained
+page: a contents menu, a section per entity listing every field with its control type, constraints,
+enumerated values and help text, then that entity's relationships, its state machine, the rules that
+fire on it and the roles that may read it.
+
+- **None of it lives on this site.** `packages/generator/src/manual/index.ts` in
+  `businessappwithai/app-with-ai-tanstack` renders it from the parsed model, and both generators call
+  it — so the browser application, the NestJS application and the deployable `.zip` all carry the same
+  manual for a given model.
+- **Its prose is the model's `%%entity help:` and `%%field help:` text and nothing else.** Where a
+  model has none it prints a dash and says so. `guide/models/crm.eml.mmd` carries help on all 17
+  entities and every column, which is why the chapter's manual reads as one; keep it that way when
+  re-vendoring the model.
+- **`guide/models/crm.eml.mmd` must stay byte-identical to `language/examples/crm.eml.mmd` upstream.**
+  They drifted once — the site's copy gained the per-entity `%%rbac … .read` rules and the generator
+  repository's `html/models/` copy did not — and a unit test upstream now asserts it.
+
 **Constraints to respect**
 
 - The page must be served over `http://` or `https://` — a Service Worker cannot register from `file://`.
@@ -456,7 +476,9 @@ thing a language model has to produce is a model file.
   without the `FK` modifier (both generators require `isForeignKey` **and** a name ending `_id`/`_by` for
   `Table Direct`), and an enumerated column with no `%%field … enum:` binding. §3.7 also carries the help
   contract: `%%field <E>.<c> help:` and `%%entity <E> help:` are compiled into `sys_column.description`
-  and `sys_table.description`, and they are the only help the generated application has. Both are diagnostics now,
+  and `sys_table.description`, and they are the only help the generated application has — **and the
+  whole of the manual it generates**, which is why §3.7 now asks for help on every column rather than
+  only the ambiguous ones. Both are diagnostics now,
   `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
   with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
