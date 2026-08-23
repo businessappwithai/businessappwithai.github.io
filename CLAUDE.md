@@ -102,7 +102,7 @@ Deployment is fully automatic:
 
 | File | Purpose |
 |------|---------|
-| `index.html` | Landing page: hero, stats, problem/solution, feature previews, the **Try It Yourself** section, the live in-browser demo, and the CRM guide preview |
+| `index.html` | Landing page: hero (with the **experimental-software notice** and the GitHub source link), stats, problem/solution, feature previews, the **Try It Yourself** section, the live in-browser demo, and the CRM guide preview |
 | `features.html` | Detailed feature breakdown (AI modeling, forms, workflows, security, analytics) |
 | `how-it-works.html` | Step-by-step AI pipeline with multi-agent architecture diagram |
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
@@ -129,8 +129,12 @@ The CSS is organized as a complete design system. Use existing classes — do no
 --success-500
 --warning-500
 --error-500
---neutral-*      /* 50–900 scale */
+--gray-*         /* 50–900 scale — the neutral ramp is spelled `gray`, not `neutral` */
 ```
+
+> There is no `--neutral-*`. This file said there was, and a rule written against
+> it renders with the property dropped and no error anywhere. Check the token
+> exists in `style.css` before using it.
 
 ### Key Component Classes
 
@@ -145,6 +149,12 @@ The CSS is organized as a complete design system. Use existing classes — do no
 **Navigation:** `.header`, `.nav`, `.nav-link`, `.logo`, `.menu-toggle`
 
 **Badges and stats:** `.hero-badge`, `.stats-grid`, `.stat-card`, `.stat-value`, `.stat-label`
+
+**Hero:** `.hero`, `.hero-content`, `.hero-badge`, `.hero-subtitle`, `.hero-cta`,
+`.hero-notice` — the amber "experimental software, not fully tested" panel under
+the headline on `index.html`. It is deliberately *above* the fold and above every
+"production-ready" claim on the page; the same caveat also closes the footer.
+Both carry the GitHub source link.
 
 **Grids:** `.features-grid` (auto-fit feature cards), `.grid` + `.grid-2/3/4`
 
@@ -265,6 +275,12 @@ them the path spans five files. If you change one, check the others.
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
 10. **Accessible markup** — maintain ARIA labels, semantic structure, and sufficient color contrast (design system colors are pre-validated).
+11. **Say what the software actually is.** The pages carry marketing claims —
+    "production-ready", "enterprise features out of the box", "90% faster". The
+    project is young and not fully tested, and `index.html` says so in the hero
+    (`.hero-notice`) and again in the footer, both linking the source on GitHub.
+    Do not quietly soften, move or delete either one: a reader deciding whether
+    to trust this needs the caveat before the claims, not after them.
 
 ## The In-Browser Demo (Chapter 09)
 
@@ -493,7 +509,11 @@ thing a language model has to produce is a model file.
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `erdwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
-  `guide/fixer.js` are actually published at.
+  `guide/fixer.js` are actually published at. **`formatReport` prints the diagnostics first and the
+  verdict last** — `OK — 0 errors, 0 warnings, 2 notes (EML 1.2.0)` — so the final line of a run is
+  always its outcome. It used to lead with the verdict, which made the last line of a *passing* run
+  whichever diagnostic sorted last; an `info` has the same shape as an error, so a clean run read as a
+  failed one. §8.2 tells the reader to read that line rather than the diagnostic above it.
 - **Every fenced `mermaid` example in it is a complete model that the checker accepts with zero errors
   and zero warnings.** That claim is made in the file's own header, so it has to stay true.
 - **Verify after every edit with `node scripts/check-spec.mjs`.** It extracts each fenced `mermaid`

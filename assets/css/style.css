@@ -441,6 +441,33 @@ a:hover {
   line-height: 1.1;
 }
 
+/* The experimental notice, directly under the headline.
+   It sat in the footer, 500 lines below a page that says "production-ready" —
+   which is the one place a reader has already made up their mind by the time
+   they reach it. Amber rather than red: this is a caveat, not a hazard. */
+.hero-notice {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--warning-50);
+  border: 1px solid var(--warning-500);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--gray-700);
+  text-align: left;
+}
+
+.hero-notice strong {
+  color: var(--warning-600);
+}
+
+.hero-notice a {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
 .hero-subtitle {
   font-size: var(--text-xl);
   color: var(--gray-600);
