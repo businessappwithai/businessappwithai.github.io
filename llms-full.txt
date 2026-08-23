@@ -1368,7 +1368,13 @@ Both modules also attach themselves to `globalThis` as `EMLChecker` and
 
 **error** — the generator would produce something wrong. Do not deliver.
 **warning** — legal, but almost certainly not what was meant. Clear it or explain it.
-**info** — worth knowing.
+**info** — worth knowing. It does not stop generation, and a report carrying
+nothing worse than infos is a report on a model that passed.
+
+`formatReport` prints the diagnostics first and **the verdict last**, so the
+final line is always the outcome — `OK — …` or `FAILED — …`, with the counts
+beside it. Read that line, not the last diagnostic above it: an `info` has the
+same shape as an error, and the run it belongs to may well have passed.
 
 | Band | Where the fault is |
 |---|---|
