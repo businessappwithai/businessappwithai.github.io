@@ -14376,7 +14376,7 @@ class TemplateLoader {
       }
       return `\`test_${index}\``;
     });
-    import_handlebars.default.registerHelper("seedValue", (fieldName, index) => {
+    import_handlebars.default.registerHelper("seedValue", (fieldName, index, entityDisplayName) => {
       const n = (fieldName ?? "").toLowerCase();
       const i = typeof index === "number" ? index : 0;
       const FIRST_NAMES = [
@@ -14404,6 +14404,7 @@ class TemplateLoader {
         "Taylor"
       ];
       const pick = (arr) => arr[i % arr.length];
+      const entityName = typeof entityDisplayName === "string" ? entityDisplayName.trim() : "";
       if (n === "first_name")
         return pick(FIRST_NAMES);
       if (n === "last_name")
@@ -14434,6 +14435,10 @@ class TemplateLoader {
         return `Title ${i + 1}`;
       if (n === "code" || n === "reference_code")
         return `CODE-${String(i + 1).padStart(3, "0")}`;
+      if (n.endsWith("_number") || n.endsWith("_no") || n.endsWith("_id") || n === "reference" || n === "sku" || n === "barcode") {
+        const prefix = entityName ? entityName.substring(0, 3).toUpperCase() : (fieldName ?? "").replace(/_number$|_no$|_id$/, "").substring(0, 3).toUpperCase() || "REF";
+        return `${prefix}-${String(i + 1).padStart(4, "0")}`;
+      }
       if (n === "score" || n === "grade_value")
         return String(70 + i * 5);
       if (n === "capacity" || n === "max_students")
@@ -14444,6 +14449,8 @@ class TemplateLoader {
         return String(2024 + i);
       if (n === "section")
         return String.fromCharCode(65 + i);
+      if ((n === "name" || n === "title") && entityName)
+        return `${entityName} ${i + 1}`;
       const humanized = (fieldName ?? "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()).trim();
       return humanized ? `${humanized} ${i + 1}` : `Sample ${i + 1}`;
     });
@@ -15410,6 +15417,7 @@ export async function executeCustomValidateHooks(
       console.warn("Operation access seed template failed, skipping:", e.message);
     }
     await writeFile(join(outputDir, "seeds/05_workflow_definitions.ts"), this.renderWorkflowDefinitionsSeed(context));
+    await writeFile(join(outputDir, "seeds/05b_workflow_transitions.ts"), this.renderWorkflowTransitionsSeed(context));
   }
   renderWorkflowDefinitionsSeed(context) {
     const byEntity = new Map;
@@ -15534,6 +15542,77 @@ export async function seed(db: Kysely<any>): Promise<void> {
   }
 }
 `;
+  }
+  renderWorkflowTransitionsSeed(context) {
+    const byEntity = new Map;
+    for (const workflow of this.options.compiledWorkflows ?? []) {
+      if (!byEntity.has(workflow.entity))
+        byEntity.set(workflow.entity, workflow);
+    }
+    const rows = [];
+    for (const entity2 of context.entities ?? []) {
+      const workflow = byEntity.get(entity2.name) ?? byEntity.get(entity2.className);
+      if (!workflow || workflow.transitions.length === 0)
+        continue;
+      const columns = (entity2.attributes ?? []).map((a) => a.columnName ?? a.name);
+      const statusField = columns.includes("status") ? "status" : "workflow_status";
+      for (const t of workflow.transitions) {
+        if (t.from === "[*]" || t.to === "[*]")
+          continue;
+        rows.push(`  {
+` + `    tableName: '${entity2.tableName}',
+` + `    statusField: '${statusField}',
+` + `    fromState: '${t.from}',
+` + `    toState: '${t.to}',
+` + `    transitionName: '${t.trigger ?? ""}',
+` + `  },`);
+      }
+    }
+    if (rows.length === 0) {
+      return `// No state-machine workflows in this model — sys_workflow_transitions will be empty.
+` + `import type { Kysely } from 'kysely';
+` + `export async function seed(_db: Kysely<any>): Promise<void> {}
+`;
+    }
+    return [
+      `import { sql, type Kysely } from 'kysely';`,
+      ``,
+      `const TRANSITIONS = [`,
+      ...rows,
+      `] as const;`,
+      ``,
+      `export async function seed(db: Kysely<any>): Promise<void> {`,
+      `  // Replace all model-declared transitions on each table, keeping any`,
+      `  // hand-crafted rows (source = 'designer') untouched.`,
+      `  const tables = [...new Set(TRANSITIONS.map((t) => t.tableName))];`,
+      `  for (const tbl of tables) {`,
+      `    await sql\``,
+      `      DELETE FROM sys_workflow_transitions`,
+      `      WHERE table_name = \${tbl}`,
+      `    \`.execute(db);`,
+      `  }`,
+      `  for (const t of TRANSITIONS) {`,
+      `    await db`,
+      `      .insertInto('sys_workflow_transitions' as any)`,
+      `      .values({`,
+      `        table_name: t.tableName,`,
+      `        status_field: t.statusField,`,
+      `        from_state: t.fromState,`,
+      `        to_state: t.toState,`,
+      `        transition_name: t.transitionName || null,`,
+      `        is_active: true,`,
+      `      } as any)`,
+      `      .onConflict((oc) =>`,
+      `        oc.constraint('sys_workflow_transitions_unique').doUpdateSet({`,
+      `          transition_name: t.transitionName || null,`,
+      `          is_active: true,`,
+      `        } as any)`,
+      `      )`,
+      `      .execute();`,
+      `  }`,
+      `}`
+    ].join(`
+`);
   }
   async updateConfigFiles(outputDir, context) {
     const packageJsonContent = await this.renderTemplate("package.json.hbs", context);

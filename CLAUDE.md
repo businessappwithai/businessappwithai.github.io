@@ -30,7 +30,7 @@ businessappwithai.github.io/
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
-│       └── stack-templates.json  # 310 stack templates for chapter 10
+│       └── stack-templates.json  # 313 stack templates for chapter 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
@@ -403,7 +403,7 @@ runs it in a WebContainer. It needs two things chapter 09 does not.
   through** — do not widen it. Isolation is a constraint, not an upgrade, and the other chapters must
   stay outside it.
 - **The network.** The WebContainer runtime comes from StackBlitz and the packages from npm. Everything
-  else — the API, the 310 templates, the fonts — is served from `assets/vendor/`.
+  else — the API, the 313 templates, the fonts — is served from `assets/vendor/`.
 
 The nine binary font templates cannot travel in `stack-templates.json` (it is JSON), so they are shipped
 in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` before it is mounted.
@@ -479,6 +479,17 @@ thing a language model has to produce is a model file.
   model and still handed over only the prose about it. Two files means the reader opens the wrong one.
 - **Four places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
   page's prompt block, the three "Try It Yourself" cards, and `try-it-yourself.html`.
+- **§5.2 says a drawn edge is the only legal move.** The NestJS stack seeds every
+  declared transition into `sys_workflow_transitions` and its entity-access guard
+  refuses, with a 403, any status write that crosses an edge the diagram never
+  drew — an administrator included, because the refusal is topological rather than
+  about roles. An entity with no `kind: state` workflow seeds no rows and stays
+  unconstrained. The browser application does not enforce it, which is why the
+  paragraph names the stack. It came across from
+  `businessappwithai/app-with-ai-tanstack` with the templates that implement it
+  (`012_add_workflow_transitions`, `entity-access.guard`, the seed the full-stack
+  bundle now writes); `check-spec.mjs` does not verify it, so check the guard
+  before editing it.
 - **§6 is access control, and it carries the functional-role rule** — name the roles a
   business has, then give every entity a `%%rbac … .read` directive naming the roles
   that work with it. `read` is the only operation that changes what a role *sees*;
