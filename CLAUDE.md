@@ -342,7 +342,7 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 415 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 419 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
 - **It is chapter 10's machinery, used differently.** `erdwithai-fullstack.js`
@@ -393,7 +393,7 @@ fire on it and the roles that may read it.
 
 ## Chapter 10 — the real stack in a WebContainer
 
-`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 406 files — and
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 410 files — and
 runs it in a WebContainer. It needs two things chapter 09 does not.
 
 - **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
