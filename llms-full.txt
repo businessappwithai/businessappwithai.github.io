@@ -1045,6 +1045,19 @@ Rules the checker enforces:
   order that is `pending_approval` while its approval task is `pending` costs
   nothing and removes the ambiguity.
 
+**A drawn edge is the only legal move.** In the NestJS application, every
+transition the diagram declares is seeded into a `sys_workflow_transitions`
+table, and the entity-access guard reads it on every write that touches the
+status column. A move the diagram does not draw is refused with **403
+Forbidden**, and the message names the current state and the states it may
+legally reach — the machine constrains the data, not merely the screens. The
+refusal is topological rather than about roles: an administrator is refused the
+same move. An entity with no `kind: state` workflow seeds no rows and stays
+unconstrained, so a lifecycle you meant to enforce has to be drawn rather than
+described in prose. Draw every move you intend to allow, including the ones that
+go backwards: `confirmed --> requested : reopen` is one line, and without it
+reopening a booking is a 403.
+
 The word after the colon is the **transition event**, and it is what `%%rbac`
 names to restrict who may make that move (§6).
 
