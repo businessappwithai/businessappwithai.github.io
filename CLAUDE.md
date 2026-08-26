@@ -55,6 +55,7 @@ businessappwithai.github.io/
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
 ├── privacy.html              # Every event by name, and three ways to turn it off
+├── todo.html                 # The four items between here and production grade
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -113,6 +114,7 @@ Deployment is fully automatic:
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
+| `todo.html` | The four open items — the DeepSeek harness and usability, documentation, end-to-end testing, the license audit — each with what *done* looks like. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
@@ -287,7 +289,13 @@ them the path spans five files. If you change one, check the others.
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
 10. **Accessible markup** — maintain ARIA labels, semantic structure, and sufficient color contrast (design system colors are pre-validated).
-11. **Say what the software actually is.** The pages carry marketing claims —
+11. **`todo.html` is the caveat's other half, and is kept honest the same way.**
+    The home page says this is early software; that page says what specifically
+    is missing. Every item carries a *Done when* that someone else could check,
+    and **an item is not marked done until that sentence is true** — the wording
+    exists so finishing is verifiable rather than declarable. Reordering or
+    adding items is ordinary; quietly softening a *Done when* is not.
+12. **Say what the software actually is.** The pages carry marketing claims —
     "production-ready", "enterprise features out of the box", "90% faster". The
     project is young and not fully tested, and `index.html` says so in the hero
     (`.hero-notice`) and again in the footer, both linking the source on GitHub.
