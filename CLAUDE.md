@@ -55,7 +55,7 @@ businessappwithai.github.io/
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
 ├── privacy.html              # Every event by name, and three ways to turn it off
-├── todo.html                 # The four items between here and production grade
+├── todo.html                 # Five items before 1.0.0, one after it
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -114,7 +114,7 @@ Deployment is fully automatic:
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
-| `todo.html` | The four open items — the DeepSeek harness and usability, documentation, end-to-end testing, the license audit — each with what *done* looks like. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
+| `todo.html` | Two groups. **Before 1.0.0**: the DeepSeek harness and usability, documentation, end-to-end testing, the license audit, security. **After it**: a research agent running wholly on the local model. Each item carries what *done* looks like. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
@@ -295,6 +295,14 @@ them the path spans five files. If you change one, check the others.
     and **an item is not marked done until that sentence is true** — the wording
     exists so finishing is verifiable rather than declarable. Reordering or
     adding items is ordinary; quietly softening a *Done when* is not.
+
+    The page states that the release which is genuinely production grade will be
+    **1.0.0**, counting from zero, and says plainly that the repository reads
+    5.1.1 today (`VERSION` in `app-with-ai-tanstack`; its root `package.json`
+    still says 5.1.0). That is a deliberate renumbering *down*, on the grounds
+    that the old number counted releases rather than readiness — so if the
+    version in that repository changes, this page is one of the places that has
+    to change with it, and the reasoning is what to preserve, not the digits.
 12. **Say what the software actually is.** The pages carry marketing claims —
     "production-ready", "enterprise features out of the box", "90% faster". The
     project is young and not fully tested, and `index.html` says so in the hero

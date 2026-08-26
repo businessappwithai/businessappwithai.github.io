@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The four things standing between AppWithAI and production grade, in the order they are being worked on: the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0.">
-  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0">
-  <title>Todo — What Stands Between AppWithAI and Production Grade</title>
+  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — the DeepSeek harness and usability, documentation, end-to-end testing, a license audit against Apache 2.0, and security — and the research agent that comes after.">
+  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, 1.0.0, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0, security, research agent, local model, Qwen">
+  <title>Todo — The Road to 1.0.0, and What Comes After It</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -42,22 +42,26 @@
       <h1>Todo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
         The home page says this is early software and not fully tested. This page says what that
-        actually means &mdash; the four things being worked on, in order, to bring it to production
-        grade. There are no dates against them, because a date nobody is held to is worse than none.
+        actually means &mdash; five things to finish before the version number reads 1.0.0, and the one
+        that comes after it. There are no dates against any of them, because a date nobody is held to is
+        worse than none.
       </p>
     </div>
   </section>
 
   <section class="section section-white">
     <div class="container container-narrow">
-      <h2 class="text-center">The goal</h2>
+      <h2 class="text-center">What 1.0.0 means here</h2>
       <p class="text-center text-muted">
-        &ldquo;Production grade&rdquo; is not a feeling. For this project it means four specific things,
-        and each one below is written with what <i>done</i> looks like, so that finishing is something
-        anyone can check rather than something we get to declare.
+        The repository reads <b>5.1.1</b> today. That number was never earned &mdash; it counted
+        releases, not readiness, and a reader has no way to tell those apart. So the release that is
+        genuinely production grade is <b>1.0.0</b>, counting from zero, and the five items below are
+        what it is waiting on. Each is written with what <i>done</i> looks like, so that finishing is
+        something anyone can check rather than something we get to declare.
       </p>
       <div class="stats-grid mt-4">
-        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">Open items</div></div>
+        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Before 1.0.0</div></div>
+        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">After it</div></div>
         <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Completed</div></div>
         <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Committed dates</div></div>
       </div>
@@ -66,6 +70,10 @@
 
   <section class="section section-gray">
     <div class="container container-narrow">
+      <div class="section-header">
+        <h2>Before 1.0.0</h2>
+        <p class="text-muted">In the order they are being worked on, which is not the same as the order they matter.</p>
+      </div>
       <div class="timeline">
 
         <div class="timeline-item">
@@ -177,11 +185,106 @@
           </div>
         </div>
 
+        <div class="timeline-item">
+          <span class="hero-badge">5 &middot; Planned</span>
+          <h3>Address the security issues &mdash; in what we ship, and in what it generates</h3>
+          <p>
+            This site advertises role-based access control, field-level and row-level security and audit
+            trails as things a generated application gets out of the box. A claim like that is a promise
+            about someone else's data, and it has to be true by demonstration rather than by
+            architecture diagram. Same two trees as the license audit, and the second one matters more
+            for the same reason: a weakness we ship is ours, but a weakness in what we generate is
+            deployed by somebody who trusted the generator.
+          </p>
+          <p>What has to be gone through, at minimum:</p>
+          <ul>
+            <li>
+              <b>Enforcement that fails open.</b> The project's own notes record one already: the table
+              behind state-machine topology is never created, so the guard reads zero rows and
+              <i>every</i> transition is allowed &mdash; while continuous integration stays green over
+              it. Every guard needs a test that a permitted action is allowed <i>and</i> a forbidden one
+              is refused, because only the second one catches this.
+            </li>
+            <li>
+              <b>Defaults that must not survive a deployment.</b> A generated application ships with a
+              seeded administrator and a demo password. That is right for a page you click around in and
+              wrong the moment somebody puts it on the internet, and the generator should be the thing
+              that knows the difference.
+            </li>
+            <li>
+              <b>Secrets and configuration.</b> Session and encryption keys, what a generated
+              <code>.env.example</code> implies is safe, and what ends up in a log, a process listing or
+              a committed file.
+            </li>
+            <li>
+              <b>The usual surface, checked rather than assumed.</b> Authentication and session
+              handling, authorization on every route that touches a project, injection through
+              model-supplied identifiers, rate limiting, and dependency vulnerabilities &mdash; which
+              the license audit above is already walking the same tree for.
+            </li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              Every access rule the product advertises has a test that a forbidden action is <i>refused</i>,
+              a generated application cannot be deployed with a demo credential still working, dependency
+              scanning runs on both trees in continuous integration, and the findings &mdash; including
+              the ones still open &mdash; are written down where a reader can see them rather than
+              summarised as &ldquo;enterprise security&rdquo;.
+            </p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
   <section class="section section-white">
+    <div class="container container-narrow">
+      <div class="section-header">
+        <h2>After 1.0.0</h2>
+        <p class="text-muted">Deliberately after. It is the most interesting item on this page and the least urgent, and shipping it before the five above would be building on sand.</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <span class="hero-badge">6 &middot; After 1.0.0</span>
+          <h3>A complete research agent, running entirely on a local model</h3>
+          <p>
+            Today the <a href="try-it-yourself.html">Try It Yourself</a> path asks you to leave. You copy
+            a prompt, take it to ChatGPT or Gemini Deep Research, have that model read the specification
+            and write a model file, and bring the file back here. It works &mdash; and it means the most
+            valuable step in the whole product happens somewhere we do not control, on a service you pay
+            for, with your business description sent to it.
+          </p>
+          <p>
+            The item is to close that loop: a research agent in the product itself, doing what those
+            tools do &mdash; plan an investigation, search, read, follow what it finds, weigh sources,
+            revise, and cite &mdash; but aimed at one deliverable, which is a model of <i>your</i>
+            business that the checker accepts.
+          </p>
+          <p>
+            <b>All of it on a local model.</b> The default is already
+            <code>Qwen3.8-27B-4bit</code> on an endpoint you run; the work is making it enough &mdash;
+            planning, tool use, long-context reading and revision on a 27B model, not on a frontier API
+            with a local fallback. That constraint is the point rather than a limitation to work around:
+            a business describing itself in detail is exactly the kind of thing that should not have to
+            leave the building to become software.
+          </p>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              &ldquo;Build me an application for <i>X</i>&rdquo;, typed into the product, produces a
+              researched model with its sources cited and a running application &mdash; with no external
+              API call, on hardware a small company owns, and with the human-in-the-loop review still in
+              front of code generation where it belongs.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gray">
     <div class="container container-narrow">
       <h2>How this list is kept</h2>
       <p>
@@ -192,7 +295,8 @@
       <p>
         The work happens in the open. If one of these matters to you, or you think the order is wrong,
         <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">say so on GitHub</a>
-        &mdash; and the fourth item in particular is one an outside reader is well placed to find holes in.
+        &mdash; and items four and five in particular are ones an outside reader is well placed to find
+        holes in.
       </p>
       <div class="hero-cta mt-4">
         <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Source on GitHub</a>
