@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — security first, then the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0 — and the research agent that comes after.">
-  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, 1.0.0, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0, security, research agent, local model, Qwen">
+  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — security first, then the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0 — and the two that come after: a local research agent, and autonomous operation under a sandboxed agent runtime.">
+  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, 1.0.0, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0, security, research agent, local model, Qwen, OpenClaw, NVIDIA OpenShell, autonomous agents, sandbox">
   <title>Todo — The Road to 1.0.0, and What Comes After It</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -42,8 +42,8 @@
       <h1>Todo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
         The home page says this is early software and not fully tested. This page says what that
-        actually means &mdash; five things to finish before the version number reads 1.0.0, and the one
-        that comes after it. There are no dates against any of them, because a date nobody is held to is
+        actually means &mdash; five things to finish before the version number reads 1.0.0, and the two
+        that come after it. There are no dates against any of them, because a date nobody is held to is
         worse than none.
       </p>
     </div>
@@ -61,7 +61,7 @@
       </p>
       <div class="stats-grid mt-4">
         <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Before 1.0.0</div></div>
-        <div class="stat-card"><div class="stat-value">1</div><div class="stat-label">After it</div></div>
+        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">After it</div></div>
         <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Completed</div></div>
         <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Committed dates</div></div>
       </div>
@@ -243,7 +243,7 @@
     <div class="container container-narrow">
       <div class="section-header">
         <h2>After 1.0.0</h2>
-        <p class="text-muted">Deliberately after. It is the most interesting item on this page and the least urgent, and shipping it before the five above would be building on sand.</p>
+        <p class="text-muted">Both deliberately after. They are the most interesting items on this page and the least urgent &mdash; and the second of them is a large part of why the first item above the line is security.</p>
       </div>
       <div class="timeline">
         <div class="timeline-item">
@@ -277,6 +277,53 @@
               researched model with its sources cited and a running application &mdash; with no external
               API call, on hardware a small company owns, and with the human-in-the-loop review still in
               front of code generation where it belongs.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">7 &middot; After 1.0.0</span>
+          <h3>Run the whole thing autonomously &mdash; OpenClaw inside a sandbox that does not trust it</h3>
+          <p>
+            The end of this list is an application that builds, tests, documents and deploys itself, and
+            keeps doing it: an autonomous agent holding the loop that a person currently drives by hand.
+            <b>OpenClaw</b> is the runtime for that half &mdash; an open-source agent with a heartbeat
+            that wakes it without being asked, installable skills, and persistent memory, running against
+            whichever model you point it at, which for us is the local one from the item above.
+          </p>
+          <p>
+            The other half is the one that makes the first half responsible rather than reckless.
+            An agent that can install packages, learn skills at runtime, spawn subagents, write files,
+            run <code>docker compose</code> and push to a repository is an agent that can do every one of
+            those things wrong, and the failure modes are not hypothetical &mdash; self-propagating
+            attacks across agent ecosystems are already a published literature.
+            <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a>
+            is the answer we intend to use: a runtime that puts the agent in a sandbox with kernel-level
+            isolation and a declarative policy governing which files it may read, where it may connect
+            and which binaries may run &mdash; enforcement living <i>outside</i> the agent, with an audit
+            trail of every allow and deny. It runs OpenClaw unmodified, which is exactly the property
+            that makes the pairing worth building on rather than a rewrite.
+          </p>
+          <p>
+            <b>Two things have to be settled honestly before this ships, and neither is a matter of
+            plumbing.</b> The first is the human-in-the-loop review, which this site calls the critical
+            differentiator and means it: &ldquo;automate everything&rdquo; must not quietly become
+            &ldquo;generate an application nobody looked at&rdquo;. The working answer is that autonomy
+            covers the mechanical loop around the model &mdash; regenerate, build, test, document,
+            deploy, keep continuous integration honest &mdash; while the model itself still stops for a
+            person. If that turns out to be wrong, the page will say so rather than the boundary moving
+            quietly. The second is that OpenShell is early preview software; depending on it is a bet,
+            and it is one to make with eyes open and a fallback, not by pretending the preview label is
+            not there.
+          </p>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              The agent takes a model from approved to deployed and keeps it there without a human in the
+              mechanical path, every action it took is readable afterwards from the sandbox's own audit
+              trail, the policy denies by default so that a capability it was never granted is a refusal
+              rather than an oversight, and pulling the agent out leaves a repository a person can still
+              work in by hand.
             </p>
           </div>
         </div>
