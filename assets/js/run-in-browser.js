@@ -45,6 +45,8 @@ const state = {
   registration: null,
   review: null,
   pgliteUrl: null,
+  // Analytics only: "built_in" or "upload". See assets/js/analytics.js.
+  origin: "",
 };
 
 /* ---------------------------------------------------------------- progress */
@@ -170,10 +172,13 @@ async function selectChoice(kind) {
   $("dropzone").hidden = kind !== "upload";
 
   if (kind === "upload") {
+    state.origin = "upload";
+    window.awTrack?.("upload_started");
     setModel("", "");
     return;
   }
 
+  state.origin = "built_in";
   const built = BUILT_IN[kind];
   setModel("", "");
   try {
@@ -210,6 +215,7 @@ for (const type of ["dragleave", "drop"]) {
 }
 
 async function readFile(file) {
+  state.origin = "upload";
   const text = await file.text();
   setModel(text, file.name);
   const guessed = file.name.replace(/\.(eml\.)?mmd$|\.md$|\.txt$/i, "").replace(/[-_]+/g, " ");
@@ -256,17 +262,42 @@ function setModel(source, label) {
   setStep("step-model", "done");
   build.done("model");
 
+  window.awTrack?.("model_uploaded", {
+    model_name: label,
+    model_size: new Blob([source]).size,
+    model_lines: source.split("\n").length,
+    model_source: state.origin || "built_in",
+  });
+
   // Checked here rather than at the point of generating, because this is the
   // moment the reader is looking at the model — and because a model with an
   // error is not going to become a working application by pressing Generate.
   build.start("check", "Checking the model against the EML language definition");
+  window.awTrack?.("checker_started", { model_name: label });
+  const checkedAt = performance.now();
   const review = checkModel(source);
+  const checkedIn = Math.round(performance.now() - checkedAt);
+  const verdict = {
+    model_name: label,
+    checker_error_count: review.counts.errors,
+    checker_warning_count: review.counts.warnings,
+    checker_info_count: review.counts.infos,
+    fixes_applied: review.fixes.filter((fix) => fix.applied).length,
+    check_time_ms: checkedIn,
+  };
   if (!review.ok) {
+    window.awTrack?.("checker_failed", {
+      ...verdict,
+      // The codes, not the messages: a message can carry the reader's own
+      // entity names, and a code is what a report would group by anyway.
+      codes: [...new Set(review.issues.filter((i) => i.severity === "error").map((i) => i.code))],
+    });
     build.fail("check", `${review.counts.errors} error(s) — nothing was generated`);
     setStep("step-generate", "idle");
     setStep("step-run", "idle");
     return;
   }
+  window.awTrack?.("checker_passed", verdict);
   build.done("check", describeReview(review));
 
   setStep("step-generate", "active");
@@ -413,6 +444,12 @@ $("generate").addEventListener("click", () => {
   button.innerHTML = '<span class="working"></span>Generating';
   build.start("compile", "Compiling the model into an application");
 
+  window.awTrack?.("generate_started", {
+    model_name: state.label,
+    sample_records: sampleRecords(),
+  });
+  const generatingSince = performance.now();
+
   // A frame so the button's state paints before the compiler blocks the thread.
   // Generation is milliseconds on a small model and long enough to notice on a
   // large one, and a button that never showed it was pressed reads as broken.
@@ -433,6 +470,14 @@ $("generate").addEventListener("click", () => {
 
       state.files = result.files;
       state.summary = result.summary;
+      window.awTrack?.("generate_succeeded", {
+        model_name: state.label,
+        generation_time_ms: Math.round(performance.now() - generatingSince),
+        file_count: result.summary.fileCount,
+        bytes: result.summary.bytes,
+        entity_count: result.summary.entities.length,
+        sample_rows: result.summary.sampleRows ?? 0,
+      });
       showResult(result);
       $("download").disabled = false;
       $("download-stack").disabled = false;
@@ -446,6 +491,13 @@ $("generate").addEventListener("click", () => {
     } catch (error) {
       // A ModelCheckError carries the findings; anything else is a compiler
       // failure, which is a different thing and should not be dressed as one.
+      window.awTrack?.("generate_failed", {
+        model_name: state.label,
+        generation_time_ms: Math.round(performance.now() - generatingSince),
+        reason: error.review ? "checker" : "compiler",
+        checker_error_count: error.review?.counts.errors ?? 0,
+        message: error.review ? undefined : String(error.message).slice(0, 200),
+      });
       if (error.review) {
         state.review = error.review;
         renderDiagnostics(error.review);
@@ -550,6 +602,10 @@ function fail(html) {
  */
 $("download").addEventListener("click", () => {
   if (!state.files) return;
+  window.awTrack?.("app_downloaded", {
+    model_name: state.label,
+    file_count: state.summary?.fileCount,
+  });
   const name = ($("app-name").value.trim() || "generated-app")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -646,6 +702,8 @@ async function withFonts(files) {
 
 $("download-stack").addEventListener("click", async () => {
   if (!state.source) return;
+  window.awTrack?.("stack_download_started", { model_name: state.label });
+  const assemblingSince = performance.now();
 
   const button = $("download-stack");
   const original = button.textContent;
@@ -692,6 +750,13 @@ $("download-stack").addEventListener("click", async () => {
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
+    window.awTrack?.("stack_downloaded", {
+      model_name: state.label,
+      file_count: Object.keys(tree).length,
+      bytes: zip.size,
+      assemble_time_ms: Math.round(performance.now() - assemblingSince),
+    });
+
     $("download-stack-hint").innerHTML =
       `<b>${Object.keys(tree).length} files</b>, ${(zip.size / 1024 / 1024).toFixed(1)}MB. ` +
       `Unzip it and run <code>docker compose up --build</code> in <code>${escapeHtml(name)}/</code> — ` +
@@ -703,6 +768,10 @@ $("download-stack").addEventListener("click", async () => {
     /* A checker failure here would already have stopped step 2, so anything
        reaching this is the assembly itself — usually a template bundle that did
        not download. Say which, rather than "failed". */
+    window.awTrack?.("stack_download_failed", {
+      model_name: state.label,
+      message: String(error.message ?? "").slice(0, 200),
+    });
     $("download-stack-hint").innerHTML =
       `<b>The deployable application could not be assembled.</b> ${escapeHtml(error.message)}`;
     $("download-stack-hint").classList.add("hint--bad");
@@ -717,6 +786,9 @@ $("download-stack").addEventListener("click", async () => {
 $("run").addEventListener("click", () => run(false));
 $("reset").addEventListener("click", () => run(true));
 
+/* When the current run began, so `app_ready` can say how long booting took. */
+let runningSince = 0;
+
 async function run(fresh) {
   if (!state.files) {
     fail("Generate the application first.");
@@ -726,6 +798,9 @@ async function run(fresh) {
   const button = $("run");
   button.disabled = true;
   button.innerHTML = '<span class="working"></span>Starting';
+
+  window.awTrack?.("run_started", { model_name: state.label, fresh: Boolean(fresh) });
+  runningSince = performance.now();
 
   const log = $("log");
   log.hidden = false;
@@ -845,6 +920,11 @@ window.addEventListener("message", (event) => {
   }
 
   if (message.type === "running") {
+    window.awTrack?.("app_ready", {
+      model_name: state.label,
+      run_time_ms: runningSince ? Math.round(performance.now() - runningSince) : undefined,
+      sample_rows: state.summary?.sampleRows ?? 0,
+    });
     build.done("boot", "The server is answering requests");
     build.start("ready");
     build.done("ready", `${message.project?.name ?? "The application"} is running`);
@@ -853,6 +933,11 @@ window.addEventListener("message", (event) => {
   }
 
   if (message.type === "failed") {
+    window.awTrack?.("run_failed", {
+      model_name: state.label,
+      run_time_ms: runningSince ? Math.round(performance.now() - runningSince) : undefined,
+      message: String(message.message ?? "").slice(0, 200),
+    });
     build.fail("boot", message.message);
     say(message.message, "bad");
   }
