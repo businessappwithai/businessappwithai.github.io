@@ -37,17 +37,18 @@
 
   const POSTHOG = {
     /*
-     * The Project API key.
+     * The project token — AppWithAI, project 578899, US Cloud.
      *
-     * Note for whoever debugs this next: PostHog's own key formats are
-     * prefixed — `phc_` for a project API key, `phx_` for a personal one,
-     * `phs_` for a project secret. The value below is a bare UUID, which
-     * matches none of them, and was supplied by the project owner as the key
-     * to use. If PostHog is receiving nothing, this is the first thing to
-     * check: a token the server does not recognise is refused there, not here,
-     * so the page will look perfectly healthy while collecting nothing.
+     * Public on purpose. PostHog's key formats are prefixed and only this one
+     * belongs in client source: `phc_` is write-only and safe to publish,
+     * while `phx_` (personal) and `phs_` (project secret) read private data
+     * and must never appear here. If a key without the `phc_` prefix is ever
+     * pasted into this constant, that is the bug — posthog-js does not
+     * validate a token, it puts it in the request URL, so an unrecognised one
+     * is refused by the server and the page goes on looking perfectly healthy
+     * while collecting nothing.
      */
-    key: "01a03f3e-947d-0000-a013-a50691ac7a99",
+    key: "phc_s62jpCL37uGZ5q7QgrfA7cH7xPzEiW4EY5DifiuyFMyf",
     host: "https://us.i.posthog.com",
   };
 
@@ -172,6 +173,9 @@
 
     posthog.init(POSTHOG.key, {
       api_host: POSTHOG.host,
+      /* The dated defaults bundle PostHog's own setup snippet for this project
+         specifies. It governs only the options not set explicitly below. */
+      defaults: "2026-05-30",
       /*
        * The library is served from this origin, and this stops it fetching any
        * further executable code — the replay recorder, surveys, the toolbar —
