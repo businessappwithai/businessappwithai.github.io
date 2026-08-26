@@ -36,8 +36,18 @@
   "use strict";
 
   const POSTHOG = {
-    /* ← paste the Project API key here (starts `phc_`) */
-    key: "",
+    /*
+     * The Project API key.
+     *
+     * Note for whoever debugs this next: PostHog's own key formats are
+     * prefixed — `phc_` for a project API key, `phx_` for a personal one,
+     * `phs_` for a project secret. The value below is a bare UUID, which
+     * matches none of them, and was supplied by the project owner as the key
+     * to use. If PostHog is receiving nothing, this is the first thing to
+     * check: a token the server does not recognise is refused there, not here,
+     * so the page will look perfectly healthy while collecting nothing.
+     */
+    key: "01a03f3e-947d-0000-a013-a50691ac7a99",
     host: "https://us.i.posthog.com",
   };
 
