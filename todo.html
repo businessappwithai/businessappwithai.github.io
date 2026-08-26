@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — the DeepSeek harness and usability, documentation, end-to-end testing, a license audit against Apache 2.0, and security — and the research agent that comes after.">
+  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — security first, then the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0 — and the research agent that comes after.">
   <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, 1.0.0, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0, security, research agent, local model, Qwen">
   <title>Todo — The Road to 1.0.0, and What Comes After It</title>
   <link rel="stylesheet" href="assets/css/style.css">
@@ -72,12 +72,62 @@
     <div class="container container-narrow">
       <div class="section-header">
         <h2>Before 1.0.0</h2>
-        <p class="text-muted">In the order they are being worked on, which is not the same as the order they matter.</p>
+        <p class="text-muted">In priority order. The second one is already underway; the first is where the work goes next, and it sits there because an access rule that fails open outranks a missing chapter.</p>
       </div>
       <div class="timeline">
 
         <div class="timeline-item">
-          <span class="hero-badge">1 &middot; In progress</span>
+          <span class="hero-badge">1 &middot; Planned</span>
+          <h3>Address the security issues &mdash; in what we ship, and in what it generates</h3>
+          <p>
+            This site advertises role-based access control, field-level and row-level security and audit
+            trails as things a generated application gets out of the box. A claim like that is a promise
+            about someone else's data, and it has to be true by demonstration rather than by
+            architecture diagram. Two dependency trees, the same two the license audit further down
+            walks, and the second one matters more for the same reason: a weakness we ship is ours, but
+            a weakness in what we generate is deployed by somebody who trusted the generator.
+          </p>
+          <p>What has to be gone through, at minimum:</p>
+          <ul>
+            <li>
+              <b>Enforcement that fails open.</b> The project's own notes record one already: the table
+              behind state-machine topology is never created, so the guard reads zero rows and
+              <i>every</i> transition is allowed &mdash; while continuous integration stays green over
+              it. Every guard needs a test that a permitted action is allowed <i>and</i> a forbidden one
+              is refused, because only the second one catches this.
+            </li>
+            <li>
+              <b>Defaults that must not survive a deployment.</b> A generated application ships with a
+              seeded administrator and a demo password. That is right for a page you click around in and
+              wrong the moment somebody puts it on the internet, and the generator should be the thing
+              that knows the difference.
+            </li>
+            <li>
+              <b>Secrets and configuration.</b> Session and encryption keys, what a generated
+              <code>.env.example</code> implies is safe, and what ends up in a log, a process listing or
+              a committed file.
+            </li>
+            <li>
+              <b>The usual surface, checked rather than assumed.</b> Authentication and session
+              handling, authorization on every route that touches a project, injection through
+              model-supplied identifiers, rate limiting, and dependency vulnerabilities &mdash; which
+              the license audit below is already walking the same tree for.
+            </li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              Every access rule the product advertises has a test that a forbidden action is <i>refused</i>,
+              a generated application cannot be deployed with a demo credential still working, dependency
+              scanning runs on both trees in continuous integration, and the findings &mdash; including
+              the ones still open &mdash; are written down where a reader can see them rather than
+              summarised as &ldquo;enterprise security&rdquo;.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">2 &middot; In progress</span>
           <h3>Run the whole generator on the DeepSeek harness &mdash; and make it pleasant to use</h3>
           <p>
             Two halves of one job. The generator already talks to an OpenAI-compatible endpoint, and the
@@ -106,7 +156,7 @@
         </div>
 
         <div class="timeline-item">
-          <span class="hero-badge">2 &middot; Planned</span>
+          <span class="hero-badge">3 &middot; Planned</span>
           <h3>Complete documentation for the generator application itself</h3>
           <p>
             There is a lot of documentation here, and it is all about something else. The
@@ -132,7 +182,7 @@
         </div>
 
         <div class="timeline-item">
-          <span class="hero-badge">3 &middot; Planned</span>
+          <span class="hero-badge">4 &middot; Planned</span>
           <h3>End-to-end testing, over the whole of it</h3>
           <p>
             Continuous integration is real here and not decorative: every commit generates an
@@ -157,7 +207,7 @@
         </div>
 
         <div class="timeline-item">
-          <span class="hero-badge">4 &middot; Planned</span>
+          <span class="hero-badge">5 &middot; Planned</span>
           <h3>Audit every license in the product against Apache 2.0</h3>
           <p>
             AppWithAI is released under the Apache License 2.0, and it has two dependency trees rather
@@ -181,56 +231,6 @@
               <code>NOTICE</code> file that discharges the attribution we owe, a written finding on
               every incompatibility with what was done about it, and a continuous-integration check
               that fails when a new dependency arrives under a license nobody has cleared.
-            </p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">5 &middot; Planned</span>
-          <h3>Address the security issues &mdash; in what we ship, and in what it generates</h3>
-          <p>
-            This site advertises role-based access control, field-level and row-level security and audit
-            trails as things a generated application gets out of the box. A claim like that is a promise
-            about someone else's data, and it has to be true by demonstration rather than by
-            architecture diagram. Same two trees as the license audit, and the second one matters more
-            for the same reason: a weakness we ship is ours, but a weakness in what we generate is
-            deployed by somebody who trusted the generator.
-          </p>
-          <p>What has to be gone through, at minimum:</p>
-          <ul>
-            <li>
-              <b>Enforcement that fails open.</b> The project's own notes record one already: the table
-              behind state-machine topology is never created, so the guard reads zero rows and
-              <i>every</i> transition is allowed &mdash; while continuous integration stays green over
-              it. Every guard needs a test that a permitted action is allowed <i>and</i> a forbidden one
-              is refused, because only the second one catches this.
-            </li>
-            <li>
-              <b>Defaults that must not survive a deployment.</b> A generated application ships with a
-              seeded administrator and a demo password. That is right for a page you click around in and
-              wrong the moment somebody puts it on the internet, and the generator should be the thing
-              that knows the difference.
-            </li>
-            <li>
-              <b>Secrets and configuration.</b> Session and encryption keys, what a generated
-              <code>.env.example</code> implies is safe, and what ends up in a log, a process listing or
-              a committed file.
-            </li>
-            <li>
-              <b>The usual surface, checked rather than assumed.</b> Authentication and session
-              handling, authorization on every route that touches a project, injection through
-              model-supplied identifiers, rate limiting, and dependency vulnerabilities &mdash; which
-              the license audit above is already walking the same tree for.
-            </li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">
-              Every access rule the product advertises has a test that a forbidden action is <i>refused</i>,
-              a generated application cannot be deployed with a demo credential still working, dependency
-              scanning runs on both trees in continuous integration, and the findings &mdash; including
-              the ones still open &mdash; are written down where a reader can see them rather than
-              summarised as &ldquo;enterprise security&rdquo;.
             </p>
           </div>
         </div>
@@ -295,8 +295,8 @@
       <p>
         The work happens in the open. If one of these matters to you, or you think the order is wrong,
         <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">say so on GitHub</a>
-        &mdash; and items four and five in particular are ones an outside reader is well placed to find
-        holes in.
+        &mdash; and the security review and the license audit in particular are ones an outside reader
+        is well placed to find holes in.
       </p>
       <div class="hero-cta mt-4">
         <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Source on GitHub</a>
