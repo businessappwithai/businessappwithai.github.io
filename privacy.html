@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="What this site measures, what it deliberately does not, and three ways to turn it off. Your model file, the application generated from it and the database it fills never leave your browser.">
+  <meta name="keywords" content="AppWithAI, privacy, analytics, PostHog, session replay, opt out, do not track, GPC, cookies">
+  <title>Privacy — What AppWithAI Measures, and How to Turn It Off</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="try-it-yourself.html" class="nav-link active">Try It Yourself</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-3xl) 0;">
+    <div class="container container-narrow">
+      <h1>Privacy</h1>
+      <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
+        Your model file, the application generated from it, and the database it fills never leave your
+        browser. What does leave is a count of which step you reached. This page says exactly which,
+        and gives you three ways to stop it.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2>The short version</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>What never leaves your browser</h3>
+          <ul>
+            <li>The <code>.mmd</code> model you upload or paste &mdash; its contents are read in the tab and are never uploaded.</li>
+            <li>The application generated from it: every one of its files is assembled in the tab.</li>
+            <li>The database that application fills. It is PostgreSQL compiled to WebAssembly, living in your browser&rsquo;s IndexedDB.</li>
+            <li>Anything you type into the running application &mdash; records, passwords, the lot.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What does leave</h3>
+          <ul>
+            <li>Anonymous product analytics: which step of the demo ran, whether it succeeded, and how long it took.</li>
+            <li>The usual web request data your browser sends anywhere &mdash; page URL, referrer, browser and operating system, and a coarse country from the IP address.</li>
+            <li>On four pages, a session recording of the page itself &mdash; with the model editor, the model preview and the application frame blanked out.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-muted text-sm mt-3">
+        Analytics are processed by <a href="https://posthog.com/" target="_blank" rel="noopener noreferrer">PostHog</a>.
+        The library itself is served from this site rather than from a content delivery network, and it
+        is configured not to fetch any further code from one. When analytics are on, your browser makes
+        exactly three kinds of request to PostHog and no others: one asking for this project&rsquo;s
+        settings, one asking which features are on, and the events below. When you have opted out, or
+        before the site is configured with a key at all, it makes none of them &mdash; the library is not
+        even downloaded.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container container-narrow">
+      <h2>Every event, by name</h2>
+      <p class="text-muted">
+        This is the whole list. It is short on purpose: the point is a funnel &mdash; how many readers who
+        arrive get as far as an application they can click on &mdash; not a profile of anybody.
+      </p>
+      <table class="comparison-table">
+        <thead>
+          <tr><th>Event</th><th>When it fires</th><th>What travels with it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>try_it_viewed</code></td><td>The Try It Yourself page opens, or its section on the home page scrolls into view</td><td>Which of the two</td></tr>
+          <tr><td><code>prompt_copied</code></td><td>The &ldquo;Copy the prompt&rdquo; button is pressed</td><td>Which block was copied</td></tr>
+          <tr><td><code>upload_started</code></td><td>The upload or paste choice is selected</td><td>&mdash;</td></tr>
+          <tr><td><code>model_uploaded</code></td><td>A model is loaded, whether an example or your own</td><td>File name, size in bytes, line count, and whether it was an example</td></tr>
+          <tr><td><code>checker_started</code></td><td>The model is handed to the EML checker</td><td>File name</td></tr>
+          <tr><td><code>checker_passed</code> / <code>checker_failed</code></td><td>The checker returns</td><td>How many errors, warnings and notes; which diagnostic <i>codes</i>; how long it took</td></tr>
+          <tr><td><code>generate_started</code></td><td>Generate is pressed</td><td>Sample rows requested</td></tr>
+          <tr><td><code>generate_succeeded</code></td><td>The application is assembled</td><td>Milliseconds taken, file count, total bytes, entity count, sample rows</td></tr>
+          <tr><td><code>generate_failed</code></td><td>Assembly stops</td><td>Whether the checker or the compiler refused, and the compiler&rsquo;s message</td></tr>
+          <tr><td><code>run_started</code></td><td>Run the application is pressed</td><td>Whether it is a fresh database</td></tr>
+          <tr><td><code>app_ready</code> / <code>run_failed</code></td><td>The generated server answers, or does not</td><td>Milliseconds from press to answer</td></tr>
+          <tr><td><code>app_interaction</code></td><td>The first click or keystroke lands inside the running application</td><td>Milliseconds since it became ready</td></tr>
+          <tr><td><code>app_downloaded</code>, <code>stack_downloaded</code>, <code>model_downloaded</code></td><td>A download is started</td><td>File count and archive size</td></tr>
+          <tr><td><code>github_clicked</code>, <code>guide_clicked</code></td><td>A link to the source or to the guide is followed</td><td>The link&rsquo;s address and its text</td></tr>
+          <tr><td><code>contact_submitted</code></td><td>The contact form is submitted</td><td>&mdash; (the form&rsquo;s own contents go to email, not to analytics)</td></tr>
+        </tbody>
+      </table>
+      <p class="text-sm text-muted mt-3">
+        Note what is <i>not</i> in that list. No event carries a line of your model, a field name, an
+        entity name or a checker message &mdash; only the diagnostic codes, because a message can quote
+        your own names back and a code is what a report would group by anyway.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2>Session recordings</h2>
+      <p>
+        Four pages record the page itself, so that a reader stuck at a dropzone or staring at a
+        report they cannot read is something we can actually see: <b>Try It Yourself</b>, and guide
+        chapters <b>09</b>, <b>10</b> and <b>11</b>. The marketing pages do not.
+      </p>
+      <p>A recording is of this site&rsquo;s own interface, and three things are blanked out of it:</p>
+      <ul>
+        <li><b>Every input and text area</b>, including the box you paste a model into.</li>
+        <li><b>Every code and preview block</b> &mdash; so the model listing, the checker report and the file tree never appear in a recording.</li>
+        <li><b>The application frame</b>, entirely. Whatever you do inside the application you generated is yours; the recording shows an empty rectangle.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container container-narrow">
+      <h2>Turning it off</h2>
+      <p>Three ways, and the first two need nothing from you at all.</p>
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">1</div>
+          <h3>Global Privacy Control</h3>
+          <p class="text-sm">If your browser or an extension sends GPC, this site collects nothing. The analytics library is never even fetched.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">2</div>
+          <h3>Do Not Track</h3>
+          <p class="text-sm">Same. DNT is widely ignored on the web; it is honoured here, before any request is made.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">3</div>
+          <h3>Ask directly</h3>
+          <p class="text-sm">Open <a href="privacy.html?analytics=off"><code>?analytics=off</code></a> on any page of this site. The choice is remembered in this browser. <a href="privacy.html?analytics=on"><code>?analytics=on</code></a> undoes it.</p>
+        </div>
+      </div>
+      <p class="text-muted text-sm mt-4">
+        An ad or tracker blocker also works, and nothing on this site depends on analytics loading &mdash;
+        the demo generates and runs an application either way. If you would rather see for yourself,
+        the whole of it is one readable file:
+        <a href="https://github.com/businessappwithai/businessappwithai.github.io/blob/main/assets/js/analytics.js" target="_blank" rel="noopener noreferrer">assets/js/analytics.js</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2>The rest of it</h2>
+      <h3>Cookies</h3>
+      <p>
+        Analytics store an anonymous identifier in this browser so that two page views in one visit
+        count as one visit rather than two. There is no advertising, no cross-site tracking and no
+        data sold or shared with anybody. Opting out above removes the identifier.
+      </p>
+      <h3>The contact form</h3>
+      <p>
+        <a href="contact.html">The contact form</a> posts what you write in it to a mail relay
+        (<a href="https://formsubmit.co/" target="_blank" rel="noopener noreferrer">FormSubmit</a>),
+        which forwards it to us by email. Only what you typed is sent, and it is used to answer you.
+      </p>
+      <h3>Hosting</h3>
+      <p>
+        The site is served by GitHub Pages, which keeps its own request logs. The guide&rsquo;s chapter 10
+        downloads its runtime from StackBlitz and its packages from npm when you run it &mdash; that is
+        the only page that reaches a host other than this one to do its work, and it says so.
+      </p>
+      <h3>Questions</h3>
+      <p>
+        Ask on <a href="https://github.com/businessappwithai/businessappwithai.github.io/issues" target="_blank" rel="noopener noreferrer">GitHub</a>
+        or through <a href="contact.html">the contact page</a>. This page is versioned with the site, so
+        its history is the change log.
+      </p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="justification.html">Why AppWithAI</a></li>
+            <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="todo.html">Todo</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

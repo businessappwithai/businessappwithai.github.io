@@ -123,9 +123,15 @@
 </p>
 
 <p class="note">
-  Nothing you load here leaves your browser, and nothing is fetched from anywhere but this site. The
-  model is parsed in this tab, the application is assembled in this tab, the sample rows are invented in
-  this tab, and the database it all fills lives in this tab's IndexedDB.
+  Your model never leaves your browser. It is parsed in this tab, the application is assembled in this
+  tab, the sample rows are invented in this tab, and the database it all fills lives in this tab's
+  IndexedDB &mdash; nothing you load here is uploaded anywhere, and every file this page needs is
+  served from this site.
+  <br><br>
+  One thing does leave: anonymous usage analytics, so we can see where readers get stuck &mdash; which
+  step ran, how long it took, how many errors the checker found. The model's <i>contents</i> are never
+  sent, and the recording of this page blanks out the editor, the model preview and the application
+  frame. <a href="../privacy.html">What is collected, and how to turn it off &rarr;</a>
 </p>
 
 <!--
@@ -395,6 +401,7 @@ bun run wasm serve ./crm</code></pre>
             <li><a href="../how-it-works.html">How It Works</a></li>
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
+            <li><a href="../todo.html">Todo</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -411,7 +418,7 @@ bun run wasm serve ./crm</code></pre>
           <h4>Legal</h4>
           <ul class="footer-links">
             <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="../privacy.html">Privacy Policy</a></li>
             <li><a href="#">Terms of Service</a></li>
             <li><a href="#">Security</a></li>
           </ul>
@@ -424,6 +431,7 @@ bun run wasm serve ./crm</code></pre>
     </div>
   </footer>
 
+  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
   <script type="module" src="../assets/js/run-in-browser.js"></script>

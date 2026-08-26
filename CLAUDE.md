@@ -18,6 +18,7 @@ businessappwithai.github.io/
 │   │   └── guide-demo.css    # Scoped styles for the three interactive chapters
 │   ├── js/
 │   │   ├── main.js               # Main JS (scroll animations, nav, forms)
+│   │   ├── analytics.js          # PostHog: the funnel, the opt-outs, window.awTrack
 │   │   ├── guide.js              # Guide chapter nav and screenshot lightbox
 │   │   ├── coi.js                # Registers the cross-origin isolation worker (ch. 10)
 │   │   ├── run-in-browser.js     # Controller for chapter 09
@@ -27,6 +28,7 @@ businessappwithai.github.io/
 │   │   ├── erdwithai-wasm.js     # Vendored: browser generator (parser + compilers)
 │   │   └── erdwithai-fullstack.js# Vendored: full NestJS/TanStack generator
 │   └── vendor/                   # Third-party payloads, served from this origin
+│       ├── posthog/              # posthog-js, the no-external build (~640KB)
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
@@ -52,6 +54,8 @@ businessappwithai.github.io/
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
+├── privacy.html              # Every event by name, and three ways to turn it off
+├── todo.html                 # The four items between here and production grade
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -110,6 +114,8 @@ Deployment is fully automatic:
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
+| `todo.html` | The four open items — the DeepSeek harness and usability, documentation, end-to-end testing, the license audit — each with what *done* looks like. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
+| `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
@@ -204,6 +210,10 @@ any navigation change at **1024px**.
   the placeholder in the source. Falls back to selecting the text where the clipboard
   API is refused (private windows, plain `http://`).
 
+`assets/js/analytics.js` is loaded on every page, immediately **before** `main.js`,
+and defines `window.awTrack(event, properties)` synchronously — see **Analytics**
+below.
+
 Utility functions available globally via the `utils` object:
 ```js
 utils.debounce(func, wait)
@@ -269,13 +279,23 @@ them the path spans five files. If you change one, check the others.
 2. **Reuse existing CSS classes** — the design system is comprehensive. Avoid adding new CSS unless absolutely necessary.
 3. **Keep pages consistent** — navigation, footer, and meta structure must match existing pages exactly.
 4. **No external JS dependencies** — do not add CDN script tags or npm packages.
+   Third-party code that genuinely has to be here is *vendored* into
+   `assets/vendor/` and served from this origin, with a `README.md` beside it
+   naming the exact published version and the command that fetched it. PGlite,
+   the WebContainer API and posthog-js are all there on those terms.
 5. **Preserve the design system** — CSS variable names and spacing scale are intentional; do not rename or restructure them.
 6. **Static only** — there is no backend, no API, no database. Forms do not submit to a server by default.
 7. **Deployment is automatic** — merging to `main` deploys to production. Test locally before merging.
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
 10. **Accessible markup** — maintain ARIA labels, semantic structure, and sufficient color contrast (design system colors are pre-validated).
-11. **Say what the software actually is.** The pages carry marketing claims —
+11. **`todo.html` is the caveat's other half, and is kept honest the same way.**
+    The home page says this is early software; that page says what specifically
+    is missing. Every item carries a *Done when* that someone else could check,
+    and **an item is not marked done until that sentence is true** — the wording
+    exists so finishing is verifiable rather than declarable. Reordering or
+    adding items is ordinary; quietly softening a *Done when* is not.
+12. **Say what the software actually is.** The pages carry marketing claims —
     "production-ready", "enterprise features out of the box", "90% faster". The
     project is young and not fully tested, and `index.html` says so in the hero
     (`.hero-notice`) and again in the footer, both linking the source on GitHub.
@@ -455,6 +475,71 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | Probes `assets/vendor/pglite/` and mounts a re-export shim at the app's `vendor/pglite/index.js` | This site vendors PGlite, so no CDN is ever reached |
 | `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
 | `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
+| `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
+| `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
+
+**Re-vendoring one of the last two loses its `awTrack` lines.** They are
+deliberately greppable: `grep -n awTrack assets/js/*.js` finds every one, and
+`assets/js/analytics.js` documents what each is for. Put them back.
+
+## Analytics — the funnel, and where each event lives
+
+The whole of it is `assets/js/analytics.js`, loaded on every page before
+`main.js`. It vendors posthog-js (`assets/vendor/posthog/`, see the README
+there), and it is the only file that decides anything about measurement.
+
+**The one thing that has to be set.** `POSTHOG.key` at the top of
+`analytics.js` is empty in the repository. Until a project API key is pasted in,
+the library is never fetched and nothing is collected — the site behaves exactly
+as it did before. A PostHog project API key is a write-only, publish-safe
+credential and belongs in client source; nothing here is a secret. Change
+`POSTHOG.host` to `https://eu.i.posthog.com` for an EU-cloud project.
+
+**What is being measured is a funnel, not a page count.** The path this site
+exists to move people along runs:
+
+```
+try_it_viewed → prompt_copied → model_uploaded → checker_passed
+              → generate_succeeded → app_ready → app_interaction
+```
+
+Every step except the first two is a real function in `run-in-browser.js` or
+`validator.js`, so it is recorded **where the step happens**, with the real
+numbers that step produced — `generation_time_ms` is measured around the
+compile, not guessed from a click. `privacy.html` lists every event and every
+property, and it is reader-facing, so **an event added here is added there too**.
+
+**`window.awTrack(event, properties)` is the whole interface.** It is defined
+synchronously, queues until PostHog loads, and is a safe no-op when analytics
+are off, absent, blocked or unconfigured — which is why the two vendored files
+call it unconditionally and neither of them contains a decision. Keep it that
+way: a rule about *what* an event means goes in `analytics.js`.
+
+**Session replay is on four pages** — `try-it-yourself.html` and guide chapters
+09, 10 and 11 — and off everywhere else, because the free allowance is five
+thousand recordings a month and the home page would spend it on bounces.
+Widening `REPLAY_SURFACES` means budgeting for it.
+
+**A recording blanks out the reader's model.** Someone pasting their own
+business model into this site is handing over entity names, field names and the
+shape of their company. `maskAllInputs`, a `maskTextSelector` covering every
+`textarea`, `pre` and `code`, and `blockSelector: "iframe"` for the generated
+application. No event carries a line of a model, an entity name or a checker
+*message* either — only diagnostic codes. Do not relax any of that to make a
+report prettier.
+
+**Three opt-outs, checked before the library is fetched**: Global Privacy
+Control, Do Not Track, and `?analytics=off` (remembered; `?analytics=on`
+forgets it). PostHog's own bot filter drops anything reporting
+`navigator.webdriver`, which is worth knowing before concluding that events are
+not being sent — a headless browser will never produce one.
+
+**What `disable_external_dependency_loading` does and does not buy.** It stops
+the recorder, surveys and toolbar being pulled from PostHog's CDN. It does not
+mean no request: a page load still asks `us-assets.i.posthog.com` for the
+project config and `api_host` for flags, before any event. The README beside the
+bundle tabulates all three, and `privacy.html` is written to match. Neither
+claim is guesswork — both were read off the network in a browser.
 
 ## `llms-full.txt` is authored here, not vendored
 

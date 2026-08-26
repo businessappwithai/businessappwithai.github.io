@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="The four things standing between AppWithAI and production grade, in the order they are being worked on: the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0.">
+  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0">
+  <title>Todo — What Stands Between AppWithAI and Production Grade</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-text">AppWithAI</span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="try-it-yourself.html" class="nav-link active">Try It Yourself</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-3xl) 0;">
+    <div class="container container-narrow">
+      <h1>Todo</h1>
+      <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
+        The home page says this is early software and not fully tested. This page says what that
+        actually means &mdash; the four things being worked on, in order, to bring it to production
+        grade. There are no dates against them, because a date nobody is held to is worse than none.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2 class="text-center">The goal</h2>
+      <p class="text-center text-muted">
+        &ldquo;Production grade&rdquo; is not a feeling. For this project it means four specific things,
+        and each one below is written with what <i>done</i> looks like, so that finishing is something
+        anyone can check rather than something we get to declare.
+      </p>
+      <div class="stats-grid mt-4">
+        <div class="stat-card"><div class="stat-value">4</div><div class="stat-label">Open items</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Completed</div></div>
+        <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Committed dates</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container container-narrow">
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <span class="hero-badge">1 &middot; In progress</span>
+          <h3>Run the whole generator on the DeepSeek harness &mdash; and make it pleasant to use</h3>
+          <p>
+            Two halves of one job. The generator already talks to an OpenAI-compatible endpoint, and the
+            multi-agent pipeline &mdash; domain analysis, entities, relationships, the ERD, the
+            human-in-the-loop review &mdash; is stack-agnostic by design. The work is running the
+            <b>complete</b> pipeline on the DeepSeek harness and keeping it there: not a model swap in a
+            config file, but every agent, the retrieval that feeds them and the generation that follows,
+            exercised end to end on that harness and kept green.
+          </p>
+          <p>
+            The second half is usability, and it is the half users actually feel. Today the distance
+            between &ldquo;describe your business&rdquo; and &ldquo;click around the application&rdquo;
+            is longer than it needs to be: steps that could be inferred are asked for, errors report what
+            failed rather than what to do about it, and the model a run produces sometimes needs
+            hand-editing before the checker will take it.
+          </p>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              A plain-English business description entered into the tool produces a model the checker
+              passes with zero errors and an application that runs, on the DeepSeek harness, with no
+              hand-editing anywhere in between &mdash; and the same run works from the hosted page as it
+              does from the CLI.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">2 &middot; Planned</span>
+          <h3>Complete documentation for the generator application itself</h3>
+          <p>
+            There is a lot of documentation here, and it is all about something else. The
+            <a href="guide/index.html">twelve-chapter guide</a> builds a CRM.
+            <a href="llms-full.txt">The specification</a> is the modelling language, written for
+            language models. What is missing is the product: installing it, the project wizard and what
+            each step expects, the rule and workflow editors, what generation actually emits, the
+            enhance and deploy steps, and how to take a generated application and keep working on it.
+          </p>
+          <p>
+            It also has to cover the parts that surprise people &mdash; that two stacks come out of one
+            model, that the browser one has no per-entity source to edit, that a generated application
+            carries its own manual, its own tests and its own migrations.
+          </p>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              Somebody who has never seen this project can go from a clone to a deployed application
+              they have modified, using the documentation alone, without opening the source to find out
+              what a screen does.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">3 &middot; Planned</span>
+          <h3>End-to-end testing, over the whole of it</h3>
+          <p>
+            Continuous integration is real here and not decorative: every commit generates an
+            application from a model, builds its backend and front end, migrates a database, starts the
+            server and runs a generated suite against it &mdash; twice, once on a WebAssembly Postgres
+            with no database server anywhere. That is a good foundation and it is not complete coverage.
+          </p>
+          <p>
+            What is not covered yet: the modelling tool's own screens end to end, regeneration over an
+            application somebody has already edited, and the paths a green build can still hide. The
+            project's own notes record a migration that no scaffold entry renders, whose seed fails
+            while the run reports success &mdash; exactly the class of defect this item exists to make
+            impossible.
+          </p>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              Every user-facing path has a test that fails when that path breaks, no suite tolerates a
+              failing step by logging past it, and a green build is evidence rather than a habit.
+            </p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">4 &middot; Planned</span>
+          <h3>Audit every license in the product against Apache 2.0</h3>
+          <p>
+            AppWithAI is released under the Apache License 2.0, and it has two dependency trees rather
+            than one: the tools we ship, and <b>the dependencies that end up inside an application it
+            generates for somebody else</b>. The second is the one that matters most, because a
+            generated application is the user's to own, sell and relicense &mdash; and a copyleft
+            dependency that travelled there in a template would quietly take that away from them.
+          </p>
+          <p>The audit has to answer, for every component in both trees:</p>
+          <ul>
+            <li>What license it is actually under, read from the package rather than assumed.</li>
+            <li>Whether it is a build-time tool or shipped at runtime &mdash; the obligations differ.</li>
+            <li>Whether it is compatible with Apache 2.0 in that role, and whether any of it is copyleft.</li>
+            <li>Whether it reaches a generated application, and under what terms the user then holds it.</li>
+            <li>What attribution we owe, and are not currently giving.</li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">
+              A checked-in inventory of every dependency and its license across both trees, a
+              <code>NOTICE</code> file that discharges the attribution we owe, a written finding on
+              every incompatibility with what was done about it, and a continuous-integration check
+              that fails when a new dependency arrives under a license nobody has cleared.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2>How this list is kept</h2>
+      <p>
+        This page is versioned with the site, so its history is the change log: what moved, when, and in
+        which commit. Items are not marked done here until the &ldquo;done when&rdquo; beside them is
+        true &mdash; that is the whole point of writing them that way.
+      </p>
+      <p>
+        The work happens in the open. If one of these matters to you, or you think the order is wrong,
+        <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">say so on GitHub</a>
+        &mdash; and the fourth item in particular is one an outside reader is well placed to find holes in.
+      </p>
+      <div class="hero-cta mt-4">
+        <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Source on GitHub</a>
+        <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg">See where it is today</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="justification.html">Why AppWithAI</a></li>
+            <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="todo.html">Todo</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
