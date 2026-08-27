@@ -1,0 +1,482 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Dark Precision — site-wide dark theme (Variant A)
+   Obsidian #0a0a0a base · Electric indigo #6366f1 accent
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Token overrides ────────────────────────────────────────────────────── */
+:root {
+  --primary-50:  #eef2ff;
+  --primary-100: #e0e7ff;
+  --primary-200: #c7d2fe;
+  --primary-300: #a5b4fc;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+  --primary-800: #3730a3;
+  --primary-900: #312e81;
+  --secondary-500: #8b5cf6;
+  --secondary-600: #7c3aed;
+  --secondary-700: #6d28d9;
+  --accent-500:  #6366f1;
+  --accent-600:  #4f46e5;
+  --accent-700:  #4338ca;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
+html { color-scheme: dark; }
+
+body {
+  background: #0a0a0a;
+  color: #e2e8f0;
+}
+
+h1, h2, h3, h4, h5, h6 { color: #f1f5f9; }
+p { color: #94a3b8; }
+li { color: #94a3b8; }
+strong { color: #e2e8f0; }
+a { color: #818cf8; }
+a:hover { color: #a5b4fc; }
+
+/* ── Logo ───────────────────────────────────────────────────────────────── */
+.logo-img {
+  /* Convert logo to indigo #818cf8 to match the accent */
+  filter: brightness(0) saturate(100%) invert(64%) sepia(35%)
+          saturate(874%) hue-rotate(205deg) brightness(103%);
+}
+
+/* ── Header / Nav ───────────────────────────────────────────────────────── */
+.header {
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1e1e2e;
+  box-shadow: none;
+}
+.nav-link { color: #94a3b8; }
+.nav-link:hover,
+.nav-link.active { color: #f1f5f9; }
+.menu-toggle span { background: #94a3b8; }
+
+/* Mobile nav drawer */
+.nav { background: #0a0a0a; }
+@media (max-width: 1023px) {
+  .nav {
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+  }
+}
+
+/* ── Hero ───────────────────────────────────────────────────────────────── */
+.hero {
+  background: radial-gradient(ellipse 80% 60% at 50% -10%,
+              rgba(99, 102, 241, 0.18) 0%, transparent 70%), #0a0a0a;
+}
+.hero h1 { color: #f1f5f9; }
+.hero p { color: #94a3b8; }
+.hero-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+.hero-subtitle { color: #94a3b8; }
+.hero-cta .btn-outline {
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #a5b4fc;
+}
+.hero-cta .btn-outline:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  color: #c7d2fe;
+}
+.text-gradient {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-notice {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: #94a3b8;
+}
+.hero-notice strong { color: #c7d2fe; }
+.hero-notice a { color: #818cf8; }
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+.section,
+.section-white { background: #0a0a0a; }
+.section-gray  { background: #0f0f1a; }
+
+.section-header h2,
+.section-header h3 { color: #f1f5f9; }
+.section-subtitle  { color: #94a3b8; }
+.section-header p  { color: #94a3b8; }
+
+/* CTA gradient sections (inline style uses var(--primary-*) — already updated above) */
+.section[style*="linear-gradient"] h2,
+.section[style*="linear-gradient"] h3,
+.section[style*="linear-gradient"] p,
+.section[style*="linear-gradient"] li { color: #f1f5f9 !important; }
+.section[style*="linear-gradient"] .section-subtitle { color: rgba(241,245,249,0.8) !important; }
+.section[style*="linear-gradient"] .hero-badge {
+  background: rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+}
+/* White buttons inside gradient CTA stay white but text gets updated primary colour */
+.section[style*="linear-gradient"] .btn[style*="background: white"],
+.section[style*="linear-gradient"] .btn[style*="background:white"] {
+  background: #f1f5f9 !important;
+  color: #312e81 !important;
+}
+.section[style*="linear-gradient"] .btn[style*="border: 2px solid white"],
+.section[style*="linear-gradient"] .btn[style*="border:2px solid white"] {
+  border-color: rgba(241,245,249,0.5) !important;
+  color: #f1f5f9 !important;
+  background: transparent !important;
+}
+
+/* ── Stat cards ─────────────────────────────────────────────────────────── */
+.stat-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+}
+.stat-value { color: #818cf8; }
+.stat-label { color: #6b7280; }
+.stats-grid .stat-card { box-shadow: none; }
+
+/* ── Cards ──────────────────────────────────────────────────────────────── */
+.card {
+  background: #111827;
+  border-color: #1f2937;
+  color: #e2e8f0;
+  box-shadow: none;
+}
+.card:hover { box-shadow: 0 0 0 1px #6366f1; }
+.card h3, .card h4 { color: #f1f5f9; }
+.card p  { color: #94a3b8; }
+.card li { color: #94a3b8; border-color: #1f2937; }
+.card a  { color: #818cf8; }
+.card strong { color: #e2e8f0; }
+.card code {
+  background: rgba(99,102,241,0.15);
+  color: #a5b4fc;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Inline-styled card variants (light backgrounds → dark) */
+.card[style*="--primary-50"],
+.card[style*="--secondary-50"],
+.card[style*="--gray-50"],
+.card[style*="background: white"],
+.card[style*="background:white"] {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+.card[style*="--success-50"] {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+.card[style*="--success-50"] strong { color: #6ee7b7 !important; }
+.card[style*="--success-50"] p,
+.card[style*="--success-50"] li { color: #a7f3d0 !important; }
+.card[style*="--error-50"] {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+.card[style*="--error-50"] strong,
+.card[style*="--error-50"] p { color: #fca5a5 !important; }
+
+/* Position-paper callout cards */
+.card[style*="border-left: 4px solid"] {
+  background: #111827 !important;
+  border-left-color: #6366f1 !important;
+}
+
+/* ── Feature cards ──────────────────────────────────────────────────────── */
+.feature-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  box-shadow: none;
+}
+.feature-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.3);
+  transform: translateY(-2px);
+}
+.feature-card h3 { color: #f1f5f9; }
+.feature-card p  { color: #94a3b8; }
+.feature-icon {
+  background: rgba(99,102,241,0.15);
+  color: #818cf8;
+}
+
+/* ── Timeline ───────────────────────────────────────────────────────────── */
+.timeline::before { background: #1f2937; }
+.timeline-item {
+  background: #111827;
+  border: 1px solid #1f2937;
+}
+.timeline-item::before { background: #6366f1; border-color: #0a0a0a; }
+.timeline-item h3 { color: #f1f5f9; }
+.timeline-item p  { color: #94a3b8; }
+.timeline-item .badge,
+.timeline-item .step-number { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+/* ── Pricing cards ──────────────────────────────────────────────────────── */
+.pricing-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  box-shadow: none;
+}
+.pricing-card h3, .pricing-card h4 { color: #f1f5f9; }
+.pricing-card p  { color: #94a3b8; }
+.pricing-card li { color: #94a3b8; }
+.pricing-card li::before { color: #6366f1; }
+.pricing-card.popular {
+  background: #1e1b4b;
+  border: 2px solid #6366f1;
+  box-shadow: 0 0 30px rgba(99,102,241,0.2);
+}
+.pricing-badge {
+  background: #6366f1;
+  color: #fff;
+}
+.pricing-features li { border-color: #1f2937; }
+
+/* ── Comparison table ───────────────────────────────────────────────────── */
+.comparison-table {
+  border-color: #1f2937;
+  background: #111827;
+}
+.comparison-table th {
+  background: #0f0f1a;
+  color: #f1f5f9;
+  border-color: #1f2937;
+}
+.comparison-table td {
+  border-color: #1f2937;
+  color: #94a3b8;
+  background: #111827;
+}
+.comparison-table tr:nth-child(even) td { background: #0f0f1a; }
+.comparison-table tr:hover td { background: #1e293b; }
+.comparison-table .check { color: #34d399; }
+.comparison-table .cross { color: #f87171; }
+.comparison-table th:first-child,
+.comparison-table td:first-child { color: #e2e8f0; }
+
+/* ── Forms ──────────────────────────────────────────────────────────────── */
+.form-input,
+.form-textarea,
+.form-select {
+  background: #1e2736;
+  border: 1px solid #374151;
+  color: #f1f5f9;
+}
+.form-input::placeholder,
+.form-textarea::placeholder { color: #6b7280; }
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  background: #252f40;
+  outline: none;
+}
+.form-label { color: #e2e8f0; }
+.form-select option { background: #1e2736; color: #f1f5f9; }
+
+/* Make the form section itself slightly lighter so inputs stand out */
+section:has(.form-input),
+section:has(.form-textarea) {
+  background: #0d0d1a;
+}
+/* Fallback for browsers without :has() */
+.section-white:has(form) { background: #0d0d1a; }
+
+/* Inline gray-bg info boxes next to forms */
+div[style*="--gray-50"],
+div[style*="var(--gray-50)"] {
+  background: #111827 !important;
+  border-radius: var(--radius-lg);
+}
+div[style*="--gray-50"] p,
+div[style*="var(--gray-50)"] p { color: #94a3b8; }
+
+/* ── Code / pre blocks ──────────────────────────────────────────────────── */
+pre {
+  background: #060608 !important;
+  border: 1px solid #1f2937;
+  color: #e2e8f0 !important;
+  font-family: 'JetBrains Mono', 'Fira Mono', monospace;
+  font-size: 13px;
+}
+pre span[data-url] { color: #818cf8; }
+pre code { background: transparent; color: inherit; }
+
+code {
+  background: rgba(99,102,241,0.12);
+  color: #a5b4fc;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+.btn-primary,
+.btn-accent {
+  background: #6366f1;
+  color: #fff;
+  border-color: transparent;
+}
+.btn-primary:hover,
+.btn-accent:hover {
+  background: #4f46e5;
+  color: #fff;
+}
+.btn-secondary {
+  background: #1f2937;
+  color: #e2e8f0;
+  border-color: #374151;
+}
+.btn-secondary:hover {
+  background: #374151;
+  color: #f1f5f9;
+}
+.btn-outline {
+  border-color: #374151;
+  color: #94a3b8;
+  background: transparent;
+}
+.btn-outline:hover {
+  border-color: #6366f1;
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.08);
+}
+.btn-ghost { color: #818cf8; }
+.btn-ghost:hover { color: #a5b4fc; }
+
+/* ── Hero badge inline variants ─────────────────────────────────────────── */
+.hero-badge[style*="--accent-100"],
+.hero-badge[style*="--primary-100"],
+.hero-badge[style*="--secondary-100"],
+.hero-badge[style*="--success-100"] {
+  background: rgba(99,102,241,0.15) !important;
+  color: #a5b4fc !important;
+}
+.hero-badge[style*="rgba(255,255,255"] { /* on gradient sections — keep as-is */ }
+
+/* ── Try It Yourself section ────────────────────────────────────────────── */
+#try-it-yourself {
+  background: linear-gradient(135deg, #1e1b4b 0%, #0f0f1a 100%) !important;
+}
+#try-it-yourself h2,
+#try-it-yourself h3 { color: #f1f5f9 !important; }
+#try-it-yourself .section-subtitle,
+#try-it-yourself > .container p { color: rgba(241,245,249,0.8) !important; }
+#try-it-yourself .hero-badge {
+  background: rgba(99,102,241,0.2) !important;
+  color: #a5b4fc !important;
+}
+#try-it-yourself .card {
+  background: rgba(17,24,39,0.85) !important;
+  border-color: rgba(99,102,241,0.2) !important;
+}
+#try-it-yourself .card h3,
+#try-it-yourself .card h4 { color: #f1f5f9 !important; }
+#try-it-yourself .card p,
+#try-it-yourself .card li { color: rgba(241,245,249,0.7) !important; }
+#try-it-yourself .text-muted { color: rgba(241,245,249,0.5) !important; }
+#try-it-yourself code {
+  background: rgba(99,102,241,0.2) !important;
+  color: #a5b4fc !important;
+}
+
+/* ── Text utilities ─────────────────────────────────────────────────────── */
+.text-muted { color: #6b7280 !important; }
+.text-gradient {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.footer {
+  background: #060608;
+  border-top: 1px solid #1f2937;
+}
+.footer h4 { color: #f1f5f9; }
+.footer p  { color: #6b7280; }
+.footer a  { color: #6b7280; }
+.footer a:hover { color: #f1f5f9; }
+.footer-brand p { color: #6b7280; }
+.footer-links a { color: #6b7280; }
+.footer-links a:hover { color: #f1f5f9; }
+.footer-bottom {
+  border-color: #1f2937;
+}
+.footer-bottom p { color: #4b5563; }
+.footer-bottom a { color: #818cf8 !important; }
+
+/* ── Dividers / HR ──────────────────────────────────────────────────────── */
+hr { border-color: #1f2937; }
+
+/* ── Comparison table (hardcoded white in style.css needs explicit override) */
+.comparison-table {
+  background: #111827 !important;
+  box-shadow: none;
+  border: 1px solid #1f2937;
+}
+.comparison-table th,
+.comparison-table td {
+  border-color: #1f2937 !important;
+  color: #e2e8f0 !important;
+}
+.comparison-table th {
+  background: #0f0f1a !important;
+  color: #f1f5f9 !important;
+}
+.comparison-table td { background: #111827 !important; color: #94a3b8 !important; }
+.comparison-table td strong { color: #e2e8f0 !important; }
+.comparison-table tr:nth-child(even) td { background: #0f0f1a !important; }
+.comparison-table .highlight {
+  background: rgba(99,102,241,0.12) !important;
+  color: #c7d2fe !important;
+}
+.comparison-table .highlight strong { color: #c7d2fe; }
+.comparison-table tr[style*="--gray-300"],
+.comparison-table tr[style*="gray-300"] {
+  border-top-color: #374151 !important;
+}
+
+/* ── Technology page — stack cards, code snippets ──────────────────────── */
+.card[style*="background: var(--gray-900)"],
+.card[style*="background: var(--gray-800)"] {
+  background: #060608 !important;
+  border-color: #1f2937 !important;
+}
+
+/* ── How It Works — numbered step circles ───────────────────────────────── */
+.step-number,
+[class*="step-"] .step-icon { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+/* ── Features page — capability sub-cards ──────────────────────────────── */
+.feature-detail,
+.capability-card {
+  background: #111827;
+  border-color: #1f2937;
+}
+.feature-detail h3,
+.capability-card h3 { color: #f1f5f9; }
+.feature-detail p,
+.capability-card p { color: #94a3b8; }
+
+/* ── Justification / todo / privacy — prose sections ───────────────────── */
+blockquote {
+  border-left-color: #6366f1;
+  background: rgba(99,102,241,0.06);
+  color: #94a3b8;
+}
+.prose h2, .prose h3 { color: #f1f5f9; }
+.prose p, .prose li { color: #94a3b8; }
