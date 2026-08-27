@@ -41,29 +41,23 @@
     <div class="container container-narrow">
       <h1>Todo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
-        The home page says this is early software and not fully tested. This page says what that
-        actually means &mdash; five things to finish before the version number reads 1.0.0, and the two
-        that come after it. There are no dates against any of them, because a date nobody is held to is
-        worse than none.
+        Five items before <b>1.0.0</b>, two after. Each carries a <i>Done when</i> somebody else can
+        check. No dates.
       </p>
     </div>
   </section>
 
   <section class="section section-white">
     <div class="container container-narrow">
-      <h2 class="text-center">What 1.0.0 means here</h2>
       <p class="text-center text-muted">
-        The repository reads <b>5.1.1</b> today. That number was never earned &mdash; it counted
-        releases, not readiness, and a reader has no way to tell those apart. So the release that is
-        genuinely production grade is <b>1.0.0</b>, counting from zero, and the five items below are
-        what it is waiting on. Each is written with what <i>done</i> looks like, so that finishing is
-        something anyone can check rather than something we get to declare.
+        The repository reads <b>5.1.1</b>. That number counted releases, not readiness, so the
+        production-grade release is <b>1.0.0</b> &mdash; a deliberate reset.
       </p>
-      <div class="stats-grid mt-4">
+      <div class="stats-grid mt-3">
         <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Before 1.0.0</div></div>
         <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">After it</div></div>
-        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Completed</div></div>
-        <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Committed dates</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Done</div></div>
+        <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Dates</div></div>
       </div>
     </div>
   </section>
@@ -72,166 +66,84 @@
     <div class="container container-narrow">
       <div class="section-header">
         <h2>Before 1.0.0</h2>
-        <p class="text-muted">In priority order. The second one is already underway; the first is where the work goes next, and it sits there because an access rule that fails open outranks a missing chapter.</p>
+        <p class="text-muted">Priority order. Item 2 is the one in progress.</p>
       </div>
       <div class="timeline">
 
         <div class="timeline-item">
-          <span class="hero-badge">1 &middot; Planned</span>
-          <h3>Address the security issues &mdash; in what we ship, and in what it generates</h3>
-          <p>
-            This site advertises role-based access control, field-level and row-level security and audit
-            trails as things a generated application gets out of the box. A claim like that is a promise
-            about someone else's data, and it has to be true by demonstration rather than by
-            architecture diagram. Two dependency trees, the same two the license audit further down
-            walks, and the second one matters more for the same reason: a weakness we ship is ours, but
-            a weakness in what we generate is deployed by somebody who trusted the generator.
-          </p>
-          <p>What has to be gone through, at minimum:</p>
+          <span class="hero-badge">1 &middot; Security</span>
+          <h3>Close the enforcement gaps, in the platform and in what it generates</h3>
+          <p class="text-sm text-muted">Two dependency trees. A weakness we ship is ours; a weakness we <i>generate</i> is deployed by someone who trusted the generator.</p>
           <ul>
-            <li>
-              <b>Enforcement that fails open.</b> The project's own notes record one already: the table
-              behind state-machine topology is never created, so the guard reads zero rows and
-              <i>every</i> transition is allowed &mdash; while continuous integration stays green over
-              it. Every guard needs a test that a permitted action is allowed <i>and</i> a forbidden one
-              is refused, because only the second one catches this.
-            </li>
-            <li>
-              <b>Defaults that must not survive a deployment.</b> A generated application ships with a
-              seeded administrator and a demo password. That is right for a page you click around in and
-              wrong the moment somebody puts it on the internet, and the generator should be the thing
-              that knows the difference.
-            </li>
-            <li>
-              <b>Secrets and configuration.</b> Session and encryption keys, what a generated
-              <code>.env.example</code> implies is safe, and what ends up in a log, a process listing or
-              a committed file.
-            </li>
-            <li>
-              <b>The usual surface, checked rather than assumed.</b> Authentication and session
-              handling, authorization on every route that touches a project, injection through
-              model-supplied identifiers, rate limiting, and dependency vulnerabilities &mdash; which
-              the license audit below is already walking the same tree for.
-            </li>
+            <li><b>Topology guard fails open.</b> <code>sys_workflow_transitions</code> is missing from the <code>scaffold</code> array in <code>nestjs-backend.generator.ts</code>, so its migration never renders, the seed fails, and <code>entity-access.guard.ts</code> reads zero rows &mdash; its <code>if (validEdges.length &gt; 0)</code> check then permits every state transition. CI stays green over it.</li>
+            <li><b>Every guard needs a negative test.</b> A permitted action passing proves nothing; only a forbidden action being <i>refused</i> catches a fail-open.</li>
+            <li><b>Demo credentials must not survive deployment.</b> Generated apps seed <code>admin@admin.com</code> / <code>admin</code>.</li>
+            <li><b>Secrets.</b> <code>SESSION_SECRET</code>, <code>JWT_SECRET</code>, <code>DB_ENCRYPTION_KEY</code>; what a generated <code>.env.example</code> implies is safe; what reaches logs and process listings.</li>
+            <li><b>Route coverage.</b> <code>requireProjectAccess</code> on every project-touching route; injection through model-supplied identifiers; rate limiting.</li>
+            <li><b>Dependency scanning</b> in CI, both trees.</li>
           </ul>
           <div class="card mt-3">
             <strong>Done when</strong>
-            <p class="text-sm">
-              Every access rule the product advertises has a test that a forbidden action is <i>refused</i>,
-              a generated application cannot be deployed with a demo credential still working, dependency
-              scanning runs on both trees in continuous integration, and the findings &mdash; including
-              the ones still open &mdash; are written down where a reader can see them rather than
-              summarised as &ldquo;enterprise security&rdquo;.
-            </p>
+            <p class="text-sm">Every advertised access rule has a test asserting refusal; a generated app cannot deploy with a demo credential live; dependency scanning gates CI on both trees; open findings are published, not summarised as &ldquo;enterprise security&rdquo;.</p>
           </div>
         </div>
 
         <div class="timeline-item">
           <span class="hero-badge">2 &middot; In progress</span>
-          <h3>Run the whole generator on the DeepSeek harness &mdash; and make it pleasant to use</h3>
-          <p>
-            Two halves of one job. The generator already talks to an OpenAI-compatible endpoint, and the
-            multi-agent pipeline &mdash; domain analysis, entities, relationships, the ERD, the
-            human-in-the-loop review &mdash; is stack-agnostic by design. The work is running the
-            <b>complete</b> pipeline on the DeepSeek harness and keeping it there: not a model swap in a
-            config file, but every agent, the retrieval that feeds them and the generation that follows,
-            exercised end to end on that harness and kept green.
-          </p>
-          <p>
-            The second half is usability, and it is the half users actually feel. Today the distance
-            between &ldquo;describe your business&rdquo; and &ldquo;click around the application&rdquo;
-            is longer than it needs to be: steps that could be inferred are asked for, errors report what
-            failed rather than what to do about it, and the model a run produces sometimes needs
-            hand-editing before the checker will take it.
-          </p>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">
-              A plain-English business description entered into the tool produces a model the checker
-              passes with zero errors and an application that runs, on the DeepSeek harness, with no
-              hand-editing anywhere in between &mdash; and the same run works from the hosted page as it
-              does from the CLI.
-            </p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">3 &middot; Planned</span>
-          <h3>Complete documentation for the generator application itself</h3>
-          <p>
-            There is a lot of documentation here, and it is all about something else. The
-            <a href="guide/index.html">twelve-chapter guide</a> builds a CRM.
-            <a href="llms-full.txt">The specification</a> is the modelling language, written for
-            language models. What is missing is the product: installing it, the project wizard and what
-            each step expects, the rule and workflow editors, what generation actually emits, the
-            enhance and deploy steps, and how to take a generated application and keep working on it.
-          </p>
-          <p>
-            It also has to cover the parts that surprise people &mdash; that two stacks come out of one
-            model, that the browser one has no per-entity source to edit, that a generated application
-            carries its own manual, its own tests and its own migrations.
-          </p>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">
-              Somebody who has never seen this project can go from a clone to a deployed application
-              they have modified, using the documentation alone, without opening the source to find out
-              what a screen does.
-            </p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">4 &middot; Planned</span>
-          <h3>End-to-end testing, over the whole of it</h3>
-          <p>
-            Continuous integration is real here and not decorative: every commit generates an
-            application from a model, builds its backend and front end, migrates a database, starts the
-            server and runs a generated suite against it &mdash; twice, once on a WebAssembly Postgres
-            with no database server anywhere. That is a good foundation and it is not complete coverage.
-          </p>
-          <p>
-            What is not covered yet: the modelling tool's own screens end to end, regeneration over an
-            application somebody has already edited, and the paths a green build can still hide. The
-            project's own notes record a migration that no scaffold entry renders, whose seed fails
-            while the run reports success &mdash; exactly the class of defect this item exists to make
-            impossible.
-          </p>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">
-              Every user-facing path has a test that fails when that path breaks, no suite tolerates a
-              failing step by logging past it, and a green build is evidence rather than a habit.
-            </p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">5 &middot; Planned</span>
-          <h3>Audit every license in the product against Apache 2.0</h3>
-          <p>
-            AppWithAI is released under the Apache License 2.0, and it has two dependency trees rather
-            than one: the tools we ship, and <b>the dependencies that end up inside an application it
-            generates for somebody else</b>. The second is the one that matters most, because a
-            generated application is the user's to own, sell and relicense &mdash; and a copyleft
-            dependency that travelled there in a template would quietly take that away from them.
-          </p>
-          <p>The audit has to answer, for every component in both trees:</p>
+          <h3>Full pipeline on the DeepSeek harness, and usability</h3>
           <ul>
-            <li>What license it is actually under, read from the package rather than assumed.</li>
-            <li>Whether it is a build-time tool or shipped at runtime &mdash; the obligations differ.</li>
-            <li>Whether it is compatible with Apache 2.0 in that role, and whether any of it is copyleft.</li>
-            <li>Whether it reaches a generated application, and under what terms the user then holds it.</li>
-            <li>What attribution we owe, and are not currently giving.</li>
+            <li><b>Whole pipeline, not a model swap.</b> Domain &rarr; entity &rarr; relationship &rarr; ERD agents, the retrieval feeding them, HITL review and generation, all exercised on the harness and kept green in CI.</li>
+            <li><b>Usability.</b> Infer what can be inferred instead of asking; errors that state the fix, not the failure; output the checker accepts without hand-editing.</li>
           </ul>
           <div class="card mt-3">
             <strong>Done when</strong>
-            <p class="text-sm">
-              A checked-in inventory of every dependency and its license across both trees, a
-              <code>NOTICE</code> file that discharges the attribution we owe, a written finding on
-              every incompatibility with what was done about it, and a continuous-integration check
-              that fails when a new dependency arrives under a license nobody has cleared.
-            </p>
+            <p class="text-sm">A plain-English description produces a model the checker passes 0 errors / 0 warnings and an application that runs, on DeepSeek, with no hand-editing &mdash; identically from the hosted page and the CLI.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">3 &middot; Documentation</span>
+          <h3>Document the product, not just the language</h3>
+          <p class="text-sm text-muted">The <a href="guide/index.html">guide</a> builds a CRM. <a href="llms-full.txt">The spec</a> is EML, for language models. Neither documents the generator.</p>
+          <ul>
+            <li>Install; the project wizard and what each step expects; the rule and workflow editors; enhance and deploy.</li>
+            <li>What generation emits, and how to keep working on a generated app.</li>
+            <li>The parts that surprise people: two stacks from one model, no per-entity source in the browser stack, generated apps carrying their own manual, tests and migrations.</li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">Someone new goes clone &rarr; deployed &rarr; modified on the documentation alone, without opening source to learn what a screen does.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">4 &middot; Testing</span>
+          <h3>End-to-end coverage over the whole surface</h3>
+          <p class="text-sm text-muted">CI already generates an app, builds both halves, migrates, boots and runs a generated suite &mdash; twice, once on WebAssembly Postgres. That is a foundation, not coverage.</p>
+          <ul>
+            <li>The modelling tool's own screens, end to end.</li>
+            <li>Regeneration over an application someone has already edited.</li>
+            <li><b>Suites that tolerate failure.</b> <code>migrate.ts</code> logs a failed seed and continues, so a broken seed exits 0. A green build must be evidence.</li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">Every user-facing path has a test that fails when it breaks, and no suite logs past a failing step.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">5 &middot; Licensing</span>
+          <h3>Audit both dependency trees against Apache 2.0</h3>
+          <p class="text-sm text-muted">A generated application is the user's to own, sell and relicense. A copyleft dependency arriving via a template takes that away silently.</p>
+          <ul>
+            <li>Actual license per component, read from the package &mdash; not assumed.</li>
+            <li>Build-time or shipped at runtime: the obligations differ.</li>
+            <li>Compatibility with Apache 2.0 in that role; any copyleft flagged.</li>
+            <li>Whether it reaches a generated app, and on what terms the user then holds it.</li>
+          </ul>
+          <div class="card mt-3">
+            <strong>Done when</strong>
+            <p class="text-sm">A checked-in inventory across both trees, a <code>NOTICE</code> discharging attribution, a written finding per incompatibility, and a CI check that fails on an uncleared license.</p>
           </div>
         </div>
 
@@ -243,90 +155,39 @@
     <div class="container container-narrow">
       <div class="section-header">
         <h2>After 1.0.0</h2>
-        <p class="text-muted">Both deliberately after. They are the most interesting items on this page and the least urgent &mdash; and the second of them is a large part of why the first item above the line is security.</p>
+        <p class="text-muted">Item 7 is a large part of why item 1 is security.</p>
       </div>
       <div class="timeline">
+
         <div class="timeline-item">
-          <span class="hero-badge">6 &middot; After 1.0.0</span>
-          <h3>A complete research agent, running entirely on a local model</h3>
-          <p>
-            Today the <a href="try-it-yourself.html">Try It Yourself</a> path asks you to leave. You copy
-            a prompt, take it to ChatGPT or Gemini Deep Research, have that model read the specification
-            and write a model file, and bring the file back here. It works &mdash; and it means the most
-            valuable step in the whole product happens somewhere we do not control, on a service you pay
-            for, with your business description sent to it.
-          </p>
-          <p>
-            The item is to close that loop: a research agent in the product itself, doing what those
-            tools do &mdash; plan an investigation, search, read, follow what it finds, weigh sources,
-            revise, and cite &mdash; but aimed at one deliverable, which is a model of <i>your</i>
-            business that the checker accepts.
-          </p>
-          <p>
-            <b>All of it on a local model.</b> The default is already
-            <code>Qwen3.8-27B-4bit</code> on an endpoint you run; the work is making it enough &mdash;
-            planning, tool use, long-context reading and revision on a 27B model, not on a frontier API
-            with a local fallback. That constraint is the point rather than a limitation to work around:
-            a business describing itself in detail is exactly the kind of thing that should not have to
-            leave the building to become software.
-          </p>
+          <span class="hero-badge">6 &middot; Research agent</span>
+          <h3>Close the loop, on a local model</h3>
+          <p class="text-sm text-muted">Today <a href="try-it-yourself.html">Try It Yourself</a> sends you out: copy a prompt, take it to ChatGPT or Gemini, bring back a <code>.mmd</code>. The highest-value step runs on a service we don't control, with your business description in it.</p>
+          <ul>
+            <li>Plan, search, read, follow, weigh sources, revise, cite &mdash; aimed at one deliverable: a model the checker accepts.</li>
+            <li>All inference on the configured local default, <code>mlx-community/Qwen3.8-27B-4bit</code>. Making 27B <i>sufficient</i> for planning, tool use and long-context revision is the work &mdash; not a frontier API with a local fallback.</li>
+          </ul>
           <div class="card mt-3">
             <strong>Done when</strong>
-            <p class="text-sm">
-              &ldquo;Build me an application for <i>X</i>&rdquo;, typed into the product, produces a
-              researched model with its sources cited and a running application &mdash; with no external
-              API call, on hardware a small company owns, and with the human-in-the-loop review still in
-              front of code generation where it belongs.
-            </p>
+            <p class="text-sm">&ldquo;Build me an application for <i>X</i>&rdquo; produces a researched, cited model and a running application &mdash; no external API call, on hardware a small company owns, HITL review still ahead of code generation.</p>
           </div>
         </div>
 
         <div class="timeline-item">
-          <span class="hero-badge">7 &middot; After 1.0.0</span>
-          <h3>Run the whole thing autonomously &mdash; OpenClaw inside a sandbox that does not trust it</h3>
-          <p>
-            The end of this list is an application that builds, tests, documents and deploys itself, and
-            keeps doing it: an autonomous agent holding the loop that a person currently drives by hand.
-            <b>OpenClaw</b> is the runtime for that half &mdash; an open-source agent with a heartbeat
-            that wakes it without being asked, installable skills, and persistent memory, running against
-            whichever model you point it at, which for us is the local one from the item above.
-          </p>
-          <p>
-            The other half is the one that makes the first half responsible rather than reckless.
-            An agent that can install packages, learn skills at runtime, spawn subagents, write files,
-            run <code>docker compose</code> and push to a repository is an agent that can do every one of
-            those things wrong, and the failure modes are not hypothetical &mdash; self-propagating
-            attacks across agent ecosystems are already a published literature.
-            <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a>
-            is the answer we intend to use: a runtime that puts the agent in a sandbox with kernel-level
-            isolation and a declarative policy governing which files it may read, where it may connect
-            and which binaries may run &mdash; enforcement living <i>outside</i> the agent, with an audit
-            trail of every allow and deny. It runs OpenClaw unmodified, which is exactly the property
-            that makes the pairing worth building on rather than a rewrite.
-          </p>
-          <p>
-            <b>Two things have to be settled honestly before this ships, and neither is a matter of
-            plumbing.</b> The first is the human-in-the-loop review, which this site calls the critical
-            differentiator and means it: &ldquo;automate everything&rdquo; must not quietly become
-            &ldquo;generate an application nobody looked at&rdquo;. The working answer is that autonomy
-            covers the mechanical loop around the model &mdash; regenerate, build, test, document,
-            deploy, keep continuous integration honest &mdash; while the model itself still stops for a
-            person. If that turns out to be wrong, the page will say so rather than the boundary moving
-            quietly. The second is that OpenShell is early preview software; depending on it is a bet,
-            and it is one to make with eyes open and a fallback, not by pretending the preview label is
-            not there.
-          </p>
+          <span class="hero-badge">7 &middot; Autonomy</span>
+          <h3>OpenClaw inside a sandbox that does not trust it</h3>
+          <ul>
+            <li><b>Runtime:</b> OpenClaw &mdash; heartbeat, installable skills, persistent memory, driving the loop a person drives today, against the local model from item 6.</li>
+            <li><b>Containment:</b> <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a> &mdash; kernel-level isolation, declarative policy over filesystem, network and binaries, enforcement outside the agent, full allow/deny audit trail. Runs OpenClaw unmodified.</li>
+            <li><b>Why containment first:</b> an agent that installs packages, learns skills at runtime, spawns subagents and pushes to a repository can do each of those wrong. Self-propagating attacks across agent ecosystems are published literature.</li>
+          </ul>
+          <p class="text-sm text-muted mt-2"><b>Two open questions, stated rather than glossed.</b> &ldquo;Automate everything&rdquo; is in tension with the human-in-the-loop review this project calls its differentiator; the working boundary is autonomy over the mechanical loop (regenerate, build, test, document, deploy, keep CI honest) with a person still ahead of the model itself &mdash; and this page will say so if that boundary moves. And OpenShell is early preview: depending on it is a bet.</p>
           <div class="card mt-3">
             <strong>Done when</strong>
-            <p class="text-sm">
-              The agent takes a model from approved to deployed and keeps it there without a human in the
-              mechanical path, every action it took is readable afterwards from the sandbox's own audit
-              trail, the policy denies by default so that a capability it was never granted is a refusal
-              rather than an oversight, and pulling the agent out leaves a repository a person can still
-              work in by hand.
-            </p>
+            <p class="text-sm">The agent takes a model from approved to deployed and keeps it there with no human in the mechanical path; every action is readable afterwards from the sandbox audit trail; the policy denies by default; and removing the agent leaves a repository a person can still work in.</p>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -334,20 +195,18 @@
   <section class="section section-gray">
     <div class="container container-narrow">
       <h2>How this list is kept</h2>
-      <p>
-        This page is versioned with the site, so its history is the change log: what moved, when, and in
-        which commit. Items are not marked done here until the &ldquo;done when&rdquo; beside them is
-        true &mdash; that is the whole point of writing them that way.
+      <p class="text-sm">
+        Versioned with the site &mdash; its history is the change log. Nothing is marked done until its
+        <i>Done when</i> is true. Order and contents change; a <i>Done when</i> does not get quietly
+        softened.
       </p>
-      <p>
-        The work happens in the open. If one of these matters to you, or you think the order is wrong,
-        <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">say so on GitHub</a>
-        &mdash; and the security review and the license audit in particular are ones an outside reader
-        is well placed to find holes in.
+      <p class="text-sm">
+        <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">Open an issue</a>
+        if the order is wrong. Items 1 and 5 are the ones an outside reader is best placed to hole.
       </p>
-      <div class="hero-cta mt-4">
-        <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-lg">Source on GitHub</a>
-        <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg">See where it is today</a>
+      <div class="hero-cta mt-3">
+        <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Source on GitHub</a>
+        <a href="guide/run-in-browser.html" class="btn btn-outline">See where it is today</a>
       </div>
     </div>
   </section>
