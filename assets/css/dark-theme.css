@@ -694,3 +694,33 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
   color: #94a3b8 !important;
 }
 .upload-zone:hover { border-color: #6366f1 !important; }
+
+/* ── Failsafe: white-background areas get dark text ─────────────────────── */
+/* If any white/light background survives the dark-theme overrides,          */
+/* ensure text is readable (dark on light) rather than invisible.            */
+[style*="background: white"] { color: #111827; }
+[style*="background:white"]  { color: #111827; }
+[style*="background: white"] p,
+[style*="background:white"] p { color: #374151 !important; }
+[style*="background: white"] strong,
+[style*="background:white"] strong { color: #111827 !important; }
+[style*="background: white"] span,
+[style*="background:white"] span { color: #374151; }
+[style*="background: white"] li,
+[style*="background:white"] li { color: #374151 !important; }
+[style*="background: white"] h2,
+[style*="background: white"] h3,
+[style*="background: white"] h4,
+[style*="background:white"] h2,
+[style*="background:white"] h3,
+[style*="background:white"] h4 { color: #111827 !important; }
+
+/* guide.css hardcoded white backgrounds */
+.guide-shell { background: #0a0a0a !important; }
+.guide-content { background: #0a0a0a !important; color: #94a3b8 !important; }
+.guide-content figure { background: #111827 !important; border-color: #1f2937 !important; }
+.guide-content .table-wrap,
+.guide-content table { background: #111827 !important; border-color: #1f2937 !important; }
+.guide-toc { background: transparent; }
+.guide-toc-body { background: transparent; }
+.guide-toc-heading { color: #6b7280 !important; }
