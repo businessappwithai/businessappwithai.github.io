@@ -142,6 +142,13 @@ The CSS is organized as a complete design system. Use existing classes — do no
 > it renders with the property dropped and no error anywhere. Check the token
 > exists in `style.css` before using it.
 
+> **A heading in a gradient hero needs `color: white` on the heading itself.**
+> `h1, h2, h3, h4, h5, h6` carry an explicit `color: var(--gray-900)`, and an
+> explicit rule beats inheritance — so `color: white` on the surrounding section
+> does nothing for the heading, which renders near-black on a dark gradient. It
+> is a contrast failure a DOM check cannot see, because the text is still there
+> and still reads correctly; only looking at the page catches it.
+
 ### Key Component Classes
 
 **Buttons:** `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-outline`, `.btn-accent`, `.btn-lg`, `.btn-sm`
