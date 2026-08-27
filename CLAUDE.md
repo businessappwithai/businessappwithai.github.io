@@ -55,7 +55,7 @@ businessappwithai.github.io/
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
 ├── privacy.html              # Every event by name, and three ways to turn it off
-├── todo.html                 # Four items before 1.0.0, one after — the short list
+├── todo.html                 # Five items before 1.0.0, one after — the short list
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
 ├── technology.html           # Tech stack options
@@ -114,7 +114,7 @@ Deployment is fully automatic:
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
-| `todo.html` | The short list, and deliberately short. **Before 1.0.0**: full testing, security testing, a detailed manual, DeepSeek harness integration. **After it**: completely autonomous app building on OpenClaw and NVIDIA OpenShell. One line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
+| `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: autonomous application delivery on OpenClaw and NVIDIA OpenShell. One line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
