@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The five things standing between AppWithAI and a 1.0.0 worth the name — security first, then the DeepSeek harness and usability, documentation, end-to-end testing, and a license audit against Apache 2.0 — and the two that come after: a local research agent, and autonomous operation under a sandboxed agent runtime.">
-  <meta name="keywords" content="AppWithAI, roadmap, todo, production grade, 1.0.0, DeepSeek, documentation, end-to-end testing, license audit, Apache 2.0, security, research agent, local model, Qwen, OpenClaw, NVIDIA OpenShell, autonomous agents, sandbox">
-  <title>Todo — The Road to 1.0.0, and What Comes After It</title>
+  <meta name="description" content="Four things before AppWithAI is 1.0.0 — full testing, security testing, a detailed manual, and DeepSeek harness integration — and one after it: completely autonomous app building on OpenClaw and NVIDIA OpenShell.">
+  <meta name="keywords" content="AppWithAI, todo, roadmap, 1.0.0, testing, security testing, manual, DeepSeek harness, OpenClaw, NVIDIA OpenShell, autonomous app building">
+  <title>Todo — The Road to 1.0.0</title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -41,173 +41,74 @@
     <div class="container container-narrow">
       <h1>Todo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
-        Five items before <b>1.0.0</b>, two after. Each carries a <i>Done when</i> somebody else can
-        check. No dates.
+        Four items remain before the <b>1.0.0</b> release. One follows it.
       </p>
     </div>
   </section>
 
   <section class="section section-white">
     <div class="container container-narrow">
-      <p class="text-center text-muted">
-        The repository reads <b>5.1.1</b>. That number counted releases, not readiness, so the
-        production-grade release is <b>1.0.0</b> &mdash; a deliberate reset.
-      </p>
-      <div class="stats-grid mt-3">
-        <div class="stat-card"><div class="stat-value">5</div><div class="stat-label">Before 1.0.0</div></div>
-        <div class="stat-card"><div class="stat-value">2</div><div class="stat-label">After it</div></div>
-        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Done</div></div>
-        <div class="stat-card"><div class="stat-value">&mdash;</div><div class="stat-label">Dates</div></div>
+      <div class="section-header">
+        <h2>Before 1.0.0</h2>
+      </div>
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <span class="hero-badge">1</span>
+          <h3>Comprehensive test coverage</h3>
+          <p>End-to-end coverage of the generator, the modelling tool and the applications it produces.</p>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">2</span>
+          <h3>Security assessment</h3>
+          <p>Access control, authentication, secrets handling and dependencies, audited across the platform and across generated applications.</p>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">3</span>
+          <h3>Complete product documentation</h3>
+          <p>A full manual for the generator, from installation through to deployment.</p>
+        </div>
+
+        <div class="timeline-item">
+          <span class="hero-badge">4</span>
+          <h3>DeepSeek harness integration</h3>
+          <p>The complete generation pipeline running on the DeepSeek harness.</p>
+        </div>
+
+      </div>
+
+      <div class="card mt-4" style="border-left: 4px solid var(--primary-500);">
+        <h3 style="margin-bottom: var(--spacing-xs);">These four constitute the 1.0.0 release</h3>
+        <p class="text-sm text-muted" style="margin: 0;">
+          The repository currently reads 5.1.1. That number tracked releases rather than production
+          readiness, so 1.0.0 is a deliberate reset.
+        </p>
       </div>
     </div>
   </section>
 
   <section class="section section-gray">
-    <div class="container container-narrow">
-      <div class="section-header">
-        <h2>Before 1.0.0</h2>
-        <p class="text-muted">Priority order. Item 2 is the one in progress.</p>
-      </div>
-      <div class="timeline">
-
-        <div class="timeline-item">
-          <span class="hero-badge">1 &middot; Security</span>
-          <h3>Close the enforcement gaps, in the platform and in what it generates</h3>
-          <p class="text-sm text-muted">Two dependency trees. A weakness we ship is ours; a weakness we <i>generate</i> is deployed by someone who trusted the generator.</p>
-          <ul>
-            <li><b>Topology guard fails open.</b> <code>sys_workflow_transitions</code> is missing from the <code>scaffold</code> array in <code>nestjs-backend.generator.ts</code>, so its migration never renders, the seed fails, and <code>entity-access.guard.ts</code> reads zero rows &mdash; its <code>if (validEdges.length &gt; 0)</code> check then permits every state transition. CI stays green over it.</li>
-            <li><b>Every guard needs a negative test.</b> A permitted action passing proves nothing; only a forbidden action being <i>refused</i> catches a fail-open.</li>
-            <li><b>Demo credentials must not survive deployment.</b> Generated apps seed <code>admin@admin.com</code> / <code>admin</code>.</li>
-            <li><b>Secrets.</b> <code>SESSION_SECRET</code>, <code>JWT_SECRET</code>, <code>DB_ENCRYPTION_KEY</code>; what a generated <code>.env.example</code> implies is safe; what reaches logs and process listings.</li>
-            <li><b>Route coverage.</b> <code>requireProjectAccess</code> on every project-touching route; injection through model-supplied identifiers; rate limiting.</li>
-            <li><b>Dependency scanning</b> in CI, both trees.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">Every advertised access rule has a test asserting refusal; a generated app cannot deploy with a demo credential live; dependency scanning gates CI on both trees; open findings are published, not summarised as &ldquo;enterprise security&rdquo;.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">2 &middot; In progress</span>
-          <h3>Full pipeline on the DeepSeek harness, and usability</h3>
-          <ul>
-            <li><b>Whole pipeline, not a model swap.</b> Domain &rarr; entity &rarr; relationship &rarr; ERD agents, the retrieval feeding them, HITL review and generation, all exercised on the harness and kept green in CI.</li>
-            <li><b>Usability.</b> Infer what can be inferred instead of asking; errors that state the fix, not the failure; output the checker accepts without hand-editing.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">A plain-English description produces a model the checker passes 0 errors / 0 warnings and an application that runs, on DeepSeek, with no hand-editing &mdash; identically from the hosted page and the CLI.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">3 &middot; Documentation</span>
-          <h3>Document the product, not just the language</h3>
-          <p class="text-sm text-muted">The <a href="guide/index.html">guide</a> builds a CRM. <a href="llms-full.txt">The spec</a> is EML, for language models. Neither documents the generator.</p>
-          <ul>
-            <li>Install; the project wizard and what each step expects; the rule and workflow editors; enhance and deploy.</li>
-            <li>What generation emits, and how to keep working on a generated app.</li>
-            <li>The parts that surprise people: two stacks from one model, no per-entity source in the browser stack, generated apps carrying their own manual, tests and migrations.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">Someone new goes clone &rarr; deployed &rarr; modified on the documentation alone, without opening source to learn what a screen does.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">4 &middot; Testing</span>
-          <h3>End-to-end coverage over the whole surface</h3>
-          <p class="text-sm text-muted">CI already generates an app, builds both halves, migrates, boots and runs a generated suite &mdash; twice, once on WebAssembly Postgres. That is a foundation, not coverage.</p>
-          <ul>
-            <li>The modelling tool's own screens, end to end.</li>
-            <li>Regeneration over an application someone has already edited.</li>
-            <li><b>Suites that tolerate failure.</b> <code>migrate.ts</code> logs a failed seed and continues, so a broken seed exits 0. A green build must be evidence.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">Every user-facing path has a test that fails when it breaks, and no suite logs past a failing step.</p>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">5 &middot; Licensing</span>
-          <h3>Audit both dependency trees against Apache 2.0</h3>
-          <p class="text-sm text-muted">A generated application is the user's to own, sell and relicense. A copyleft dependency arriving via a template takes that away silently.</p>
-          <ul>
-            <li>Actual license per component, read from the package &mdash; not assumed.</li>
-            <li>Build-time or shipped at runtime: the obligations differ.</li>
-            <li>Compatibility with Apache 2.0 in that role; any copyleft flagged.</li>
-            <li>Whether it reaches a generated app, and on what terms the user then holds it.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">A checked-in inventory across both trees, a <code>NOTICE</code> discharging attribution, a written finding per incompatibility, and a CI check that fails on an uncleared license.</p>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <section class="section section-white">
     <div class="container container-narrow">
       <div class="section-header">
         <h2>After 1.0.0</h2>
-        <p class="text-muted">Item 7 is a large part of why item 1 is security.</p>
       </div>
       <div class="timeline">
-
         <div class="timeline-item">
-          <span class="hero-badge">6 &middot; Research agent</span>
-          <h3>Close the loop, on a local model</h3>
-          <p class="text-sm text-muted">Today <a href="try-it-yourself.html">Try It Yourself</a> sends you out: copy a prompt, take it to ChatGPT or Gemini, bring back a <code>.mmd</code>. The highest-value step runs on a service we don't control, with your business description in it.</p>
-          <ul>
-            <li>Plan, search, read, follow, weigh sources, revise, cite &mdash; aimed at one deliverable: a model the checker accepts.</li>
-            <li>All inference on the configured local default, <code>mlx-community/Qwen3.8-27B-4bit</code>. Making 27B <i>sufficient</i> for planning, tool use and long-context revision is the work &mdash; not a frontier API with a local fallback.</li>
-          </ul>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">&ldquo;Build me an application for <i>X</i>&rdquo; produces a researched, cited model and a running application &mdash; no external API call, on hardware a small company owns, HITL review still ahead of code generation.</p>
-          </div>
+          <span class="hero-badge">5</span>
+          <h3>Autonomous application delivery</h3>
+          <p>
+            Integration with <b>OpenClaw</b> as the agent runtime and
+            <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a>
+            as its sandbox, for fully autonomous application building.
+          </p>
         </div>
-
-        <div class="timeline-item">
-          <span class="hero-badge">7 &middot; Autonomy</span>
-          <h3>OpenClaw inside a sandbox that does not trust it</h3>
-          <ul>
-            <li><b>Runtime:</b> OpenClaw &mdash; heartbeat, installable skills, persistent memory, driving the loop a person drives today, against the local model from item 6.</li>
-            <li><b>Containment:</b> <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a> &mdash; kernel-level isolation, declarative policy over filesystem, network and binaries, enforcement outside the agent, full allow/deny audit trail. Runs OpenClaw unmodified.</li>
-            <li><b>Why containment first:</b> an agent that installs packages, learns skills at runtime, spawns subagents and pushes to a repository can do each of those wrong. Self-propagating attacks across agent ecosystems are published literature.</li>
-          </ul>
-          <p class="text-sm text-muted mt-2"><b>Two open questions, stated rather than glossed.</b> &ldquo;Automate everything&rdquo; is in tension with the human-in-the-loop review this project calls its differentiator; the working boundary is autonomy over the mechanical loop (regenerate, build, test, document, deploy, keep CI honest) with a person still ahead of the model itself &mdash; and this page will say so if that boundary moves. And OpenShell is early preview: depending on it is a bet.</p>
-          <div class="card mt-3">
-            <strong>Done when</strong>
-            <p class="text-sm">The agent takes a model from approved to deployed and keeps it there with no human in the mechanical path; every action is readable afterwards from the sandbox audit trail; the policy denies by default; and removing the agent leaves a repository a person can still work in.</p>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </section>
-
-  <section class="section section-gray">
-    <div class="container container-narrow">
-      <h2>How this list is kept</h2>
-      <p class="text-sm">
-        Versioned with the site &mdash; its history is the change log. Nothing is marked done until its
-        <i>Done when</i> is true. Order and contents change; a <i>Done when</i> does not get quietly
-        softened.
+      <p class="text-sm text-muted mt-4">
+        Detailed scope and acceptance criteria for each item are maintained with the source:
+        <a href="https://github.com/businessappwithai/app-with-ai-tanstack/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">ROADMAP.md</a>.
       </p>
-      <p class="text-sm">
-        <a href="https://github.com/businessappwithai/app-with-ai-tanstack/issues" target="_blank" rel="noopener noreferrer">Open an issue</a>
-        if the order is wrong. Items 1 and 5 are the ones an outside reader is best placed to hole.
-      </p>
-      <div class="hero-cta mt-3">
-        <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Source on GitHub</a>
-        <a href="guide/run-in-browser.html" class="btn btn-outline">See where it is today</a>
-      </div>
     </div>
   </section>
 
