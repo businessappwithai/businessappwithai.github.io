@@ -40,9 +40,8 @@ a:hover { color: #a5b4fc; }
 
 /* ── Logo ───────────────────────────────────────────────────────────────── */
 .logo-img {
-  /* Convert logo to indigo #818cf8 to match the accent */
-  filter: brightness(0) saturate(100%) invert(64%) sepia(35%)
-          saturate(874%) hue-rotate(205deg) brightness(103%);
+  /* White logo on dark nav — clean, high-contrast, always readable */
+  filter: brightness(0) invert(1);
 }
 
 /* ── Header / Nav ───────────────────────────────────────────────────────── */
@@ -480,3 +479,218 @@ blockquote {
 }
 .prose h2, .prose h3 { color: #f1f5f9; }
 .prose p, .prose li { color: #94a3b8; }
+
+/* ── Inline div backgrounds (how-it-works pipeline, features code blocks) ── */
+div[style*="background: white"],
+div[style*="background:white"] {
+  background: #1a2035 !important;
+  color: #e2e8f0 !important;
+}
+div[style*="background: var(--gray-50)"],
+div[style*="background:var(--gray-50)"],
+div[style*="background: var(--gray-100)"],
+div[style*="background:var(--gray-100)"] {
+  background: #111827 !important;
+  color: #e2e8f0 !important;
+}
+div[style*="background: var(--secondary-50)"],
+div[style*="background:var(--secondary-50)"] {
+  background: rgba(139,92,246,0.12) !important;
+  border-color: rgba(139,92,246,0.3) !important;
+  color: #e2e8f0 !important;
+}
+div[style*="background: var(--primary-50)"],
+div[style*="background:var(--primary-50)"] {
+  background: rgba(99,102,241,0.1) !important;
+  border-color: rgba(99,102,241,0.3) !important;
+  color: #e2e8f0 !important;
+}
+
+/* Text inside inline-styled divs */
+div[style*="background: white"] strong,
+div[style*="background:white"] strong,
+div[style*="background: var(--gray-50)"] strong,
+div[style*="background: var(--gray-100)"] strong { color: #f1f5f9 !important; }
+
+div[style*="background: white"] p,
+div[style*="background:white"] p,
+div[style*="background: var(--gray-50)"] p,
+div[style*="background: var(--gray-100)"] p { color: #94a3b8 !important; }
+
+/* border-left accent divs (pipeline steps) */
+div[style*="border-left: 4px solid"] {
+  background: #1a2035 !important;
+  color: #e2e8f0 !important;
+}
+div[style*="border-left: 4px solid"] p,
+div[style*="border-left: 4px solid"] strong { color: #e2e8f0 !important; }
+
+/* ── Inline <table> without .comparison-table (how-it-works step 3) ─────── */
+table:not(.comparison-table) {
+  background: #111827;
+  border-collapse: collapse;
+}
+table:not(.comparison-table) th,
+table:not(.comparison-table) td {
+  color: #e2e8f0 !important;
+  border-color: #1f2937 !important;
+}
+table:not(.comparison-table) th { color: #f1f5f9 !important; }
+table:not(.comparison-table) tr[style*="--gray-200"],
+table:not(.comparison-table) tr[style*="--gray-100"] {
+  border-color: #1f2937 !important;
+}
+
+/* ── Guide pages — guide.css specifics ─────────────────────────────────── */
+.guide-nav { background: #0a0a0a; border-color: #1f2937; }
+.guide-nav a { color: #94a3b8; }
+.guide-nav a:hover,
+.guide-nav a.active { color: #f1f5f9; }
+.guide-nav a.active { border-color: #6366f1; }
+.chapter-nav { background: #0f0f1a; border-color: #1f2937; }
+.chapter-nav a { color: #818cf8; }
+.chapter-intro { color: #94a3b8; }
+.chapter-intro h1 { color: #f1f5f9; }
+.chapter-content { color: #94a3b8; }
+.chapter-content h2,
+.chapter-content h3,
+.chapter-content h4 { color: #f1f5f9; }
+.chapter-content p { color: #94a3b8; }
+.chapter-content li { color: #94a3b8; }
+.chapter-content code {
+  background: rgba(99,102,241,0.15);
+  color: #a5b4fc;
+}
+.chapter-content pre {
+  background: #060608 !important;
+  border: 1px solid #1f2937;
+  color: #e2e8f0 !important;
+}
+figure { background: transparent; }
+figcaption { color: #6b7280; }
+.guide-demo { background: #0f0f1a; }
+
+/* Guide run-in-browser specific */
+.run-controls { background: #111827; border-color: #1f2937; }
+.run-controls label { color: #e2e8f0; }
+.stage { background: #111827; border-color: #1f2937; }
+.stage h3 { color: #f1f5f9; }
+
+/* ── guide.css overrides ────────────────────────────────────────────────── */
+
+/* Sidebar */
+.guide-sidebar {
+  background: #0f0f1a !important;
+  border-color: #1f2937 !important;
+}
+.guide-nav a {
+  background: transparent !important;
+  color: #94a3b8 !important;
+}
+.guide-nav a:hover { color: #f1f5f9 !important; background: rgba(99,102,241,0.08) !important; }
+.guide-nav a[aria-current="page"],
+.guide-nav a.active {
+  background: rgba(99,102,241,0.15) !important;
+  color: #a5b4fc !important;
+  border-color: #6366f1 !important;
+}
+.guide-nav .guide-num { color: #6b7280 !important; }
+.guide-nav a[aria-current="page"] .guide-num { color: #818cf8 !important; }
+
+/* Chapter header area */
+.guide-header { background: #0a0a0a; border-color: #1f2937; }
+.guide-header h1 { color: #f1f5f9; }
+.guide-header p,
+.guide-header .guide-meta { color: #94a3b8; }
+.chapter-header { background: #0f0f1a; border-color: #1f2937; }
+
+/* Chapter pill / badge */
+.guide-chapter-badge,
+a.guide-chapter-badge {
+  background: rgba(99,102,241,0.15) !important;
+  color: #a5b4fc !important;
+  border-color: rgba(99,102,241,0.3) !important;
+}
+
+/* Content area */
+.guide-content { color: #94a3b8; }
+.guide-content h2,
+.guide-content h3,
+.guide-content h4 { color: #f1f5f9; }
+.guide-content p  { color: #94a3b8; }
+.guide-content li { color: #94a3b8; }
+.guide-content strong { color: #e2e8f0; }
+.guide-content a { color: #818cf8; }
+
+/* Guide note callouts */
+.guide-content .note {
+  border-left-color: #6366f1 !important;
+  background: rgba(99,102,241,0.08) !important;
+  color: #94a3b8 !important;
+}
+.guide-content .note.tip  { border-left-color: #f59e0b !important; background: rgba(245,158,11,0.08) !important; }
+.guide-content .note.warn { border-left-color: #ef4444 !important; background: rgba(239,68,68,0.08) !important; }
+.guide-content .note.win  { border-left-color: #10b981 !important; background: rgba(16,185,129,0.08) !important; }
+.guide-content .note strong { color: #e2e8f0 !important; }
+
+/* Guide code blocks */
+.guide-content pre,
+.guide-content .code-block {
+  background: #060608 !important;
+  border: 1px solid #1f2937 !important;
+  color: #e2e8f0 !important;
+}
+.guide-content code {
+  background: rgba(99,102,241,0.12);
+  color: #a5b4fc;
+}
+
+/* Guide tables (not comparison-table) */
+.guide-content table,
+.table-wrap table {
+  background: #111827 !important;
+}
+.table-wrap { border-color: #1f2937 !important; background: #111827 !important; }
+.guide-content th { background: #0f0f1a !important; color: #f1f5f9 !important; border-color: #1f2937 !important; }
+.guide-content td { color: #94a3b8 !important; border-color: #1f2937 !important; background: #111827 !important; }
+.guide-content tr:nth-child(even) td { background: #0f0f1a !important; }
+
+/* Guide figure / screenshot boxes */
+.guide-content figure,
+.guide-content .figure-wrap {
+  background: #111827 !important;
+  border: 1px solid #1f2937 !important;
+}
+.guide-content figcaption { color: #6b7280; }
+
+/* Chapter navigation links */
+.chapter-nav,
+.guide-pagination { background: #0f0f1a; border-color: #1f2937; }
+.chapter-nav a,
+.guide-pagination a { color: #818cf8; }
+
+/* Guide index chapter cards */
+.guide-card,
+a.guide-card {
+  background: #111827 !important;
+  border: 1px solid #1f2937 !important;
+  color: #e2e8f0 !important;
+}
+.guide-card:hover,
+a.guide-card:hover { border-color: #6366f1 !important; }
+.guide-card h3 { color: #f1f5f9 !important; }
+.guide-card p  { color: #94a3b8 !important; }
+.guide-card .guide-num { color: #6b7280 !important; }
+
+/* run-in-browser / run-real-stack specific */
+.guide-demo-wrap,
+.run-section { background: #0f0f1a; border-color: #1f2937; }
+.model-select-wrap { background: #111827; border-color: #1f2937; }
+select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151; }
+.status-bar { background: #0f0f1a; color: #94a3b8; border-color: #1f2937; }
+.upload-zone {
+  background: #111827 !important;
+  border-color: #374151 !important;
+  color: #94a3b8 !important;
+}
+.upload-zone:hover { border-color: #6366f1 !important; }
