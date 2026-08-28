@@ -13,9 +13,10 @@ businessappwithai.github.io/
 │       └── static.yml        # GitHub Actions: auto-deploy to GitHub Pages on push to main
 ├── assets/
 │   ├── css/
-│   │   ├── style.css         # Main stylesheet (Lunaris Design System, ~1,010 lines)
+│   │   ├── style.css         # Main stylesheet (Lunaris Design System)
 │   │   ├── guide.css         # Documentation layer for the "Build a CRM" guide
-│   │   └── guide-demo.css    # Scoped styles for the three interactive chapters
+│   │   ├── guide-demo.css    # Scoped styles for the three interactive chapters
+│   │   └── dark-theme.css    # Dark Precision — loaded last on every page
 │   ├── js/
 │   │   ├── main.js               # Main JS (scroll animations, nav, forms)
 │   │   ├── analytics.js          # PostHog: the funnel, the opt-outs, window.awTrack
@@ -160,6 +161,16 @@ The CSS is organized as a complete design system. Use existing classes — do no
 **Forms:** `.form-group`, `.form-label`, `.form-input`, `.form-select`, `.form-textarea`
 
 **Navigation:** `.header`, `.nav`, `.nav-link`, `.logo`, `.menu-toggle`
+
+> **The logo is CSS, not an image.** `.logo` is the home link on every page and
+> contains `.logo-mark` (the gradient tile carrying the brand initial) and
+> `.logo-word` (`App` · `.logo-word-dim` · `.logo-word-ai`). There is no
+> `image.png` and no `.logo-img` — the wordmark follows the theme's tokens,
+> stays crisp at any density and costs no request. `.logo::after` is the
+> **HOME** pill that appears on hover and on keyboard focus; it is positioned
+> out of flow on purpose, because the header is at its width ceiling at 1024px
+> and the home link must not grow by a pixel to say what it is. The mark and
+> the type both step down in the 1024–1279px query for the same reason.
 
 **Badges and stats:** `.hero-badge`, `.stats-grid`, `.stat-card`, `.stat-value`, `.stat-label`
 
@@ -427,7 +438,11 @@ fire on it and the roles that may read it.
   `guide/models/` and `guide/wasm-app/` must stay siblings.
 - `guide-demo.css` is scoped entirely to `.guide-demo` so that the demo's own `.btn`, `.card`, `.stage`
   and similar names never collide with the Lunaris classes. Its palette is a token bridge onto the
-  design system variables — change the bridge, not the individual rules.
+  design system variables — change the bridge, not the individual rules. **`dark-theme.css` re-points
+  that bridge rather than restyling the demo**, and scopes an inverted `--gray-*` ramp to
+  `.guide-shell` so guide.css's own `var(--gray-900)` text and `var(--gray-50)` surfaces land dark
+  too. Add a component to either stylesheet and it arrives on theme with nothing to do in the theme
+  file; only a rule naming `white` outright needs an entry there.
 
 ## Chapter 10 — the real stack in a WebContainer
 
