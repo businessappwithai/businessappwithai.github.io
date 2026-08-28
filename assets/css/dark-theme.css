@@ -39,9 +39,17 @@ a { color: #818cf8; }
 a:hover { color: #a5b4fc; }
 
 /* ── Logo ───────────────────────────────────────────────────────────────── */
-.logo-img {
-  /* White logo on dark nav — clean, high-contrast, always readable */
-  filter: brightness(0) invert(1);
+/* The wordmark is CSS (see `.logo` in style.css), so the dark theme only has
+   to restate the two type colours and warm the tile's glow to the indigo the
+   rest of this file uses. */
+.logo-word { color: #f1f5f9; }
+.logo-word-dim { color: #64748b; }
+.logo-mark { box-shadow: 0 6px 18px -8px rgba(99, 102, 241, 0.95); }
+.logo:hover .logo-mark { box-shadow: 0 9px 24px -8px rgba(99, 102, 241, 1); }
+.logo::after {
+  background: #6366f1;
+  color: #f8fafc;
+  box-shadow: 0 8px 20px -10px rgba(99, 102, 241, 0.9);
 }
 
 /* ── Header / Nav ───────────────────────────────────────────────────────── */
@@ -724,3 +732,116 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
 .guide-toc { background: transparent; }
 .guide-toc-body { background: transparent; }
 .guide-toc-heading { color: #6b7280 !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   The guide shell — theming the tokens rather than the rules
+   ───────────────────────────────────────────────────────────────────────────
+   guide.css and guide-demo.css were authored against the Lunaris tokens, and
+   this file re-points the accent ramps but left `--gray-*` alone, so every
+   `var(--gray-900)` text and `var(--gray-50)` surface inside the guide kept
+   its light-mode value: a near-black sidebar title on a near-black sidebar,
+   a white progress panel, white step cards. The fix belongs on the ramp, not
+   on each rule — an inverted neutral scale scoped to the guide shell, and the
+   demo's own token bridge re-pointed on top of it. Add a component to either
+   stylesheet and it lands dark with nothing to do here.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The neutral ramp, inverted, scoped to the guide ────────────────────── */
+/* Scoped rather than global: the marketing pages are already dark by way of
+   several hundred explicit overrides above, and inverting the ramp under them
+   would apply the correction twice. */
+.guide-shell {
+  --gray-50:  #0f0f1a;
+  --gray-100: #151522;
+  --gray-200: #1f2937;
+  --gray-300: #374151;
+  --gray-400: #6b7280;
+  --gray-500: #94a3b8;
+  --gray-600: #94a3b8;
+  --gray-700: #cbd5e1;
+  --gray-800: #e2e8f0;
+  --gray-900: #f1f5f9;
+}
+
+/* ── guide.css: the surfaces that name `white` outright ─────────────────── */
+.guide-main { background: #0a0a0a; }
+.guide-sidebar-title { color: #f1f5f9; }
+.guide-eyebrow-label { color: #6b7280; }
+.guide-sidebar-foot { color: #6b7280; }
+.guide-sidebar-foot code { background: rgba(99, 102, 241, 0.12); color: #a5b4fc; }
+.guide-toc-summary,
+.guide-toc-current { background: #111827; color: #e2e8f0; border-color: #1f2937; }
+
+.guide-content .lede { color: #cbd5e1; }
+.guide-content h4 { color: #6b7280; }
+
+/* The chapter pager — two cards that stayed white under `.pager`, which the
+   `.guide-pagination` overrides above never matched. */
+.guide-content .pager a {
+  background: #111827;
+  border-color: #1f2937;
+  color: #e2e8f0;
+}
+.guide-content .pager a:hover { border-color: #6366f1; }
+.guide-content .pager .dir { color: #6b7280; }
+.guide-content .pager .ttl { color: #f1f5f9; }
+.guide-content .pager { border-top-color: #1f2937; }
+
+.guide-content .stat { background: #111827; border-color: #1f2937; }
+.guide-content .stat .n { color: #f1f5f9; }
+
+/* A screenshot is its own image and keeps a light mat, but the frame around it
+   belongs to the page. */
+.guide-content figure img { background: #0f0f1a; border-color: #1f2937; }
+
+/* ── guide-demo.css: the token bridge, re-pointed ───────────────────────── */
+/* guide-demo.css bridges its own palette onto the Lunaris tokens once, at the
+   top of the file, and every rule in it reads through that bridge. Three of
+   the bridge's entries name `white` directly and the tinted ones point at the
+   50-step of each ramp, which this theme does not restate — so the bridge is
+   where the demo is made dark, exactly as guide-demo.css asks. */
+.guide-demo {
+  --bg: #0a0a0a;
+  --bg-soft: #0f0f1a;
+  --bg-sunken: #151522;
+  --surface: #111827;
+  --border: #1f2937;
+  --border-strong: #374151;
+  --text: #f1f5f9;
+  --text-soft: #94a3b8;
+  --text-faint: #6b7280;
+
+  --accent: #6366f1;
+  --accent-soft: rgba(99, 102, 241, 0.14);
+  --teal: #818cf8;
+  --teal-soft: rgba(129, 140, 248, 0.14);
+  --violet: #a78bfa;
+  --violet-soft: rgba(167, 139, 250, 0.14);
+  --red: #f87171;
+  --red-soft: rgba(248, 113, 113, 0.13);
+  --green: #34d399;
+  --green-soft: rgba(52, 211, 153, 0.13);
+
+  --bad: #fca5a5;
+
+  --shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9);
+}
+
+/* The two demo chips and the sign-in note read as text on their own tint, so
+   they take the lighter step of the ramp rather than the 600 the bridge used
+   against white. */
+.guide-demo .chip--rule { color: #c4b5fd; }
+.guide-demo .chip--flow { color: #a5b4fc; }
+.guide-demo .credentials { color: #cbd5e1; }
+.guide-demo .credentials b { color: #f1f5f9; }
+
+/* Indigo keeps its white label — that is the pairing the header's own buttons
+   use. The two swatches that got genuinely light in the bridge, so that they
+   would read as text on a dark ground, take the obsidian label instead. */
+.guide-demo .flow-step[data-state="done"] .flow-step__num { color: #0a0a0a; }
+.guide-demo .diag--error .diag__sev,
+.guide-demo .diag--fixed .diag__sev { color: #0a0a0a; }
+
+/* The application runs in this frame with its own design system; the page owns
+   only the border around it. */
+.guide-demo .stage iframe { background: #0f0f1a; }

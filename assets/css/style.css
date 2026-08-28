@@ -302,17 +302,115 @@ a:hover {
   margin: 0 auto;
 }
 
+/* The logo is a CSS wordmark rather than an image: it inherits the theme's
+   tokens, stays crisp at any density, and costs no request. It is also the
+   home link on every page, so it says so — see `.logo::after` below. */
 .logo {
+  position: relative;
   text-decoration: none;
   display: flex;
   align-items: center;
+  gap: 0.625rem;
   flex-shrink: 0;
+  line-height: 1;
 }
 
-.logo-img {
-  height: 38px;
-  width: auto;
-  display: block;
+.logo-mark {
+  position: relative;
+  isolation: isolate;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
+  color: white;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  box-shadow: 0 6px 16px -8px var(--primary-600);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* A light falling across the tile. Painted as a child so it sits over the
+   gradient; `isolation: isolate` on the tile keeps the negative z-index above
+   the tile's own background and below the letter. */
+.logo-mark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 58%);
+}
+
+.logo-word {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--gray-900);
+  white-space: nowrap;
+}
+
+.logo-word-dim {
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.logo-word-ai {
+  background: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Every page's logo goes home, and a wordmark leaves that to convention. This
+   pill says it outright on hover and on keyboard focus. It is positioned out
+   of flow on purpose: the header carries seven nav items plus two buttons at
+   1024px, and the home link must not grow by a single pixel to say this. */
+.logo::after {
+  content: "Home";
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-500);
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.logo:hover::after,
+.logo:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.logo:hover .logo-mark {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 22px -8px var(--primary-500);
+}
+
+.logo:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 5px;
+  border-radius: var(--radius-md);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-mark,
+  .logo::after { transition: none; }
+  .logo:hover .logo-mark { transform: none; }
 }
 
 .nav {
@@ -925,6 +1023,13 @@ a:hover {
     padding: 0.65rem 1.1rem;
     font-size: var(--text-sm);
   }
+
+  /* The wordmark tightens with the nav. Seven items plus two buttons fit at
+     1024px with the logo at this size — measured, and the reason the mark and
+     the type both step down rather than only one of them. */
+  .logo { gap: 0.5rem; }
+  .logo-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 0.9375rem; }
+  .logo-word { font-size: 1.0625rem; }
 }
 
 /* Tablet and below — collapse the navigation behind the menu toggle */
@@ -961,6 +1066,10 @@ a:hover {
   :root {
     --container-padding: 1rem;
   }
+
+  .logo { gap: 0.5rem; }
+  .logo-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 0.9375rem; }
+  .logo-word { font-size: 1.0625rem; }
 
   h1 { font-size: var(--text-4xl); }
   h2 { font-size: var(--text-3xl); }
