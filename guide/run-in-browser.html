@@ -171,7 +171,7 @@
           <span class="choice__name">Use the CRM example</span>
           <span class="choice__desc">
             The seventeen-entity CRM from this guide: eight rules, five state machines, five sagas and
-            fifteen access restrictions. Nothing to download.
+            thirty-two access restrictions. Nothing to download.
           </span>
           <span class="choice__meta">language/examples/crm.eml.mmd</span>
         </button>
@@ -182,6 +182,15 @@
             CAPAs. Useful for seeing rules refuse a write.
           </span>
           <span class="choice__meta">examples/drug-discovery.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
+          <span class="choice__name">Use the hospital example</span>
+          <span class="choice__desc">
+            Twenty-eight entities across admissions, wards and beds, orders and results, billing and
+            stock — nine state machines and eighty-seven access restrictions. The one where the person
+            entity is <code>Staff</code> rather than <code>User</code>.
+          </span>
+          <span class="choice__meta">examples/hospital-management-system.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-upload" aria-pressed="false">
           <span class="choice__name">Upload your own</span>
@@ -212,7 +221,7 @@
       <span class="flow-step__num">2</span>
       <div>
         <h2 class="flow-step__title">Generate the application</h2>
-        <p class="flow-step__hint">The same parser and compiler the <code>erdwithai-wasm</code> command runs, bundled for the browser.</p>
+        <p class="flow-step__hint">The same parser and compiler the <code>appwithai-wasm</code> command runs, bundled for the browser.</p>
       </div>
     </header>
     <div class="flow-step__body">

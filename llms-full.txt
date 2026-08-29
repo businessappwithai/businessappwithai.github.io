@@ -13,8 +13,8 @@
 > file. Not a specification, a report, or a summary with the model somewhere
 > inside it. §1 is the procedure; §1.0 says exactly what "delivered" means.
 
-- **EML version**: 1.2.0 · **Based on**: Mermaid · **Updated**: 2026-08-19
-- **Authority**: `language/erdwithai-language.json`. Where this document and that
+- **EML version**: 1.2.0 · **Based on**: Mermaid · **Updated**: 2026-08-29
+- **Authority**: `language/appwithai-language.json`. Where this document and that
   file disagree, that file wins.
 - **Validators** (§8): `https://appwithai.org/guide/checker.js` and
   `https://appwithai.org/guide/fixer.js`
@@ -530,7 +530,7 @@ there.
 The `_id` spelling is a different column and a legitimate one:
 `created_by` is the generator's audit stamp — a bare UUID with no lookup —
 while `created_by_id FK` is a reference you modelled, and it resolves to your
-`User` entity with a lookup on it (§3.5). If you want the author of a record to
+model's person entity with a lookup on it (§3.5). If you want the author of a record to
 be selectable and shown by name, declare `created_by_id FK`, not `created_by`.
 
 ### 3.2 Types
@@ -617,14 +617,22 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
   because `po_line` reads back as `PoLine` — an entity whose name runs two
   capitals together cannot be reached by a foreign key. Name such an entity
   `PurchaseOrderLine` rather than trying to spell the column around it.
-- **Columns naming a person resolve to `User`, but only by an exact list.**
-  Anything ending `_by` or `_by_id` — `created_by_id`, `approved_by_id`,
-  `received_by_id` — plus these names: `assigned_to`, `author_id`,
-  `lab_manager_id`, `manager_id`, `owner_id`, `pi_id`, `remediation_owner`,
-  `remediation_owner_id`, `user_id`. Nothing else. `approver_id` derives
-  `Approver` and `assigned_to_id` derives `AssignedTo` — entities nobody
-  declared, so both raise `EML502` while looking entirely reasonable. Name person
-  columns `<verb>_by_id` (`approved_by_id`) or use `owner_id`.
+- **Columns naming a person resolve to the model's person entity, but only by an
+  exact list.** Anything ending `_by` or `_by_id` — `created_by_id`,
+  `approved_by_id`, `received_by_id` — plus these names: `assigned_to`,
+  `author_id`, `lab_manager_id`, `manager_id`, `owner_id`, `pi_id`,
+  `remediation_owner`, `remediation_owner_id`, `user_id`. Nothing else.
+  `approver_id` derives `Approver` and `assigned_to_id` derives `AssignedTo` —
+  entities nobody declared, so both raise `EML502` while looking entirely
+  reasonable. Name person columns `<verb>_by_id` (`approved_by_id`) or use
+  `owner_id`.
+- **Which entity that is, is read off your model.** `User` if you declared one,
+  otherwise `Staff`, otherwise `Employee` — the first of the three that exists.
+  So `pi_id` in a research model with a `User` entity resolves to `User`, and
+  `reported_by_id` in a hospital model that has `Staff` and no `User` resolves to
+  `Staff` rather than raising `EML502` for a `User` entity you never wrote. A
+  model with none of the three still resolves to `User`, which is the diagnostic
+  you want: declare a person entity, or the reference has nothing to point at.
 - **Two names on that list are traps**: `assigned_to` and `remediation_owner` are
   recognised, but they do not end `_id`, so they raise `EML114` — and the repair
   renames them to `assigned_to_id` and `remediation_owner_id`, which are *not* on
@@ -1058,6 +1066,20 @@ described in prose. Draw every move you intend to allow, including the ones that
 go backwards: `confirmed --> requested : reopen` is one line, and without it
 reopening a booking is a 403.
 
+**The two questions are answered separately, and only one of them a master role
+bypasses.** Whether an edge *exists* is decided by the diagram and enforced from
+`sys_workflow_transitions` for every caller. *Who may cross* an edge that exists
+is `%%rbac`'s question, answered from `sys_transition_access`, and that one a
+master role does bypass. So an edge no `%%rbac` names is open to any
+authenticated caller, while an edge the diagram omits is refused to everyone.
+Checking topology only where a role rule happened to cover it would leave every
+unguarded edge open, which is why they are kept apart.
+
+`GET /api/workflows/transitions` returns the stored edges, narrowable with
+`?table=` and `?from=`. A screen offering a status change should ask this and
+offer only the moves that exist, rather than offering every state and letting the
+save be refused.
+
 The word after the colon is the **transition event**, and it is what `%%rbac`
 names to restrict who may make that move (§6).
 
@@ -1210,7 +1232,13 @@ Three mechanical rules that cause most saga failures:
 
 **It restricts; it does not grant.** A target no directive names is open to any
 authenticated caller. One or more directives close that target to the union of
-the roles they name. Role names match case-insensitively.
+the roles they name. Role names match case-insensitively, and a role flagged
+`is_admin` — the master role — bypasses.
+
+**The master bypass is over access, not over the shape of the model.** It answers
+"may this caller do this thing", so it opens any `%%rbac` target. It does not
+open a state-machine edge the diagram never drew: that refusal is topological
+(§5.2), and an administrator is refused it like everyone else.
 
 `<op>` is a CRUD operation — `create` `read` `update` `delete` `*` — **or** a
 transition event from that entity's `stateDiagram-v2` (§5.2).

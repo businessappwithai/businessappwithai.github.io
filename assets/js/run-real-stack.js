@@ -16,6 +16,15 @@
  * that is what a WebContainer is — and the page says so.
  */
 
+// The published validator — the same file `llms-full.txt` §1.3 and §8 point a
+// model at. Checking here, when the model is chosen, rather than only inside
+// `generateFullStack`: the reader is looking at the model now, and a document
+// with an error is not going to become an application by pressing Assemble.
+//
+// Local delta: `../../guide/fixer.js` rather than upstream's `../fixer.js`,
+// because this site publishes the validators under `guide/` while this module
+// lives under `assets/js/`.
+import { checkAndFix } from "../../guide/fixer.js";
 import { generateFullStack, loadTemplates } from "./erdwithai-fullstack.js";
 
 /** Vendored under assets/vendor rather than pulled from esm.sh: one less host
@@ -54,6 +63,11 @@ const BUILT_IN = {
     label: "drug-discovery.eml.mmd",
     name: "Drug Discovery",
   },
+  hospital: {
+    path: "models/hospital-management-system.eml.mmd",
+    label: "hospital-management-system.eml.mmd",
+    name: "Hospital Management System",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -71,6 +85,7 @@ const state = { source: "", label: "", files: null, templates: null, container: 
  */
 const PHASES = [
   { id: "model", label: "Read the model", weight: 3 },
+  { id: "check", label: "Check it", weight: 3 },
   { id: "templates", label: "Fetch the templates", weight: 5 },
   { id: "assemble", label: "Assemble the application", weight: 7 },
   { id: "boot", label: "Boot the WebContainer", weight: 15 },
@@ -145,7 +160,7 @@ const build = {
     $("build-bar").setAttribute("aria-valuenow", String(pct));
     $("build-phases").innerHTML = PHASES.map(
       (phase) =>
-        `<li class="build__phase" data-state="${this.status[phase.id]}">` +
+        `<li class="build__phase" data-phase="${phase.id}" data-state="${this.status[phase.id]}">` +
         `<span class="build__tick"></span>${escapeHtml(phase.label)}</li>`
     ).join("");
   },
@@ -156,6 +171,7 @@ const build = {
 const choices = [
   [$("choice-crm"), "crm"],
   [$("choice-drug"), "drug"],
+  [$("choice-hospital"), "hospital"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -181,8 +197,12 @@ async function selectChoice(kind) {
 }
 
 $("file").addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
+  const input = event.target;
+  const file = input.files?.[0];
   if (file) readFile(file);
+  // See run-in-browser.js: without this, re-choosing the file you just fixed
+  // fires no `change` and the stale findings simply stay on screen.
+  input.value = "";
 });
 for (const type of ["dragenter", "dragover"]) {
   $("dropzone").addEventListener(type, (event) => {
@@ -231,8 +251,68 @@ function setModel(source, label) {
 
   setStep("step-model", "done");
   build.done("model");
+
+  build.start("check", "Checking the model against the EML language definition");
+  const review = checkModel(source);
+  if (!review.ok) {
+    build.fail("check", `${review.counts.errors} error(s) — nothing was assembled`);
+    setStep("step-generate", "idle");
+    setStep("step-run", "idle");
+    return;
+  }
+  build.done("check", describeReview(review));
+
   setStep("step-generate", "active");
   setStep("step-run", "idle");
+}
+
+/**
+ * Check the model, repairing what the fixer can repair.
+ *
+ * The repaired source replaces the loaded one, so what gets assembled is what
+ * the reader is being shown findings about.
+ */
+function checkModel(source) {
+  let review;
+  try {
+    const result = checkAndFix(source);
+    review = { ...result, issues: result.remaining };
+  } catch (error) {
+    review = {
+      ok: false,
+      repaired: false,
+      source,
+      fixes: [],
+      counts: { errors: 1, warnings: 0, infos: 0 },
+      issues: [
+        {
+          severity: "error",
+          code: "EML000",
+          message: `This file could not be read as EML: ${error.message}`,
+          hint: "An EML document is a Mermaid file with an erDiagram section.",
+        },
+      ],
+    };
+  }
+  if (review.repaired) state.source = review.source;
+  renderDiagnostics(review);
+  return review;
+}
+
+function describeReview(review) {
+  const { errors } = review.counts;
+  return [`${errors} error${errors === 1 ? "" : "s"}`, ...describeRest(review)].join(" · ");
+}
+
+/** The counts other than errors — the header states that one itself. */
+function describeRest(review) {
+  const { warnings, infos } = review.counts;
+  const applied = (review.fixes || []).filter((fix) => fix.applied).length;
+  const parts = [];
+  if (applied) parts.push(`${applied} auto-fix${applied === 1 ? "" : "es"} applied`);
+  if (warnings) parts.push(`${warnings} warning${warnings === 1 ? "" : "s"}`);
+  if (infos) parts.push(`${infos} info`);
+  return parts;
 }
 
 /* ------------------------------------------------------------------ step 2 */
@@ -293,7 +373,7 @@ function showResult(result) {
     <p class="result__note">
       The WebAssembly overlay added ${overlay.added.length} files, rewrote
       ${overlay.rewritten.length} and moved ${overlay.debunned.length} scripts off Bun.
-      Every other file is what <code>erdwithai</code> generates, unchanged.
+      Every other file is what <code>appwithai</code> generates, unchanged.
     </p>`;
   $("result").classList.add("is-shown");
 }
@@ -304,10 +384,19 @@ const cell = (value, label) =>
 function renderDiagnostics(review) {
   const box = $("diagnostics");
   const loud = review.issues.filter((issue) => issue.severity !== "info");
+  if (review.ok && !loud.length) {
+    box.hidden = true;
+    return;
+  }
   box.hidden = false;
   box.dataset.state = review.ok ? "ok" : "failed";
+  // Every interpolation below is either a number this module computed or passed
+  // through escapeHtml, the same as upstream.
+  const head = review.ok
+    ? "The checker accepted this model"
+    : `The checker refused this model — ${review.counts.errors} error${review.counts.errors === 1 ? "" : "s"}`;
   box.innerHTML =
-    `<div class="diag__head"><b>The checker refused this model — ${review.counts.errors} error(s)</b></div>` +
+    `<div class="diag__head"><b>${head}</b><span>${escapeHtml(describeRest(review).join(" · "))}</span></div>` +
     `<ul class="diags">${loud
       .map(
         (issue) => `<li class="diag diag--${issue.severity}">
@@ -318,7 +407,14 @@ function renderDiagnostics(review) {
           ${issue.hint ? `<span class="diag__hint">${escapeHtml(issue.hint)}</span>` : ""}
         </li>`
       )
-      .join("")}</ul>`;
+      .join("")}</ul>` +
+    (review.ok
+      ? ""
+      : `<p class="diag__foot"><b>Nothing was assembled.</b> Fix the ${
+          review.counts.errors === 1 ? "line above" : "lines above"
+        } in your
+           <code>.mmd</code> file, save it, and choose it again — this page re-checks every time
+           a model is loaded, so you can correct and re-submit until it passes.</p>`);
 }
 
 /* ------------------------------------------------------------------ step 3 */

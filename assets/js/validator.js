@@ -12,7 +12,7 @@
  * validation, a model could pass here and fail in the generator, and a reader
  * would have no way to tell which one was lying. Everything below goes through
  * the published modules, at the published URLs, so what this page says is what
- * `erdwithai` will say.
+ * `appwithai` will say.
  */
 
 import { check, formatReport, AUTO_FIXABLE, LANGUAGE_VERSION } from "../../guide/checker.js";
@@ -21,6 +21,10 @@ import { checkAndFix } from "../../guide/fixer.js";
 const EXAMPLES = {
   crm: { path: "models/crm.eml.mmd", label: "crm.eml.mmd" },
   drug: { path: "models/drug-discovery.eml.mmd", label: "drug-discovery.eml.mmd" },
+  hospital: {
+    path: "models/hospital-management-system.eml.mmd",
+    label: "hospital-management-system.eml.mmd",
+  },
 };
 
 /**
@@ -72,19 +76,26 @@ const state = { label: "crm.eml.mmd" };
  * these lines are unconditional. The codes travel; the messages do not, because
  * a message carries the reader's own entity names.
  */
-const verdictOf = (result, extra) => ({
-  model_name: state.label,
-  checker_error_count: result.counts.errors,
-  checker_warning_count: result.counts.warnings,
-  checker_info_count: result.counts.infos,
-  codes: [...new Set(result.issues.filter((i) => i.severity === "error").map((i) => i.code))],
-  ...extra,
-});
+const verdictOf = (result, extra) => {
+  // `check` reports its findings as `issues`; `checkAndFix` reports the ones
+  // that survived the repair as `remaining`. Both call through here, and reading
+  // only `issues` threw on the repair path — which took the whole handler down
+  // with it, so "Check and repair" rendered nothing at all.
+  const issues = result.issues ?? result.remaining ?? [];
+  return {
+    model_name: state.label,
+    checker_error_count: result.counts.errors,
+    checker_warning_count: result.counts.warnings,
+    checker_info_count: result.counts.infos,
+    codes: [...new Set(issues.filter((i) => i.severity === "error").map((i) => i.code))],
+    ...extra,
+  };
+};
 
 /* --------------------------------------------------------------- the model */
 
 async function load(key) {
-  for (const id of ["choice-crm", "choice-drug", "choice-broken", "choice-paste"]) {
+  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", String(id === `choice-${key}`));
   }
 
@@ -187,7 +198,7 @@ function notAModel(issues) {
 }
 
 function verdict(ok, counts) {
-  if (ok && !counts.warnings) return `<div class="verdict verdict--ok">Clean. <code>erdwithai generate</code> will accept this model.</div>`;
+  if (ok && !counts.warnings) return `<div class="verdict verdict--ok">Clean. <code>appwithai generate</code> will accept this model.</div>`;
   if (ok) return `<div class="verdict verdict--warn">No errors, but ${counts.warnings} warning(s). Warnings describe something the generator accepts and quietly gets wrong — clear them, or be able to say why you left them.</div>`;
   return `<div class="verdict verdict--bad">${counts.errors} error(s). The generator would refuse this model; do not hand it over in this state.</div>`;
 }
@@ -266,7 +277,7 @@ $("fix").addEventListener("click", () => {
  * Hand the document back as a file — but only a document the generator would
  * accept. The button appears when a run comes back with no errors, whether it
  * needed repairs or not, and stays hidden when errors remain: handing someone a
- * file that `erdwithai generate` will refuse is the failure this page exists to
+ * file that `appwithai generate` will refuse is the failure this page exists to
  * catch, not a convenience.
  *
  *
@@ -302,6 +313,7 @@ $("download-fixed").addEventListener("click", () => {
 
 $("choice-crm").addEventListener("click", () => load("crm"));
 $("choice-drug").addEventListener("click", () => load("drug"));
+$("choice-hospital").addEventListener("click", () => load("hospital"));
 $("choice-broken").addEventListener("click", () => load("broken"));
 $("choice-paste").addEventListener("click", () => {
   window.awTrack?.("upload_started", { method: "paste" });
@@ -318,7 +330,7 @@ $("file").addEventListener("change", async (event) => {
     model_size: file.size,
     model_source: "upload",
   });
-  for (const id of ["choice-crm", "choice-drug", "choice-broken", "choice-paste"]) {
+  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", "false");
   }
   reset();
