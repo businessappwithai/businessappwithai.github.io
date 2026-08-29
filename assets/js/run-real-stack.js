@@ -25,7 +25,7 @@
 // because this site publishes the validators under `guide/` while this module
 // lives under `assets/js/`.
 import { checkAndFix } from "../../guide/fixer.js";
-import { generateFullStack, loadTemplates } from "./erdwithai-fullstack.js";
+import { generateFullStack, loadTemplates } from "./appwithai-fullstack.js";
 
 /** Vendored under assets/vendor rather than pulled from esm.sh: one less host
  *  to trust, and one less thing to be down. Resolved against this module. */

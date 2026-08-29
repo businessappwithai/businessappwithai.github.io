@@ -40,12 +40,14 @@ a:hover { color: #a5b4fc; }
 
 /* ── Logo ───────────────────────────────────────────────────────────────── */
 .logo-img {
-  /* Original logo in a white pill — readable on any dark nav */
+  /* Original logo in a white pill — readable on any dark nav.
+     The pill's padding and radius are scaled with the mark, so doubling the
+     height reads as a bigger logo rather than a logo in a tighter box. */
   filter: none;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 3px 10px;
-  height: 28px;
+  border-radius: 12px;
+  padding: 6px 20px;
+  height: 56px;
 }
 
 /* ── Header / Nav ───────────────────────────────────────────────────────── */
@@ -779,6 +781,18 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
 /* ── Guide demo section (run-in-browser, run-real-stack, check-a-model) ──── */
 /* guide-demo.css uses a local token bridge starting with --bg: white.        */
 /* Override every token so the interactive demo matches the dark theme.       */
+/* The storage permission dialog lives in the top layer, outside .guide-demo,
+   so the bridge above cannot reach it. Same palette, stated for the dialog.    */
+.storage-ask {
+  --ask-surface:    #111827;
+  --ask-border:     #1f2937;
+  --ask-text:       #e2e8f0;
+  --ask-text-soft:  #94a3b8;
+  --ask-btn-bg:     #1e2736;
+  --ask-btn-border: #374151;
+  --ask-btn-hover:  #253044;
+}
+
 .guide-demo {
   --bg:           #0a0a0a;
   --bg-soft:      #111827;

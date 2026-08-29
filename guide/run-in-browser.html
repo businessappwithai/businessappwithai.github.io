@@ -289,7 +289,6 @@
 
       <div class="credentials" id="credentials" hidden></div>
       <div class="log" id="log" hidden></div>
-
       <div class="stage" id="stage">
         <div class="stage__bar">
           <span class="stage__dot"></span>
@@ -441,6 +440,25 @@ bun run wasm serve ./crm</code></pre>
       </div>
     </div>
   </footer>
+
+
+    <!--
+      Asked before the application boots, and only when there is something to
+      clear. Each run keeps a real PostgreSQL in IndexedDB; left alone they
+      accumulate until the browser's quota for this site runs out, and the
+      failure that follows names WebAssembly rather than storage. Clearing is
+      the reader's call, because the data is theirs.
+    -->
+    <dialog class="storage-ask" id="storage-ask" aria-labelledby="storage-ask-title">
+      <form method="dialog">
+        <h3 class="storage-ask__title" id="storage-ask-title">Clear the databases from earlier runs?</h3>
+        <p class="storage-ask__detail" id="storage-ask-detail"></p>
+        <div class="storage-ask__actions">
+          <button type="submit" class="btn" value="keep">Keep them</button>
+          <button type="submit" class="btn btn--go" value="clear" autofocus>Clear and continue</button>
+        </div>
+      </form>
+    </dialog>
 
   <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>

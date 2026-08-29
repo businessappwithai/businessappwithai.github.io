@@ -408,8 +408,8 @@
       if (teamSize === 'large') teamMultiplier = 2;
 
       const traditionalCost = numApps * baseCost * teamMultiplier * (duration / 6);
-      const erdwithAI = numApps * 10000 + (duration * 2000);
-      const savings = traditionalCost - erdwithAI;
+      const appWithAI = numApps * 10000 + (duration * 2000);
+      const savings = traditionalCost - appWithAI;
 
       document.getElementById('savingsAmount').textContent = '$' + Math.max(0, Math.round(savings)).toLocaleString();
     }
