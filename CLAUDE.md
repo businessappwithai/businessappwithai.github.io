@@ -25,8 +25,8 @@ businessappwithai.github.io/
 │   │   ├── run-real-stack.js     # Controller for chapter 10
 │   │   ├── validator.js          # Controller for chapter 11
 │   │   ├── zip.js                # Dependency-free ZIP writer (the deployable download)
-│   │   ├── erdwithai-wasm.js     # Vendored: browser generator (parser + compilers)
-│   │   └── erdwithai-fullstack.js# Vendored: full NestJS/TanStack generator
+│   │   ├── appwithai-wasm.js     # Vendored: browser generator (parser + compilers)
+│   │   └── appwithai-fullstack.js# Vendored: full NestJS/TanStack generator
 │   └── vendor/                   # Third-party payloads, served from this origin
 │       ├── posthog/              # posthog-js, the no-external build (~640KB)
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
@@ -328,7 +328,7 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 **How it works**
 
 1. `assets/js/run-in-browser.js` (an ES module) reads a model from `guide/models/`, or from a file the
-   visitor picks, and compiles it with `assets/js/erdwithai-wasm.js` — the generator bundled for the browser.
+   visitor picks, and compiles it with `assets/js/appwithai-wasm.js` — the generator bundled for the browser.
 2. The generated files are posted to the Service Worker at `guide/wasm-app/sw.js`, which serves them
    from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
 3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
@@ -366,7 +366,7 @@ exactly that reason.
 - **No sample-data logic lives on this site.** `run-in-browser.js` reads the select, passes
   `sampleRecords` and `sampleSeed` to `generateFromSource`, and renders `summary.sampleRows`. Everything
   else — the vocabulary, the typing, the ordering — is in the vendored bundle, the same code
-  `erdwithai-wasm generate --standalone` runs. Adding a rule here would mean the page showing records
+  `appwithai-wasm generate --standalone` runs. Adding a rule here would mean the page showing records
   the CLI would not write.
 - **The seed is the application's name**, so two readers who leave the field alone see the same records
   and can talk about row four.
@@ -383,7 +383,7 @@ app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
 source, 419 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
-- **It is chapter 10's machinery, used differently.** `erdwithai-fullstack.js`
+- **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
   and `assets/vendor/stack-templates.json` are what `run-real-stack.html`
   already loads; here the file map is zipped instead of mounted in a
   WebContainer. Both are imported **lazily, on the click** — three quarters of a
@@ -483,7 +483,7 @@ modules already returned — not decisions of their own:
 
 ## Vendored files
 
-Everything under `assets/vendor/`, plus `assets/js/erdwithai-*.js`, `assets/js/run-*.js`,
+Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
 `guide/wasm-app/sw.js`, `guide/checker.js` and `guide/fixer.js` comes from
 `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand. The local deltas,
 all deliberate and all commented at the point of change:
@@ -567,7 +567,7 @@ modelling tool. **It is now a different document**: the EML language and nothing
 thing a language model has to produce is a model file.
 
 - **Do not overwrite it from upstream.** Re-copying loses the rewrite. Take language changes across by
-  hand, and use `language/erdwithai-language.json` in the generator repository as the authority.
+  hand, and use `language/appwithai-language.json` in the generator repository as the authority.
 - **§1 is the authoring protocol** — the four steps a model follows to answer "build me an app for X".
   The home page's prompt block quotes that section number.
 - **§1.0 states the deliverable**, and it is there for one reason: the observed failure is a model
@@ -612,7 +612,7 @@ thing a language model has to produce is a model file.
   `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
   with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
-  derivation table against `erdwithai-wasm.js` and asserts that the three codes fire;
+  derivation table against `appwithai-wasm.js` and asserts that the three codes fire;
   `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
   where an older checker is vendored.
 - **§3.7 also carries the display value** — what a reference shows in place of its uuid. The dictionary
@@ -621,7 +621,7 @@ thing a language model has to produce is a model file.
   parents resolved through *their* labels (`Spring Promo — Omar Kowalski`), else the first text column,
   else the uuid. The key is never an identifier. Only the first two parents, only one level deep, and
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
-  all of it against `erdwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
+  all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at. **`formatReport` prints the diagnostics first and the
   verdict last** — `OK — 0 errors, 0 warnings, 2 notes (EML 1.2.0)` — so the final line of a run is

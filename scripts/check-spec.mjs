@@ -193,7 +193,7 @@ console.log(`${pass} claims verified, ${fail} contradicted`);
    against the bundled generator the browser chapter runs. */
 const claimsBefore = pass;
 const failuresBefore = fail;
-const { generateFromSource } = await import("../assets/js/erdwithai-wasm.js");
+const { generateFromSource } = await import("../assets/js/appwithai-wasm.js");
 const REFERENCE = { 10: "String", 12: "Amount", 13: "ID", 14: "Text", 15: "Date", 16: "DateTime",
   19: "Table Direct", 20: "Yes-No", 24: "URL", 27: "Color", 28: "JSON", 29: "Password", 30: "Email", 31: "Phone" };
 

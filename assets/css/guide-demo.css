@@ -537,3 +537,95 @@
   overflow-x: auto;
   max-width: none;
 }
+
+/* ---- the storage permission dialog --------------------------------------
+   The one block in this file that is not scoped to `.guide-demo`, and it has to
+   be: a <dialog> opened with showModal() is promoted to the browser's top
+   layer, which takes it out of the demo's subtree, so a descendant selector
+   would never match it. It carries its own `storage-ask` prefix instead, which
+   collides with nothing on the site, and its own token bridge — dark-theme.css
+   re-points these the way it re-points the demo's.
+
+   It appears before the generated application boots, and only when there are
+   databases from earlier runs to clear. See askToReclaimStorage() in
+   assets/js/run-in-browser.js for why the page asks rather than assumes.
+   -------------------------------------------------------------------------- */
+
+.storage-ask {
+  --ask-surface: white;
+  --ask-border: var(--gray-200);
+  --ask-text: var(--gray-900);
+  --ask-text-soft: var(--gray-600);
+  --ask-btn-bg: white;
+  --ask-btn-border: var(--gray-300);
+  --ask-btn-hover: var(--gray-50);
+
+  max-width: 30rem;
+  /* A modal <dialog> is centred by the UA with `margin: auto`; style.css resets
+     margins broadly enough to win that, so the centring is restated here. */
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--ask-border);
+  border-radius: var(--radius-lg);
+  background: var(--ask-surface);
+  color: var(--ask-text);
+  box-shadow: var(--shadow-lg);
+}
+
+.storage-ask::backdrop {
+  background: rgb(3 3 8 / 70%);
+}
+
+.storage-ask form {
+  padding: 24px;
+}
+
+.storage-ask__title {
+  margin: 0 0 10px;
+  color: var(--ask-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.storage-ask__detail {
+  margin: 0 0 20px;
+  color: var(--ask-text-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.storage-ask__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* The dialog is outside `.guide-demo`, so the demo's own .btn rules do not
+   reach it. These are the same shapes, stated once more for the top layer. */
+.storage-ask .btn {
+  padding: 9px 16px;
+  border: 1px solid var(--ask-btn-border);
+  border-radius: var(--radius-md);
+  background: var(--ask-btn-bg);
+  color: var(--ask-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.storage-ask .btn:hover {
+  background: var(--ask-btn-hover);
+}
+
+.storage-ask .btn--go {
+  border-color: transparent;
+  background: var(--primary-600);
+  color: white;
+}
+
+.storage-ask .btn--go:hover {
+  background: var(--primary-500);
+}

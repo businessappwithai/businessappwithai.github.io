@@ -5,9 +5,8 @@
  *
  *   1. A model is read — from `models/*.eml.mmd` beside this page, or from a
  *      file the reader picks. Reading a picked file never leaves the tab.
- *   2. `erdwithai-wasm.js` compiles it — the site's filename for the bundle
- *      upstream builds as `appwithai-wasm.js`. It is built from the same source
- *      the CLI uses, so the application produced here is the application
+ *   2. `appwithai-wasm.js` compiles it. That bundle is built from the same
+ *      source the CLI uses, so the application produced here is the application
  *      `appwithai-wasm generate` would have written.
  *   3. The files are posted to a Service Worker, which serves them as if they
  *      had come off a web server, and an iframe is pointed at the result.
@@ -30,7 +29,7 @@
 // because this site publishes the validators under `guide/` while this module
 // lives under `assets/js/`. Same file, same URL the spec quotes.
 import { checkAndFix } from "../../guide/fixer.js";
-import { generateFromSource } from "./erdwithai-wasm.js";
+import { generateFromSource } from "./appwithai-wasm.js";
 import { createZip } from "./zip.js";
 
 const BASE = new URL("wasm-app/run/", window.location.href).pathname;
@@ -663,9 +662,9 @@ $("download").addEventListener("click", () => {
     "",
     ...Object.entries(state.files).flatMap(([path, contents]) => [
       `mkdir -p "$(dirname "${path}")"`,
-      `cat > "${path}" <<'ERDWITHAI_EOF'`,
+      `cat > "${path}" <<'APPWITHAI_EOF'`,
       contents.replace(/\r/g, ""),
-      "ERDWITHAI_EOF",
+      "APPWITHAI_EOF",
       "",
     ]),
     `echo "Wrote ${Object.keys(state.files).length} files into ${name}/"`,
@@ -698,7 +697,7 @@ $("download").addEventListener("click", () => {
  * and handed over instead, which is the shorter path to the same artifact and
  * the one that survives closing the tab.
  *
- * Both halves are lazy on purpose. `erdwithai-fullstack.js` is three quarters
+ * Both halves are lazy on purpose. `appwithai-fullstack.js` is three quarters
  * of a megabyte and the stack templates are close to two, and a reader who came
  * to look at the browser application should not pay for either.
  */
@@ -761,7 +760,7 @@ $("download-stack").addEventListener("click", async () => {
   try {
     if (!stackCache.module) {
       button.innerHTML = '<span class="working"></span>Fetching the generator';
-      stackCache.module = await import("./erdwithai-fullstack.js");
+      stackCache.module = await import("./appwithai-fullstack.js");
     }
     if (!stackCache.templates) {
       button.innerHTML = '<span class="working"></span>Fetching the stack templates';
@@ -823,6 +822,98 @@ $("download-stack").addEventListener("click", async () => {
   }
 });
 
+/* ------------------------------------------------- storage, and asking first */
+
+/*
+ * Every run of the generated application keeps a real PostgreSQL in IndexedDB,
+ * and nothing has ever cleared it. That is deliberate — the page promises a
+ * reload picks up where you left off — but it compounds: each model, each run,
+ * another ten megabytes, until the origin hits its quota and PGlite aborts
+ * inside `callMain` with a message about WebAssembly that has nothing to do
+ * with what went wrong.
+ *
+ * So the page now says what it is holding and asks before it clears it. Asked,
+ * not assumed: a reader who came back for the data they entered last time
+ * should not lose it because the page decided to tidy up.
+ */
+
+const PGLITE_DB = /^\/pglite\//;
+
+/** What this origin is holding, or null when it cannot be known or is empty. */
+async function surveyStorage() {
+  try {
+    if (typeof indexedDB.databases !== "function") return null;
+    const names = (await indexedDB.databases())
+      .map((entry) => entry.name)
+      .filter((name) => typeof name === "string" && PGLITE_DB.test(name));
+    if (!names.length) return null;
+
+    let bytes = 0;
+    try {
+      bytes = (await navigator.storage.estimate()).usage || 0;
+    } catch {
+      // A number we cannot get is one we simply do not show.
+    }
+    return { names, bytes };
+  } catch {
+    return null;
+  }
+}
+
+async function dropDatabases(names) {
+  await Promise.all(
+    names.map(
+      (name) =>
+        new Promise((resolve) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.onsuccess = request.onerror = request.onblocked = () => resolve();
+        })
+    )
+  );
+}
+
+/**
+ * Ask whether to clear the databases earlier runs left behind.
+ *
+ * Returns only after the reader has answered. Declining is a first-class
+ * answer and simply starts the application on top of what is already there,
+ * which is what every run before this one did.
+ */
+async function askToReclaimStorage() {
+  const held = await surveyStorage();
+  if (!held) return;
+
+  const dialog = $("storage-ask");
+  if (!dialog || typeof dialog.showModal !== "function") return;
+
+  const megabytes = held.bytes ? (held.bytes / 1048576).toFixed(0) : null;
+  const count = held.names.length;
+
+  $("storage-ask-detail").textContent =
+    `${count} database${count === 1 ? "" : "s"} from earlier runs ${count === 1 ? "is" : "are"} ` +
+    `stored in this browser${megabytes ? `, using about ${megabytes} MB` : ""}. ` +
+    "Clearing them frees the space and starts this application with empty tables. " +
+    "Keeping them leaves any records you entered before exactly where they were.";
+
+  const answer = await new Promise((resolve) => {
+    dialog.addEventListener("close", () => resolve(dialog.returnValue), { once: true });
+    dialog.showModal();
+  });
+
+  if (answer !== "clear") {
+    window.awTrack?.("storage_kept", { databases: count, bytes: held.bytes });
+    return;
+  }
+
+  await dropDatabases(held.names);
+  window.awTrack?.("storage_cleared", { databases: count, bytes: held.bytes });
+  say(
+    `Cleared ${count} database${count === 1 ? "" : "s"}` +
+      (megabytes ? `, freeing about ${megabytes} MB` : ""),
+    "ok"
+  );
+}
+
 /* ------------------------------------------------------------------ step 3 */
 
 $("run").addEventListener("click", () => run(false));
@@ -847,6 +938,11 @@ async function run(fresh) {
   const log = $("log");
   log.hidden = false;
   log.innerHTML = "";
+  // Before anything is mounted, because this is the last moment the answer is
+  // cheap: once PGlite has opened a data directory, clearing it out from under
+  // the running application is not a thing the reader can be offered.
+  await askToReclaimStorage();
+
   build.start("mount", "Handing the files to the Service Worker");
 
   try {
