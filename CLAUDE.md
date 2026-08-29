@@ -492,9 +492,20 @@ all deliberate and all commented at the point of change:
 |---|---|---|
 | `assets/js/run-in-browser.js` | Probes `assets/vendor/pglite/` and mounts a re-export shim at the app's `vendor/pglite/index.js` | This site vendors PGlite, so no CDN is ever reached |
 | `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
-| `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
+| `assets/js/run-in-browser.js` | Imports `checkAndFix` from `../../guide/fixer.js`, not upstream's `../fixer.js` | The validators are published under `guide/` here; this module lives under `assets/js/` |
+| `assets/js/run-real-stack.js` | The same import path | The same |
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
+| `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
+
+`guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
+`ignoreMethod: true` in `serve()`, because the Cache API matches GET only and
+the generated application's HEAD probes were escaping to the network. Upstream
+now matches on `request.url` rather than on the Request, which fixes that and
+the Safari failure beside it — a `cache: "no-store"` request WebKit would not
+match, which 404'd `app/schema.sys.sql` against a file the worker was holding.
+Both properties are gone from the lookup, so there is nothing left to re-apply:
+copy it straight.
 
 **Re-vendoring one of the last two loses its `awTrack` lines.** They are
 deliberately greppable: `grep -n awTrack assets/js/*.js` finds every one, and

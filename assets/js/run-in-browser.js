@@ -1007,9 +1007,20 @@ async function run(fresh) {
   } catch (error) {
     build.fail("mount", error.message);
     say(error.message, "bad");
+    /*
+     * The hint has to earn its place, the same way boot.js's does. This used to
+     * print the file:// advice after every failure — on a page plainly served
+     * over https, which sends the reader to a problem they do not have and away
+     * from the one they do. A Service Worker that will not register on http(s)
+     * is nearly always the browser refusing it, not the protocol.
+     */
     say(
-      "This page needs to be served over http:// or https:// — a Service Worker cannot be registered " +
-        "from a file:// URL.",
+      window.location.protocol === "file:"
+        ? "This page needs to be served over http:// or https:// — a Service Worker cannot be " +
+            "registered from a file:// URL."
+        : "The browser refused to register the Service Worker that serves this application. A " +
+            "private window, a storage-blocking setting or an enterprise policy will all do it; " +
+            "reloading the page clears a worker left in a bad state.",
       "bad"
     );
   } finally {
