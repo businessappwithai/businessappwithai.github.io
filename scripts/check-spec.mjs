@@ -176,8 +176,18 @@ t("UpdateEntity on the triggering record names no entity", target("    %%step C 
 const person = (column) => `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    User {\n        string id PK\n        string full_name\n    }\n    Thing {\n        string id PK\n        string ${column} FK\n    }\n    User ||--o{ Thing : "owns"\n`;
 for (const column of ["approved_by_id", "created_by_id", "owner_id", "user_id", "manager_id"])
   t(`person column ${column} resolves to User`, person(column));
+/* A name matching no entity now falls back to a parent the model declared and
+   nothing else claims — which is what the generator does, so the checker agrees.
+   `person()` gives Thing exactly one such parent, so these resolve. */
 for (const column of ["approver_id", "assigned_to_id"])
-  t(`person column ${column} does not resolve — EML502`, person(column), "EML502");
+  t(`person column ${column} falls back to the declared parent`, person(column));
+
+/* With no relationship to fall back on, the column resolves to nothing and
+   EML502 is right again. */
+const unowned = (column) =>
+  `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    User {\n        string id PK\n        string full_name\n    }\n    Thing {\n        string id PK\n        string ${column} FK\n        string name\n    }\n`;
+for (const column of ["approver_id", "assigned_to_id"])
+  t(`person column ${column} with no declared parent — EML502`, unowned(column), "EML502");
 t("assigned_to is recognised but does not end _id — EML114", person("assigned_to"), "EML114");
 
 // §7 — %%meta stack takes one of two values (EML003).
