@@ -5,9 +5,10 @@
  *
  *   1. A model is read — from `models/*.eml.mmd` beside this page, or from a
  *      file the reader picks. Reading a picked file never leaves the tab.
- *   2. `erdwithai-wasm.js` compiles it. That bundle is built from the same
- *      source the CLI uses, so the application produced here is the application
- *      `erdwithai-wasm generate` would have written.
+ *   2. `erdwithai-wasm.js` compiles it — the site's filename for the bundle
+ *      upstream builds as `appwithai-wasm.js`. It is built from the same source
+ *      the CLI uses, so the application produced here is the application
+ *      `appwithai-wasm generate` would have written.
  *   3. The files are posted to a Service Worker, which serves them as if they
  *      had come off a web server, and an iframe is pointed at the result.
  *
@@ -19,7 +20,17 @@
  * keeps the generated application byte-identical to the one you would deploy.
  */
 
-import { generateFromSource, reviewModel } from "./erdwithai-wasm.js";
+// The published validator, not the copy inside the generator bundle. Same engine
+// either way — but this is the file `llms-full.txt` §1.3 and §8 tell a model to
+// validate against, so the page and the protocol cannot drift into disagreeing
+// about whether a document is acceptable. `fixer.js` carries the checker with
+// it, which is what lets it re-check what it repaired.
+//
+// Local delta: `../../guide/fixer.js` rather than upstream's `../fixer.js`,
+// because this site publishes the validators under `guide/` while this module
+// lives under `assets/js/`. Same file, same URL the spec quotes.
+import { checkAndFix } from "../../guide/fixer.js";
+import { generateFromSource } from "./erdwithai-wasm.js";
 import { createZip } from "./zip.js";
 
 const BASE = new URL("wasm-app/run/", window.location.href).pathname;
@@ -32,6 +43,11 @@ const BUILT_IN = {
     path: "models/drug-discovery.eml.mmd",
     label: "drug-discovery.eml.mmd",
     name: "Drug Discovery",
+  },
+  hospital: {
+    path: "models/hospital-management-system.eml.mmd",
+    label: "hospital-management-system.eml.mmd",
+    name: "Hospital Management System",
   },
 };
 
@@ -147,7 +163,7 @@ const build = {
 
     $("build-phases").innerHTML = PHASES.map(
       (phase) =>
-        `<li class="build__phase" data-state="${this.status[phase.id]}">` +
+        `<li class="build__phase" data-phase="${phase.id}" data-state="${this.status[phase.id]}">` +
         `<span class="build__tick"></span>${escapeHtml(phase.label)}</li>`
     ).join("");
   },
@@ -158,6 +174,7 @@ const build = {
 const choices = [
   [$("choice-crm"), "crm"],
   [$("choice-drug"), "drug"],
+  [$("choice-hospital"), "hospital"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -197,8 +214,14 @@ async function selectChoice(kind) {
 
 const dropzone = $("dropzone");
 $("file").addEventListener("change", (event) => {
-  const file = event.target.files && event.target.files[0];
+  const input = event.target;
+  const file = input.files && input.files[0];
   if (file) readFile(file);
+  // Clearing the value is what makes "fix it and choose it again" work. A file
+  // input fires no `change` when the same filename is picked twice, so a reader
+  // who edited the file the checker just refused and re-selected it would sit
+  // looking at the stale findings with nothing having happened.
+  input.value = "";
 });
 for (const type of ["dragenter", "dragover"]) {
   dropzone.addEventListener(type, (event) => {
@@ -321,7 +344,11 @@ function setModel(source, label) {
 function checkModel(source) {
   let review;
   try {
-    review = reviewModel(source);
+    // `checkAndFix` repairs what it can, then checks again — so the findings
+    // shown are the ones that survive the repair rather than the ones that
+    // arrived. `remaining` is that second reading.
+    const result = checkAndFix(source);
+    review = { ...result, issues: result.remaining };
   } catch (error) {
     // A document the parser cannot read at all — not a finding, a refusal.
     review = {
@@ -351,14 +378,25 @@ function checkModel(source) {
 }
 
 function describeReview(review) {
-  const { errors, warnings, infos } = review.counts;
+  const { errors } = review.counts;
+  return [`${errors} error${errors === 1 ? "" : "s"}`, ...describeRest(review)].join(" · ");
+}
+
+/**
+ * The counts other than errors.
+ *
+ * Split out because the diagnostics header already states the error count in its
+ * own sentence, and repeating it in the sub-line read as "refused this model —
+ * 1 error · 1 error".
+ */
+function describeRest(review) {
+  const { warnings, infos } = review.counts;
   const applied = review.fixes.filter((fix) => fix.applied).length;
   const parts = [];
   if (applied) parts.push(`${applied} auto-fix${applied === 1 ? "" : "es"} applied`);
-  parts.push(`${errors} error${errors === 1 ? "" : "s"}`);
   if (warnings) parts.push(`${warnings} warning${warnings === 1 ? "" : "s"}`);
   if (infos) parts.push(`${infos} info`);
-  return parts.join(" · ");
+  return parts;
 }
 
 const SEVERITY_LABEL = { error: "error", warning: "warning", info: "info" };
@@ -395,7 +433,7 @@ function renderDiagnostics(review) {
           ? "The checker accepted this model"
           : `The checker refused this model — ${review.counts.errors} error${review.counts.errors === 1 ? "" : "s"}`
       }</b>
-      <span>${escapeHtml(describeReview(review))}</span>
+      <span>${escapeHtml(describeRest(review).join(" · "))}</span>
     </div>
     ${
       applied.length
@@ -420,9 +458,13 @@ function renderDiagnostics(review) {
     ${
       review.ok
         ? ""
-        : `<p class="diag__foot">Nothing was generated. The command-line tool stops here too —
-             <code>erdwithai-wasm generate</code> refuses a model with errors unless you pass
-             <code>--skip-check</code>.</p>`
+        : `<p class="diag__foot"><b>Nothing was generated.</b> Fix the ${
+            review.counts.errors === 1 ? "line above" : "lines above"
+          } in your
+             <code>.mmd</code> file, save it, and choose it again — this page re-checks every
+             time a model is loaded, so you can correct and re-submit until it passes. The
+             command-line tool stops here too: <code>appwithai-wasm generate</code> refuses a
+             model with errors unless you pass <code>--skip-check</code>.</p>`
     }`;
 }
 
@@ -613,7 +655,7 @@ $("download").addEventListener("click", () => {
 
   const script = [
     "#!/bin/sh",
-    "# Generated by ERDwithAI (browser stack). Writes the application into ./" + name,
+    "# Generated by APPWITHAI (browser stack). Writes the application into ./" + name,
     "# Read it before you run it; every file below is plain text.",
     "set -e",
     `mkdir -p "${name}"`,
@@ -731,7 +773,7 @@ $("download-stack").addEventListener("click", async () => {
       source: state.source,
       templates: stackCache.templates,
       name: $("app-name").value.trim() || "Generated App",
-      description: "Generated by ERDwithAI",
+      description: "Generated by APPWITHAI",
     });
 
     button.innerHTML = '<span class="working"></span>Packing the archive';
@@ -907,7 +949,7 @@ const BOOT_MARKS = [
 
 window.addEventListener("message", (event) => {
   const message = event.data;
-  if (!message || message.source !== "erdwithai-boot") return;
+  if (!message || message.source !== "appwithai-boot") return;
 
   if (message.type === "status" || message.type === "log") {
     const text = message.status ?? message.message ?? "";

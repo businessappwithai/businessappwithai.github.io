@@ -15,7 +15,7 @@
  * the generator would refuse the model.
  *
  * It is a runner, not a second checker. Every diagnostic it prints comes from
- * `checker.js` and `fixer.js` — the same engines `erdwithai` runs.
+ * `checker.js` and `fixer.js` — the same engines `appwithai` runs.
  *
  * Options
  *   --base <url>   where to load checker.js and fixer.js from

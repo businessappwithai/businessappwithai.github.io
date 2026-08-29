@@ -108,7 +108,7 @@
   Everything before the install is the same code the command line runs. <code>generateApplication</code>
   and the WebAssembly overlay are imported unmodified; what changes is the filesystem beneath them,
   which is a <code>Map</code> in this tab instead of a disk. That is the whole trick, and it is why what
-  boots below is the application <code>erdwithai generate</code> would have written rather than
+  boots below is the application <code>appwithai generate</code> would have written rather than
   something assembled to look like it.
 </p>
 
@@ -148,13 +148,18 @@
       <div class="choices">
         <button type="button" class="choice" id="choice-crm" aria-pressed="true">
           <span class="choice__name">Use the CRM example</span>
-          <span class="choice__desc">Seventeen entities, eight rules, ten processes, fifteen access restrictions.</span>
+          <span class="choice__desc">Seventeen entities, eight rules, ten processes, thirty-two access restrictions.</span>
           <span class="choice__meta">language/examples/crm.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-drug" aria-pressed="false">
           <span class="choice__name">Use the drug-discovery example</span>
           <span class="choice__desc">A regulated-lab model — compounds, experiments, deviations, CAPAs.</span>
           <span class="choice__meta">examples/drug-discovery.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
+          <span class="choice__name">Use the hospital example</span>
+          <span class="choice__desc">Twenty-eight entities — admissions, wards and beds, orders and results, billing, stock. Nine state machines.</span>
+          <span class="choice__meta">examples/hospital-management-system.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-upload" aria-pressed="false">
           <span class="choice__name">Upload your own</span>

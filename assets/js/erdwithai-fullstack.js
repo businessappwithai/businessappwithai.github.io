@@ -33,14 +33,12 @@ var __toESM = (mod, isNodeMode, target) => {
   }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  if (mod && typeof mod === "object" || typeof mod === "function") {
-    for (let key of __getOwnPropNames(mod))
-      if (!__hasOwnProp.call(to, key))
-        __defProp(to, key, {
-          get: __accessProp.bind(mod, key),
-          enumerable: true
-        });
-  }
+  for (let key of __getOwnPropNames(mod))
+    if (!__hasOwnProp.call(to, key))
+      __defProp(to, key, {
+        get: __accessProp.bind(mod, key),
+        enumerable: true
+      });
   if (canCache)
     cache.set(mod, to);
   return to;
@@ -81,29 +79,29 @@ var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 // packages/generator/src/browser/memory-fs.ts
 var exports_memory_fs = {};
 __export(exports_memory_fs, {
-  access: () => access,
-  chmod: () => chmod,
-  copyFile: () => copyFile,
-  copyFileSync: () => copyFileSync,
-  default: () => memory_fs_default,
-  existsSync: () => existsSync,
-  mkdir: () => mkdir,
-  mkdirSync: () => mkdirSync,
-  normalize: () => normalize,
-  promises: () => promises,
-  readFile: () => readFile,
-  readFileSync: () => readFileSync,
-  readdir: () => readdir,
-  readdirSync: () => readdirSync,
-  reset: () => reset,
-  rm: () => rm,
-  seed: () => seed,
-  snapshot: () => snapshot,
-  stat: () => stat,
-  statSync: () => statSync,
-  unlink: () => unlink,
+  writeFileSync: () => writeFileSync,
   writeFile: () => writeFile,
-  writeFileSync: () => writeFileSync
+  unlink: () => unlink,
+  statSync: () => statSync,
+  stat: () => stat,
+  snapshot: () => snapshot,
+  seed: () => seed,
+  rm: () => rm,
+  reset: () => reset,
+  readdirSync: () => readdirSync,
+  readdir: () => readdir,
+  readFileSync: () => readFileSync,
+  readFile: () => readFile,
+  promises: () => promises,
+  normalize: () => normalize,
+  mkdirSync: () => mkdirSync,
+  mkdir: () => mkdir,
+  existsSync: () => existsSync,
+  default: () => memory_fs_default,
+  copyFileSync: () => copyFileSync,
+  copyFile: () => copyFile,
+  chmod: () => chmod,
+  access: () => access
 });
 function normalize(path) {
   const absolute = path.startsWith("/") ? path : `/${path}`;
@@ -431,18 +429,18 @@ var init_language = __esm(() => {
   init_node_url();
   LANGUAGE_DEFINITION_PATH = (() => {
     const here = node_path_default.dirname(fileURLToPath(import.meta.url));
-    return node_path_default.join(here, "erdwithai-language.json");
+    return node_path_default.join(here, "appwithai-language.json");
   })();
 });
 
 // builtin-stub:node:child_process
 var exports_node_child_process = {};
 __export(exports_node_child_process, {
-  default: () => node_child_process_default,
-  exec: () => exec,
-  execSync: () => execSync,
+  spawnSync: () => spawnSync,
   spawn: () => spawn,
-  spawnSync: () => spawnSync
+  execSync: () => execSync,
+  exec: () => exec,
+  default: () => node_child_process_default
 });
 var refuse = () => {
   throw new Error("no subprocesses in the browser");
@@ -456,7 +454,7 @@ var init_node_child_process = __esm(() => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/utils.js
-var require_utils = __commonJS(function(exports) {
+var require_utils = __commonJS((exports) => {
   exports.__esModule = true;
   exports.extend = extend;
   exports.indexOf = indexOf;
@@ -552,7 +550,7 @@ var require_utils = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/exception.js
-var require_exception = __commonJS(function(exports, module) {
+var require_exception = __commonJS((exports, module) => {
   exports.__esModule = true;
   var errorProps = ["description", "fileName", "lineNumber", "endLineNumber", "message", "name", "number", "stack"];
   function Exception(message, node) {
@@ -597,7 +595,7 @@ var require_exception = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/block-helper-missing.js
-var require_block_helper_missing = __commonJS(function(exports, module) {
+var require_block_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -630,7 +628,7 @@ var require_block_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/each.js
-var require_each = __commonJS(function(exports, module) {
+var require_each = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -711,7 +709,7 @@ var require_each = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/helper-missing.js
-var require_helper_missing = __commonJS(function(exports, module) {
+var require_helper_missing = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -731,7 +729,7 @@ var require_helper_missing = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/if.js
-var require_if = __commonJS(function(exports, module) {
+var require_if = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -768,7 +766,7 @@ var require_if = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/log.js
-var require_log = __commonJS(function(exports, module) {
+var require_log = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("log", function() {
@@ -790,7 +788,7 @@ var require_log = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/lookup.js
-var require_lookup = __commonJS(function(exports, module) {
+var require_lookup = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("lookup", function(obj, field, options) {
@@ -804,7 +802,7 @@ var require_lookup = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/with.js
-var require_with = __commonJS(function(exports, module) {
+var require_with = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -840,7 +838,7 @@ var require_with = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers.js
-var require_helpers = __commonJS(function(exports) {
+var require_helpers = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultHelpers = registerDefaultHelpers;
   exports.moveHelperToHooks = moveHelperToHooks;
@@ -881,7 +879,7 @@ var require_helpers = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/decorators/inline.js
-var require_inline = __commonJS(function(exports, module) {
+var require_inline = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -905,7 +903,7 @@ var require_inline = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/decorators.js
-var require_decorators = __commonJS(function(exports) {
+var require_decorators = __commonJS((exports) => {
   exports.__esModule = true;
   exports.registerDefaultDecorators = registerDefaultDecorators;
   function _interopRequireDefault(obj) {
@@ -919,7 +917,7 @@ var require_decorators = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/logger.js
-var require_logger = __commonJS(function(exports, module) {
+var require_logger = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var logger = {
@@ -955,7 +953,7 @@ var require_logger = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/internal/proto-access.js
-var require_proto_access = __commonJS(function(exports) {
+var require_proto_access = __commonJS((exports) => {
   exports.__esModule = true;
   exports.createProtoAccessControl = createProtoAccessControl;
   exports.resultIsAllowed = resultIsAllowed;
@@ -1022,7 +1020,7 @@ var require_proto_access = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/base.js
-var require_base = __commonJS(function(exports) {
+var require_base = __commonJS((exports) => {
   exports.__esModule = true;
   exports.HandlebarsEnvironment = HandlebarsEnvironment;
   function _interopRequireDefault(obj) {
@@ -1115,7 +1113,7 @@ var require_base = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/safe-string.js
-var require_safe_string = __commonJS(function(exports, module) {
+var require_safe_string = __commonJS((exports, module) => {
   exports.__esModule = true;
   function SafeString(string) {
     this.string = string;
@@ -1128,7 +1126,7 @@ var require_safe_string = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/internal/wrapHelper.js
-var require_wrapHelper = __commonJS(function(exports) {
+var require_wrapHelper = __commonJS((exports) => {
   exports.__esModule = true;
   exports.wrapHelper = wrapHelper;
   function wrapHelper(helper, transformOptionsFn) {
@@ -1145,7 +1143,7 @@ var require_wrapHelper = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/runtime.js
-var require_runtime = __commonJS(function(exports) {
+var require_runtime = __commonJS((exports) => {
   exports.__esModule = true;
   exports.checkRevision = checkRevision;
   exports.template = template;
@@ -1460,7 +1458,7 @@ var require_runtime = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/no-conflict.js
-var require_no_conflict = __commonJS(function(exports, module) {
+var require_no_conflict = __commonJS((exports, module) => {
   exports.__esModule = true;
   exports.default = function(Handlebars) {
     (function() {
@@ -1484,7 +1482,7 @@ var require_no_conflict = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars.runtime.js
-var require_handlebars_runtime = __commonJS(function(exports, module) {
+var require_handlebars_runtime = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1538,7 +1536,7 @@ var require_handlebars_runtime = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/ast.js
-var require_ast = __commonJS(function(exports, module) {
+var require_ast = __commonJS((exports, module) => {
   exports.__esModule = true;
   var AST = {
     helpers: {
@@ -1558,7 +1556,7 @@ var require_ast = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/parser.js
-var require_parser = __commonJS(function(exports, module) {
+var require_parser = __commonJS((exports, module) => {
   exports.__esModule = true;
   var handlebars = function() {
     var parser = {
@@ -2282,7 +2280,7 @@ Expecting ` + expected.join(", ") + ", got '" + (this.terminals_[symbol] || symb
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/visitor.js
-var require_visitor = __commonJS(function(exports, module) {
+var require_visitor = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2387,7 +2385,7 @@ var require_visitor = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/whitespace-control.js
-var require_whitespace_control = __commonJS(function(exports, module) {
+var require_whitespace_control = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2533,7 +2531,7 @@ var require_whitespace_control = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/helpers.js
-var require_helpers2 = __commonJS(function(exports) {
+var require_helpers2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.SourceLocation = SourceLocation;
   exports.id = id;
@@ -2718,7 +2716,7 @@ var require_helpers2 = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/base.js
-var require_base2 = __commonJS(function(exports) {
+var require_base2 = __commonJS((exports) => {
   exports.__esModule = true;
   exports.parseWithoutProcessing = parseWithoutProcessing;
   exports.parse = parse;
@@ -2817,7 +2815,7 @@ var require_base2 = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/compiler.js
-var require_compiler = __commonJS(function(exports) {
+var require_compiler = __commonJS((exports) => {
   exports.__esModule = true;
   exports.Compiler = Compiler;
   exports.precompile = precompile;
@@ -3234,7 +3232,7 @@ var require_compiler = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/base64.js
-var require_base64 = __commonJS(function(exports) {
+var require_base64 = __commonJS((exports) => {
   var intToCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
   exports.encode = function(number) {
     if (0 <= number && number < intToCharMap.length) {
@@ -3273,7 +3271,7 @@ var require_base64 = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/base64-vlq.js
-var require_base64_vlq = __commonJS(function(exports) {
+var require_base64_vlq = __commonJS((exports) => {
   var base64 = require_base64();
   var VLQ_BASE_SHIFT = 5;
   var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
@@ -3325,7 +3323,7 @@ var require_base64_vlq = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/util.js
-var require_util = __commonJS(function(exports) {
+var require_util = __commonJS((exports) => {
   function getArg(aArgs, aName, aDefaultValue) {
     if (aName in aArgs) {
       return aArgs[aName];
@@ -3624,7 +3622,7 @@ var require_util = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/array-set.js
-var require_array_set = __commonJS(function(exports) {
+var require_array_set = __commonJS((exports) => {
   var util3 = require_util();
   var has = Object.prototype.hasOwnProperty;
   var hasNativeMap = typeof Map !== "undefined";
@@ -3692,7 +3690,7 @@ var require_array_set = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/mapping-list.js
-var require_mapping_list = __commonJS(function(exports) {
+var require_mapping_list = __commonJS((exports) => {
   var util3 = require_util();
   function generatedPositionAfter(mappingA, mappingB) {
     var lineA = mappingA.generatedLine;
@@ -3729,7 +3727,7 @@ var require_mapping_list = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-map-generator.js
-var require_source_map_generator = __commonJS(function(exports) {
+var require_source_map_generator = __commonJS((exports) => {
   var base64VLQ = require_base64_vlq();
   var util3 = require_util();
   var ArraySet = require_array_set().ArraySet;
@@ -3999,7 +3997,7 @@ var require_source_map_generator = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/binary-search.js
-var require_binary_search = __commonJS(function(exports) {
+var require_binary_search = __commonJS((exports) => {
   exports.GREATEST_LOWER_BOUND = 1;
   exports.LEAST_UPPER_BOUND = 2;
   function recursiveSearch(aLow, aHigh, aNeedle, aHaystack, aCompare, aBias) {
@@ -4046,7 +4044,7 @@ var require_binary_search = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/quick-sort.js
-var require_quick_sort = __commonJS(function(exports) {
+var require_quick_sort = __commonJS((exports) => {
   function swap(ary, x, y) {
     var temp = ary[x];
     ary[x] = ary[y];
@@ -4079,7 +4077,7 @@ var require_quick_sort = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-map-consumer.js
-var require_source_map_consumer = __commonJS(function(exports) {
+var require_source_map_consumer = __commonJS((exports) => {
   var util3 = require_util();
   var binarySearch = require_binary_search();
   var ArraySet = require_array_set().ArraySet;
@@ -4648,7 +4646,7 @@ var require_source_map_consumer = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-node.js
-var require_source_node = __commonJS(function(exports) {
+var require_source_node = __commonJS((exports) => {
   var SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   var util3 = require_util();
   var REGEX_NEWLINE = /(\r?\n)/;
@@ -4902,14 +4900,14 @@ var require_source_node = __commonJS(function(exports) {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/source-map.js
-var require_source_map = __commonJS(function(exports) {
+var require_source_map = __commonJS((exports) => {
   exports.SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   exports.SourceMapConsumer = require_source_map_consumer().SourceMapConsumer;
   exports.SourceNode = require_source_node().SourceNode;
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/code-gen.js
-var require_code_gen = __commonJS(function(exports, module) {
+var require_code_gen = __commonJS((exports, module) => {
   exports.__esModule = true;
   var _utils = require_utils();
   var SourceNode = undefined;
@@ -5042,7 +5040,7 @@ var require_code_gen = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/javascript-compiler.js
-var require_javascript_compiler = __commonJS(function(exports, module) {
+var require_javascript_compiler = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -5810,7 +5808,7 @@ var require_javascript_compiler = __commonJS(function(exports, module) {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars.js
-var require_handlebars = __commonJS(function(exports, module) {
+var require_handlebars = __commonJS((exports, module) => {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -5875,18 +5873,18 @@ var init_model_check_error = __esm(() => {
 
 // packages/generator/src/browser/full-stack.ts
 init_language();
-// language/erdwithai-language.json
-var erdwithai_language_default = {
+// language/appwithai-language.json
+var appwithai_language_default = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "https://erdwithai.dev/language/erdwithai-language.json",
+  $id: "https://appwithai.dev/language/appwithai-language.json",
   language: {
-    id: "erdwithai-eml",
-    name: "ERDwithAI Modeling Language",
+    id: "appwithai-eml",
+    name: "APPWITHAI Modeling Language",
     abbreviation: "EML",
     version: "1.2.0",
     basedOn: "mermaid",
     mermaidCompatibility: "All EML documents are valid, renderable Mermaid. EML is a semantic superset that assigns generator meaning to standard Mermaid constructs (erDiagram, flowchart, stateDiagram-v2) and to `%%`-prefixed directive comments.",
-    description: "A single, standalone, Mermaid-based language for describing an application's Entity Relationship Diagram (ERD), its business rules, and its business workflows in one place. EML is the source language read by the ERDwithAI generator to produce full-stack applications (TanStack Start + NestJS, or OpenUI5 + OData V4).",
+    description: "A single, standalone, Mermaid-based language for describing an application's Entity Relationship Diagram (ERD), its business rules, and its business workflows in one place. EML is the source language read by the APPWITHAI generator to produce full-stack applications (TanStack Start + NestJS, or OpenUI5 + OData V4).",
     fileExtensions: [".eml.mmd", ".erd.mmd", ".flow.mmd", ".rules.mmd", ".mmd"],
     encoding: "utf-8",
     caseSensitivity: {
@@ -6157,12 +6155,12 @@ var erdwithai_language_default = {
     description: "How an FK column name resolves to the table it points at. The generator derives the target from the column name alone — there is no explicit target syntax on the attribute — so the name has to carry the reference.",
     suffix: "_id",
     resolution: [
-      "1. A person-role name (see personRoleColumns) resolves to the user entity.",
+      "1. A person-role name (see personRoleColumns) resolves to the model's person entity (User if it exists, then Staff, then Employee).",
       "2. Otherwise <entity>_id resolves to bus_<entity>.",
       "3. A column that resolves to nothing is stored as a plain string: no lookup, no display name, the raw id renders in grids and forms."
     ],
     personRoleColumns: {
-      description: "Columns naming a person by the role they played rather than by entity. All resolve to the model's user entity (bus_user).",
+      description: "Columns naming a person by the role they played rather than by entity. All resolve to the model's person entity (User > Staff > Employee, whichever exists first).",
       suffixes: ["_by", "_by_id"],
       names: [
         "assigned_to",
@@ -6176,13 +6174,13 @@ var erdwithai_language_default = {
         "user_id"
       ],
       examples: [
-        "reported_by_id -> bus_user",
-        "registered_by_id -> bus_user",
-        "pi_id -> bus_user (a principal investigator is a user, not a bus_pi table)"
+        "reported_by_id -> bus_user (or bus_staff when the model has no User entity)",
+        "registered_by_id -> bus_user (or bus_staff / bus_employee)",
+        "pi_id -> bus_user (a principal investigator is a person, not a bus_pi table)"
       ]
     },
     checkerCodes: {
-      EML114: "FK column does not end in _id. Auto-fixable: the fixer appends the suffix, so `reported_by FK` becomes `reported_by_id FK` and starts resolving to bus_user.",
+      EML114: "FK column does not end in _id. Auto-fixable: the fixer appends the suffix, so `reported_by FK` becomes `reported_by_id FK` and starts resolving to the person entity.",
       EML119: "A column named like a reference (_id/_by, resolving to a declared entity) that carries no FK modifier. Both conditions are required for TABLE_DIRECT, and a column that fails either is recorded as a plain String."
     }
   },
@@ -6282,6 +6280,37 @@ var erdwithai_language_default = {
       EML119: "A reference-shaped column with no FK modifier - the lookup is lost.",
       EML146: "A status/state/stage column with no %%field enum binding - the dropdown is lost.",
       EML500: "A `kind: state` workflow bound to an entity with no status/state/stage column at all - the machine has nothing to track."
+    },
+    reportDesigns: {
+      description: "Generated applications include a document report subsystem backed by the AnkaReport library. One default AnkaReport layout is seeded per entity into sys_report_designs at generation time. Administrators can customise any layout at Admin → Report Designs. Users get a Print button on a record's detail view (visible only when a design exists for that table), and can export the rendered report to PDF.",
+      table: "sys_report_designs",
+      columns: {
+        id: "UUID primary key",
+        table_name: "Entity table name; UNIQUE — one design per table",
+        name: 'Human-readable design name (e.g. "Contact Default Report")',
+        layout: "JSONB AnkaReport ILayout object — headerSection, contentSection, footerSection"
+      },
+      defaultLayout: {
+        description: "Generated by packages/generator/templates/common/seeds/report-designs.ts.hbs. Fields in the layout are every non-audit, non-PK column: not id, created_at, updated_at, deleted_at, version.",
+        structure: {
+          headerSection: 'height 56; entity displayName + " Report" in 20pt bold #0f4c75',
+          contentSection: 'binding: "records"; one label+value row per field, 24pt high with 4px gap',
+          footerSection: 'height 28; "Generated by APPWITHAI" in 9pt #9ca3af centered'
+        }
+      },
+      adminRoutes: [
+        "GET /admin/reports — lists all entity tables with Designed/New badge",
+        "GET /admin/reports/:tableName — opens AnkaReport designer pre-loaded with the existing layout"
+      ],
+      backendEndpoints: [
+        "GET /sys/report-designs — list all designs",
+        "GET /sys/report-designs/:tableName — get design by table",
+        "POST /sys/report-designs — create (admin only)",
+        "PUT /sys/report-designs/:tableName — upsert (admin only)",
+        "DELETE /sys/report-designs/:tableName — delete (admin only)"
+      ],
+      printButton: "Appears in the record toolbar (ADToolbar hasPrintReport prop) only when a design exists for the current entity. Clicking opens ReportPrintModal which renders the report via AnkaReport.render() and offers PDF export.",
+      authoringNote: "No EML directive controls report designs. The default layout is always seeded automatically from the entity's columns. Customisation is done through the running Admin UI, not through the model."
     }
   },
   cardinalities: {
@@ -6508,7 +6537,9 @@ var erdwithai_language_default = {
       start: "[*] --> FirstState",
       end: "LastState --> [*]",
       transition: "StateA --> StateB : eventName",
-      mappingHint: "States are treated as a status enum for the bound entity; transitions define the allowed status changes."
+      mappingHint: "States are treated as a status enum for the bound entity; transitions define the allowed status changes.",
+      enforcement: "The edges are enforced, not merely documented. Every transition a diagram draws is compiled into sys_workflow_transitions, and the generated EntityAccessGuard refuses a write that moves a record to a state with no matching edge from the state it is in — answering 403 and leaving the record where it was. This holds for every caller, the master role included: an edge the diagram never drew is not a permission an administrator lacks, it is a move that does not exist, and allowing it would put the record in a state every rule and workflow downstream was written without. Who may cross an edge that does exist is the separate question %%rbac answers, from sys_transition_access, and that one the master role does bypass. Keep the two apart: enforcing topology only where a role rule happens to cover it leaves every unguarded edge open.",
+      readingTheEdges: "GET /api/workflows/transitions returns the stored edges, optionally narrowed by ?table= and ?from=. A screen offering a status change asks this rather than offering every state and letting the save be refused. A table with no state diagram has no rows and nothing is enforced for it."
     },
     workflowKinds: {
       hook: {
@@ -6519,7 +6550,7 @@ var erdwithai_language_default = {
       },
       state: {
         form: "%%workflow <name> entity: <Entity> kind: state",
-        description: "A stateDiagram-v2 whose states map to a status enum for the bound entity. Transitions define allowed status changes; %%guard directives add RBAC checks; %%trigger directives declare external event sources. Fully parsed by the shipped hook-parser.",
+        description: "A stateDiagram-v2 whose states map to a status enum for the bound entity. Transitions define the allowed status changes and are enforced as the entity's topology — see stateForm.enforcement. %%rbac directives naming a transition event add the role check on top of that; %%trigger directives declare external event sources. Fully parsed by the shipped hook-parser.",
         diagram: "stateDiagram-v2",
         shipped: true
       },
@@ -6538,7 +6569,7 @@ var erdwithai_language_default = {
       }
     },
     stepNodes: {
-      description: "Executable step types for a `kind: saga` workflow. A %%step directive binds a flowchart node to one of these and supplies its properties; each becomes one bpmn:serviceTask with erdwithai:property extension elements. This table is the single source of truth for the checker, the generator, the EML authoring canvas and the generated Workflow Designer.",
+      description: "Executable step types for a `kind: saga` workflow. A %%step directive binds a flowchart node to one of these and supplies its properties; each becomes one bpmn:serviceTask with appwithai:property extension elements. This table is the single source of truth for the checker, the generator, the EML authoring canvas and the generated Workflow Designer.",
       directive: "%%step <nodeId> <stepType> <key>: <value> ...",
       propertyForm: "Space-separated `key: value` pairs. A value runs to the next `<key>:` token or the end of the line, so it may contain spaces. `fields` is JSON and must be the last key on the line.",
       variables: "Steps share a context: the triggering record's columns, plus every variable a previous step published. CreateEntity publishes the new row's id under `as`; Formula publishes under `target`. A later step reads one by naming it in `source` or `targetSource`. This is what lets a workflow reach a row it created earlier.",
@@ -7022,7 +7053,7 @@ var erdwithai_language_default = {
           "seeded into sys_operation_access / sys_transition_access",
           "enforced by the generated EntityAccessGuard on /bus CRUD"
         ],
-        purpose: "Restrict a CRUD operation or a state transition to named roles. It restricts rather than grants: a target no directive mentions is open to any authenticated caller, so a model declaring no %%rbac generates what it always did. A target with one or more directives requires the union of the roles they name. A master role bypasses. Role names are matched case-insensitively, because seeded roles are title-cased (Manager) and directives are written lower-case (role:manager) - an exact match would make such a rule unsatisfiable, locking out exactly the people it was written to admit. Spelled %%guard until that keyword was needed unambiguously for automation conditions.",
+        purpose: "Restrict a CRUD operation or a state transition to named roles. It restricts rather than grants: a target no directive mentions is open to any authenticated caller, so a model declaring no %%rbac generates what it always did. A target with one or more directives requires the union of the roles they name. A master role bypasses. That bypass is over access — who may do a thing — and not over the shape of the model: a state machine's topology is enforced for the master role too, because an edge the diagram never drew is a move that does not exist rather than a permission anyone is missing (see workflowConstructs.stateForm.enforcement). Role names are matched case-insensitively, because seeded roles are title-cased (Manager) and directives are written lower-case (role:manager) - an exact match would make such a rule unsatisfiable, locking out exactly the people it was written to admit. Spelled %%guard until that keyword was needed unambiguously for automation conditions.",
         examples: [
           "%%rbac role:admin on Order.delete",
           "%%rbac role:sales|manager on Deal.update",
@@ -7032,7 +7063,7 @@ var erdwithai_language_default = {
         ],
         notes: {
           operations: "create | read | update | delete, plus * for all four. Aliases are accepted (insert/add, view/select/list, edit/write/modify, remove/destroy).",
-          transitions: "A name that is not a CRUD operation is resolved against the entity's stateDiagram-v2 transitions. There is no named-transition endpoint in a generated application - moving a record along an edge is a status update - so the rule is stored as the (from_state, to_state) pair it covers and the guard recognises the move by the states the write crosses. Both ends are kept because one event can sit on several edges and two events can reach the same state.",
+          transitions: "A name that is not a CRUD operation is resolved against the entity's stateDiagram-v2 transitions. There is no named-transition endpoint in a generated application - moving a record along an edge is a status update - so the rule is stored as the (from_state, to_state) pair it covers and the guard recognises the move by the states the write crosses. Both ends are kept because one event can sit on several edges and two events can reach the same state. This directive decides *who* may cross an edge; whether the edge exists at all is decided by the state diagram itself and enforced separately, so an edge no %%rbac names is open to any authenticated caller but an edge the diagram omits is refused to everyone.",
           notSysAccess: "A restriction on any operation other than read deliberately does not write sys_access. That is a grant table feeding sys_refresh_dictionary_scope(), where the first row added narrows a window to one role; a restriction on deleting must not become a restriction on looking. read is the one exception, and it is the exception on purpose - see functionalRoles.",
           functionalRoles: "read is the operation that decides which functional role an entity belongs to, and the only one that changes what a role sees. An entity a role may not read is absent from that role's navigation entirely - no menu entry, no dashboard card, no lookup - because a menu full of entries that answer 403 is a worse application than a shorter one. A model is expected to name every entity on at least one `%%rbac ... .read` directive, so that every entity belongs to somebody. Declaring none leaves every entity visible to every signed-in caller, which is what every model did before this rule existed.",
           seededAccounts: "Every role a directive names is created, and one account is seeded holding it, beside the administrator who bypasses everything and a role-less User. An application whose only account is the administrator cannot demonstrate its own access control, because the administrator is exempt from all of it. Both stacks derive the same list from rbac/roles.ts, and both sign-in screens print it with the number of entities each role can see."
@@ -7071,7 +7102,7 @@ var erdwithai_language_default = {
     }
   },
   grammar: {
-    notation: "EBNF-like; see language/grammar/erdwithai.ebnf for the full grammar.",
+    notation: "EBNF-like; see language/grammar/appwithai.ebnf for the full grammar.",
     topLevel: "document ::= ( comment | directive | erdSection | ruleSection | workflowSection | blankLine )*",
     erdSection: "erdSection ::= 'erDiagram' NEWLINE ( entityBlock | relationship | comment )*",
     entityBlock: "entityBlock ::= IDENT '{' NEWLINE attribute* '}' NEWLINE",
@@ -7090,10 +7121,12 @@ var erdwithai_language_default = {
       "3. Rules section -> flowchart-parser -> jdm-converter -> GoRules JDM graph -> seeded into sys_rule_definitions and evaluated by the rules engine.",
       "4. Rules section carrying %%action directives -> compileRules -> a GoRules decision table whose rows carry action/message/ruleId/workflowName outputs, instead of a node graph. This is how a model-declared rule reaches a model-declared saga: the rule's `when` expression decides, and its trigger-workflow action names the workflow.",
       "5. Workflow section, hook form -> compileHooks -> per-entity handler modules under src/modules/hooks/handlers plus a registry the bus service calls around every CRUD operation.",
-      "6. Workflow section, state form -> compileWorkflows -> BPMN seeded into sys_workflow_definitions; the trigger-workflow rules resolve it by name and the run puts a new record into the state machine's starting state.",
+      "6. Workflow section, state form -> compileWorkflows -> BPMN seeded into sys_workflow_definitions; the trigger-workflow rules resolve it by name and the run puts a new record into the state machine's starting state. The same pass writes every edge the diagram draws into sys_workflow_transitions, which EntityAccessGuard reads to refuse a status write the model never allowed for, and which GET /api/workflows/transitions exposes so a screen can offer only the moves that exist.",
       "7. Workflow section, saga form -> compileSagaWorkflows -> one bpmn:serviceTask per %%step, ordered by the flowchart edges, seeded into sys_workflow_definitions with source 'model'. A definition declared in the model is owned by the model: the generated Workflow Designer shows it read-only, and regeneration rewrites it. Definitions authored in the app carry source 'designer' and are never touched by regeneration.",
       "8. The whole document -> language/rag.ts -> retrieval chunks (one per entity, rule, workflow and spec section) -> the pgvector model_context index the assistant searches.",
-      "9. %%rbac directives -> compileRbac -> per-operation rules in sys_operation_access and per-transition rules in sys_transition_access, enforced by EntityAccessGuard on the generated /bus CRUD routes. Restrictive, not granting: a target no directive names stays open."
+      "9. %%rbac directives -> compileRbac -> per-operation rules in sys_operation_access and per-transition rules in sys_transition_access, enforced by EntityAccessGuard on the generated /bus CRUD routes. Restrictive, not granting: a target no directive names stays open.",
+      "10. ERD section -> nestjs-backend.generator -> one default AnkaReport layout per entity seeded into sys_report_designs. The layout renders every non-audit, non-PK field as a two-column (label | value) report. Administrators can customise layouts at Admin → Report Designs. Records get a Print button on their detail view if a design exists for their table.",
+      "11. %%enum and %%workflow kind: state -> the generated test suite's harness/model.ts, which carries the declared values and edges into the suites as data. This is the one consumer that reads the model rather than the dictionary compiled from it, and the distinction is the point: a suite that asserts a running application against the dictionary the same generator wrote proves only that the application is self-consistent, and passes just as happily when a value or an edge was dropped on the way. Asserting against the model's own word is what makes a dropped %%enum value or a missing state-machine edge fail a test rather than ship. Read by suite 02c (references) and suite 06b (state machines)."
     ],
     referenceFiles: {
       pipeline: "packages/generator/src/pipeline/generate-application.ts",
@@ -7109,7 +7142,8 @@ var erdwithai_language_default = {
       chunker: "language/rag.ts",
       checker: "language/checker.ts",
       orchestrator: "packages/generator/src/generators/orchestrator.ts",
-      rbacCompiler: "packages/generator/src/rbac/index.ts"
+      rbacCompiler: "packages/generator/src/rbac/index.ts",
+      testHarnessModel: "packages/generator/templates/tanstack-start-nestjs/tests/harness/model.ts.hbs"
     },
     authoringSurface: {
       description: "The web app keeps its own parsers for the editors, which run in the browser and cannot import the generator. They read the same syntax, but they do not decide what is generated - when the two disagree, the generator's copy is the language and the web copy is the bug.",
@@ -7300,7 +7334,7 @@ export declare function escapeLiteral(value: string): string;
  * This package is installed under the name \`pg\`, so every \`import { Pool } from
  * "pg"\` in the generated backend resolves here instead of to the network
  * driver. That is the entire database difference between an application
- * generated by \`erdwithai\` and one generated by \`erdwithai-wasm\`: not one line
+ * generated by \`appwithai\` and one generated by \`appwithai-wasm\`: not one line
  * of the backend's own source changes — not the Nest database module, not
  * better-auth, not the migration runner, not the seeds — because none of them
  * ever knew what was on the other side of a \`Pool\`.
@@ -7996,7 +8030,7 @@ function findDefinitionFile() {
   for (const start of starts) {
     let dir = start;
     for (let i = 0;i < 12; i++) {
-      const candidate = node_path_default.join(dir, "language", "erdwithai-language.json");
+      const candidate = node_path_default.join(dir, "language", "appwithai-language.json");
       if (existsSync(candidate))
         return candidate;
       const parent = node_path_default.dirname(dir);
@@ -8058,113 +8092,113 @@ init_node_path();
 // node_modules/.bun/zod@3.25.76/node_modules/zod/v3/external.js
 var exports_external = {};
 __export(exports_external, {
-  BRAND: () => BRAND,
-  DIRTY: () => DIRTY,
-  EMPTY_PATH: () => EMPTY_PATH,
-  INVALID: () => INVALID,
-  NEVER: () => NEVER,
-  OK: () => OK,
-  ParseStatus: () => ParseStatus,
-  Schema: () => ZodType,
-  ZodAny: () => ZodAny,
-  ZodArray: () => ZodArray,
-  ZodBigInt: () => ZodBigInt,
-  ZodBoolean: () => ZodBoolean,
-  ZodBranded: () => ZodBranded,
-  ZodCatch: () => ZodCatch,
-  ZodDate: () => ZodDate,
-  ZodDefault: () => ZodDefault,
-  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
-  ZodEffects: () => ZodEffects,
-  ZodEnum: () => ZodEnum,
-  ZodError: () => ZodError,
-  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
-  ZodFunction: () => ZodFunction,
-  ZodIntersection: () => ZodIntersection,
-  ZodIssueCode: () => ZodIssueCode,
-  ZodLazy: () => ZodLazy,
-  ZodLiteral: () => ZodLiteral,
-  ZodMap: () => ZodMap,
-  ZodNaN: () => ZodNaN,
-  ZodNativeEnum: () => ZodNativeEnum,
-  ZodNever: () => ZodNever,
-  ZodNull: () => ZodNull,
-  ZodNullable: () => ZodNullable,
-  ZodNumber: () => ZodNumber,
-  ZodObject: () => ZodObject,
-  ZodOptional: () => ZodOptional,
-  ZodParsedType: () => ZodParsedType,
-  ZodPipeline: () => ZodPipeline,
-  ZodPromise: () => ZodPromise,
-  ZodReadonly: () => ZodReadonly,
-  ZodRecord: () => ZodRecord,
-  ZodSchema: () => ZodType,
-  ZodSet: () => ZodSet,
-  ZodString: () => ZodString,
-  ZodSymbol: () => ZodSymbol,
-  ZodTransformer: () => ZodEffects,
-  ZodTuple: () => ZodTuple,
-  ZodType: () => ZodType,
-  ZodUndefined: () => ZodUndefined,
-  ZodUnion: () => ZodUnion,
-  ZodUnknown: () => ZodUnknown,
-  ZodVoid: () => ZodVoid,
-  addIssueToContext: () => addIssueToContext,
-  any: () => anyType,
-  array: () => arrayType,
-  bigint: () => bigIntType,
-  boolean: () => booleanType,
-  coerce: () => coerce,
-  custom: () => custom,
-  date: () => dateType,
-  datetimeRegex: () => datetimeRegex,
-  defaultErrorMap: () => en_default,
-  discriminatedUnion: () => discriminatedUnionType,
-  effect: () => effectsType,
-  enum: () => enumType,
-  function: () => functionType,
-  getErrorMap: () => getErrorMap,
-  getParsedType: () => getParsedType,
-  instanceof: () => instanceOfType,
-  intersection: () => intersectionType,
-  isAborted: () => isAborted,
-  isAsync: () => isAsync,
-  isDirty: () => isDirty,
-  isValid: () => isValid,
-  late: () => late,
-  lazy: () => lazyType,
-  literal: () => literalType,
-  makeIssue: () => makeIssue,
-  map: () => mapType,
-  nan: () => nanType,
-  nativeEnum: () => nativeEnumType,
-  never: () => neverType,
-  null: () => nullType,
-  nullable: () => nullableType,
-  number: () => numberType,
-  object: () => objectType,
-  objectUtil: () => objectUtil,
-  oboolean: () => oboolean,
-  onumber: () => onumber,
-  optional: () => optionalType,
-  ostring: () => ostring,
-  pipeline: () => pipelineType,
-  preprocess: () => preprocessType,
-  promise: () => promiseType,
-  quotelessJson: () => quotelessJson,
-  record: () => recordType,
-  set: () => setType,
-  setErrorMap: () => setErrorMap,
-  strictObject: () => strictObjectType,
-  string: () => stringType,
-  symbol: () => symbolType,
-  transformer: () => effectsType,
-  tuple: () => tupleType,
-  undefined: () => undefinedType,
-  union: () => unionType,
-  unknown: () => unknownType,
+  void: () => voidType,
   util: () => util,
-  void: () => voidType
+  unknown: () => unknownType,
+  union: () => unionType,
+  undefined: () => undefinedType,
+  tuple: () => tupleType,
+  transformer: () => effectsType,
+  symbol: () => symbolType,
+  string: () => stringType,
+  strictObject: () => strictObjectType,
+  setErrorMap: () => setErrorMap,
+  set: () => setType,
+  record: () => recordType,
+  quotelessJson: () => quotelessJson,
+  promise: () => promiseType,
+  preprocess: () => preprocessType,
+  pipeline: () => pipelineType,
+  ostring: () => ostring,
+  optional: () => optionalType,
+  onumber: () => onumber,
+  oboolean: () => oboolean,
+  objectUtil: () => objectUtil,
+  object: () => objectType,
+  number: () => numberType,
+  nullable: () => nullableType,
+  null: () => nullType,
+  never: () => neverType,
+  nativeEnum: () => nativeEnumType,
+  nan: () => nanType,
+  map: () => mapType,
+  makeIssue: () => makeIssue,
+  literal: () => literalType,
+  lazy: () => lazyType,
+  late: () => late,
+  isValid: () => isValid,
+  isDirty: () => isDirty,
+  isAsync: () => isAsync,
+  isAborted: () => isAborted,
+  intersection: () => intersectionType,
+  instanceof: () => instanceOfType,
+  getParsedType: () => getParsedType,
+  getErrorMap: () => getErrorMap,
+  function: () => functionType,
+  enum: () => enumType,
+  effect: () => effectsType,
+  discriminatedUnion: () => discriminatedUnionType,
+  defaultErrorMap: () => en_default,
+  datetimeRegex: () => datetimeRegex,
+  date: () => dateType,
+  custom: () => custom,
+  coerce: () => coerce,
+  boolean: () => booleanType,
+  bigint: () => bigIntType,
+  array: () => arrayType,
+  any: () => anyType,
+  addIssueToContext: () => addIssueToContext,
+  ZodVoid: () => ZodVoid,
+  ZodUnknown: () => ZodUnknown,
+  ZodUnion: () => ZodUnion,
+  ZodUndefined: () => ZodUndefined,
+  ZodType: () => ZodType,
+  ZodTuple: () => ZodTuple,
+  ZodTransformer: () => ZodEffects,
+  ZodSymbol: () => ZodSymbol,
+  ZodString: () => ZodString,
+  ZodSet: () => ZodSet,
+  ZodSchema: () => ZodType,
+  ZodRecord: () => ZodRecord,
+  ZodReadonly: () => ZodReadonly,
+  ZodPromise: () => ZodPromise,
+  ZodPipeline: () => ZodPipeline,
+  ZodParsedType: () => ZodParsedType,
+  ZodOptional: () => ZodOptional,
+  ZodObject: () => ZodObject,
+  ZodNumber: () => ZodNumber,
+  ZodNullable: () => ZodNullable,
+  ZodNull: () => ZodNull,
+  ZodNever: () => ZodNever,
+  ZodNativeEnum: () => ZodNativeEnum,
+  ZodNaN: () => ZodNaN,
+  ZodMap: () => ZodMap,
+  ZodLiteral: () => ZodLiteral,
+  ZodLazy: () => ZodLazy,
+  ZodIssueCode: () => ZodIssueCode,
+  ZodIntersection: () => ZodIntersection,
+  ZodFunction: () => ZodFunction,
+  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
+  ZodError: () => ZodError,
+  ZodEnum: () => ZodEnum,
+  ZodEffects: () => ZodEffects,
+  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
+  ZodDefault: () => ZodDefault,
+  ZodDate: () => ZodDate,
+  ZodCatch: () => ZodCatch,
+  ZodBranded: () => ZodBranded,
+  ZodBoolean: () => ZodBoolean,
+  ZodBigInt: () => ZodBigInt,
+  ZodArray: () => ZodArray,
+  ZodAny: () => ZodAny,
+  Schema: () => ZodType,
+  ParseStatus: () => ParseStatus,
+  OK: () => OK,
+  NEVER: () => NEVER,
+  INVALID: () => INVALID,
+  EMPTY_PATH: () => EMPTY_PATH,
+  DIRTY: () => DIRTY,
+  BRAND: () => BRAND
 });
 
 // node_modules/.bun/zod@3.25.76/node_modules/zod/v3/helpers/util.js
@@ -13499,13 +13533,13 @@ function buildSagaBpmn(saga, tableName, resolveTable = (entity2) => entity2) {
     for (const [key, value] of Object.entries(step.props)) {
       entries.push([key, key === "entity" ? resolveTable(value) : value]);
     }
-    const properties = entries.map(([key, value]) => `          <erdwithai:property name="${escapeXmlAttr(key)}" value="${escapeXmlAttr(value)}" />`).join(`
+    const properties = entries.map(([key, value]) => `          <appwithai:property name="${escapeXmlAttr(key)}" value="${escapeXmlAttr(value)}" />`).join(`
 `);
     return `    <bpmn:serviceTask id="${escapeXmlAttr(step.nodeId)}" name="${escapeXmlAttr(step.label)}">
       <bpmn:extensionElements>
-        <erdwithai:properties xmlns:erdwithai="http://erdwithai.io/schema/1.0">
+        <appwithai:properties xmlns:appwithai="http://appwithai.io/schema/1.0">
 ${properties}
-        </erdwithai:properties>
+        </appwithai:properties>
       </bpmn:extensionElements>
     </bpmn:serviceTask>`;
   }).join(`
@@ -13514,7 +13548,7 @@ ${properties}
   const flows = ids.slice(0, -1).map((from, index) => `    <bpmn:sequenceFlow id="flow_${index}" sourceRef="${escapeXmlAttr(from)}" targetRef="${escapeXmlAttr(ids[index + 1])}" />`).join(`
 `);
   return `<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_${processId}" targetNamespace="http://erdwithai.dev/bpmn">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="defs_${processId}" targetNamespace="http://appwithai.dev/bpmn">
   <bpmn:process id="${processId}" isExecutable="true">
     <bpmn:startEvent id="start" name="Record written" />
 ${tasks}
@@ -13636,12 +13670,12 @@ function buildStateEntryBpmn(workflow, tableName, statusField) {
   const taskId = "task_enter_initial";
   const task = workflow.initial ? `    <bpmn:serviceTask id="${taskId}" name="Enter ${escapeXml(workflow.initial)}">
       <bpmn:extensionElements>
-        <erdwithai:properties xmlns:erdwithai="http://erdwithai.dev/bpmn">
-          <erdwithai:property name="nodeType" value="UpdateEntity" />
-          <erdwithai:property name="entity" value="${escapeXml(tableName)}" />
-          <erdwithai:property name="field" value="${escapeXml(statusField)}" />
-          <erdwithai:property name="value" value="${escapeXml(workflow.initial)}" />
-        </erdwithai:properties>
+        <appwithai:properties xmlns:appwithai="http://appwithai.dev/bpmn">
+          <appwithai:property name="nodeType" value="UpdateEntity" />
+          <appwithai:property name="entity" value="${escapeXml(tableName)}" />
+          <appwithai:property name="field" value="${escapeXml(statusField)}" />
+          <appwithai:property name="value" value="${escapeXml(workflow.initial)}" />
+        </appwithai:properties>
       </bpmn:extensionElements>
     </bpmn:serviceTask>
 ` : "";
@@ -13650,7 +13684,7 @@ function buildStateEntryBpmn(workflow, tableName, statusField) {
 ` : `    <bpmn:sequenceFlow id="flow_1" sourceRef="start" targetRef="end" />
 `;
   return `<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="defs_${processId}" targetNamespace="http://erdwithai.dev/bpmn">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="defs_${processId}" targetNamespace="http://appwithai.dev/bpmn">
   <bpmn:process id="${processId}" isExecutable="true">
     <bpmn:startEvent id="start" name="Record written" />
 ${task}${flows}    <bpmn:endEvent id="end" name="Done" />
@@ -13661,16 +13695,16 @@ ${task}${flows}    <bpmn:endEvent id="end" name="Done" />
 function buildPassThroughBpmn(tableName) {
   const processId = `${tableName}_passthrough`;
   return `<?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="defs_${processId}" targetNamespace="http://erdwithai.dev/bpmn">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="defs_${processId}" targetNamespace="http://appwithai.dev/bpmn">
   <bpmn:process id="${processId}" isExecutable="true">
     <bpmn:startEvent id="start" name="Record written" />
     <bpmn:serviceTask id="task_noop" name="No workflow declared">
       <bpmn:extensionElements>
-        <erdwithai:properties xmlns:erdwithai="http://erdwithai.dev/bpmn">
-          <erdwithai:property name="nodeType" value="Formula" />
-          <erdwithai:property name="target" value="acknowledged" />
-          <erdwithai:property name="expression" value="true" />
-        </erdwithai:properties>
+        <appwithai:properties xmlns:appwithai="http://appwithai.dev/bpmn">
+          <appwithai:property name="nodeType" value="Formula" />
+          <appwithai:property name="target" value="acknowledged" />
+          <appwithai:property name="expression" value="true" />
+        </appwithai:properties>
       </bpmn:extensionElements>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="flow_1" sourceRef="start" targetRef="task_noop" />
@@ -14660,6 +14694,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       entities: busEntities.map((entity2) => entity2.name)
     });
     const dbUser = this.options.databaseType === "postgresql" ? process.env.USER || process.env.USERNAME || "postgres" : "postgres";
+    const fkOverrides = this.buildFkOverrides(busEntities, relationships);
     return {
       project: {
         name: this.options.projectName,
@@ -14683,6 +14718,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       projectKebab: this.options.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       entities: busEntities,
       relationships,
+      fkOverrides,
       sysTables,
       sysColumns,
       modelEnums,
@@ -14732,6 +14768,74 @@ class NestJsBackendGenerator extends BaseGenerator {
       isDefault: category.isDefault,
       tables: category.entities.map((entityName) => tableByName.get(entityName.toLowerCase())).filter((tableName) => !!tableName)
     }));
+  }
+  buildFkOverrides(busEntities, relationships) {
+    const tableSet = new Set(busEntities.map((e) => e.tableName));
+    const entityToTable = new Map(busEntities.map((e) => [(e.originalName || e.name).toLowerCase(), e.tableName]));
+    const overrides = [];
+    const seen = new Set;
+    for (const entity2 of busEntities) {
+      const entityName = (entity2.originalName || entity2.name).toLowerCase();
+      const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
+      const parentRels = relationships.filter((r) => r.targetEntity.toLowerCase() === entityName);
+      for (const attr of fkAttrs) {
+        const col = attr.columnName || attr.name;
+        if (seen.has(col))
+          continue;
+        const base = col.replace(/_id$/, "");
+        if (tableSet.has(`bus_${base}`))
+          continue;
+        for (const rel of parentRels) {
+          const srcTable = entityToTable.get(rel.sourceEntity.toLowerCase());
+          if (!srcTable)
+            continue;
+          const srcBase = srcTable.replace(/^bus_/, "");
+          if (base === srcBase)
+            continue;
+          const alreadyResolved = fkAttrs.some((a) => {
+            const b = (a.columnName || a.name).replace(/_id$/, "");
+            return b === srcBase;
+          });
+          if (alreadyResolved)
+            continue;
+          overrides.push({ column: col, table: srcTable });
+          seen.add(col);
+          break;
+        }
+      }
+    }
+    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : "bus_user";
+    const personRoleColumns = [
+      "pi_id",
+      "lab_manager_id",
+      "assigned_to",
+      "owner_id",
+      "author_id",
+      "manager_id",
+      "user_id",
+      "created_by_user",
+      "remediation_owner",
+      "remediation_owner_id"
+    ];
+    for (const col of personRoleColumns) {
+      if (!seen.has(col)) {
+        overrides.push({ column: col, table: personTable });
+        seen.add(col);
+      }
+    }
+    for (const entity2 of busEntities) {
+      const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
+      for (const attr of fkAttrs) {
+        const col = attr.columnName || attr.name;
+        if (seen.has(col))
+          continue;
+        if (col.endsWith("_by_id") || col.endsWith("_by")) {
+          overrides.push({ column: col, table: personTable });
+          seen.add(col);
+        }
+      }
+    }
+    return overrides;
   }
   async generateCoreFiles(outputDir, context) {
     const mainContent = await this.renderTemplate("src/main.ts.hbs", context);
@@ -15363,6 +15467,14 @@ export async function executeCustomValidateHooks(
       {
         slug: "add_operation_access",
         template: "src/migrations/011_add_operation_access.ts.hbs"
+      },
+      {
+        slug: "add_workflow_transitions",
+        template: "src/migrations/012_add_workflow_transitions.ts.hbs"
+      },
+      {
+        slug: "add_report_designs",
+        template: "src/migrations/013_add_report_designs.ts.hbs"
       }
     ];
     const scaffoldSlugs = new Set(scaffold.map((m) => m.slug));
@@ -15418,6 +15530,8 @@ export async function executeCustomValidateHooks(
     }
     await writeFile(join(outputDir, "seeds/05_workflow_definitions.ts"), this.renderWorkflowDefinitionsSeed(context));
     await writeFile(join(outputDir, "seeds/05b_workflow_transitions.ts"), this.renderWorkflowTransitionsSeed(context));
+    const reportDesignsSeedContent = await this.renderTemplate("../../common/seeds/report-designs.ts.hbs", context);
+    await writeFile(join(outputDir, "seeds/06_report_designs.ts"), reportDesignsSeedContent);
   }
   renderWorkflowDefinitionsSeed(context) {
     const byEntity = new Map;
@@ -15962,6 +16076,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       "src/lib/workflow",
       "src/lib/automation",
       "src/components/automation",
+      "src/components/reports",
       "test"
     ];
     for (const dir of dirs2) {
@@ -16331,6 +16446,14 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
         dest: "src/components/admin/ad-detail-shell.tsx"
       },
       {
+        src: "src/components/reports/ReportPrintModal.tsx",
+        dest: "src/components/reports/ReportPrintModal.tsx"
+      },
+      {
+        src: "src/components/reports/ReportDesigner.tsx",
+        dest: "src/components/reports/ReportDesigner.tsx"
+      },
+      {
         src: "src/components/admin/ad-list-shell.tsx",
         dest: "src/components/admin/ad-list-shell.tsx"
       },
@@ -16517,6 +16640,12 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       console.warn("Admin audit page not found");
     }
     try {
+      const reportsContent = await this.component("src/routes/admin/reports.tsx");
+      await writeFile(join(adminDir, "reports.tsx"), reportsContent);
+    } catch (e) {
+      console.warn("Admin reports page template not found");
+    }
+    try {
       const usersContent = await this.component("src/routes/admin/users.tsx");
       await writeFile(join(adminDir, "users.tsx"), usersContent);
     } catch (e) {
@@ -16535,15 +16664,27 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       { src: "src/routes/admin/reference", dest: "src/routes/admin/reference" },
       { src: "src/routes/admin/rules", dest: "src/routes/admin/rules" },
       {
+        src: "src/routes/admin/reports.$tableName.tsx",
+        dest: "src/routes/admin/reports.$tableName.tsx"
+      },
+      {
         src: "src/routes/admin/workflow-definitions",
         dest: "src/routes/admin/workflow-definitions"
       }
     ];
     for (const subdir of adminSubdirs) {
+      const src = join(templateDir, subdir.src);
+      const dest = join(outputDir, subdir.dest);
       try {
-        await this.copyDirRecursive(join(templateDir, subdir.src), join(outputDir, subdir.dest));
+        const stats = await stat(src);
+        if (stats.isDirectory()) {
+          await this.copyDirRecursive(src, dest);
+        } else {
+          await mkdir(dirname(dest), { recursive: true });
+          await copyFile(src, dest);
+        }
       } catch (e) {
-        console.warn(`Admin subdir not found: ${subdir.src}`);
+        console.warn(`Admin route template not found: ${subdir.src}`);
       }
     }
   }
@@ -16555,8 +16696,8 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     }
   }
   async copyDirRecursive(src, dest) {
-    await mkdir(dest, { recursive: true });
     const entries = await readdir(src, { withFileTypes: true });
+    await mkdir(dest, { recursive: true });
     for (const entry of entries) {
       const srcPath = join(src, entry.name);
       const destPath = join(dest, entry.name);
@@ -16658,6 +16799,7 @@ var HARNESS_FILES = [
   "auth.ts",
   "server.ts",
   "entities.ts",
+  "model.ts",
   "factory.ts",
   "rules.ts",
   "workflows.ts",
@@ -16671,12 +16813,16 @@ var SHARED_SUITES = [
   "00-health.test.ts",
   "01-auth.test.ts",
   "02-dictionary.test.ts",
+  "02b-dictionary-layout.test.ts",
+  "02c-dictionary-references.test.ts",
   "04-bulk-seed.test.ts",
   "06-rules-workflow.test.ts",
+  "06b-workflow-transitions.test.ts",
   "07-workflow-random.test.ts",
   "08-users-roles.test.ts",
   "09-workflow-multistep.test.ts",
-  "10-benchmark.test.ts"
+  "10-benchmark.test.ts",
+  "11-performance-budget.test.ts"
 ];
 var ROOT_FILES = ["package.json", "tsconfig.json", "README.md", "run.ts", "cleanup.ts"];
 var EXECUTABLE_FILES = ["run.ts", "cleanup.ts"];
@@ -16715,8 +16861,106 @@ class BunE2ETestGenerator extends BaseGenerator {
       },
       entities,
       relationships,
+      fkOverrides: this.buildFkOverrides(entities, relationships),
+      modelEnums: this.options.modelEnums ?? [],
+      stateMachines: this.stateMachines(entities),
       now: new Date().toISOString()
     };
+  }
+  buildFkOverrides(busEntities, relationships) {
+    const tableSet = new Set(busEntities.map((e) => e.tableName));
+    const entityToTable = new Map(busEntities.map((e) => [(e.originalName || e.name).toLowerCase(), e.tableName]));
+    const overrides = [];
+    const seen = new Set;
+    for (const entity2 of busEntities) {
+      const entityName = (entity2.originalName || entity2.name).toLowerCase();
+      const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
+      const parentRels = relationships.filter((r) => r.targetEntity.toLowerCase() === entityName);
+      for (const attr of fkAttrs) {
+        const col = attr.columnName || attr.name;
+        if (seen.has(col))
+          continue;
+        const base = col.replace(/_id$/, "");
+        if (tableSet.has(`bus_${base}`))
+          continue;
+        for (const rel of parentRels) {
+          const srcTable = entityToTable.get(rel.sourceEntity.toLowerCase());
+          if (!srcTable)
+            continue;
+          const srcBase = srcTable.replace(/^bus_/, "");
+          if (base === srcBase)
+            continue;
+          const alreadyResolved = fkAttrs.some((a) => {
+            const b = (a.columnName || a.name).replace(/_id$/, "");
+            return b === srcBase;
+          });
+          if (alreadyResolved)
+            continue;
+          overrides.push({ column: col, table: srcTable });
+          seen.add(col);
+          break;
+        }
+      }
+    }
+    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : "bus_user";
+    const personRoleColumns = [
+      "pi_id",
+      "lab_manager_id",
+      "assigned_to",
+      "owner_id",
+      "author_id",
+      "manager_id",
+      "user_id",
+      "created_by_user",
+      "remediation_owner",
+      "remediation_owner_id"
+    ];
+    for (const col of personRoleColumns) {
+      if (!seen.has(col)) {
+        overrides.push({ column: col, table: personTable });
+        seen.add(col);
+      }
+    }
+    for (const entity2 of busEntities) {
+      const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
+      for (const attr of fkAttrs) {
+        const col = attr.columnName || attr.name;
+        if (seen.has(col))
+          continue;
+        if (col.endsWith("_by_id") || col.endsWith("_by")) {
+          overrides.push({ column: col, table: personTable });
+          seen.add(col);
+        }
+      }
+    }
+    return overrides;
+  }
+  stateMachines(entities) {
+    const byEntity = new Map;
+    for (const workflow of this.options.compiledWorkflows ?? []) {
+      if (!byEntity.has(workflow.entity))
+        byEntity.set(workflow.entity, workflow);
+    }
+    const machines = [];
+    for (const entity2 of entities) {
+      const workflow = byEntity.get(entity2.name) ?? byEntity.get(entity2.originalName);
+      if (!workflow || workflow.transitions.length === 0)
+        continue;
+      const columns = (entity2.attributes ?? []).map((attribute) => attribute.columnName ?? attribute.name);
+      const statusField = columns.includes("status") ? "status" : "workflow_status";
+      const edges = workflow.transitions.filter((t) => t.from !== "[*]" && t.to !== "[*]").map((t) => ({ from: t.from, to: t.to, trigger: t.trigger ?? "" }));
+      if (edges.length === 0)
+        continue;
+      machines.push({
+        entity: entity2.name,
+        tableName: entity2.tableName,
+        statusField,
+        initial: workflow.initial ?? "",
+        terminal: workflow.terminal ?? [],
+        edges
+      });
+    }
+    return machines;
   }
   async writeRootFiles(testsDir, context) {
     for (const file of ROOT_FILES) {
@@ -16834,7 +17078,9 @@ class FullStackGenerator {
         projectDescription: this.options.projectDescription,
         port: this.options.port,
         frontendPort: this.options.frontendPort ?? DEFAULT_FRONTEND_PORT,
-        recordsPerEntity: this.options.recordsPerEntity
+        recordsPerEntity: this.options.recordsPerEntity,
+        modelEnums: this.options.modelEnums,
+        compiledWorkflows: this.options.compiledWorkflows
       });
       await testGenerator.generate(entities, relationships, outputDir);
     }
@@ -16913,6 +17159,13 @@ npm-debug.log*
 # Database
 *.db
 *.sqlite
+
+# What a test run leaves behind. The metrics reports and the seed manifest name
+# the rows one particular run created, on one particular database — committing
+# them would put a second developer's ids in everyone's tree, and the next run
+# rewrites them anyway.
+test-results/
+tests/.e2e-seed-manifest.json
 `;
     await writeFile(join(outputDir, ".gitignore"), gitignore);
     await this.writeContainerFiles(outputDir);
@@ -18213,6 +18466,88 @@ function parseRuleActions(flowchart) {
 function zenLiteral(value) {
   return `'${value.replace(/'/g, "\\'")}'`;
 }
+var DECISION_TABLE_DIRECTIVE = "%%decision-table ";
+function parseDecisionTableDirective(flowchart) {
+  const line = (flowchart ?? "").split(`
+`).map((l) => l.trim()).find((l) => l.startsWith(DECISION_TABLE_DIRECTIVE));
+  if (!line)
+    return null;
+  try {
+    const parsed = JSON.parse(line.slice(DECISION_TABLE_DIRECTIVE.length));
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+function isBareLiteral(value) {
+  return value === "true" || value === "false" || value === "null" || value !== "" && !Number.isNaN(Number(value));
+}
+function isQuoted(value) {
+  return value.length >= 2 && (value.startsWith("'") || value.startsWith('"')) && value.endsWith(value[0]);
+}
+function zenCell(raw) {
+  const value = (raw ?? "").trim();
+  if (value === "")
+    return "";
+  if (isQuoted(value) || isBareLiteral(value))
+    return value;
+  return zenLiteral(value);
+}
+function zenInputCell(raw) {
+  const value = (raw ?? "").trim();
+  if (value === "")
+    return "";
+  const match = value.match(/^(>=|<=|!=|=|>|<)\s*(.*)$/);
+  if (!match)
+    return zenCell(value);
+  const [, operator, operand] = match;
+  const cell = zenCell(operand);
+  if (!cell)
+    return "";
+  return operator === "=" ? cell : `${operator} ${cell}`;
+}
+function buildEditorDecisionTable(ruleName, table) {
+  const inputs = (table.inputs ?? []).filter((column) => (column.field ?? "").trim() !== "");
+  const outputs = (table.outputs ?? []).filter((column) => (column.field ?? "").trim() !== "");
+  const rows = (table.rules ?? []).map((row, index) => {
+    const compiled = { _id: row._id || `${ruleName}-${index + 1}` };
+    for (const column of inputs)
+      compiled[column.id] = zenInputCell(row[column.id]);
+    for (const column of outputs)
+      compiled[column.id] = zenCell(row[column.id]);
+    return compiled;
+  });
+  const tableId = `${ruleName}-table`;
+  return {
+    nodes: [
+      { id: "input", name: "Input", type: "inputNode" },
+      {
+        id: tableId,
+        name: ruleName,
+        type: "decisionTableNode",
+        content: {
+          hitPolicy: table.hitPolicy === "collect" ? "collect" : "first",
+          inputs: inputs.map((column) => ({
+            id: column.id,
+            name: column.name ?? column.id,
+            field: column.field ?? ""
+          })),
+          outputs: outputs.map((column) => ({
+            id: column.id,
+            name: column.name ?? column.id,
+            field: column.field ?? ""
+          })),
+          rules: rows
+        }
+      },
+      { id: "output", name: "Output", type: "outputNode" }
+    ],
+    edges: [
+      { id: "edge-1", sourceId: "input", targetId: tableId },
+      { id: "edge-2", sourceId: tableId, targetId: "output" }
+    ]
+  };
+}
 function buildActionDecisionTable(ruleName, actions) {
   const cells = [
     (action) => zenLiteral(action.type),
@@ -18273,13 +18608,21 @@ function compileRules(sections, onWarn = () => {}) {
       continue;
     }
     try {
+      const editorTable = parseDecisionTableDirective(section.flowchart);
       const ast = parseMermaidFlowchart(section.flowchart);
-      if (!ast.nodes.size) {
+      if (!editorTable && !ast.nodes.size) {
         onWarn(`Rule "${section.name}" has no nodes; skipping.`);
         continue;
       }
       const actions = parseRuleActions(section.flowchart);
-      const jdm = actions.length ? buildActionDecisionTable(section.name, actions) : convertToJdm(ast);
+      let jdm;
+      if (editorTable) {
+        jdm = buildEditorDecisionTable(section.name, editorTable);
+      } else if (actions.length) {
+        jdm = buildActionDecisionTable(section.name, actions);
+      } else {
+        jdm = convertToJdm(ast);
+      }
       compiled.push({
         name: section.name,
         entity: section.entity,
@@ -18379,7 +18722,7 @@ function buildGeneratorOptions(model, settings) {
 async function writeManifest(outputDir, model, settings, extras = {}) {
   const port = settings.port ?? GENERATION_DEFAULTS.port;
   try {
-    await writeFile(join(outputDir, ".erdwithai.json"), JSON.stringify({
+    await writeFile(join(outputDir, ".appwithai.json"), JSON.stringify({
       name: settings.projectName,
       version: settings.projectVersion ?? GENERATION_DEFAULTS.projectVersion,
       description: settings.projectDescription ?? GENERATION_DEFAULTS.projectDescription,
@@ -19151,9 +19494,19 @@ class CheckEngine {
   }
   fkToEntityName(fkAttr) {
     if (isPersonRoleColumn(fkAttr))
-      return "User";
+      return this.personEntity();
     const base = fkAttr.slice(0, -3);
     return base.replace(/(^|_)([a-z])/g, (_, _sep, ch) => ch.toUpperCase());
+  }
+  personEntity() {
+    const names = new Set(this.model.entities.map((e) => e.name));
+    if (names.has("User"))
+      return "User";
+    if (names.has("Staff"))
+      return "Staff";
+    if (names.has("Employee"))
+      return "Employee";
+    return "User";
   }
   checkDocument() {
     const { meta } = this.model;
@@ -19292,7 +19645,7 @@ class CheckEngine {
       if (rawBase && rawBase !== "string" && !(rawBase in def.types.map)) {
         this.warn("EML115", `Unknown type "${attr.rawType}" on "${entity2.name}.${attr.name}"; mapped to "string".`, {
           line: attrLine,
-          hint: `Valid types: ${def.types.canonical.join(", ")} (plus aliases listed in erdwithai-language.json).`
+          hint: `Valid types: ${def.types.canonical.join(", ")} (plus aliases listed in appwithai-language.json).`
         });
       }
       if (attr.isPrimaryKey && attrLine) {
@@ -20831,8 +21184,8 @@ function reviewModel(source, options = {}) {
 // packages/generator/src/browser/full-stack.ts
 init_memory_fs();
 init_model_check_error();
-setLanguageDefinition2(erdwithai_language_default);
-setLanguageDefinition(erdwithai_language_default);
+setLanguageDefinition2(appwithai_language_default);
+setLanguageDefinition(appwithai_language_default);
 var TEMPLATE_ROOT = "/templates";
 var OUTPUT_ROOT = "/app";
 async function generateFullStack(options) {
@@ -20898,7 +21251,7 @@ async function loadTemplates(url = "assets/stack-templates.json") {
   return await response.json();
 }
 export {
-  ModelCheckError,
+  loadTemplates,
   generateFullStack,
-  loadTemplates
+  ModelCheckError
 };

@@ -107,7 +107,7 @@
   Two ES modules are published at fixed URLs on this site. They are bundled from
   <code>language/checker.ts</code> and <code>language/fixer.ts</code> by
   <code>scripts/build-language-tools.ts</code> — the same engines the command line runs, not a lighter
-  web edition — so a document that passes here is a document <code>erdwithai</code> will accept.
+  web edition — so a document that passes here is a document <code>appwithai</code> will accept.
 </p>
 
 <div class="table-wrap">
@@ -171,6 +171,11 @@ console.log(formatReport(report));</code></pre>
           <span class="choice__name">The drug-discovery model</span>
           <span class="choice__desc">A regulated-lab model — compounds, experiments, deviations, CAPAs.</span>
           <span class="choice__meta">drug-discovery.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
+          <span class="choice__name">The hospital model</span>
+          <span class="choice__desc">Twenty-eight entities, no <code>User</code> entity — the person columns resolve to <code>Staff</code>. Clean, with one warning worth reading.</span>
+          <span class="choice__meta">hospital-management-system.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-broken" aria-pressed="false">
           <span class="choice__name">A broken model</span>
@@ -378,7 +383,7 @@ node check-model.mjs my-business.mmd</code></pre>
 <p>
   Point a language model at it before asking for a model, and it has the language definition, the
   directive table, the checker codes and this protocol without having to guess at any of them. When that
-  file and <code>language/erdwithai-language.json</code> disagree, the definition wins; when the
+  file and <code>language/appwithai-language.json</code> disagree, the definition wins; when the
   definition and a shipped compiler disagree, the compiler wins and the definition is the bug.
 </p>
 
