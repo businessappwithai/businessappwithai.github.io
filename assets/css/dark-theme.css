@@ -73,6 +73,12 @@ a:hover { color: #a5b4fc; }
 }
 
 /* ── Hero ───────────────────────────────────────────────────────────────── */
+/* The epigraph band under the nav — see .quote-bar in style.css. */
+.quote-bar { background: #0d0d16; border-bottom-color: #1e1e2e; }
+.quote-bar__text { color: #cbd5e1; }
+.quote-bar__attribution { color: #6b7280; }
+.quote-bar__attribution a:hover { color: #a5b4fc; }
+
 .hero {
   background: radial-gradient(ellipse 80% 60% at 50% -10%,
               rgba(99, 102, 241, 0.18) 0%, transparent 70%), #0a0a0a;
