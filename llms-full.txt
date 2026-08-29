@@ -623,9 +623,18 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
   `author_id`, `lab_manager_id`, `manager_id`, `owner_id`, `pi_id`,
   `remediation_owner`, `remediation_owner_id`, `user_id`. Nothing else.
   `approver_id` derives `Approver` and `assigned_to_id` derives `AssignedTo` —
-  entities nobody declared, so both raise `EML502` while looking entirely
-  reasonable. Name person columns `<verb>_by_id` (`approved_by_id`) or use
-  `owner_id`.
+  entities nobody declared. Name person columns `<verb>_by_id`
+  (`approved_by_id`) or use `owner_id`.
+- **A name that resolves to nothing falls back to a relationship you drew.** If
+  the entity declares a parent that no other foreign key on it accounts for, the
+  column is bound to that parent — so `ImagingReport.radiologist_id` finds
+  `Doctor` when the model says `Doctor ||--o{ ImagingReport`, rather than
+  hunting for a `Radiologist` nobody wrote. The generator resolves it this way,
+  and the checker agrees rather than reporting a column that in fact works.
+  `EML502` remains for the case with nothing to fall back on: a foreign key
+  whose name matches no entity *and* whose entity declares no spare parent.
+  Relying on the fallback is still worse than naming the column well — it is
+  unambiguous only while the entity has exactly one unclaimed parent.
 - **Which entity that is, is read off your model.** `User` if you declared one,
   otherwise `Staff`, otherwise `Employee` — the first of the three that exists.
   So `pi_id` in a research model with a `User` entity resolves to `User`, and
@@ -642,6 +651,57 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
 - Declare the matching relationship line as well as the column. A `FK` with no
   relationship raises `EML502`, and the generated interface loses the navigation
   the relationship would have given it.
+
+### 3.5.1 Parent and child — line items
+
+Some entities have no life away from their owner: an invoice line, an order
+line, a prescription item. **The ERD cannot express this**, which is the whole
+reason the directive exists — `InvoiceLine.invoice_id` and `Invoice.patient_id`
+are both a foreign key with a relationship behind it, and nothing in Mermaid
+says that a line means nothing without its invoice while a patient means a great
+deal without one.
+
+```
+%%entity InvoiceLine parent: Invoice
+```
+
+**Decide it with these questions, in this order:**
+
+1. Would a list of these records, *away from their owner*, be useful to anyone?
+   A screen of every invoice line ever written is not a screen anyone opens. If
+   no — it is a child.
+2. Does the row's identity depend on the owner? "Line 1 of invoice 7", not
+   "line 1". If yes — it is a child.
+3. Would deleting the owner make the row meaningless? If yes — it is a child.
+
+A **reference** is the opposite on all three: `Invoice.patient_id` points at a
+Patient who exists, and matters, on their own. Most foreign keys are references.
+Line items are the minority, and they are usually obvious once the questions are
+asked — the noun is a *line*, an *item*, a *detail*, an *entry*.
+
+**What it does to the application:**
+
+| | Parent | Child |
+|---|---|---|
+| `sys_window` | its own | **none** |
+| Dashboard | a card | **no card — not navigable** |
+| `sys_tab` | `tab_level: 0` | `tab_level: 1`, in the *parent's* window |
+| Reached by | opening the window | opening a parent record |
+
+The tab links on the child's own foreign key back to the parent — the one
+already in the ERD, marked `sys_column.is_parent` and stored as
+`sys_tab.link_column_id`. **Do not declare a second column for it**, and do not
+drop the relationship line: the directive names the parent, the ERD still draws
+the edge.
+
+Two errors police it: `EML147` when the parent is not declared, or an entity
+names itself; `EML148` when the child has no foreign key back — a line item with
+nothing to link on loses its own window and gains no tab, which is an entity that
+has quietly left the application.
+
+A child is still a real table with real rules, access control and a form. Only
+its *placement* changes. Leave it out of `%%category`: a category lists what
+appears on the dashboard, and a child does not.
 
 ### 3.6 Enums, field metadata, indexes and grouping
 
@@ -666,8 +726,31 @@ whose snake_case name it carries. `customer_id` finds `Customer`;
   `min`, `max`, `format`) are accepted and validated only.
 - **`%%entity <Name> help: <sentence>`** — or `description:`, the same key — is
   the sentence that explains the entity. It becomes `sys_table.description`.
-  Write both kinds of help as you model: they are the only part of the
-  application that says *why* a field exists, and nobody adds them later.
+
+**Help is not optional. Write `%%entity <Name> help:` for every entity and
+`%%field <Entity>.<column> help:` for every column, without exception.**
+
+This is the most-skipped part of a model and the most expensive to skip. The
+generated application has no other source of explanation: no tooltips written by
+hand, no README beside the form, no designer to ask. What you write here is what
+a user reads under the control, what the Application Dictionary shows beside the
+column, and the whole of the manual the generator ships. Leave it out and the
+application still runs — which is exactly why it gets left out — but every field
+on every form is a label with nothing behind it.
+
+- **Every entity**, including the self-evident ones. "Invoice" is not a
+  description of an invoice.
+- **Every column**, including `status`, the foreign keys and the enums. A
+  reference column should say what the reference is *for* — "the ward this bed
+  stands in" — not restate its type.
+- **Say what it is for, not what it is.** `%%field Lead.score help: 0-100, set by
+  the scoring rule. Anything over 70 routes to a salesperson.` tells a reader
+  something. `The score of the lead.` does not.
+- **Nobody adds it later.** The model is the only place it can be written, and
+  the moment it is being written is the only moment anyone knows the answer.
+
+A delivery missing help is incomplete even though the checker returns zero
+errors — §10's checklist asks for both.
 - **`%%index <E>(<a>[, <b>]) [unique]`** becomes a real index. Add one for every
   column combination the business searches or filters on, and no more — every
   index is paid for on every write.
@@ -1688,28 +1771,35 @@ flowchart TD
 9. Every status column, and every other column with a closed vocabulary, has a
    `%%enum` **and** a `%%field … enum:` binding it — without the binding the
    dictionary records free text (§3.7).
-10. Every entity carries `%%entity <E> help:` and every column carries
-   `%%field <E>.<col> help:` — that text is the whole of the application's help
-   *and* the whole of its generated manual, and no later pass adds it (§3.7).
-11. Every entity with a status has a `kind: state` workflow, with an initial
+10. **Every entity carries `%%entity <E> help:` and every column carries
+   `%%field <E>.<col> help:`** — no exceptions, including the self-evident ones.
+   That text is the whole of the application's help *and* the whole of its
+   generated manual, and no later pass adds it (§3.6, §3.7).
+11. **Every line item is declared as one.** Go through the entities and ask of
+   each: is this a thing in its own right, or part of another thing? Every
+   invoice line, order line, prescription item and delivery line gets
+   `%%entity <Child> parent: <Parent>`, and is left out of `%%category`
+   (§3.5.1). Missing it puts a card on the dashboard listing every line ever
+   written, which is a screen nobody opens.
+12. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
-12. Every rule that must *do* something has an `%%action` — not just a flowchart.
-13. Every cross-entity effect is a hook, an action, or a saga step.
-14. Every restricted operation and transition has a `%%rbac` directive.
-15. Every entity is named by at least one `%%rbac … .read` directive, so it
+13. Every rule that must *do* something has an `%%action` — not just a flowchart.
+14. Every cross-entity effect is a hook, an action, or a saga step.
+15. Every restricted operation and transition has a `%%rbac` directive.
+16. Every entity is named by at least one `%%rbac … .read` directive, so it
    belongs to a functional role — and every role that may act on an entity can
    also read it (§6). A model where one role sees all forty tables is the same
    application once, not four times.
 
 **The handover**
 
-16. Exactly one file is being handed over, and it ends `.mmd` — no companion
+17. Exactly one file is being handed over, and it ends `.mmd` — no companion
     specification document, report or README (§1.0).
-17. `check(source)` returns `ok: true`, run three times over the file's exact
+18. `check(source)` returns `ok: true`, run three times over the file's exact
     bytes, the last two over unchanged bytes — `node check-model.mjs <file>.mmd`
     is those three passes and exits `0` — or you have said plainly that the
     checker could not be run and walked this list by hand instead (§1.3).
-18. Warnings are cleared, or each remaining one is explained to the user.
-19. The file the user receives is the file you validated, delivered as a
+19. Warnings are cleared, or each remaining one is explained to the user.
+20. The file the user receives is the file you validated, delivered as a
     download, with the enhanced specification and the checker counts beside it in
     the reply — not inside the file (§1.4).
