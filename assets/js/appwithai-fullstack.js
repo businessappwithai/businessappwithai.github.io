@@ -33,12 +33,14 @@ var __toESM = (mod, isNodeMode, target) => {
   }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
-  for (let key of __getOwnPropNames(mod))
-    if (!__hasOwnProp.call(to, key))
-      __defProp(to, key, {
-        get: __accessProp.bind(mod, key),
-        enumerable: true
-      });
+  if (mod && typeof mod === "object" || typeof mod === "function") {
+    for (let key of __getOwnPropNames(mod))
+      if (!__hasOwnProp.call(to, key))
+        __defProp(to, key, {
+          get: __accessProp.bind(mod, key),
+          enumerable: true
+        });
+  }
   if (canCache)
     cache.set(mod, to);
   return to;
@@ -79,29 +81,29 @@ var __esm = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 // packages/generator/src/browser/memory-fs.ts
 var exports_memory_fs = {};
 __export(exports_memory_fs, {
-  writeFileSync: () => writeFileSync,
-  writeFile: () => writeFile,
-  unlink: () => unlink,
-  statSync: () => statSync,
-  stat: () => stat,
-  snapshot: () => snapshot,
-  seed: () => seed,
-  rm: () => rm,
-  reset: () => reset,
-  readdirSync: () => readdirSync,
-  readdir: () => readdir,
-  readFileSync: () => readFileSync,
-  readFile: () => readFile,
-  promises: () => promises,
-  normalize: () => normalize,
-  mkdirSync: () => mkdirSync,
-  mkdir: () => mkdir,
-  existsSync: () => existsSync,
-  default: () => memory_fs_default,
-  copyFileSync: () => copyFileSync,
-  copyFile: () => copyFile,
+  access: () => access,
   chmod: () => chmod,
-  access: () => access
+  copyFile: () => copyFile,
+  copyFileSync: () => copyFileSync,
+  default: () => memory_fs_default,
+  existsSync: () => existsSync,
+  mkdir: () => mkdir,
+  mkdirSync: () => mkdirSync,
+  normalize: () => normalize,
+  promises: () => promises,
+  readFile: () => readFile,
+  readFileSync: () => readFileSync,
+  readdir: () => readdir,
+  readdirSync: () => readdirSync,
+  reset: () => reset,
+  rm: () => rm,
+  seed: () => seed,
+  snapshot: () => snapshot,
+  stat: () => stat,
+  statSync: () => statSync,
+  unlink: () => unlink,
+  writeFile: () => writeFile,
+  writeFileSync: () => writeFileSync
 });
 function normalize(path) {
   const absolute = path.startsWith("/") ? path : `/${path}`;
@@ -436,11 +438,11 @@ var init_language = __esm(() => {
 // builtin-stub:node:child_process
 var exports_node_child_process = {};
 __export(exports_node_child_process, {
-  spawnSync: () => spawnSync,
-  spawn: () => spawn,
-  execSync: () => execSync,
+  default: () => node_child_process_default,
   exec: () => exec,
-  default: () => node_child_process_default
+  execSync: () => execSync,
+  spawn: () => spawn,
+  spawnSync: () => spawnSync
 });
 var refuse = () => {
   throw new Error("no subprocesses in the browser");
@@ -454,7 +456,7 @@ var init_node_child_process = __esm(() => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/utils.js
-var require_utils = __commonJS((exports) => {
+var require_utils = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.extend = extend;
   exports.indexOf = indexOf;
@@ -550,7 +552,7 @@ var require_utils = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/exception.js
-var require_exception = __commonJS((exports, module) => {
+var require_exception = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var errorProps = ["description", "fileName", "lineNumber", "endLineNumber", "message", "name", "number", "stack"];
   function Exception(message, node) {
@@ -595,7 +597,7 @@ var require_exception = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/block-helper-missing.js
-var require_block_helper_missing = __commonJS((exports, module) => {
+var require_block_helper_missing = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -628,7 +630,7 @@ var require_block_helper_missing = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/each.js
-var require_each = __commonJS((exports, module) => {
+var require_each = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -709,7 +711,7 @@ var require_each = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/helper-missing.js
-var require_helper_missing = __commonJS((exports, module) => {
+var require_helper_missing = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -729,7 +731,7 @@ var require_helper_missing = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/if.js
-var require_if = __commonJS((exports, module) => {
+var require_if = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -766,7 +768,7 @@ var require_if = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/log.js
-var require_log = __commonJS((exports, module) => {
+var require_log = __commonJS(function(exports, module) {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("log", function() {
@@ -788,7 +790,7 @@ var require_log = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/lookup.js
-var require_lookup = __commonJS((exports, module) => {
+var require_lookup = __commonJS(function(exports, module) {
   exports.__esModule = true;
   exports.default = function(instance) {
     instance.registerHelper("lookup", function(obj, field, options) {
@@ -802,7 +804,7 @@ var require_lookup = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers/with.js
-var require_with = __commonJS((exports, module) => {
+var require_with = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -838,7 +840,7 @@ var require_with = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/helpers.js
-var require_helpers = __commonJS((exports) => {
+var require_helpers = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.registerDefaultHelpers = registerDefaultHelpers;
   exports.moveHelperToHooks = moveHelperToHooks;
@@ -879,7 +881,7 @@ var require_helpers = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/decorators/inline.js
-var require_inline = __commonJS((exports, module) => {
+var require_inline = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var _utils = require_utils();
   exports.default = function(instance) {
@@ -903,7 +905,7 @@ var require_inline = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/decorators.js
-var require_decorators = __commonJS((exports) => {
+var require_decorators = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.registerDefaultDecorators = registerDefaultDecorators;
   function _interopRequireDefault(obj) {
@@ -917,7 +919,7 @@ var require_decorators = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/logger.js
-var require_logger = __commonJS((exports, module) => {
+var require_logger = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var _utils = require_utils();
   var logger = {
@@ -953,7 +955,7 @@ var require_logger = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/internal/proto-access.js
-var require_proto_access = __commonJS((exports) => {
+var require_proto_access = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.createProtoAccessControl = createProtoAccessControl;
   exports.resultIsAllowed = resultIsAllowed;
@@ -1020,7 +1022,7 @@ var require_proto_access = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/base.js
-var require_base = __commonJS((exports) => {
+var require_base = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.HandlebarsEnvironment = HandlebarsEnvironment;
   function _interopRequireDefault(obj) {
@@ -1113,7 +1115,7 @@ var require_base = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/safe-string.js
-var require_safe_string = __commonJS((exports, module) => {
+var require_safe_string = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function SafeString(string) {
     this.string = string;
@@ -1126,7 +1128,7 @@ var require_safe_string = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/internal/wrapHelper.js
-var require_wrapHelper = __commonJS((exports) => {
+var require_wrapHelper = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.wrapHelper = wrapHelper;
   function wrapHelper(helper, transformOptionsFn) {
@@ -1143,7 +1145,7 @@ var require_wrapHelper = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/runtime.js
-var require_runtime = __commonJS((exports) => {
+var require_runtime = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.checkRevision = checkRevision;
   exports.template = template;
@@ -1458,7 +1460,7 @@ var require_runtime = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/no-conflict.js
-var require_no_conflict = __commonJS((exports, module) => {
+var require_no_conflict = __commonJS(function(exports, module) {
   exports.__esModule = true;
   exports.default = function(Handlebars) {
     (function() {
@@ -1482,7 +1484,7 @@ var require_no_conflict = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars.runtime.js
-var require_handlebars_runtime = __commonJS((exports, module) => {
+var require_handlebars_runtime = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -1536,7 +1538,7 @@ var require_handlebars_runtime = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/ast.js
-var require_ast = __commonJS((exports, module) => {
+var require_ast = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var AST = {
     helpers: {
@@ -1556,7 +1558,7 @@ var require_ast = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/parser.js
-var require_parser = __commonJS((exports, module) => {
+var require_parser = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var handlebars = function() {
     var parser = {
@@ -2280,7 +2282,7 @@ Expecting ` + expected.join(", ") + ", got '" + (this.terminals_[symbol] || symb
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/visitor.js
-var require_visitor = __commonJS((exports, module) => {
+var require_visitor = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2385,7 +2387,7 @@ var require_visitor = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/whitespace-control.js
-var require_whitespace_control = __commonJS((exports, module) => {
+var require_whitespace_control = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -2531,7 +2533,7 @@ var require_whitespace_control = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/helpers.js
-var require_helpers2 = __commonJS((exports) => {
+var require_helpers2 = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.SourceLocation = SourceLocation;
   exports.id = id;
@@ -2716,7 +2718,7 @@ var require_helpers2 = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/base.js
-var require_base2 = __commonJS((exports) => {
+var require_base2 = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.parseWithoutProcessing = parseWithoutProcessing;
   exports.parse = parse;
@@ -2815,7 +2817,7 @@ var require_base2 = __commonJS((exports) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/compiler.js
-var require_compiler = __commonJS((exports) => {
+var require_compiler = __commonJS(function(exports) {
   exports.__esModule = true;
   exports.Compiler = Compiler;
   exports.precompile = precompile;
@@ -3232,7 +3234,7 @@ var require_compiler = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/base64.js
-var require_base64 = __commonJS((exports) => {
+var require_base64 = __commonJS(function(exports) {
   var intToCharMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
   exports.encode = function(number) {
     if (0 <= number && number < intToCharMap.length) {
@@ -3271,7 +3273,7 @@ var require_base64 = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/base64-vlq.js
-var require_base64_vlq = __commonJS((exports) => {
+var require_base64_vlq = __commonJS(function(exports) {
   var base64 = require_base64();
   var VLQ_BASE_SHIFT = 5;
   var VLQ_BASE = 1 << VLQ_BASE_SHIFT;
@@ -3323,7 +3325,7 @@ var require_base64_vlq = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/util.js
-var require_util = __commonJS((exports) => {
+var require_util = __commonJS(function(exports) {
   function getArg(aArgs, aName, aDefaultValue) {
     if (aName in aArgs) {
       return aArgs[aName];
@@ -3622,7 +3624,7 @@ var require_util = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/array-set.js
-var require_array_set = __commonJS((exports) => {
+var require_array_set = __commonJS(function(exports) {
   var util3 = require_util();
   var has = Object.prototype.hasOwnProperty;
   var hasNativeMap = typeof Map !== "undefined";
@@ -3690,7 +3692,7 @@ var require_array_set = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/mapping-list.js
-var require_mapping_list = __commonJS((exports) => {
+var require_mapping_list = __commonJS(function(exports) {
   var util3 = require_util();
   function generatedPositionAfter(mappingA, mappingB) {
     var lineA = mappingA.generatedLine;
@@ -3727,7 +3729,7 @@ var require_mapping_list = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-map-generator.js
-var require_source_map_generator = __commonJS((exports) => {
+var require_source_map_generator = __commonJS(function(exports) {
   var base64VLQ = require_base64_vlq();
   var util3 = require_util();
   var ArraySet = require_array_set().ArraySet;
@@ -3997,7 +3999,7 @@ var require_source_map_generator = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/binary-search.js
-var require_binary_search = __commonJS((exports) => {
+var require_binary_search = __commonJS(function(exports) {
   exports.GREATEST_LOWER_BOUND = 1;
   exports.LEAST_UPPER_BOUND = 2;
   function recursiveSearch(aLow, aHigh, aNeedle, aHaystack, aCompare, aBias) {
@@ -4044,7 +4046,7 @@ var require_binary_search = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/quick-sort.js
-var require_quick_sort = __commonJS((exports) => {
+var require_quick_sort = __commonJS(function(exports) {
   function swap(ary, x, y) {
     var temp = ary[x];
     ary[x] = ary[y];
@@ -4077,7 +4079,7 @@ var require_quick_sort = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-map-consumer.js
-var require_source_map_consumer = __commonJS((exports) => {
+var require_source_map_consumer = __commonJS(function(exports) {
   var util3 = require_util();
   var binarySearch = require_binary_search();
   var ArraySet = require_array_set().ArraySet;
@@ -4646,7 +4648,7 @@ var require_source_map_consumer = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/lib/source-node.js
-var require_source_node = __commonJS((exports) => {
+var require_source_node = __commonJS(function(exports) {
   var SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   var util3 = require_util();
   var REGEX_NEWLINE = /(\r?\n)/;
@@ -4900,14 +4902,14 @@ var require_source_node = __commonJS((exports) => {
 });
 
 // node_modules/.bun/source-map@0.6.1/node_modules/source-map/source-map.js
-var require_source_map = __commonJS((exports) => {
+var require_source_map = __commonJS(function(exports) {
   exports.SourceMapGenerator = require_source_map_generator().SourceMapGenerator;
   exports.SourceMapConsumer = require_source_map_consumer().SourceMapConsumer;
   exports.SourceNode = require_source_node().SourceNode;
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/code-gen.js
-var require_code_gen = __commonJS((exports, module) => {
+var require_code_gen = __commonJS(function(exports, module) {
   exports.__esModule = true;
   var _utils = require_utils();
   var SourceNode = undefined;
@@ -5040,7 +5042,7 @@ var require_code_gen = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/compiler/javascript-compiler.js
-var require_javascript_compiler = __commonJS((exports, module) => {
+var require_javascript_compiler = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -5808,7 +5810,7 @@ var require_javascript_compiler = __commonJS((exports, module) => {
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars.js
-var require_handlebars = __commonJS((exports, module) => {
+var require_handlebars = __commonJS(function(exports, module) {
   exports.__esModule = true;
   function _interopRequireDefault(obj) {
     return obj && obj.__esModule ? obj : { default: obj };
@@ -7219,6 +7221,8 @@ var appwithai_language_default = {
     },
     autoFixable: {
       EML001: "Missing %%meta name - inserts one derived from the first entity.",
+      EML103: "Column is added by the generator anyway - deletes the declared line.",
+      EML112: "Duplicate attribute - deletes the later line, keeping the stronger constraints.",
       EML114: "Foreign key not ending in _id - appends the suffix.",
       EML117: "Entity has no primary key - prepends `string id PK`.",
       EML421: "State workflow has no initial transition - inserts `[*] --> <firstState>`.",
@@ -8112,113 +8116,113 @@ init_node_path();
 // node_modules/.bun/zod@3.25.76/node_modules/zod/v3/external.js
 var exports_external = {};
 __export(exports_external, {
-  void: () => voidType,
-  util: () => util,
-  unknown: () => unknownType,
-  union: () => unionType,
-  undefined: () => undefinedType,
-  tuple: () => tupleType,
-  transformer: () => effectsType,
-  symbol: () => symbolType,
-  string: () => stringType,
-  strictObject: () => strictObjectType,
-  setErrorMap: () => setErrorMap,
-  set: () => setType,
-  record: () => recordType,
-  quotelessJson: () => quotelessJson,
-  promise: () => promiseType,
-  preprocess: () => preprocessType,
-  pipeline: () => pipelineType,
-  ostring: () => ostring,
-  optional: () => optionalType,
-  onumber: () => onumber,
-  oboolean: () => oboolean,
-  objectUtil: () => objectUtil,
-  object: () => objectType,
-  number: () => numberType,
-  nullable: () => nullableType,
-  null: () => nullType,
-  never: () => neverType,
-  nativeEnum: () => nativeEnumType,
-  nan: () => nanType,
-  map: () => mapType,
-  makeIssue: () => makeIssue,
-  literal: () => literalType,
-  lazy: () => lazyType,
-  late: () => late,
-  isValid: () => isValid,
-  isDirty: () => isDirty,
-  isAsync: () => isAsync,
-  isAborted: () => isAborted,
-  intersection: () => intersectionType,
-  instanceof: () => instanceOfType,
-  getParsedType: () => getParsedType,
-  getErrorMap: () => getErrorMap,
-  function: () => functionType,
-  enum: () => enumType,
-  effect: () => effectsType,
-  discriminatedUnion: () => discriminatedUnionType,
-  defaultErrorMap: () => en_default,
-  datetimeRegex: () => datetimeRegex,
-  date: () => dateType,
-  custom: () => custom,
-  coerce: () => coerce,
-  boolean: () => booleanType,
-  bigint: () => bigIntType,
-  array: () => arrayType,
-  any: () => anyType,
-  addIssueToContext: () => addIssueToContext,
-  ZodVoid: () => ZodVoid,
-  ZodUnknown: () => ZodUnknown,
-  ZodUnion: () => ZodUnion,
-  ZodUndefined: () => ZodUndefined,
-  ZodType: () => ZodType,
-  ZodTuple: () => ZodTuple,
-  ZodTransformer: () => ZodEffects,
-  ZodSymbol: () => ZodSymbol,
-  ZodString: () => ZodString,
-  ZodSet: () => ZodSet,
-  ZodSchema: () => ZodType,
-  ZodRecord: () => ZodRecord,
-  ZodReadonly: () => ZodReadonly,
-  ZodPromise: () => ZodPromise,
-  ZodPipeline: () => ZodPipeline,
-  ZodParsedType: () => ZodParsedType,
-  ZodOptional: () => ZodOptional,
-  ZodObject: () => ZodObject,
-  ZodNumber: () => ZodNumber,
-  ZodNullable: () => ZodNullable,
-  ZodNull: () => ZodNull,
-  ZodNever: () => ZodNever,
-  ZodNativeEnum: () => ZodNativeEnum,
-  ZodNaN: () => ZodNaN,
-  ZodMap: () => ZodMap,
-  ZodLiteral: () => ZodLiteral,
-  ZodLazy: () => ZodLazy,
-  ZodIssueCode: () => ZodIssueCode,
-  ZodIntersection: () => ZodIntersection,
-  ZodFunction: () => ZodFunction,
-  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
-  ZodError: () => ZodError,
-  ZodEnum: () => ZodEnum,
-  ZodEffects: () => ZodEffects,
-  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
-  ZodDefault: () => ZodDefault,
-  ZodDate: () => ZodDate,
-  ZodCatch: () => ZodCatch,
-  ZodBranded: () => ZodBranded,
-  ZodBoolean: () => ZodBoolean,
-  ZodBigInt: () => ZodBigInt,
-  ZodArray: () => ZodArray,
-  ZodAny: () => ZodAny,
-  Schema: () => ZodType,
-  ParseStatus: () => ParseStatus,
-  OK: () => OK,
-  NEVER: () => NEVER,
-  INVALID: () => INVALID,
-  EMPTY_PATH: () => EMPTY_PATH,
+  BRAND: () => BRAND,
   DIRTY: () => DIRTY,
-  BRAND: () => BRAND
+  EMPTY_PATH: () => EMPTY_PATH,
+  INVALID: () => INVALID,
+  NEVER: () => NEVER,
+  OK: () => OK,
+  ParseStatus: () => ParseStatus,
+  Schema: () => ZodType,
+  ZodAny: () => ZodAny,
+  ZodArray: () => ZodArray,
+  ZodBigInt: () => ZodBigInt,
+  ZodBoolean: () => ZodBoolean,
+  ZodBranded: () => ZodBranded,
+  ZodCatch: () => ZodCatch,
+  ZodDate: () => ZodDate,
+  ZodDefault: () => ZodDefault,
+  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
+  ZodEffects: () => ZodEffects,
+  ZodEnum: () => ZodEnum,
+  ZodError: () => ZodError,
+  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
+  ZodFunction: () => ZodFunction,
+  ZodIntersection: () => ZodIntersection,
+  ZodIssueCode: () => ZodIssueCode,
+  ZodLazy: () => ZodLazy,
+  ZodLiteral: () => ZodLiteral,
+  ZodMap: () => ZodMap,
+  ZodNaN: () => ZodNaN,
+  ZodNativeEnum: () => ZodNativeEnum,
+  ZodNever: () => ZodNever,
+  ZodNull: () => ZodNull,
+  ZodNullable: () => ZodNullable,
+  ZodNumber: () => ZodNumber,
+  ZodObject: () => ZodObject,
+  ZodOptional: () => ZodOptional,
+  ZodParsedType: () => ZodParsedType,
+  ZodPipeline: () => ZodPipeline,
+  ZodPromise: () => ZodPromise,
+  ZodReadonly: () => ZodReadonly,
+  ZodRecord: () => ZodRecord,
+  ZodSchema: () => ZodType,
+  ZodSet: () => ZodSet,
+  ZodString: () => ZodString,
+  ZodSymbol: () => ZodSymbol,
+  ZodTransformer: () => ZodEffects,
+  ZodTuple: () => ZodTuple,
+  ZodType: () => ZodType,
+  ZodUndefined: () => ZodUndefined,
+  ZodUnion: () => ZodUnion,
+  ZodUnknown: () => ZodUnknown,
+  ZodVoid: () => ZodVoid,
+  addIssueToContext: () => addIssueToContext,
+  any: () => anyType,
+  array: () => arrayType,
+  bigint: () => bigIntType,
+  boolean: () => booleanType,
+  coerce: () => coerce,
+  custom: () => custom,
+  date: () => dateType,
+  datetimeRegex: () => datetimeRegex,
+  defaultErrorMap: () => en_default,
+  discriminatedUnion: () => discriminatedUnionType,
+  effect: () => effectsType,
+  enum: () => enumType,
+  function: () => functionType,
+  getErrorMap: () => getErrorMap,
+  getParsedType: () => getParsedType,
+  instanceof: () => instanceOfType,
+  intersection: () => intersectionType,
+  isAborted: () => isAborted,
+  isAsync: () => isAsync,
+  isDirty: () => isDirty,
+  isValid: () => isValid,
+  late: () => late,
+  lazy: () => lazyType,
+  literal: () => literalType,
+  makeIssue: () => makeIssue,
+  map: () => mapType,
+  nan: () => nanType,
+  nativeEnum: () => nativeEnumType,
+  never: () => neverType,
+  null: () => nullType,
+  nullable: () => nullableType,
+  number: () => numberType,
+  object: () => objectType,
+  objectUtil: () => objectUtil,
+  oboolean: () => oboolean,
+  onumber: () => onumber,
+  optional: () => optionalType,
+  ostring: () => ostring,
+  pipeline: () => pipelineType,
+  preprocess: () => preprocessType,
+  promise: () => promiseType,
+  quotelessJson: () => quotelessJson,
+  record: () => recordType,
+  set: () => setType,
+  setErrorMap: () => setErrorMap,
+  strictObject: () => strictObjectType,
+  string: () => stringType,
+  symbol: () => symbolType,
+  transformer: () => effectsType,
+  tuple: () => tupleType,
+  undefined: () => undefinedType,
+  union: () => unionType,
+  unknown: () => unknownType,
+  util: () => util,
+  void: () => voidType
 });
 
 // node_modules/.bun/zod@3.25.76/node_modules/zod/v3/helpers/util.js
@@ -13144,14 +13148,14 @@ ${stderr}`);
   static async removeDirectory(dirPath) {
     try {
       await rm(dirPath, { recursive: true, force: true });
-    } catch (error) {
+    } catch (_error) {
       console.warn(`Warning: Could not remove directory ${dirPath}`);
     }
   }
   static async copyDirectory(src, dest) {
     try {
       await undefined(src, dest, { recursive: true });
-    } catch (error) {
+    } catch (_error) {
       throw new Error(`Failed to copy directory from ${src} to ${dest}`);
     }
   }
@@ -14580,7 +14584,7 @@ function cleanJsonContent(jsonStr) {
     cleaned = cleaned.replace(/(\{\s*),/g, "$1");
     const parsed = JSON.parse(cleaned);
     return JSON.stringify(parsed, null, 2);
-  } catch (e) {
+  } catch (_e) {
     return jsonStr.replace(/,(\s*[}\]])/g, "$1").replace(/(\[\s*),/g, "$1");
   }
 }
@@ -14867,7 +14871,7 @@ class NestJsBackendGenerator extends BaseGenerator {
     for (const file of staticAppFiles) {
       try {
         await copyFile(join(this.resolvedTemplateDir, file), join(outputDir, file));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Static app file not found: ${file}`);
       }
     }
@@ -14882,72 +14886,72 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const content = await this.renderTemplate(`${file}.hbs`, context);
         await writeFile(join(outputDir, file), content);
-      } catch (e) {}
+      } catch (_e) {}
     }
     try {
       const publicDecoratorContent = await this.renderTemplate("src/modules/auth/decorators/public.decorator.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/decorators/public.decorator.ts"), publicDecoratorContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Public decorator template not found");
     }
     try {
       const rolesDecoratorContent = await this.renderTemplate("src/modules/auth/decorators/roles.decorator.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/decorators/roles.decorator.ts"), rolesDecoratorContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Roles decorator template not found");
     }
     try {
       const currentUserDecoratorContent = await this.renderTemplate("src/modules/auth/decorators/current-user.decorator.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/decorators/current-user.decorator.ts"), currentUserDecoratorContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Current user decorator template not found");
     }
     try {
       const jwtGuardContent = await this.renderTemplate("src/modules/auth/guards/jwt-auth.guard.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/guards/jwt-auth.guard.ts"), jwtGuardContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("JWT auth guard template not found");
     }
     try {
       const sessionAuthGuardContent = await this.renderTemplate("src/modules/auth/guards/session-auth.guard.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/guards/session-auth.guard.ts"), sessionAuthGuardContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Session auth guard template not found");
     }
     try {
       const rolesGuardContent = await this.renderTemplate("src/modules/auth/guards/roles.guard.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/guards/roles.guard.ts"), rolesGuardContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Roles guard template not found");
     }
     try {
       const entityAccessGuardContent = await this.renderTemplate("src/modules/auth/guards/entity-access.guard.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/guards/entity-access.guard.ts"), entityAccessGuardContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Entity access guard template not found");
     }
     try {
       const dictionaryWriteGuardContent = await this.renderTemplate("src/modules/auth/guards/dictionary-write.guard.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/guards/dictionary-write.guard.ts"), dictionaryWriteGuardContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Dictionary write guard template not found");
     }
     try {
       const authControllerContent = await this.renderTemplate("src/modules/auth/auth.controller.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/auth.controller.ts"), authControllerContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Auth controller template not found");
     }
     try {
       const authModuleContent = await this.renderTemplate("src/modules/auth/auth.module.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/auth.module.ts"), authModuleContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Auth module template not found");
     }
     try {
       const betterAuthContent = await this.renderTemplate("src/lib/better-auth.ts.hbs", context);
       await writeFile(join(outputDir, "src/lib/better-auth.ts"), betterAuthContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Better-auth lib template not found");
     }
     const hookFiles = [
@@ -14960,14 +14964,14 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Hook template not found: ${tpl}`);
       }
     }
     try {
       const triggerConfigContent = await this.renderTemplate("trigger.config.ts.hbs", context);
       await writeFile(join(outputDir, "trigger.config.ts"), triggerConfigContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Trigger.dev config template not found");
     }
     const triggerTasks = ["email", "report", "sync", "entity-lifecycle-workflow"];
@@ -14975,7 +14979,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const taskContent = await this.renderTemplate(`src/trigger/${task}.task.ts.hbs`, context);
         await writeFile(join(outputDir, `src/trigger/${task}.task.ts`), taskContent);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Trigger task template not found: ${task}`);
       }
     }
@@ -14997,7 +15001,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Job queue template not found: ${tpl}`);
       }
     }
@@ -15018,7 +15022,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Rules template not found: ${tpl}`);
       }
     }
@@ -15040,7 +15044,7 @@ class NestJsBackendGenerator extends BaseGenerator {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Workflow template not found: ${tpl}`);
       }
     }
@@ -15732,7 +15736,7 @@ export async function seed(db: Kysely<any>): Promise<void> {
       `  }`,
       `  for (const t of TRANSITIONS) {`,
       `    await db`,
-      `      .insertInto('sys_workflow_transitions' as any)`,
+      `      .insertInto('sys_workflow_transitions')`,
       `      .values({`,
       `        table_name: t.tableName,`,
       `        status_field: t.statusField,`,
@@ -15740,12 +15744,12 @@ export async function seed(db: Kysely<any>): Promise<void> {
       `        to_state: t.toState,`,
       `        transition_name: t.transitionName || null,`,
       `        is_active: true,`,
-      `      } as any)`,
+      `      })`,
       `      .onConflict((oc) =>`,
       `        oc.constraint('sys_workflow_transitions_unique').doUpdateSet({`,
       `          transition_name: t.transitionName || null,`,
       `          is_active: true,`,
-      `        } as any)`,
+      `        })`,
       `      )`,
       `      .execute();`,
       `  }`,
@@ -15759,19 +15763,19 @@ export async function seed(db: Kysely<any>): Promise<void> {
     try {
       const tsconfigContent = await this.renderTemplate("tsconfig.json.hbs", context);
       await writeFile(join(outputDir, "tsconfig.json"), tsconfigContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom tsconfig template not found, keeping NestJS default");
     }
     try {
       const nestCliContent = await this.renderTemplate("nest-cli.json.hbs", context);
       await writeFile(join(outputDir, "nest-cli.json"), nestCliContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("nest-cli.json template not found, keeping NestJS default");
     }
     try {
       const prettierContent = await this.renderTemplate(".prettierrc.hbs", context);
       await writeFile(join(outputDir, ".prettierrc"), prettierContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn(".prettierrc template not found, skipping");
     }
     try {
@@ -15791,14 +15795,14 @@ export async function seed(db: Kysely<any>): Promise<void> {
     for (const file of staticConfigFiles) {
       try {
         await copyFile(join(this.resolvedTemplateDir, file), join(outputDir, file));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Static config file not found: ${file}`);
       }
     }
     try {
       const dockerfileContent = await this.renderTemplate("Dockerfile.hbs", context);
       await writeFile(join(outputDir, "Dockerfile"), dockerfileContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Dockerfile template not found, skipping");
     }
     const migrateContent = await this.renderTemplate("src/migrate.ts.hbs", context);
@@ -15817,7 +15821,7 @@ export async function seed(db: Kysely<any>): Promise<void> {
     try {
       const biomeContent = await this.renderTemplate("biome.json.hbs", context);
       await writeFile(join(outputDir, "biome.json"), biomeContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom Biome config template not found, using defaults");
     }
     const dbModuleContent = await this.renderTemplate("src/database/database.module.ts.hbs", context);
@@ -15827,13 +15831,13 @@ export async function seed(db: Kysely<any>): Promise<void> {
     try {
       const dbServiceContent = await this.renderTemplate("src/database/database.service.ts.hbs", context);
       await writeFile(join(outputDir, "src/database/database.service.ts"), dbServiceContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Database service template not found");
     }
     try {
       const dbServiceDecoratorContent = await this.renderTemplate("src/database/database.service.decorator.ts.hbs", context);
       await writeFile(join(outputDir, "src/database/database.service.decorator.ts"), dbServiceDecoratorContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Database service decorator template not found");
     }
   }
@@ -15862,26 +15866,26 @@ export async function seed(db: Kysely<any>): Promise<void> {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Auth test template not found: ${tpl}`);
       }
     }
     try {
       const rulesEngineTestContent = await this.renderTemplate("test/rules-engine.test.ts.hbs", context);
       await writeFile(join(outputDir, "test/rules-engine.test.ts"), rulesEngineTestContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Rules engine test template not found");
     }
     try {
       const triggerWorkflowTestContent = await this.renderTemplate("test/rules-workflow-trigger.test.ts.hbs", context);
       await writeFile(join(outputDir, "test/rules-workflow-trigger.test.ts"), triggerWorkflowTestContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Trigger-workflow test template not found");
     }
     try {
       const jobQueueTestContent = await this.renderTemplate("test/modules/jobs/job-queue.service.test.ts.hbs", context);
       await writeFile(join(outputDir, "test/modules/jobs/job-queue.service.test.ts"), jobQueueTestContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Job queue test template not found");
     }
     const behaviourTestFiles = [
@@ -15895,7 +15899,7 @@ export async function seed(db: Kysely<any>): Promise<void> {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Behaviour test template not found: ${tpl}`);
       }
     }
@@ -15908,7 +15912,7 @@ export async function seed(db: Kysely<any>): Promise<void> {
       try {
         const content = await this.renderTemplate(tpl, context);
         await writeFile(join(outputDir, out), content);
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Trigger test template not found: ${tpl}`);
       }
     }
@@ -16194,7 +16198,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     try {
       const adminLayoutContent = await this.component("src/routes/admin.tsx");
       await writeFile(join(outputDir, "src/routes/admin.tsx"), adminLayoutContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin layout route template not found");
     }
     const providersContent = await this.component("src/providers/index.tsx");
@@ -16208,14 +16212,14 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const file of providerFiles) {
       try {
         await copyFile(join(templateDir, file), join(outputDir, file));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Provider file not found: ${file}`);
       }
     }
     await mkdir(join(outputDir, "src/contexts"), { recursive: true });
     try {
       await copyFile(join(templateDir, "src/contexts/auth-context.tsx"), join(outputDir, "src/contexts/auth-context.tsx"));
-    } catch (e) {
+    } catch (_e) {
       console.warn("Auth context file not found");
     }
     const stylesContent = await this.component("src/styles/globals.css");
@@ -16223,51 +16227,51 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     try {
       const loginPageContent = await this.component("src/routes/auth/login.tsx");
       await writeFile(join(outputDir, "src/routes/auth/login.tsx"), loginPageContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Login page template not found");
     }
     try {
       await copyFile(join(templateDir, "src/lib/auth.ts"), join(outputDir, "src/lib/auth.ts"));
-    } catch (e) {
+    } catch (_e) {
       console.warn("Auth lib file not found");
     }
     try {
       const apiEntry = await this.renderTemplate("src/api.ts.hbs", context);
       await writeFile(join(outputDir, "src/api.ts"), apiEntry);
-    } catch (e) {
+    } catch (_e) {
       console.warn("API entry template not found");
     }
     try {
       const apiProxy = await this.component("src/lib/api-proxy.ts");
       await writeFile(join(outputDir, "src/lib/api-proxy.ts"), apiProxy);
-    } catch (e) {
+    } catch (_e) {
       console.warn("API proxy lib template not found");
     }
     try {
       const copilotRuntime = await this.component("src/lib/copilot-runtime.ts");
       await writeFile(join(outputDir, "src/lib/copilot-runtime.ts"), copilotRuntime);
-    } catch (e) {
+    } catch (_e) {
       console.warn("CopilotKit runtime lib template not found");
     }
     try {
       await mkdir(join(outputDir, "src/routes/api"), { recursive: true });
       const apiProxyContent = await this.renderTemplate("src/routes/api/$.ts.hbs", context);
       await writeFile(join(outputDir, "src/routes/api/$.ts"), apiProxyContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("API proxy route template not found");
     }
     try {
       await mkdir(join(outputDir, "src/routes/api/auth"), { recursive: true });
       const authProxyContent = await this.renderTemplate("src/routes/api/auth/$.ts.hbs", context);
       await writeFile(join(outputDir, "src/routes/api/auth/$.ts"), authProxyContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Auth proxy route template not found");
     }
     try {
       await mkdir(join(outputDir, "src/routes/api/copilotkit"), { recursive: true });
       const copilotRuntime = await this.renderTemplate("src/routes/api/copilotkit/$.ts.hbs", context);
       await writeFile(join(outputDir, "src/routes/api/copilotkit/$.ts"), copilotRuntime);
-    } catch (e) {
+    } catch (_e) {
       console.warn("CopilotKit runtime route template not found");
     }
   }
@@ -16303,7 +16307,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const file of i18nFiles) {
       try {
         await copyFile(join(templateDir, file), join(outputDir, file));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`i18n file not found: ${file}`);
       }
     }
@@ -16314,7 +16318,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     try {
       const modelAssistant = await this.component("src/hooks/useModelAssistant.ts");
       await writeFile(join(outputDir, "src/hooks/useModelAssistant.ts"), modelAssistant);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Model assistant hook template not found");
     }
     try {
@@ -16350,13 +16354,13 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const component of uiComponents) {
       try {
         await copyFile(join(templateDir, `src/components/ui/${component}.tsx`), join(outputDir, `src/components/ui/${component}.tsx`));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`UI component not found: ${component}`);
       }
     }
     try {
       await copyFile(join(templateDir, "src/lib/utils.ts"), join(outputDir, "src/lib/utils.ts"));
-    } catch (e) {
+    } catch (_e) {
       console.warn("Utils file not found");
     }
     await mkdir(join(outputDir, "src/components/layout"), { recursive: true });
@@ -16368,7 +16372,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const component of staticLayoutComponents) {
       try {
         await copyFile(join(templateDir, component), join(outputDir, component));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Layout component not found: ${component}`);
       }
     }
@@ -16572,7 +16576,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const component of staticComponents) {
       try {
         await copyFile(join(templateDir, component.src), join(outputDir, component.dest));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Static component not found: ${component.src}`);
       }
     }
@@ -16580,7 +16584,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const routeFile of dynamicRoutes) {
       try {
         await copyFile(join(templateDir, "src/routes", routeFile), join(outputDir, "src/routes", routeFile));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Dynamic route not found: ${routeFile}`);
       }
     }
@@ -16631,7 +16635,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     for (const page of staticAdminPages) {
       try {
         await copyFile(join(templateDir, "src/routes/admin", page), join(adminDir, page));
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Static admin page not found: ${page}`);
       }
     }
@@ -16640,48 +16644,48 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     try {
       const rulesContent = await this.renderTemplate("src/routes/admin/rules.tsx.hbs", context);
       await writeFile(join(adminDir, "rules.tsx"), rulesContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin rules page template not found");
     }
     try {
       const categoriesContent = await this.component("src/routes/admin/categories.tsx");
       await writeFile(join(adminDir, "categories.tsx"), categoriesContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin categories page template not found");
     }
     try {
       const automationsContent = await this.renderTemplate("src/routes/admin/automations.tsx.hbs", context);
       await writeFile(join(adminDir, "automations.tsx"), automationsContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin automations page template not found");
     }
     try {
       const workflowsContent = await this.component("src/routes/admin/workflows.tsx");
       await writeFile(join(adminDir, "workflows.tsx"), workflowsContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin workflows page template not found");
     }
     try {
       await copyFile(join(templateDir, "src/routes/admin/audit.tsx"), join(adminDir, "audit.tsx"));
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin audit page not found");
     }
     try {
       const reportsContent = await this.component("src/routes/admin/reports.tsx");
       await writeFile(join(adminDir, "reports.tsx"), reportsContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin reports page template not found");
     }
     try {
       const usersContent = await this.component("src/routes/admin/users.tsx");
       await writeFile(join(adminDir, "users.tsx"), usersContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin users page template not found");
     }
     try {
       const rolesContent = await this.component("src/routes/admin/roles.tsx");
       await writeFile(join(adminDir, "roles.tsx"), rolesContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Admin roles page template not found");
     }
     const adminSubdirs = [
@@ -16710,7 +16714,7 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
           await mkdir(dirname(dest), { recursive: true });
           await copyFile(src, dest);
         }
-      } catch (e) {
+      } catch (_e) {
         console.warn(`Admin route template not found: ${subdir.src}`);
       }
     }
@@ -16742,30 +16746,30 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     try {
       const tanStackConfigContent = await this.renderTemplate("app.config.ts.hbs", context);
       await writeFile(join(outputDir, "app.config.ts"), tanStackConfigContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom app.config.ts template not found, keeping TanStack Start default");
     }
     try {
       const tailwindContent = await this.component("tailwind.config.js");
       await writeFile(join(outputDir, "tailwind.config.js"), tailwindContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom tailwind config template not found, keeping TanStack Start default");
     }
     try {
       await copyFile(join(templateDir, "postcss.config.js"), join(outputDir, "postcss.config.js"));
-    } catch (e) {
+    } catch (_e) {
       console.warn("postcss.config.js template not found");
     }
     try {
       const tsconfigContent = await this.renderTemplate("tsconfig.json.hbs", context);
       await writeFile(join(outputDir, "tsconfig.json"), tsconfigContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom tsconfig template not found, keeping TanStack Start default");
     }
     try {
       const biomeContent = await this.renderTemplate("biome.json.hbs", context);
       await writeFile(join(outputDir, "biome.json"), biomeContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Custom Biome config template not found, using defaults");
     }
     const envLocalContent = `VITE_API_URL=
@@ -16783,7 +16787,7 @@ PORT=${context.config.frontendPort}
     try {
       const dockerfileContent = await this.renderTemplate("Dockerfile.hbs", context);
       await writeFile(join(outputDir, "Dockerfile"), dockerfileContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Frontend Dockerfile template not found, skipping");
     }
   }
@@ -16795,7 +16799,7 @@ PORT=${context.config.frontendPort}
       await writeFile(join(outputDir, "test/components.test.tsx"), componentsTestContent);
       const vitestContent = await this.renderTemplate("vitest.config.ts.hbs", context);
       await writeFile(join(outputDir, "vitest.config.ts"), vitestContent);
-    } catch (e) {
+    } catch (_e) {
       console.warn("Unit test templates not found, skipping unit test generation");
     }
   }
@@ -17285,7 +17289,7 @@ tests/.e2e-seed-manifest.json
             }
           }
         }
-      } catch (e) {}
+      } catch (_e) {}
       try {
         const backendWorkflowsSource = join(templatesDir, "tanstack-start-nestjs/backend/.github/workflows");
         if (await this.directoryExists(backendWorkflowsSource)) {
@@ -17302,7 +17306,7 @@ tests/.e2e-seed-manifest.json
             }
           }
         }
-      } catch (e) {}
+      } catch (_e) {}
     }
   }
   async directoryExists(dir) {
@@ -17447,7 +17451,7 @@ MIT
       console.log(`
 ✨ Linting checks completed!`);
       console.log('   Tip: Run "bun run lint:fix" in backend/frontend directories to auto-fix issues');
-    } catch (error) {
+    } catch (_error) {
       console.warn("  ⚠️  Linting could not be completed (dependencies not installed?)");
       console.log('   Tip: Run "bun install" first, then run linting manually');
     }
@@ -20873,7 +20877,7 @@ class CheckEngine {
     for (const rule2 of this.model.rules) {
       if (!rule2.entity) {
         this.info("EML506", `Rule "${rule2.name}" has no entity binding.`, {
-          hint: "Add  %%rule ${rule.name} on <Entity> event: <hookType>  to bind this rule to an entity lifecycle."
+          hint: `Add  %%rule ${rule2.name} on <Entity> event: <hookType>  to bind this rule to an entity lifecycle.`
         });
       }
     }
@@ -21338,7 +21342,7 @@ async function loadTemplates(url = "assets/stack-templates.json") {
   return await response.json();
 }
 export {
-  loadTemplates,
+  ModelCheckError,
   generateFullStack,
-  ModelCheckError
+  loadTemplates
 };
