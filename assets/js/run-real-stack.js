@@ -68,6 +68,11 @@ const BUILT_IN = {
     label: "hospital-management-system.eml.mmd",
     name: "Hospital Management System",
   },
+  dance: {
+    path: "models/dance-studio.eml.mmd",
+    label: "dance-studio.eml.mmd",
+    name: "Acme Dance Studio",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -172,6 +177,7 @@ const choices = [
   [$("choice-crm"), "crm"],
   [$("choice-drug"), "drug"],
   [$("choice-hospital"), "hospital"],
+  [$("choice-dance"), "dance"],
   [$("choice-upload"), "upload"],
 ];
 

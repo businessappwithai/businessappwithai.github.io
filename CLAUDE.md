@@ -45,7 +45,9 @@ businessappwithai.github.io/
 │   ├── check-model.mjs       # Site-authored CLI runner for both of the above
 │   ├── coi-sw.js             # Service Worker that isolates chapter 10
 │   ├── img/                  # Screenshots used by the chapters
-│   ├── models/               # Example EML models the chapters load
+│   ├── models/               # Example EML models the chapters load (crm,
+│   │                         # drug-discovery, hospital-management-system,
+│   │                         # dance-studio)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── llms-full.txt             # EML language specification, for language models
 ├── llmdetailed.txt           # The whole system, and §10's *interactive* authoring
@@ -527,7 +529,8 @@ Where each one comes from:
 | `assets/js/appwithai-fullstack.js` | `html/assets/appwithai-fullstack.js` | the same build |
 | `assets/vendor/stack-templates.json` | `html/assets/stack-templates.json` (gitignored there) | `bun run build:stack-templates` |
 | `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
-| `guide/models/*.eml.mmd` | `html/models/*.eml.mmd` | — |
+| `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd` | `html/models/*.eml.mmd` | — |
+| `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `llmdetailed.txt` | `llmtext/llmdetailed.txt` | — |
 
 The five generator artifacts move together. Re-vendoring `checker.js` without
@@ -544,6 +547,7 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
+| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes four models where upstream's pages offer two |
 
 `guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
 `ignoreMethod: true` in `serve()`, because the Cache API matches GET only and
@@ -729,6 +733,16 @@ and the two documents stop agreeing about a language they both define.
   to move or rename those two modules.
 - **`scripts/check-spec.mjs` does not read this file** — it verifies `llms-full.txt` only.
   A change here is checked upstream, where the file is authored.
+- **`guide/models/dance-studio.eml.mmd` is §10's worked example.** The section walks a
+  booking business end to end and holds the model it builds to a standard — help text on
+  every entity and every column, one `%%rbac … .read` per entity, every state backed by a
+  declared `%%enum` — so the model is the evidence the standard is reachable. Nine
+  entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
+  restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`
+  (the hospital model is the one that does not — no `%%hook` directives). It comes from
+  `language/examples/` upstream, **not** `html/models/`, so the
+  byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
+  step with `language/examples/dance-studio.eml.mmd` instead.
 - It is linked from `try-it-yourself.html` (the section subtitle and the
   `#enterprise-prompt` card) and from one line on the home page. It is **not** in the
   primary nav, which is at its seven-item ceiling.
