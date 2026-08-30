@@ -32,7 +32,7 @@ businessappwithai.github.io/
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
-│       └── stack-templates.json  # 313 stack templates for chapter 10
+│       └── stack-templates.json  # 327 stack templates for chapters 09 and 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
@@ -48,6 +48,9 @@ businessappwithai.github.io/
 │   ├── models/               # Example EML models the chapters load
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── llms-full.txt             # EML language specification, for language models
+├── llmdetailed.txt           # The whole system, and §10's *interactive* authoring
+│                             # protocol — the enterprise path. Vendored from
+│                             # `llmtext/llmdetailed.txt`, unlike llms-full.txt
 ├── scripts/
 │   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js
 │   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
@@ -121,6 +124,7 @@ Deployment is fully automatic:
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
 | `guide/11-check-a-model.html` | Chapter 11: the authoring protocol, and the published validators running live |
 | `llms-full.txt` | The EML language specification language models are pointed at — the language only, deliberately not the generator or the framework |
+| `llmdetailed.txt` | The same language, plus the generator, the templates and the generated application — and an *interactive* authoring protocol in §10. The professional/enterprise path, linked from `try-it-yourself.html#enterprise-prompt` and the home page |
 
 ## Design System (Lunaris)
 
@@ -260,7 +264,8 @@ Do not reintroduce a demo the site cannot serve itself.
 The section on the home page (`index.html#try-it-yourself`) is the site's main call to
 action, and `try-it-yourself.html` is the same path with room to explain itself — the
 nav points at the page, the home page keeps the short version and links to it. Between
-them the path spans five files. If you change one, check the others.
+them the path spans five files. If you change one, check the others. There are now
+**two prompts, not one** — see item 6.
 
 1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
    visitor copies a link to the host they are actually on. The copy button is
@@ -279,6 +284,14 @@ them the path spans five files. If you change one, check the others.
    explained, the four dictionary habits, and both ways to run the checker. **Its example
    model is checker-clean** — `node guide/check-model.mjs` it after any edit, the same way
    `llms-full.txt`'s examples are held to.
+6. **The second prompt — `try-it-yourself.html#enterprise-prompt`.** Same card layout, a
+   `<pre id="enterprise-research-prompt">` and its own `[data-copy]` button, and a
+   `[data-url]` span naming `llmdetailed.txt`. **Its body is the first prompt word for
+   word**; only the document and the section number differ, because the two
+   specifications number their protocols differently — `llms-full.txt` §1 is the batch
+   protocol, `llmdetailed.txt` §10 is the interactive one. If you edit one prompt, edit
+   the other, or the claim on the page that they are identical stops being true. The
+   home page carries a one-line pointer to it and nothing more.
 
 ## Key Conventions for AI Assistants
 
@@ -319,6 +332,25 @@ them the path spans five files. If you change one, check the others.
     (`.hero-notice`) and again in the footer, both linking the source on GitHub.
     Do not quietly soften, move or delete either one: a reader deciding whether
     to trust this needs the caveat before the claims, not after them.
+13. **Security is Better Auth, and nothing else is claimed.** Sign-in in the
+    generated application is Better Auth configured for **email and password with
+    server-side sessions** — that is the whole of what
+    `templates/.../backend/src/lib/better-auth.ts.hbs` enables. There are no
+    `socialProviders`, no second factor, no SSO; read that template before writing
+    otherwise. Everything else the pages call security is *authorization* —
+    roles, table and field permissions, row policies, the audit trail — derived
+    from the model and enforced in the generated API, which is real and may be
+    described as such.
+
+    `features.html` used to carry a four-card grid reading **SOX Ready · GDPR
+    Compliant · ISO 27001 Aligned**, and `technology.html` and `features.html`
+    both claimed OAuth and "MFA-ready flows". None of it had been assessed or
+    was implemented. It has been replaced by a card that says so plainly and
+    points at `todo.html`, where the security assessment is one of the five
+    items before 1.0.0. **Do not reintroduce a compliance badge.** A compliance
+    programme audits an organization, not a code generator; the access control
+    and the audit trail are evidence a reader would bring to one, and saying more
+    than that is the same failure convention 12 exists to prevent.
 
 ## The In-Browser Demo (Chapter 09)
 
@@ -380,7 +412,7 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 419 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 425 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
 - **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
@@ -431,7 +463,7 @@ fire on it and the roles that may read it.
 
 ## Chapter 10 — the real stack in a WebContainer
 
-`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 410 files — and
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 425 files — and
 runs it in a WebContainer. It needs two things chapter 09 does not.
 
 - **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
@@ -441,7 +473,7 @@ runs it in a WebContainer. It needs two things chapter 09 does not.
   through** — do not widen it. Isolation is a constraint, not an upgrade, and the other chapters must
   stay outside it.
 - **The network.** The WebContainer runtime comes from StackBlitz and the packages from npm. Everything
-  else — the API, the 313 templates, the fonts — is served from `assets/vendor/`.
+  else — the API, the 327 templates, the fonts — is served from `assets/vendor/`.
 
 The nine binary font templates cannot travel in `stack-templates.json` (it is JSON), so they are shipped
 in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` before it is mounted.
@@ -484,8 +516,23 @@ modules already returned — not decisions of their own:
 ## Vendored files
 
 Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
-`guide/wasm-app/sw.js`, `guide/checker.js` and `guide/fixer.js` comes from
-`businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand. The local deltas,
+`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llmdetailed.txt` comes
+from `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand.
+Where each one comes from:
+
+| Here | Upstream | Rebuilt upstream with |
+|---|---|---|
+| `guide/checker.js`, `guide/fixer.js` | `html/checker.js`, `html/fixer.js` | `bun run build:language-tools` |
+| `assets/js/appwithai-wasm.js` | `html/assets/appwithai-wasm.js` | `bun run build:wasm-browser` |
+| `assets/js/appwithai-fullstack.js` | `html/assets/appwithai-fullstack.js` | the same build |
+| `assets/vendor/stack-templates.json` | `html/assets/stack-templates.json` (gitignored there) | `bun run build:stack-templates` |
+| `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
+| `guide/models/*.eml.mmd` | `html/models/*.eml.mmd` | — |
+| `llmdetailed.txt` | `llmtext/llmdetailed.txt` | — |
+
+The five generator artifacts move together. Re-vendoring `checker.js` without
+`appwithai-wasm.js` leaves chapter 11 disagreeing with chapter 09 about the same
+model — they carry two copies of the same engine. The local deltas,
 all deliberate and all commented at the point of change:
 
 | File | Local change | Why |
@@ -658,6 +705,33 @@ file — the Pages source is GitHub Actions, which keeps a custom domain in repo
 than in the tree — so the page never trusts that string: every URL it shows carries a `data-url`
 attribute and `validator.js` resolves it against `window.location`, so the text always names the host
 that is actually answering. Keep that mechanism if you edit those URLs.
+
+## `llmdetailed.txt` — the enterprise path, and it *is* vendored
+
+Unlike `llms-full.txt`, this one is a **straight copy of `llmtext/llmdetailed.txt`** in
+`businessappwithai/app-with-ai-tanstack`. Re-copy it when it changes upstream; do not
+rewrite it here, or it acquires the same maintenance problem the section above describes
+and the two documents stop agreeing about a language they both define.
+
+- **It is the whole system**, not the language alone: repository topology, the generator
+  pipeline, the templates, the generated application, the modelling tool. That is the
+  opposite of the decision taken for `llms-full.txt`, and deliberately so — the reader it
+  is written for is a model that will be asked about the system, not only asked to emit a
+  file.
+- **§10 is why the site publishes it.** `llms-full.txt` §1 is the *batch* authoring
+  protocol: read the brief, infer the model, write it, validate, deliver. `llmdetailed.txt`
+  §10 is the *interactive* one: seven phases separated by approval gates, the entities
+  walked one at a time, the `.mmd` built on disk as the walkthrough runs. Neither
+  supersedes the other, and the file says so in its own header. **The page must quote §10,
+  not §1** — the same prompt against the wrong section number gets the wrong protocol.
+- **It already points at this site's validators**, `https://appwithai.org/guide/checker.js`
+  and `…/fixer.js`, at exactly the paths chapter 11 publishes. That is one more reason not
+  to move or rename those two modules.
+- **`scripts/check-spec.mjs` does not read this file** — it verifies `llms-full.txt` only.
+  A change here is checked upstream, where the file is authored.
+- It is linked from `try-it-yourself.html` (the section subtitle and the
+  `#enterprise-prompt` card) and from one line on the home page. It is **not** in the
+  primary nav, which is at its seven-item ceiling.
 
 ## CI/CD Pipeline
 
