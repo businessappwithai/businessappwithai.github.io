@@ -364,4 +364,80 @@ expect(/OK — 0 errors/.test(cleanRun.stdout), "check-model.mjs prints the chec
 expect(brokenRun.status === 1, "check-model.mjs exits 1 when the generator would refuse the model");
 expect(spawnSync(process.execPath, [runner], { encoding: "utf8" }).status === 2, "check-model.mjs exits 2 when it cannot run");
 
-process.exit(exampleFailures + fail + runnerFail === 0 ? 0 : 1);
+/* ------------------------------- 6. llmdetailed.txt — the interactive §10 ---
+ *
+ * llms-full.txt is authored here; llmdetailed.txt is vendored from
+ * app-with-ai-tanstack. So this section does not re-audit the language — it
+ * holds the claims §10 makes about *the tooling it tells a model to run*,
+ * which is exactly what goes stale when the file is re-vendored or when
+ * check-model.mjs changes underneath it. Every one of these was verified by
+ * hand once; that is the thing this section replaces.
+ */
+
+const detailed = readFileSync(root + "llmdetailed.txt", "utf8");
+/* The file is hard-wrapped, so any assertion about a *sentence* has to run
+ * against a whitespace-collapsed copy — otherwise it silently passes or fails
+ * on where the line happened to break. */
+const detailedProse = detailed.replace(/\s+/g, " ");
+const checkerSource = readFileSync(root + "guide/checker.js", "utf8");
+const runnerSource = readFileSync(runner, "utf8");
+let detailedFail = 0;
+const held = (cond, label) => {
+  if (cond) console.log(`ok   ${label}`);
+  else { detailedFail++; console.log(`FAIL ${label}`); }
+};
+
+// Every diagnostic the document names must be one the engine can actually emit.
+// A code invented for a table reads exactly like a real one to a language model.
+const cited = [...new Set(detailed.match(/EML\d{3}/g) ?? [])].sort();
+const unknown = cited.filter((code) => !checkerSource.includes(code));
+held(cited.length >= 20 && unknown.length === 0,
+  `every diagnostic llmdetailed.txt cites exists in the checker (${cited.length} codes${unknown.length ? ", missing: " + unknown.join(", ") : ""})`);
+
+// The auto-fixable seven, against the engine rather than against a copy of the list.
+held(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(detailed)),
+  `section 10.6 tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
+held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length === 7,
+  `section 10.6 counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
+
+// The runner it tells a model to use, and the flags it promises that runner has.
+held(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
+  "section 10.6 carries the one-line way to run the checker without a checkout");
+for (const flag of ["--write", "--base"])
+  held(detailed.includes(flag) && runnerSource.includes(flag),
+    `section 10.6's \`${flag}\` is a flag check-model.mjs actually has`);
+held(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(detailed),
+  "section 10.6 documents all three of the runner's exit codes");
+
+// The central claim of the rewrite: GitHub is in none of the checker's paths.
+// If the runner ever learns to fetch from GitHub, the document becomes wrong.
+held(!/github/i.test(runnerSource),
+  "check-model.mjs reaches no GitHub host, as section 10.6 tells the reader");
+held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can run/i.test(detailedProse)
+  || /reach GitHub says nothing about whether the checker can run/i.test(detailedProse),
+  "section 10.6 states that an unreachable GitHub is not an unreachable checker");
+
+// Every rung of the ladder has to name something this site actually serves.
+for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js", "guide/11-check-a-model.html"])
+  held(existsSync(root + rung) && detailed.includes(rung.replace("guide/", "")),
+    `the ladder's ${rung} is published here and named in the document`);
+
+// Cross-references inside the file must resolve, or the ladder sends a reader nowhere.
+const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
+const referenced = [...new Set([...detailed.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))];
+const dangling = referenced.filter((ref) => !headings.has(ref));
+held(dangling.length === 0,
+  `every §N.N cross-reference in llmdetailed.txt resolves to a heading${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
+
+/* Three observed failures were one URL failing, generalised into "no validation
+ * is possible" — in one case the blocked URL was llmdetailed.txt itself. */
+held(/needs no specification document at all/i.test(detailedProse),
+  "section 10.6 separates fetching the spec from running the checker");
+held(/Perform the validation; do not offer it/i.test(detailedProse),
+  "section 10.6 requires the run rather than offering it");
+
+// The per-step rule, which is the other half of what §10 now promises.
+held(/every step that touches the `\.mmd`/i.test(detailedProse),
+  "section 10 binds the fixer-then-checker loop to every step, not only to phase 6");
+
+process.exit(exampleFailures + fail + runnerFail + detailedFail === 0 ? 0 : 1);

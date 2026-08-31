@@ -54,7 +54,8 @@ businessappwithai.github.io/
 │                             # protocol — the enterprise path. Vendored from
 │                             # `llmtext/llmdetailed.txt`, unlike llms-full.txt
 ├── scripts/
-│   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js
+│   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js,
+│   │                         # plus llmdetailed.txt §10's tooling claims
 │   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
@@ -769,8 +770,16 @@ and the two documents stop agreeing about a language they both define.
 - **It already points at this site's validators**, `https://appwithai.org/guide/checker.js`
   and `…/fixer.js`, at exactly the paths chapter 11 publishes. That is one more reason not
   to move or rename those two modules.
-- **`scripts/check-spec.mjs` does not read this file** — it verifies `llms-full.txt` only.
-  A change here is checked upstream, where the file is authored.
+- **`scripts/check-spec.mjs` audits this file too, but only for its tooling claims.**
+  The language itself is checked upstream, where the file is authored; what is held
+  here is §10's account of *what a model is told to run* — that every `EML` code it
+  cites is one the checker can emit, that the auto-fixable table matches
+  `AUTO_FIXABLE` exactly, that `--write`, `--base` and the three exit codes are real,
+  that every rung of its ladder names a file this site actually serves, and that
+  `check-model.mjs` still reaches no GitHub host. Those are exactly the claims that
+  rot when the file is re-vendored or the runner changes underneath it, and each one
+  was verified by hand once before the check existed. Add to that section rather than
+  re-verifying by hand.
 - **`guide/models/dance-studio.eml.mmd` is §10's worked example.** The section walks a
   booking business end to end and holds the model it builds to a standard — help text on
   every entity and every column, one `%%rbac … .read` per entity, every state backed by a

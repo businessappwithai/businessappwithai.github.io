@@ -346,7 +346,11 @@ decide but cannot act. Clear them, or say why you left one.
 
 **If you cannot reach the checker** — no network from your runtime, no JavaScript
 engine, imports blocked — that changes what you can *claim*, not what you
-deliver. Walk §10 by hand instead, item by item, then hand over the file with one
+deliver. First make sure that is actually true: §8.4 lists a row per runtime,
+and every observed case of "the checker could not be run" has been one row
+failing while the others went untried. A `curl` that is unavailable, a URL
+import Node declines, or a repository that will not clone are each one row, not
+a verdict on the environment. Walk §10 by hand instead, item by item, then hand over the file with one
 plain sentence: the checker could not be run here, this is what was verified by
 hand, and the user can validate it in their own browser in a few seconds at
 `https://appwithai.org/guide/11-check-a-model.html`, which runs these same two
@@ -1570,8 +1574,36 @@ usually gets skipped. Find your row and run it.
 | A shell with Node 18+, Bun or Deno | `curl -sO https://appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
 | Bun or Deno, writing the code yourself | `import { check } from "https://appwithai.org/guide/checker.js"` — a URL import works as it stands |
 | Node, writing the code yourself | Node has no network imports: fetch both files, write them into one directory, `import()` them from there (below) |
-| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import |
+| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
 | No network, or no JavaScript at all | Do not skip it silently: walk §10 by hand and tell the user, as §1.3 says |
+
+**One failed attempt is a finding about that attempt, not about the
+environment.** Work the rows above in order and stop at the first that runs;
+reach the last row by exhausting the others, not by inferring it.
+
+**Nothing here needs a checkout, and nothing here needs GitHub.** There is no
+repository to clone, no credentials to hold and no `bun` to install: the two
+modules and the runner are served from `appwithai.org`. `check-model.mjs`
+resolves them from `--base`, then from its own directory, then from the
+published site — GitHub is in none of those paths. "I could not obtain the
+repository, therefore I could not validate" is a wrong inference, not an honest
+limitation, and it has been observed in the wild.
+
+**The same mistake generalises, and it has now been made three ways.** Not
+reaching GitHub, not reaching `llmdetailed.txt` itself, and Node refusing a URL
+import are each one address or one call failing. None of them is a statement
+about `guide/checker.js`, which is a different file on a different host — and
+`check-model.mjs` needs no specification document at all: it reads the model and
+nothing else. Whatever you could not fetch, walk the ladder before reporting the
+checker as unavailable. Re-reading this text is not a precondition for running
+the engine it describes.
+
+**Perform the validation; do not offer it.** "If you want the actual checker
+counts, I can run the published checker" hands the user a choice they were never
+given: the run is required, so the counts are part of the deliverable rather
+than an upgrade to it. A model that proposes the mandatory step instead of
+taking it has skipped it — and the offer reads as diligence, which is what makes
+it hard to catch.
 
 ```sh
 curl -sO https://appwithai.org/guide/check-model.mjs
