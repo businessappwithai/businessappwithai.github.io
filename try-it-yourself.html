@@ -87,7 +87,7 @@
     <div class="container">
       <div class="section-header">
         <h2>The prompt — copy it as it is</h2>
-        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
+        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you. For a professional or enterprise application, use <a href="#enterprise-prompt" style="color: inherit;">the same prompt against the detailed specification</a> instead — same words, a longer conversation, a model nobody had to guess.</p>
       </div>
 
       <div class="card">
@@ -113,6 +113,47 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
               <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-5" id="enterprise-prompt">
+        <span class="hero-badge">For professional and enterprise software</span>
+        <h3 style="margin-top: var(--spacing-md);">Building something serious? Point the same prompt at the detailed specification</h3>
+        <p class="text-muted">The prompt above is right for a first model — one pass, one answer, a file back in a couple of minutes. It is the wrong trade once the business is large enough that guessing it in a single pass is guessing. For that there is a second specification, <a href="llmdetailed.txt"><code>llmdetailed.txt</code></a>: the same language, the same diagnostics, the same checker — plus how the generator, the templates and the generated application actually work, and a different authoring protocol in its section 10.</p>
+
+        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
+          <div>
+            <h4>What section 10 does differently</h4>
+            <p class="text-sm text-muted">Section 1 of <code>llms-full.txt</code> is the <strong>batch</strong> protocol: read the brief, infer the model, write it, validate, deliver. Section 10 of <code>llmdetailed.txt</code> is the <strong>interactive</strong> one — seven phases separated by approval gates you have to pass before the model moves on.</p>
+            <ul class="footer-links" style="line-height: 1.9;">
+              <li><strong>Phase 1</strong> — research your business, and show you what it found</li>
+              <li><strong>Phase 2</strong> — agree the entity roster before a line is written</li>
+              <li><strong>Phase 3</strong> — seed the <code>.mmd</code>, and build it on disk from here on</li>
+              <li><strong>Phase 4</strong> — walk the entities one at a time, checking after each</li>
+              <li><strong>Phase 5</strong> — the cross-cutting pass: processes, the access matrix, coverage</li>
+              <li><strong>Phase 6</strong> — validate to clean, and escalate what needs your decision</li>
+              <li><strong>Phase 7</strong> — deliver</li>
+            </ul>
+            <p class="text-muted text-sm">It costs a conversation instead of a reply. What you get for it is that nothing about your business was inferred without your seeing it, and the <code>help:</code> text — the only help your users will ever get, and the whole of the manual the generator writes — is still written by entity fifteen.</p>
+          </div>
+          <div>
+            <pre id="enterprise-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailed.txt">https://appwithai.org/llmdetailed.txt</span> in full, and follow section 10 — the interactive authoring protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
+
+My business:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+
+Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
+
+Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
+
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
+            <button type="button" class="btn btn-primary" data-copy="enterprise-research-prompt">Copy the detailed prompt</button>
+            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
+            <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps the <code>.mmd</code> on disk as it goes rather than holding it in the conversation. It ends where the prompt above ends — one file, checked clean, that you upload and run here.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+              <a href="llmdetailed.txt" class="btn btn-outline">Read the detailed specification &rarr;</a>
             </div>
           </div>
         </div>

@@ -309,7 +309,7 @@
         <div style="background: var(--gray-50); padding: var(--spacing-xl); border-radius: var(--radius-lg); margin-top: var(--spacing-md);">
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Authentication Layer</strong>
-            <p class="text-muted">Session management via Better-Auth — supports OAuth providers, email/password, and MFA-ready flows</p>
+            <p class="text-muted">Better Auth, configured for email and password with server-side sessions. That is the whole of it — no social sign-in, no second factor, nothing else configured on your behalf. Better Auth supports more; the generated application enables what it needs, and you add the rest</p>
           </div>
           <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
             <strong>Role Assignment Layer</strong>
@@ -347,23 +347,10 @@
         <p class="text-sm text-muted" style="margin-top: var(--spacing-md);"><a href="guide/06-dictionary.html">Chapter 06 &rarr;</a></p>
       </div>
 
-      <div class="grid grid-4 mt-5">
-        <div class="card text-center">
-          <div class="stat-value text-base">SOX</div>
-          <p class="text-sm">Ready</p>
-        </div>
-        <div class="card text-center">
-          <div class="stat-value text-base">GDPR</div>
-          <p class="text-sm">Compliant</p>
-        </div>
-        <div class="card text-center">
-          <div class="stat-value text-base">ISO 27001</div>
-          <p class="text-sm">Aligned</p>
-        </div>
-        <div class="card text-center">
-          <div class="stat-value text-base">Audit</div>
-          <p class="text-sm">Trail Built-In</p>
-        </div>
+      <div class="card mt-5">
+        <h4>What this is, and what it is not</h4>
+        <p class="text-muted">Authentication is <strong>Better Auth</strong> — email and password, server-side sessions. Everything else on this page is authorization: roles, table and field permissions, row policies and the audit trail, all derived from your model and enforced in the generated API.</p>
+        <p class="text-muted">This page used to claim SOX readiness, GDPR compliance and ISO 27001 alignment. It no longer does, because none of them had been assessed. A compliance programme is an audit of an organization and its operations, not a property a code generator can hand you — the access control and the audit trail here are evidence you would bring to one, not a substitute for it. The security assessment is on <a href="todo.html">the list of things outstanding before 1.0.0</a>.</p>
       </div>
     </div>
   </section>
