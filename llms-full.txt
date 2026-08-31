@@ -271,9 +271,12 @@ Every EML document is valid Mermaid (§0), so the finished file must render in a
 Mermaid viewer as well as compile. That is a free second opinion: a viewer that
 refuses the file is telling you the bytes are not what you think they are.
 
-Check a directive's `status` (§7) before relying on it. `%%entity`, `%%rule` and
-`%%trigger` are validated but not compiled — they will not change a generated
-application, so do not promise the user behaviour that rides on them.
+Check a directive's `status` (§7) before relying on it. `%%rule` and `%%trigger`
+are validated but not compiled — they will not change a generated application,
+so do not promise the user behaviour that rides on them. `%%entity` is
+**compiled** for `help:`/`description:` and for `parent:`, validated otherwise:
+its help text is never inert — it becomes `sys_table.description` and the whole
+of the manual's prose (§3.7).
 
 ### 1.3 Validate against the published checker — three runs, three repairs
 
@@ -1410,7 +1413,7 @@ the checker reads it.
 | `%%rbac` | `%%rbac <roleExpr> on <E>.<op>` | compiled |
 | `%%guard` | `%%guard <field> <operator> <jsonValue>` | compiled *(see below)* |
 | `%%loop` | `%%loop <id> while: <f> <op> <v> max: <n>` | compiled |
-| `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`; the rest **validated**)* |
+| `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`, `parent:`; the rest **validated**)* |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
 

@@ -436,6 +436,24 @@ held(/needs no specification document at all/i.test(detailedProse),
 held(/Perform the validation; do not offer it/i.test(detailedProse),
   "section 10.6 requires the run rather than offering it");
 
+/* Directive status: a document that calls a compiled directive inert tells a
+ * model its help text does nothing. %%entity help: becomes sys_table.description
+ * and the whole of the generated manual's prose, and §11 rule 2 called it
+ * "validated but not compiled" while the same file's own table said compiled.
+ * The authority (language/appwithai-language.json) lives upstream, so what is
+ * held here is each document against its own status table. */
+for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spec.join("\n")]]) {
+  const compiled = [...body.matchAll(/^\| `%%(\w+)` \|[^\n]*\bcompiled\b[^\n]*$/gm)].map((m) => m[1]);
+  held(compiled.length >= 8, `${file}: its directive table marks the compiled directives (${compiled.length})`);
+  const flat = body.replace(/\s+/g, " ");
+  for (const directive of compiled) {
+    held(
+      !new RegExp(`%%${directive}\`?,? (and )?[^.]{0,60}are validated but not compiled`).test(flat),
+      `${file}: prose does not call the compiled %%${directive} "validated but not compiled"`
+    );
+  }
+}
+
 // The per-step rule, which is the other half of what §10 now promises.
 held(/every step that touches the `\.mmd`/i.test(detailedProse),
   "section 10 binds the fixer-then-checker loop to every step, not only to phase 6");
