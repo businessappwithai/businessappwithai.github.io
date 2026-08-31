@@ -414,7 +414,7 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 425 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 428 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
 - **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
@@ -423,6 +423,26 @@ brings up PostgreSQL, the API and the web front end.
   WebContainer. Both are imported **lazily, on the click** — three quarters of a
   megabyte and nearly two more — because a reader who came for the browser
   application should not pay for either.
+- **The download passes `overlay: false`, and that is the whole difference
+  between the two callers.** `generateFullStack` applies the WASM overlay by
+  default, because chapter 10 mounts its output in a WebContainer, which has
+  neither a database server nor bun. This caller is the opposite case: the
+  reader unzips the archive and runs `docker compose up --build`, and compose
+  starts a real PostgreSQL. The zip shipped the overlay until it was found —
+  `"pg": "file:./pg-wasm"` in `backend/package.json` and `DATABASE_URL=./pgdata`
+  in `backend/.env`, so the database container came up and nothing spoke to it.
+  With the flag off the archive is what `appwithai generate` writes: verified
+  against a real CLI run on the CRM model, 0 files the browser wrote that the
+  CLI did not, and 413 of 419 byte-identical once the generation timestamp is
+  normalised. **Do not drop the flag when re-vendoring, and do not add it to
+  `run-real-stack.js`** — chapter 10 needs the overlay.
+- **The zip has no `bun.lock` and no `frontend/src/routeTree.gen.ts`**, because
+  the CLI writes those by installing and running the router generator, and a
+  browser can do neither. Both are produced by the Docker build:
+  `frontend/app.config.ts` carries the `tsr` block that makes `vinxi build`
+  generate the route tree and add the `createFileRoute` imports, and the
+  Dockerfile's install step handles a missing lockfile
+  (`if [ -f bun.lock ]; then … else bun install; fi`).
 - **`assets/js/zip.js` is the archive writer, and it has no dependency.**
   Compression is `CompressionStream("deflate-raw")`, which is the browser's own
   zlib and exactly what a ZIP's method 8 wants; where it is missing an entry is
@@ -548,6 +568,7 @@ all deliberate and all commented at the point of change:
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
 | `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes four models where upstream's pages offer two |
+| `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
 
 `guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
 `ignoreMethod: true` in `serve()`, because the Cache API matches GET only and
