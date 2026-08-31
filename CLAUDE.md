@@ -202,7 +202,24 @@ Both carry the GitHub source link.
 | `max-width: 767px` | Single-column layouts, full-width buttons, scrollable comparison tables |
 
 Design is desktop-first with mobile overrides. Test any new section at **767px** and
-any navigation change at **1024px**.
+any navigation change at **1024px**. **767px is not narrow enough on its own** — a
+real phone is 360–390px, and the overflow below was invisible at 767 and obvious at
+390. Check a new section at **390px** too.
+
+> **`.grid > * { min-width: 0 }` and `pre { overflow-wrap: anywhere }` are load-bearing.**
+> A grid item defaults to `min-width: auto`, which floors its track at the item's
+> *min-content* width — so `grid-template-columns: 1fr` is not actually free to
+> shrink. Where that item held a `<pre>` with a URL in it, and a URL offers no
+> break opportunity, the column came out wider than a phone screen and every line
+> in the card rendered outside the card's own box. Both rules are needed: the item
+> has to be allowed to shrink, *and* the long token needs somewhere to break.
+>
+> `overflow-wrap` only affects a block that already wraps, so a `<pre>` left at the
+> default `white-space: pre` still scrolls inside its own `overflow-x: auto` box —
+> which is what the worked model listing and the `curl` command want. That is why
+> the rule is `anywhere` on `pre` rather than `word-break: break-all`, and why
+> adding `white-space: pre-wrap` to a code block is a decision about whether its
+> lines may be broken, not a formatting detail.
 
 ## JavaScript Conventions
 

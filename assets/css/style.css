@@ -601,6 +601,32 @@ a:hover {
   gap: var(--spacing-xl);
 }
 
+/*
+ * A grid item defaults to `min-width: auto`, which floors its track at the
+ * item's min-content width — so a `1fr` column is not actually free to shrink.
+ * In the two prompt cards on try-it-yourself.html that item holds a <pre> with
+ * a URL in it, and a URL offers no break opportunity: on a phone the column
+ * came out wider than the screen, and every line in the card — the pre, the
+ * heading, the list beside it — rendered outside the card's own box.
+ *
+ * This is half the fix. The other half is `pre` below: the column can only
+ * shrink to what its contents will allow, so the long token needs somewhere
+ * to break.
+ */
+.grid > * {
+  min-width: 0;
+}
+
+/*
+ * Only affects a block that already wraps. A <pre> left at the default
+ * `white-space: pre` does not wrap at all, so it keeps scrolling inside its
+ * own `overflow-x: auto` box — which is what the worked model listing wants,
+ * and why this is not `word-break: break-all`.
+ */
+pre {
+  overflow-wrap: anywhere;
+}
+
 .grid-2 {
   grid-template-columns: repeat(2, 1fr);
 }
