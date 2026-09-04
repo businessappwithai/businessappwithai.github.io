@@ -790,8 +790,12 @@ and the two documents stop agreeing about a language they both define.
   every entity and every column, one `%%rbac … .read` per entity, every state backed by a
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
   entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
-  restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`
-  (the hospital model is the one that does not — no `%%hook` directives). It comes from
+  restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`.
+  The hospital model used to be the one that did not — it declared no `%%hook` — and now
+  scores 20/20 as well, with four `kind: hook` sections, 17 hooks, 22 `%%index`
+  declarations and a `%%meta description:`. **Run the scorer on a model before publishing
+  it**, not only the checker: a model can be 0/0 and still be missing half the language.
+  Dance studio comes from
   `language/examples/` upstream, **not** `html/models/`, so the
   byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
   step with `language/examples/dance-studio.eml.mmd` instead.
