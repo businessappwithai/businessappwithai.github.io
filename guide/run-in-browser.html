@@ -213,19 +213,24 @@
           </span>
           <span class="choice__meta">examples/investment-planning-wealth-management-system.eml.mmd</span>
         </button>
-        <button type="button" class="choice" id="choice-upload" aria-pressed="false">
+        <!-- The upload choice *is* the file picker: a label wrapping the input,
+             so one click both selects this option and opens the dialog. It used
+             to be a button beside a separate dropzone box further down the page,
+             which meant the control a reader arriving with their own model came
+             here to use was a second thing to find. -->
+        <label class="choice choice--upload" id="choice-upload" role="button" aria-pressed="false">
+          <input type="file" id="file" accept=".mmd,.md,.txt,text/plain">
           <span class="choice__name">Upload your own</span>
           <span class="choice__desc">
             Any EML or Mermaid ER document. It is read in this tab and never uploaded anywhere.
           </span>
-          <span class="choice__meta">.mmd · .eml.mmd · .md</span>
-        </button>
+          <span class="dropzone" id="dropzone">
+            <b>Choose a file</b>
+            <span class="dropzone__sub">or drop one here</span>
+            <span class="dropzone__hint">.mmd &middot; .eml.mmd &middot; .md</span>
+          </span>
+        </label>
       </div>
-
-      <label class="dropzone" id="dropzone" hidden>
-        <input type="file" id="file" accept=".mmd,.md,.txt,text/plain">
-        <b>Choose a file</b> or drop one here
-      </label>
 
       <div class="model-summary" id="model-summary" hidden></div>
       <div class="diagnostics" id="diagnostics" hidden></div>
