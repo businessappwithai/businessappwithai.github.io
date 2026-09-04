@@ -123,14 +123,34 @@
 .guide-demo .choice__desc { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
 .guide-demo .choice__meta { font-size: 12px; color: var(--text-faint); font-family: ui-monospace, Menlo, Consolas, monospace; }
 
+/*
+ * The dropzone lives inside the "Upload your own" card now, under its own
+ * paragraph, rather than in a separate box below the grid. It was a footnote
+ * at 14px under six examples and got missed; here it is the highlighted part
+ * of the one card a reader arriving with their own model is looking for, and
+ * the card itself is the `<label>` that opens the picker.
+ */
+.guide-demo .choice--upload { border-style: dashed; border-color: var(--accent); }
+.guide-demo .choice--upload:hover { background: var(--accent-soft); }
+
 .guide-demo .dropzone {
-  margin-top: 14px;
-  border: 1.5px dashed var(--border-strong); border-radius: var(--radius);
-  padding: 22px; text-align: center; color: var(--text-soft); font-size: 14px;
-  transition: border-color 0.14s ease, background 0.14s ease;
+  display: block;
+  margin-top: 10px;
+  border: 2px dashed var(--accent); border-radius: var(--radius);
+  background: var(--accent-soft);
+  padding: 20px 16px; text-align: center; color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease, box-shadow 0.14s ease;
 }
+.guide-demo .dropzone b { display: block; font-size: 18px; font-weight: 680; }
+.guide-demo .dropzone .dropzone__sub { display: block; margin-top: 2px; font-size: 14px; color: var(--text-soft); }
+.guide-demo .dropzone .dropzone__hint {
+  display: block; margin-top: 8px; font-size: 12px; color: var(--text-faint);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.guide-demo .choice--upload:hover .dropzone { box-shadow: 0 0 0 3px var(--accent-soft); }
 .guide-demo .dropzone.is-over { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
-.guide-demo .dropzone input[type="file"] { display: none; }
+.guide-demo .choice--upload input[type="file"] { display: none; }
 
 .guide-demo .model-summary {
   margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
