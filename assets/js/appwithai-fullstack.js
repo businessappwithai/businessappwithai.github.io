@@ -436,23 +436,12 @@ var init_language = __esm(() => {
 });
 
 // builtin-stub:node:child_process
-var exports_node_child_process = {};
-__export(exports_node_child_process, {
-  default: () => node_child_process_default,
-  exec: () => exec,
-  execSync: () => execSync,
-  spawn: () => spawn,
-  spawnSync: () => spawnSync
-});
 var refuse = () => {
   throw new Error("no subprocesses in the browser");
-}, spawn, spawnSync, exec, execSync, node_child_process_default;
+}, spawn, execSync;
 var init_node_child_process = __esm(() => {
   spawn = refuse;
-  spawnSync = refuse;
-  exec = refuse;
   execSync = refuse;
-  node_child_process_default = { spawn, spawnSync, exec, execSync };
 });
 
 // node_modules/.bun/handlebars@4.7.9/node_modules/handlebars/dist/cjs/handlebars/utils.js
@@ -6595,6 +6584,7 @@ var appwithai_language_default = {
       directive: "%%step <nodeId> <stepType> <key>: <value> ...",
       propertyForm: "Space-separated `key: value` pairs. A value runs to the next `<key>:` token or the end of the line, so it may contain spaces. `fields` is JSON and must be the last key on the line.",
       variables: "Steps share a context: the triggering record's columns, plus every variable a previous step published. CreateEntity publishes the new row's id under `as`; Formula publishes under `target`. A later step reads one by naming it in `source` or `targetSource`. This is what lets a workflow reach a row it created earlier.",
+      loopMembership: "`in: <loopId>` joins a step to a %%loop declared in the same section. It is read off every step type alike, before the type is consulted at all, so it belongs to no single contract below and is deliberately absent from their `optional` lists. A reader validating step properties must treat it as known for every type — see automations.loops and the %%loop directive.",
       types: [
         {
           name: "UpdateEntity",
@@ -6932,12 +6922,13 @@ var appwithai_language_default = {
           "language/composer.ts (section classification and round-trip)",
           "packages/generator/src/eml (section extraction via composer)"
         ],
-        purpose: "Document/section metadata: name, kind (erd|rules|workflow), version, entity binding, description, stack.",
+        purpose: "Document/section metadata: name, kind (erd|rules|workflow), version, entity binding, description (application summary seeded into sys_system.APP_DESCRIPTION and the generated manual), stack.",
         examples: [
           "%%meta name: CRM Core",
           "%%meta kind: rules",
           "%%meta entity: Order",
-          "%%meta version: 1.0.0"
+          "%%meta version: 1.0.0",
+          "%%meta description: This application manages customer relationships, sales pipelines, and support tickets for mid-market B2B companies."
         ]
       },
       {
@@ -12412,11 +12403,18 @@ function attributeReferenceId(attr, entityPrimaryKey) {
 function isForeignKeyColumnName(columnName) {
   return columnName.endsWith("_id") || columnName.endsWith("_by");
 }
+function foreignKeyLabelStem(attr, entityPrimaryKey) {
+  const isTableDirect = attributeReferenceId(attr, entityPrimaryKey) === ReferenceType.TABLE_DIRECT;
+  if (isTableDirect && attr.name.endsWith("_id") && !attr.name.endsWith("_by_id")) {
+    return attr.name.slice(0, -"_id".length);
+  }
+  return attr.name;
+}
 function attributeToBusAttribute(attr, index, entityPrimaryKey) {
   return {
     ...attr,
     columnName: attr.name,
-    displayName: formatDisplayName(attr.name),
+    displayName: formatDisplayName(foreignKeyLabelStem(attr, entityPrimaryKey)),
     referenceId: attributeReferenceId(attr, entityPrimaryKey),
     seqNo: (index + 1) * 10,
     isIdentifier: false
@@ -12739,7 +12737,8 @@ var HOOK_CONTRACTS = {
     summary: "Runs on every create and update. Throw to reject the write."
   }
 };
-var DIRECTIVE = /%%hook\s+(\w+)\s+([A-Za-z_]\w*)\s+on\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?/;
+var DIRECTIVE = /^%%+hook\s+(\w+)\s+([A-Za-z_]\w*)\s+on\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?/;
+var DIRECTIVE_LINE = /^%%+hook\b/;
 function parseFields(bracket) {
   if (!bracket)
     return;
@@ -12761,7 +12760,7 @@ function compileHooks(source, knownEntities = [], onWarn = () => {}) {
   for (const rawLine of (source ?? "").split(`
 `)) {
     const line = rawLine.trim();
-    if (!line.includes("%%hook"))
+    if (!DIRECTIVE_LINE.test(line))
       continue;
     const match = line.match(DIRECTIVE);
     if (!match) {
@@ -12819,6 +12818,494 @@ function hooksByEntity(hooks) {
   for (const list of grouped.values())
     list.sort((a, b) => a.order - b.order);
   return grouped;
+}
+// packages/core/src/logging/log-spec.json
+var log_spec_default = {
+  $schema: "./log-spec.schema.json",
+  specVersion: "1.0.0",
+  description: "The log specification — the single source of truth for what this system logs, at what level, on which channel, and with which fields. Both this repository and every generated application read this shape. A call site names an event id; the level, the channel, the message and the required fields come from here, so changing what is logged is a change to this file rather than a sweep through the code.",
+  levels: {
+    fatal: 60,
+    error: 50,
+    warn: 40,
+    info: 30,
+    debug: 20,
+    trace: 10
+  },
+  environments: {
+    production: {
+      level: "info",
+      pretty: false
+    },
+    staging: {
+      level: "info",
+      pretty: false
+    },
+    development: {
+      level: "debug",
+      pretty: true
+    },
+    test: {
+      level: "silent",
+      pretty: false
+    }
+  },
+  transport: {
+    destination: "stdout",
+    rationale: "The application writes structured JSON to stdout and nothing else — no files, no rotation, no network. Whatever runs the process (Docker, Kubernetes, systemd, a log shipper) is what collects and ships it. A process that manages its own log files has to be configured twice, fills a disk nobody is watching, and blocks the event loop doing it.",
+    asyncOnProduction: true
+  },
+  redact: {
+    censor: "[redacted]",
+    paths: [
+      "password",
+      "passwordHash",
+      "password_hash",
+      "currentPassword",
+      "newPassword",
+      "token",
+      "accessToken",
+      "refreshToken",
+      "sessionToken",
+      "apiKey",
+      "api_key",
+      "secret",
+      "clientSecret",
+      "privateKey",
+      "authorization",
+      "cookie",
+      "setCookie",
+      "req.headers.authorization",
+      "req.headers.cookie",
+      "res.headers['set-cookie']",
+      "body.password",
+      "body.token",
+      "*.password",
+      "*.token",
+      "*.secret"
+    ],
+    rationale: "Redaction is declared once, here, rather than remembered at each call site. A credential reaches stdout exactly once before it is in a log aggregator forever, so the default is to censor by key name anywhere in the object rather than to trust every caller to strip it."
+  },
+  channels: [
+    {
+      name: "http",
+      description: "Inbound HTTP request lifecycle — one completion line per request, plus failures.",
+      level: "info",
+      surfaces: ["generator", "generated"]
+    },
+    {
+      name: "auth",
+      description: "Authentication and authorization outcomes: sign-in, sign-out, denial, rate limiting.",
+      level: "info",
+      surfaces: ["generator", "generated"]
+    },
+    {
+      name: "db",
+      description: "Database connection lifecycle, migrations and query failures. Individual successful queries are trace.",
+      level: "info",
+      surfaces: ["generator", "generated"]
+    },
+    {
+      name: "pipeline",
+      description: "The code-generation pipeline: parse, compile, emit, verify.",
+      level: "info",
+      surfaces: ["generator"]
+    },
+    {
+      name: "ai",
+      description: "Model calls, embeddings and retrieval. Prompts and completions are never logged at info.",
+      level: "debug",
+      surfaces: ["generator"]
+    },
+    {
+      name: "rules",
+      description: "Business-rule evaluation and the actions a matched rule performed.",
+      level: "debug",
+      surfaces: ["generated"]
+    },
+    {
+      name: "workflow",
+      description: "State-machine transitions and saga execution, including refusals.",
+      level: "debug",
+      surfaces: ["generated"]
+    },
+    {
+      name: "hooks",
+      description: "Entity lifecycle hook execution.",
+      level: "debug",
+      surfaces: ["generated"]
+    },
+    {
+      name: "entity",
+      description: "Business-entity reads and writes in a generated application.",
+      level: "info",
+      surfaces: ["generated"]
+    },
+    {
+      name: "app",
+      description: "Process lifecycle: startup, readiness, configuration, shutdown.",
+      level: "info",
+      surfaces: ["generator", "generated"]
+    }
+  ],
+  events: [
+    {
+      id: "app.starting",
+      channel: "app",
+      level: "info",
+      message: "Application starting",
+      fields: ["name", "version", "env", "nodeVersion"]
+    },
+    {
+      id: "app.started",
+      channel: "app",
+      level: "info",
+      message: "Application listening",
+      fields: ["url", "port", "env"]
+    },
+    {
+      id: "app.config.missing",
+      channel: "app",
+      level: "warn",
+      message: "Optional configuration is absent; the feature it enables is off",
+      fields: ["key", "feature"]
+    },
+    {
+      id: "app.config.invalid",
+      channel: "app",
+      level: "error",
+      message: "Configuration is present but unusable",
+      fields: ["key", "reason"]
+    },
+    {
+      id: "app.shutdown",
+      channel: "app",
+      level: "info",
+      message: "Application shutting down",
+      fields: ["signal", "uptimeMs"]
+    },
+    {
+      id: "app.uncaught",
+      channel: "app",
+      level: "fatal",
+      message: "Unhandled error reached the top of the process",
+      fields: ["err"]
+    },
+    {
+      id: "http.request.completed",
+      channel: "http",
+      level: "info",
+      message: "Request completed",
+      fields: ["method", "path", "status", "durationMs", "requestId"]
+    },
+    {
+      id: "http.request.client_error",
+      channel: "http",
+      level: "warn",
+      message: "Request rejected",
+      fields: ["method", "path", "status", "durationMs", "requestId", "reason"]
+    },
+    {
+      id: "http.request.failed",
+      channel: "http",
+      level: "error",
+      message: "Request failed",
+      fields: ["method", "path", "status", "durationMs", "requestId", "err"]
+    },
+    {
+      id: "http.request.slow",
+      channel: "http",
+      level: "warn",
+      message: "Request exceeded its latency budget",
+      fields: ["method", "path", "durationMs", "budgetMs", "requestId"]
+    },
+    {
+      id: "auth.signin.succeeded",
+      channel: "auth",
+      level: "info",
+      message: "Sign-in succeeded",
+      fields: ["email", "userId", "ip"]
+    },
+    {
+      id: "auth.signin.failed",
+      channel: "auth",
+      level: "warn",
+      message: "Sign-in failed",
+      fields: ["email", "ip", "reason"]
+    },
+    {
+      id: "auth.signout",
+      channel: "auth",
+      level: "info",
+      message: "Sign-out",
+      fields: ["userId"]
+    },
+    {
+      id: "auth.signout.failed",
+      channel: "auth",
+      level: "error",
+      message: "Sign-out could not reach the session store; the token may still be valid",
+      fields: ["userId", "err"]
+    },
+    {
+      id: "auth.access.denied",
+      channel: "auth",
+      level: "warn",
+      message: "Access denied",
+      fields: ["userId", "resource", "operation", "requiredRoles"]
+    },
+    {
+      id: "auth.ratelimit.exceeded",
+      channel: "auth",
+      level: "warn",
+      message: "Rate limit exceeded",
+      fields: ["bucket", "ip", "limit", "windowMs"]
+    },
+    {
+      id: "db.connected",
+      channel: "db",
+      level: "info",
+      message: "Database connection established",
+      fields: ["host", "database", "poolMax"]
+    },
+    {
+      id: "db.connection.failed",
+      channel: "db",
+      level: "error",
+      message: "Database connection failed",
+      fields: ["host", "database", "err"]
+    },
+    {
+      id: "db.query.failed",
+      channel: "db",
+      level: "error",
+      message: "Query failed",
+      fields: ["operation", "table", "err"]
+    },
+    {
+      id: "db.query.slow",
+      channel: "db",
+      level: "warn",
+      message: "Query exceeded its latency budget",
+      fields: ["operation", "table", "durationMs", "budgetMs"]
+    },
+    {
+      id: "db.migration.applied",
+      channel: "db",
+      level: "info",
+      message: "Migration applied",
+      fields: ["name", "durationMs"]
+    },
+    {
+      id: "db.migration.failed",
+      channel: "db",
+      level: "error",
+      message: "Migration failed",
+      fields: ["name", "err"]
+    },
+    {
+      id: "pipeline.generation.started",
+      channel: "pipeline",
+      level: "info",
+      message: "Generation started",
+      fields: ["project", "stack", "input", "output"]
+    },
+    {
+      id: "pipeline.model.parsed",
+      channel: "pipeline",
+      level: "info",
+      message: "Model parsed",
+      fields: ["entities", "rules", "workflows", "sagas", "hooks", "enums"]
+    },
+    {
+      id: "pipeline.model.warning",
+      channel: "pipeline",
+      level: "warn",
+      message: "The model parsed, but something in it will not do what its author expects",
+      fields: ["code", "detail", "line"]
+    },
+    {
+      id: "pipeline.files.written",
+      channel: "pipeline",
+      level: "info",
+      message: "Files written",
+      fields: ["count", "output", "durationMs"]
+    },
+    {
+      id: "pipeline.generation.completed",
+      channel: "pipeline",
+      level: "info",
+      message: "Generation completed",
+      fields: ["project", "files", "durationMs"]
+    },
+    {
+      id: "pipeline.generation.failed",
+      channel: "pipeline",
+      level: "error",
+      message: "Generation failed",
+      fields: ["project", "stage", "err"]
+    },
+    {
+      id: "pipeline.artifact.write_failed",
+      channel: "pipeline",
+      level: "warn",
+      message: "A non-essential generated artifact could not be written",
+      fields: ["artifact", "err"]
+    },
+    {
+      id: "ai.request.started",
+      channel: "ai",
+      level: "debug",
+      message: "Model request started",
+      fields: ["model", "operation"]
+    },
+    {
+      id: "ai.request.completed",
+      channel: "ai",
+      level: "info",
+      message: "Model request completed",
+      fields: ["model", "operation", "durationMs", "promptTokens", "completionTokens"]
+    },
+    {
+      id: "ai.request.failed",
+      channel: "ai",
+      level: "error",
+      message: "Model request failed",
+      fields: ["model", "operation", "durationMs", "err"]
+    },
+    {
+      id: "ai.retrieval.completed",
+      channel: "ai",
+      level: "debug",
+      message: "Retrieval completed",
+      fields: ["index", "projectId", "matches", "durationMs"]
+    },
+    {
+      id: "rules.evaluated",
+      channel: "rules",
+      level: "debug",
+      message: "Rule set evaluated",
+      fields: ["entity", "event", "matched", "durationMs"]
+    },
+    {
+      id: "rules.action.performed",
+      channel: "rules",
+      level: "info",
+      message: "Rule action performed",
+      fields: ["entity", "rule", "action"]
+    },
+    {
+      id: "rules.write.prevented",
+      channel: "rules",
+      level: "warn",
+      message: "A rule refused the write",
+      fields: ["entity", "rule", "reason"]
+    },
+    {
+      id: "rules.evaluation.failed",
+      channel: "rules",
+      level: "error",
+      message: "Rule evaluation failed",
+      fields: ["entity", "rule", "err"]
+    },
+    {
+      id: "workflow.transition.applied",
+      channel: "workflow",
+      level: "info",
+      message: "State transition applied",
+      fields: ["entity", "recordId", "from", "to", "userId"]
+    },
+    {
+      id: "workflow.transition.refused",
+      channel: "workflow",
+      level: "warn",
+      message: "State transition refused",
+      fields: ["entity", "recordId", "from", "to", "reason"]
+    },
+    {
+      id: "workflow.step.completed",
+      channel: "workflow",
+      level: "debug",
+      message: "Workflow step completed",
+      fields: ["workflow", "step", "type", "durationMs"]
+    },
+    {
+      id: "workflow.step.failed",
+      channel: "workflow",
+      level: "error",
+      message: "Workflow step failed",
+      fields: ["workflow", "step", "type", "err"]
+    },
+    {
+      id: "workflow.loop.exhausted",
+      channel: "workflow",
+      level: "warn",
+      message: "A loop hit its declared maximum without its condition going false",
+      fields: ["workflow", "loop", "max"]
+    },
+    {
+      id: "hooks.executed",
+      channel: "hooks",
+      level: "debug",
+      message: "Lifecycle hook executed",
+      fields: ["entity", "event", "handler", "durationMs"]
+    },
+    {
+      id: "hooks.failed",
+      channel: "hooks",
+      level: "error",
+      message: "Lifecycle hook failed",
+      fields: ["entity", "event", "handler", "err"]
+    },
+    {
+      id: "entity.created",
+      channel: "entity",
+      level: "info",
+      message: "Record created",
+      fields: ["entity", "recordId", "userId"]
+    },
+    {
+      id: "entity.updated",
+      channel: "entity",
+      level: "info",
+      message: "Record updated",
+      fields: ["entity", "recordId", "userId", "changedFields"]
+    },
+    {
+      id: "entity.deleted",
+      channel: "entity",
+      level: "info",
+      message: "Record deleted",
+      fields: ["entity", "recordId", "userId"]
+    },
+    {
+      id: "entity.validation.failed",
+      channel: "entity",
+      level: "warn",
+      message: "Record rejected by validation",
+      fields: ["entity", "field", "reason"]
+    }
+  ]
+};
+
+// packages/generator/src/logging/generated-spec.ts
+var SURFACE = "generated";
+function generatedLogSpec() {
+  const spec = log_spec_default;
+  const channels = spec.channels.filter((channel) => channel.surfaces.includes(SURFACE));
+  const kept = new Set(channels.map((channel) => channel.name));
+  const shipped = {
+    specVersion: spec.specVersion,
+    description: "The log specification for this application. Levels, channels, messages and " + "redaction are declared here; the code names an event id and this file decides " + "the rest. Generated from the APPWITHAI canonical specification — edit it to " + "change what this application logs.",
+    levels: spec.levels,
+    environments: spec.environments,
+    transport: spec.transport,
+    redact: spec.redact,
+    channels: channels.map(({ surfaces: _surfaces, ...channel }) => channel),
+    events: spec.events.filter((event) => kept.has(event.channel))
+  };
+  return `${JSON.stringify(shipped, null, 2)}
+`;
 }
 
 // packages/generator/src/rbac/index.ts
@@ -13304,7 +13791,7 @@ function sagaPropsFromAutomation(type, props) {
   }
   return out;
 }
-var PROP_SPLIT = /\s+(?=[A-Za-z_]\w*:)/;
+var PROP_SPLIT = /\s+(?=[A-Za-z_]\w*:(?!\/\/))/;
 function parseStepProps(rest) {
   const props = {};
   const trimmed = rest.trim();
@@ -14435,7 +14922,7 @@ class TemplateLoader {
       }
       return `\`test_${index}\``;
     });
-    import_handlebars.default.registerHelper("seedValue", (fieldName, index, entityDisplayName) => {
+    import_handlebars.default.registerHelper("seedValue", (fieldName, index, entityDisplayName, enumValues) => {
       const n = (fieldName ?? "").toLowerCase();
       const i = typeof index === "number" ? index : 0;
       const FIRST_NAMES = [
@@ -14464,6 +14951,9 @@ class TemplateLoader {
       ];
       const pick = (arr) => arr[i % arr.length];
       const entityName = typeof entityDisplayName === "string" ? entityDisplayName.trim() : "";
+      const declared = Array.isArray(enumValues) ? enumValues.map((value) => String(value).trim()).filter(Boolean) : [];
+      if (declared.length > 0)
+        return pick(declared);
       if (n === "first_name")
         return pick(FIRST_NAMES);
       if (n === "last_name")
@@ -14512,6 +15002,23 @@ class TemplateLoader {
         return `${entityName} ${i + 1}`;
       const humanized = (fieldName ?? "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()).trim();
       return humanized ? `${humanized} ${i + 1}` : `Sample ${i + 1}`;
+    });
+    import_handlebars.default.registerHelper("seedNumber", (fieldName, index) => {
+      const n = (fieldName ?? "").toLowerCase();
+      const i = typeof index === "number" ? index : 0;
+      if (n === "capacity" || n === "max_students" || n === "seats")
+        return 20 + i * 5;
+      if (n.startsWith("credits") || n.endsWith("_credits"))
+        return 10 + i * 5;
+      if (n.endsWith("_count") || n === "quantity" || n === "qty")
+        return 1 + i;
+      if (n === "duration_minutes" || n.endsWith("_minutes"))
+        return 45 + i * 15;
+      if (n === "position" || n === "queue_position" || n === "seq_no" || n === "sequence")
+        return i + 1;
+      if (n === "year" || n === "academic_year")
+        return 2024 + i;
+      return i;
     });
   }
 }
@@ -14829,7 +15336,7 @@ class NestJsBackendGenerator extends BaseGenerator {
         }
       }
     }
-    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : "bus_user";
+    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : null;
     const personRoleColumns = [
       "pi_id",
       "lab_manager_id",
@@ -14843,10 +15350,14 @@ class NestJsBackendGenerator extends BaseGenerator {
       "remediation_owner_id"
     ];
     for (const col of personRoleColumns) {
-      if (!seen.has(col)) {
-        overrides.push({ column: col, table: personTable });
-        seen.add(col);
-      }
+      if (seen.has(col))
+        continue;
+      if (!personTable)
+        continue;
+      if (tableSet.has(`bus_${col.replace(/_id$/, "")}`))
+        continue;
+      overrides.push({ column: col, table: personTable });
+      seen.add(col);
     }
     for (const entity2 of busEntities) {
       const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
@@ -14854,7 +15365,7 @@ class NestJsBackendGenerator extends BaseGenerator {
         const col = attr.columnName || attr.name;
         if (seen.has(col))
           continue;
-        if (col.endsWith("_by_id") || col.endsWith("_by")) {
+        if (personTable && (col.endsWith("_by_id") || col.endsWith("_by"))) {
           overrides.push({ column: col, table: personTable });
           seen.add(col);
         }
@@ -14879,15 +15390,20 @@ class NestJsBackendGenerator extends BaseGenerator {
       "src/common/decorators/etag.decorator.ts",
       "src/common/filters/http-exception.filter.ts",
       "src/common/guards/etag.guard.ts",
+      "src/common/interceptors/logging.interceptor.ts",
       "src/common/interceptors/transform.interceptor.ts",
+      "src/common/logging/logger.service.ts",
       "src/common/pipes/zod-validation.pipe.ts"
     ];
     for (const file of commonFiles) {
       try {
         const content = await this.renderTemplate(`${file}.hbs`, context);
+        await mkdir(dirname(join(outputDir, file)), { recursive: true });
         await writeFile(join(outputDir, file), content);
       } catch (_e) {}
     }
+    await mkdir(join(outputDir, "src/common/logging"), { recursive: true });
+    await writeFile(join(outputDir, "src/common/logging/log-spec.json"), generatedLogSpec());
     try {
       const publicDecoratorContent = await this.renderTemplate("src/modules/auth/decorators/public.decorator.ts.hbs", context);
       await writeFile(join(outputDir, "src/modules/auth/decorators/public.decorator.ts"), publicDecoratorContent);
@@ -15075,6 +15591,8 @@ class NestJsBackendGenerator extends BaseGenerator {
     await mkdir(join(outputDir, "src/modules/sys/services"), { recursive: true });
     const categoryServiceContent = await this.renderTemplate("src/modules/sys/services/sys-category.service.ts.hbs", context);
     await writeFile(join(outputDir, "src/modules/sys/services/sys-category.service.ts"), categoryServiceContent);
+    const systemConfigServiceContent = await this.renderTemplate("src/modules/sys/services/system-config.service.ts.hbs", context);
+    await writeFile(join(outputDir, "src/modules/sys/services/system-config.service.ts"), systemConfigServiceContent);
     const categoryControllerContent = await this.renderTemplate("src/modules/sys/controllers/sys-category.controller.ts.hbs", context);
     await writeFile(join(outputDir, "src/modules/sys/controllers/sys-category.controller.ts"), categoryControllerContent);
   }
@@ -15442,6 +15960,7 @@ export async function executeCustomValidateHooks(
     await writeFile(join(outputDir, "src/modules/bus/bus.controller.ts"), controllerContent);
     const serviceContent = await this.renderTemplate("src/modules/bus/bus.service.ts.hbs", context);
     await writeFile(join(outputDir, "src/modules/bus/bus.service.ts"), serviceContent);
+    await copyFile(join(this.resolvedTemplateDir, "src/modules/bus/window-list-defaults.ts"), join(outputDir, "src/modules/bus/window-list-defaults.ts"));
     for (const name of ["entity-promotion.service", "promotion-dispatcher.service"]) {
       const content = await this.renderTemplate(`src/modules/bus/${name}.ts.hbs`, context);
       await writeFile(join(outputDir, `src/modules/bus/${name}.ts`), content);
@@ -15504,6 +16023,14 @@ export async function executeCustomValidateHooks(
       {
         slug: "add_record_notes",
         template: "src/migrations/014_add_record_notes.ts.hbs"
+      },
+      {
+        slug: "add_system_config",
+        template: "src/migrations/015_add_system_config.ts.hbs"
+      },
+      {
+        slug: "add_window_list_defaults",
+        template: "src/migrations/016_add_window_list_defaults.ts.hbs"
       }
     ];
     const scaffoldSlugs = new Set(scaffold.map((m) => m.slug));
@@ -15561,6 +16088,8 @@ export async function executeCustomValidateHooks(
     await writeFile(join(outputDir, "seeds/05b_workflow_transitions.ts"), this.renderWorkflowTransitionsSeed(context));
     const reportDesignsSeedContent = await this.renderTemplate("../../common/seeds/report-designs.ts.hbs", context);
     await writeFile(join(outputDir, "seeds/06_report_designs.ts"), reportDesignsSeedContent);
+    const systemConfigContent = await this.renderTemplate("../../common/seeds/system-config.ts.hbs", context);
+    await writeFile(join(outputDir, "seeds/07_system_config.ts"), systemConfigContent);
   }
   renderWorkflowDefinitionsSeed(context) {
     const byEntity = new Map;
@@ -16281,6 +16810,8 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     await writeFile(join(outputDir, "src/lib/app-meta.ts"), appMeta);
     const apiClientContent = await this.component("src/lib/api-client.ts");
     await writeFile(join(outputDir, "src/lib/api-client.ts"), apiClientContent);
+    const csvContent = await this.component("src/lib/csv.ts");
+    await writeFile(join(outputDir, "src/lib/csv.ts"), csvContent);
     try {
       const viteEnv = await this.renderTemplate("src/vite-env.d.ts.hbs", context);
       await writeFile(join(outputDir, "src/vite-env.d.ts"), viteEnv);
@@ -16826,6 +17357,7 @@ function resolveTemplateDir3(subpath) {
 }
 var HARNESS_FILES = [
   "config.ts",
+  "access.ts",
   "http.ts",
   "auth.ts",
   "server.ts",
@@ -16852,7 +17384,15 @@ var SHARED_SUITES = [
   "07-workflow-random.test.ts",
   "08-users-roles.test.ts",
   "09-workflow-multistep.test.ts",
+  "12-access-control.test.ts",
+  "13-enum-integrity.test.ts",
+  "14-validation.test.ts",
+  "15-record-lifecycle.test.ts",
+  "16-api-contract.test.ts",
+  "17-display-identifier.test.ts",
+  "19-window-list-defaults.test.ts",
   "10-benchmark.test.ts",
+  "18-write-benchmark.test.ts",
   "11-performance-budget.test.ts"
 ];
 var ROOT_FILES = ["package.json", "tsconfig.json", "README.md", "run.ts", "cleanup.ts"];
@@ -16895,8 +17435,43 @@ class BunE2ETestGenerator extends BaseGenerator {
       fkOverrides: this.buildFkOverrides(entities, relationships),
       modelEnums: this.options.modelEnums ?? [],
       stateMachines: this.stateMachines(entities),
+      ...this.accessContext(entities),
       now: new Date().toISOString()
     };
+  }
+  accessContext(entities) {
+    const compiled = this.options.compiledRbac;
+    if (!compiled || compiled.operations.length === 0) {
+      return { rbacRules: [], roleAccounts: [] };
+    }
+    const projectId = this.options.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    const derived = deriveAccess(compiled, {
+      projectId,
+      entities: entities.map((entity2) => entity2.originalName || entity2.name),
+      adminEmail: this.options.adminEmail
+    });
+    const byName = new Map(entities.map((entity2) => [
+      String(entity2.originalName || entity2.name).toLowerCase(),
+      entity2
+    ]));
+    const rbacRules = compiled.operations.map((rule2) => {
+      const entity2 = byName.get(rule2.entity.toLowerCase());
+      return {
+        entity: rule2.entity,
+        tableName: rule2.tableName,
+        route: entity2 ? entity2.route || entity2.tableName : rule2.tableName,
+        operation: rule2.operation,
+        roles: rule2.roles
+      };
+    }).filter((rule2) => byName.has(rule2.entity.toLowerCase()));
+    const roleAccounts = derived.users.map((user) => ({
+      email: user.email,
+      name: user.name,
+      roleName: user.roleName,
+      declaredAs: derived.roles.find((role) => role.name === user.roleName)?.declaredAs ?? user.roleName,
+      isAdmin: user.isAdmin === true
+    }));
+    return { rbacRules, roleAccounts };
   }
   buildFkOverrides(busEntities, relationships) {
     const tableSet = new Set(busEntities.map((e) => e.tableName));
@@ -16933,7 +17508,7 @@ class BunE2ETestGenerator extends BaseGenerator {
         }
       }
     }
-    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : "bus_user";
+    const personTable = tableSet.has("bus_user") ? "bus_user" : tableSet.has("bus_staff") ? "bus_staff" : tableSet.has("bus_employee") ? "bus_employee" : null;
     const personRoleColumns = [
       "pi_id",
       "lab_manager_id",
@@ -16947,10 +17522,14 @@ class BunE2ETestGenerator extends BaseGenerator {
       "remediation_owner_id"
     ];
     for (const col of personRoleColumns) {
-      if (!seen.has(col)) {
-        overrides.push({ column: col, table: personTable });
-        seen.add(col);
-      }
+      if (seen.has(col))
+        continue;
+      if (!personTable)
+        continue;
+      if (tableSet.has(`bus_${col.replace(/_id$/, "")}`))
+        continue;
+      overrides.push({ column: col, table: personTable });
+      seen.add(col);
     }
     for (const entity2 of busEntities) {
       const fkAttrs = (entity2.attributes || []).filter((a) => a.isForeignKey);
@@ -16958,7 +17537,7 @@ class BunE2ETestGenerator extends BaseGenerator {
         const col = attr.columnName || attr.name;
         if (seen.has(col))
           continue;
-        if (col.endsWith("_by_id") || col.endsWith("_by")) {
+        if (personTable && (col.endsWith("_by_id") || col.endsWith("_by"))) {
           overrides.push({ column: col, table: personTable });
           seen.add(col);
         }
@@ -17046,9 +17625,6 @@ class FullStackGenerator {
     if (this.options.aiNlAddon && this.options.aiNlAddon !== "none") {
       console.log(`   AI NL Add-on: ${this.options.aiNlAddon} (${this.options.aiNlProvider || "anthropic"})`);
     }
-    console.log(`
-\uD83D\uDD0D Running mandatory linting checks...`);
-    await this.runLintingChecks(outputDir);
   }
   async generateTanStackStartNestjs(entities, relationships, outputDir) {
     const backendDir = join(outputDir, "backend");
@@ -17111,7 +17687,8 @@ class FullStackGenerator {
         frontendPort: this.options.frontendPort ?? DEFAULT_FRONTEND_PORT,
         recordsPerEntity: this.options.recordsPerEntity,
         modelEnums: this.options.modelEnums,
-        compiledWorkflows: this.options.compiledWorkflows
+        compiledWorkflows: this.options.compiledWorkflows,
+        compiledRbac: this.options.compiledRbac
       });
       await testGenerator.generate(entities, relationships, outputDir);
     }
@@ -17416,45 +17993,6 @@ Field ordering is controlled by:
 
 MIT
 `;
-  }
-  async runLintingChecks(outputDir) {
-    const { execFileSync } = (init_node_child_process(), __toCommonJS(exports_node_child_process));
-    const runLint = (command, args, cwd) => {
-      try {
-        execFileSync(command, args, { cwd, stdio: "pipe", timeout: 60000 });
-        return true;
-      } catch (_error) {
-        return false;
-      }
-    };
-    try {
-      if (!this.options.skipBackend) {
-        console.log(`
-  \uD83D\uDCCB Linting NestJS backend...`);
-        const backendLintPassed = runLint("npm", ["run", "lint"], join(outputDir, "backend"));
-        if (backendLintPassed) {
-          console.log("  ✅ Backend linting passed");
-        } else {
-          console.warn('  ⚠️  Backend linting found issues (run "cd backend && bun run lint:fix" to auto-fix)');
-        }
-      }
-      if (!this.options.skipFrontend) {
-        console.log(`
-  \uD83D\uDCCB Linting TanStack Start frontend...`);
-        const frontendLintPassed = runLint("npm", ["run", "lint"], join(outputDir, "frontend"));
-        if (frontendLintPassed) {
-          console.log("  ✅ Frontend linting passed");
-        } else {
-          console.warn('  ⚠️  Frontend linting found issues (run "cd frontend && bun run lint:fix" to auto-fix)');
-        }
-      }
-      console.log(`
-✨ Linting checks completed!`);
-      console.log('   Tip: Run "bun run lint:fix" in backend/frontend directories to auto-fix issues');
-    } catch (_error) {
-      console.warn("  ⚠️  Linting could not be completed (dependencies not installed?)");
-      console.log('   Tip: Run "bun install" first, then run linting manually');
-    }
   }
   getStackDescription() {
     return "tanstackjs-nestjs - Modern Web (TanStack Start + NestJS)";
@@ -17854,6 +18392,7 @@ tbody tr:last-child td { border-bottom: none; }
 .missing { color: var(--muted); font-style: italic; }
 .unset { color: var(--muted); }
 .detail { margin-top: 5px; font-size: 13px; color: var(--soft); }
+.app-overview { margin: 18px 0; padding: 16px 20px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: 4px; font-size: 15px; line-height: 1.7; }
 ul.plain { margin: 4px 0 12px; padding-left: 20px; }
 .process { border-left: 3px solid var(--border); padding-left: 16px; margin: 18px 0; }
 .back { margin-top: 18px; font-size: 13px; }
@@ -17882,7 +18421,8 @@ ${contents}
 
   <section id="overview">
     <h2>What this application is</h2>
-    <p>${escapeHtml(options.name)} keeps ${model.entities.length} kinds of record${model.entities.length === 1 ? "" : "s"}${model.categories.length ? `, grouped into ${model.categories.length} areas of the business` : ""}. Every screen in it &mdash; every list, every form, every field label and every dropdown &mdash; is drawn from a description of those records held in the application itself, so the application can be changed by changing that description rather than by editing code.</p>
+${options.description && options.description !== "A generated full-stack application" ? `    <div class="app-overview"><p>${escapeHtml(options.description)}</p></div>
+` : ""}    <p>${escapeHtml(options.name)} keeps ${model.entities.length} kinds of record${model.entities.length === 1 ? "" : "s"}${model.categories.length ? `, grouped into ${model.categories.length} areas of the business` : ""}. Every screen in it &mdash; every list, every form, every field label and every dropdown &mdash; is drawn from a description of those records held in the application itself, so the application can be changed by changing that description rather than by editing code.</p>
     <p>This manual is generated from the same description. It cannot describe a record type the application does not have, and it cannot miss one it does.</p>
 ${model.categories.length ? `    <table>
       <thead><tr><th>Area</th><th>Records</th></tr></thead>
@@ -17934,6 +18474,11 @@ ${processSection}
 </html>
 `;
 }
+
+// packages/generator/src/pipeline/logger-port.ts
+var NO_LOG = {
+  event() {}
+};
 
 // packages/generator/src/parsers/category.parser.ts
 function slugifyCategory(name) {
@@ -18297,7 +18842,7 @@ class MermaidParser {
       sourceEntity,
       targetEntity,
       cardinality,
-      foreignKey: this.generateForeignKey(targetEntity, cardinality)
+      foreignKey: this.generateForeignKey(sourceEntity, targetEntity, cardinality)
     };
   }
   parseAttribute(line) {
@@ -18368,8 +18913,9 @@ class MermaidParser {
   normalizeRelationshipName(name) {
     return name.trim().replace(/\s+/g, "_").toLowerCase();
   }
-  generateForeignKey(targetEntity, _cardinality) {
-    const snakeName = this.toSnakeCase(targetEntity);
+  generateForeignKey(sourceEntity, targetEntity, cardinality) {
+    const referenced = cardinality === "oneToMany" ? sourceEntity : targetEntity;
+    const snakeName = this.toSnakeCase(referenced);
     const cleanName = snakeName.replace(/^bus_/, "");
     return `${cleanName}_id`;
   }
@@ -18604,16 +19150,26 @@ function buildEditorDecisionTable(ruleName, table) {
     ]
   };
 }
+var RUNTIME_ACTION = {
+  "validation-error": "prevent"
+};
+function transformDataCell(action) {
+  const field = (action.props.field ?? "").trim();
+  if (action.type !== "transform" || !field)
+    return zenLiteral("");
+  return zenLiteral(JSON.stringify({ [field]: action.props.value ?? "" }));
+}
 function buildActionDecisionTable(ruleName, actions) {
   const cells = [
-    (action) => zenLiteral(action.type),
+    (action) => zenLiteral(RUNTIME_ACTION[action.type] ?? action.type),
     (action) => zenLiteral(action.props.message ?? `${ruleName}: ${action.name}`),
     () => zenLiteral(ruleName),
     (action) => zenLiteral(action.props.workflow ?? ""),
     (action) => zenLiteral(action.props.field ?? ""),
     (action) => zenLiteral(action.props.value ?? ""),
     (action) => zenLiteral(action.props.targetEntity ?? ""),
-    (action) => zenLiteral(action.props.linkField ?? "")
+    (action) => zenLiteral(action.props.linkField ?? ""),
+    transformDataCell
   ];
   const rows = actions.map((action) => {
     const row = {
@@ -18643,7 +19199,8 @@ function buildActionDecisionTable(ruleName, actions) {
             { id: "o5", name: "Field", field: "field" },
             { id: "o6", name: "Value", field: "value" },
             { id: "o7", name: "Target Entity", field: "targetEntity" },
-            { id: "o8", name: "Link Field", field: "linkField" }
+            { id: "o8", name: "Link Field", field: "linkField" },
+            { id: "o9", name: "Transform Data", field: "transformData" }
           ],
           rules: rows
         }
@@ -18775,7 +19332,7 @@ function buildGeneratorOptions(model, settings) {
     compiledRbac: model.rbac
   };
 }
-async function writeManifest(outputDir, model, settings, extras = {}) {
+async function writeManifest(outputDir, model, settings, extras = {}, log = NO_LOG) {
   const port = settings.port ?? GENERATION_DEFAULTS.port;
   try {
     await writeFile(join(outputDir, ".appwithai.json"), JSON.stringify({
@@ -18801,21 +19358,71 @@ async function writeManifest(outputDir, model, settings, extras = {}) {
       packageManager: extras.packageManager,
       generatedAt: new Date().toISOString()
     }, null, 2));
-  } catch {}
+  } catch (err) {
+    log.event("pipeline.artifact.write_failed", { artifact: ".appwithai.json", err });
+  }
+}
+async function countFiles(directory) {
+  let total = 0;
+  try {
+    const entries = await readdir(directory, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === "node_modules" || entry.name === ".git")
+        continue;
+      total += entry.isDirectory() ? await countFiles(join(directory, entry.name)) : 1;
+    }
+  } catch {
+    return total;
+  }
+  return total;
 }
 async function generateApplication(options) {
-  const model = options.model ?? parseModel(options.sources);
-  await mkdir(options.outputDir, { recursive: true });
-  const generator = new FullStackGenerator(buildGeneratorOptions(model, options));
-  await generator.generate(model.entities, model.relationships);
-  await writeModelSource(options.outputDir, options.sources);
-  await writeManual(options.outputDir, model, options);
-  if (options.writeManifestFile !== false) {
-    await writeManifest(options.outputDir, model, options, options.manifest ?? {});
+  const log = options.logger ?? NO_LOG;
+  const startedAt = Date.now();
+  log.event("pipeline.generation.started", {
+    project: options.projectName,
+    stack: options.stackOption ?? GENERATION_DEFAULTS.stackOption,
+    input: Array.isArray(options.sources) ? `${options.sources.length} sources` : "1 source",
+    output: options.outputDir
+  });
+  let stage = "parse";
+  try {
+    const model = options.model ?? parseModel(options.sources);
+    log.event("pipeline.model.parsed", {
+      entities: model.entities.length,
+      rules: model.rules.length,
+      workflows: model.workflows.length,
+      sagas: model.sagas.length,
+      hooks: model.hooks.length,
+      enums: model.enums.length
+    });
+    stage = "emit";
+    await mkdir(options.outputDir, { recursive: true });
+    const generator = new FullStackGenerator(buildGeneratorOptions(model, options));
+    await generator.generate(model.entities, model.relationships);
+    log.event("pipeline.files.written", {
+      count: await countFiles(options.outputDir),
+      output: options.outputDir,
+      durationMs: Date.now() - startedAt
+    });
+    stage = "artifacts";
+    await writeModelSource(options.outputDir, options.sources, log);
+    await writeManual(options.outputDir, model, options, log);
+    if (options.writeManifestFile !== false) {
+      await writeManifest(options.outputDir, model, options, options.manifest ?? {}, log);
+    }
+    log.event("pipeline.generation.completed", {
+      project: options.projectName,
+      files: await countFiles(options.outputDir),
+      durationMs: Date.now() - startedAt
+    });
+    return model;
+  } catch (err) {
+    log.event("pipeline.generation.failed", { project: options.projectName, stage, err });
+    throw err;
   }
-  return model;
 }
-async function writeManual(outputDir, model, options) {
+async function writeManual(outputDir, model, options, log = NO_LOG) {
   try {
     const directory = join(outputDir, "frontend", "public");
     await mkdir(directory, { recursive: true });
@@ -18825,9 +19432,11 @@ async function writeManual(outputDir, model, options) {
       description: options.projectDescription ?? GENERATION_DEFAULTS.projectDescription,
       stack: "nestjs"
     }), "utf-8");
-  } catch {}
+  } catch (err) {
+    log.event("pipeline.artifact.write_failed", { artifact: "manual.html", err });
+  }
 }
-async function writeModelSource(outputDir, sources) {
+async function writeModelSource(outputDir, sources, log = NO_LOG) {
   const document = (Array.isArray(sources) ? sources : [sources]).filter(Boolean).join(`
 
 `);
@@ -18836,7 +19445,9 @@ async function writeModelSource(outputDir, sources) {
   try {
     await mkdir(join(outputDir, "model"), { recursive: true });
     await writeFile(join(outputDir, "model", "model.eml.mmd"), document, "utf-8");
-  } catch {}
+  } catch (err) {
+    log.event("pipeline.artifact.write_failed", { artifact: "model/model.eml.mmd", err });
+  }
 }
 
 // language/checker.ts
@@ -18979,6 +19590,8 @@ function parseDirective(line, n, model) {
     case "hook": {
       const m = rest.match(/^(\w+)\s+(\w+)\s+on\s+(\w+)\s*(\[[^\]]*\])?/);
       if (!m) {
+        if (/^\w+\s+on\s+\w+\s*$/.test(rest))
+          return;
         model.diagnostics.push({
           severity: "error",
           code: "EML201",
@@ -19452,6 +20065,50 @@ var MANAGED_COLUMN_NAMES2 = new Set([
   "deleted_at",
   "deleted_by"
 ]);
+var AUTOMATION_WORKFLOW = /^%%workflow\s+name:\s*\S/;
+var AUTO_TYPE_DIRECTIVE2 = /^%%step\s+([A-Za-z_]\w*)\s+type:\s*([A-Za-z]\w*)\s*(.*)$/;
+var AUTO_PROP_DIRECTIVE2 = /^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z_]\w*):\s*(.*)$/;
+function sagaPropsFromAutomation2(type, props) {
+  const out = { ...props };
+  const ref = (value) => value?.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)?.[1] ?? null;
+  const move = (from, to) => {
+    const value = out[from];
+    if (value !== undefined && out[to] === undefined)
+      out[to] = value;
+    delete out[from];
+  };
+  if (type === "Decision") {
+    move("ruleTable", "rule");
+    move("table", "decisionTable");
+    delete out.inputs;
+  } else if (type === "CreateEntity") {
+    move("values", "fields");
+  } else if (type === "UpdateEntity" || type === "DeleteEntity") {
+    const target = ref(out.target);
+    if (target) {
+      out.targetSource = out.targetSource ?? target;
+      delete out.target;
+    } else
+      move("target", "targetField");
+    const value = ref(out.value);
+    if (value) {
+      out.source = out.source ?? value;
+      delete out.value;
+    }
+  } else if (type === "Formula") {
+    move("as", "target");
+    const left = ref(out.left);
+    if (left)
+      out.source = out.source ?? left;
+    else if (out.left !== undefined)
+      out.value = out.value ?? out.left;
+    delete out.left;
+    move("right", "operand");
+  } else if (type === "REST") {
+    move("body", "bodyTemplate");
+  }
+  return out;
+}
 var PERSON_ROLE_COLUMN_NAMES = new Set([
   "assigned_to",
   "author_id",
@@ -19489,7 +20146,7 @@ class CheckEngine {
     "parent"
   ]);
   validFieldKeys = new Set(["enum", "ui", "default", "min", "max", "help", "format"]);
-  validMetaKeys = new Set(["name", "kind", "version", "entity", "stack"]);
+  validMetaKeys = new Set(["name", "kind", "version", "entity", "stack", "description"]);
   validWorkflowKinds = new Set(["hook", "state", "saga"]);
   validTriggerSources = /^(cron:|webhook:|message:)/;
   validRoleExpr = /^role:[A-Za-z][A-Za-z0-9_]*(\|(?:role:)?[A-Za-z][A-Za-z0-9_]*)*$/;
@@ -19530,6 +20187,7 @@ class CheckEngine {
     this.checkIndexDirectives();
     this.checkEntityDirectives();
     this.checkHooks();
+    this.checkAutomationTriggers();
     this.checkGuards();
     this.checkRbac();
     this.checkTriggers();
@@ -20184,15 +20842,38 @@ class CheckEngine {
       }
     }
   }
+  checkAutomationTriggers() {
+    const entityNames = new Set(this.model.entities.map((e) => e.name));
+    for (const { lineNo, text } of this.src.findAll(/^\s*%%hook\b/)) {
+      const m = text.trim().match(/^%%hook\s+(\w+)\s+on\s+(\w+)\s*$/);
+      if (!m)
+        continue;
+      const [event, entity2] = caps(m, 2);
+      if (!this.validHookTypes.has(event)) {
+        this.error("EML205", `Automation trigger uses unknown event "${event}".`, {
+          line: lineNo,
+          hint: `Valid events: ${[...this.validHookTypes].join(", ")}.`
+        });
+      }
+      if (!entityNames.has(entity2)) {
+        this.warn("EML206", `Automation trigger references undeclared entity "${entity2}".`, {
+          line: lineNo,
+          hint: `Declare "${entity2}" in the erDiagram section.`
+        });
+      }
+    }
+  }
   checkWorkflowDirectives() {
     const entityNames = new Set(this.model.entities.map((e) => e.name));
     const workflowLines = this.src.findAll(/^%%workflow\b/);
     for (const { lineNo, text } of workflowLines) {
+      if (AUTOMATION_WORKFLOW.test(text.trim()))
+        continue;
       const m = text.trim().match(/^%%workflow\s+(\w+)\s+entity:\s*(\w+)\s+kind:\s*(\w+)/);
       if (!m) {
         this.error("EML240", `Invalid %%workflow syntax: "${text.trim()}"`, {
           line: lineNo,
-          hint: "Syntax: %%workflow <name> entity: <Entity> kind: <hook|state|saga>"
+          hint: "Syntax: %%workflow <name> entity: <Entity> kind: <hook|state|saga>, or %%workflow name: <name> for an automation"
         });
         continue;
       }
@@ -20290,16 +20971,7 @@ class CheckEngine {
       for (const attribute of trigger?.attributes ?? [])
         published.add(attribute.name);
       const bound = new Set;
-      for (const { lineNo, text } of section.steps) {
-        const match = text.trim().match(/^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z]\w*)\s*(.*)$/);
-        if (!match) {
-          this.error("EML260", `Invalid %%step syntax: "${text.trim()}"`, {
-            line: lineNo,
-            hint: "Syntax: %%step <nodeId> <StepType> <key>: <value> ..."
-          });
-          continue;
-        }
-        const [, nodeId, typeName, rest] = match;
+      for (const { lineNo, nodeId, typeName, props, automation } of this.stepEntries(section.steps)) {
         const contract = stepTypes.get(typeName);
         if (!contract) {
           this.error("EML261", `%%step on node ${nodeId} has unknown type "${typeName}".`, {
@@ -20308,7 +20980,7 @@ class CheckEngine {
           });
           continue;
         }
-        if (bound.has(nodeId)) {
+        if (!automation && bound.has(nodeId)) {
           this.error("EML270", `Node "${nodeId}" has more than one %%step.`, {
             line: lineNo,
             hint: "Only the first binding runs. Give the second step its own node."
@@ -20322,7 +20994,6 @@ class CheckEngine {
             hint: `Add a node "${nodeId}" to the flowchart, or bind the step to an existing one.`
           });
         }
-        const props = this.parseStepProps(rest ?? "");
         const has = (key) => (props[key] ?? "").trim().length > 0;
         const missing = [];
         for (const key of contract.required ?? []) {
@@ -20350,7 +21021,9 @@ class CheckEngine {
           ...contract.required ?? [],
           ...contract.optional ?? [],
           ...(contract.oneOf ?? []).flat(),
-          ...typeName === "Formula" ? ["source", "operand", "value"] : []
+          ...typeName === "Formula" ? ["source", "operand", "value"] : [],
+          "in",
+          ...automation ? ["as"] : []
         ]);
         for (const key of Object.keys(props)) {
           if (!known.has(key)) {
@@ -20440,13 +21113,82 @@ class CheckEngine {
     for (const { lineNo, text } of this.src.findAll(/^\s*%%step\b/)) {
       if (this.sagaStepLines.has(lineNo))
         continue;
-      this.warn("EML269", `%%step is only read inside a "kind: saga" workflow: "${text.trim()}"`, {
+      this.warn("EML269", `%%step is only read inside a saga or automation workflow: "${text.trim()}"`, {
         line: lineNo,
-        hint: "Move it into a %%workflow ... kind: saga section, or delete it."
+        hint: "Move it into a %%workflow ... kind: saga or %%workflow name: ... section, or delete it."
       });
     }
   }
   sagaStepLines = new Set;
+  stepEntries(steps2) {
+    const order = [];
+    const auto = new Map;
+    const entryFor = (nodeId, lineNo, text) => {
+      const existing = auto.get(nodeId);
+      if (existing)
+        return existing;
+      const created = {
+        lineNo,
+        text,
+        nodeId,
+        typeName: "",
+        props: {},
+        automation: true
+      };
+      auto.set(nodeId, created);
+      order.push(created);
+      return created;
+    };
+    for (const { lineNo, text } of steps2) {
+      const line = text.trim();
+      const typeLine = line.match(AUTO_TYPE_DIRECTIVE2);
+      if (typeLine) {
+        const [, nodeId2 = "", typeName2 = "", rest2 = ""] = typeLine;
+        const entry = entryFor(nodeId2, lineNo, text);
+        entry.typeName = typeName2;
+        entry.lineNo = lineNo;
+        entry.text = text;
+        Object.assign(entry.props, this.parseStepProps(rest2));
+        continue;
+      }
+      const propLine = line.match(AUTO_PROP_DIRECTIVE2);
+      if (propLine && propLine[2] !== "type") {
+        const [, nodeId2 = "", key = "", value = ""] = propLine;
+        entryFor(nodeId2, lineNo, text).props[key] = value.trim();
+        continue;
+      }
+      const match = line.match(/^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z]\w*)\s*(.*)$/);
+      if (!match) {
+        this.error("EML260", `Invalid %%step syntax: "${line}"`, {
+          line: lineNo,
+          hint: "Syntax: %%step <nodeId> <StepType> <key>: <value> ..., or %%step <nodeId> type: <StepType> for an automation"
+        });
+        continue;
+      }
+      const [, nodeId = "", typeName = "", rest = ""] = match;
+      order.push({
+        lineNo,
+        text,
+        nodeId,
+        typeName,
+        props: this.parseStepProps(rest),
+        automation: false
+      });
+    }
+    for (const entry of order) {
+      if (!entry.automation)
+        continue;
+      if (!entry.typeName) {
+        this.error("EML274", `%%step node "${entry.nodeId}" has no "type:" line.`, {
+          line: entry.lineNo,
+          hint: `Add %%step ${entry.nodeId} type: <StepType>. Without it the step compiles as a Formula.`
+        });
+        continue;
+      }
+      entry.props = sagaPropsFromAutomation2(entry.typeName, entry.props);
+    }
+    return order.filter((entry) => entry.typeName);
+  }
   sagaSections() {
     const sections = [];
     let current = null;
@@ -20455,6 +21197,13 @@ class CheckEngine {
     const all = this.src.findAll(/.*/);
     for (const { lineNo, text } of all) {
       const trimmed = text.trim();
+      const automation = trimmed.match(/^%%workflow\s+name:\s*(.+?)\s*$/);
+      if (automation) {
+        if (current)
+          sections.push(current);
+        current = { name: automation[1], entity: "", nodeIds: new Set, steps: [] };
+        continue;
+      }
       const workflow = trimmed.match(/^%%workflow\s+(\w+)\s+entity:\s*(\w+)\s+kind:\s*(\w+)/);
       if (workflow) {
         if (current)
@@ -20470,6 +21219,11 @@ class CheckEngine {
       }
       if (!current)
         continue;
+      const trigger = trimmed.match(/^%%hook\s+\w+\s+on\s+(\w+)\s*$/);
+      if (trigger && !current.entity) {
+        current.entity = trigger[1];
+        continue;
+      }
       if (trimmed.startsWith("%%step")) {
         current.steps.push({ lineNo, text });
         this.sagaStepLines.add(lineNo);
@@ -20536,7 +21290,7 @@ class CheckEngine {
     const trimmed = rest.trim();
     if (!trimmed)
       return props;
-    for (const chunk of trimmed.split(/\s+(?=[A-Za-z_]\w*:)/)) {
+    for (const chunk of trimmed.split(/\s+(?=[A-Za-z_]\w*:(?!\/\/))/)) {
       const at = chunk.indexOf(":");
       if (at <= 0)
         continue;

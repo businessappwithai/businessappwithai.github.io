@@ -132,7 +132,11 @@ t("step Formula set", saga("    %%step B Formula target: label operation: set va
 t("step Formula copy", saga("    %%step B Formula target: copied operation: copy source: name", "    A([Start]) --> B(Compute)\n    B --> Z([End])"));
 t("step Decision inline table", saga('    %%step B Decision decisionTable: {"hitPolicy":"first","inputs":[{"id":"i1","name":"Qty","field":"qty"}],"outputs":[{"id":"o1","name":"Band","field":"band"}],"rules":[{"_id":"hi","i1":"> 10","o1":"\'high\'"},{"_id":"rest","i1":"","o1":"\'low\'"}]}', "    A([Start]) --> B{Decide}\n    B --> Z([End])"));
 t("step REST url closed up to its key", saga("    %%step B REST method: POST url:https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"));
-t("step REST with a space before https raises EML262", saga("    %%step B REST method: POST url: https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"), "EML262");
+// Both spellings are accepted now. The parser used to end a value at the next
+// `<key>:` token, and `https:` looked like one, so the spaced form raised
+// EML262 + EML268 for a line that read perfectly correctly. It recognises a
+// scheme and reads through it now — §5.3 says so, and this is what holds it.
+t("step REST with a space before https", saga("    %%step B REST method: POST url: https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"));
 t("step Agent needs agentId", saga("    %%step B Agent agentId: triage-v1", "    A([Start]) --> B(Agent)\n    B --> Z([End])"));
 t("step Agent without agentId raises EML262", saga("    %%step B Agent", "    A([Start]) --> B(Agent)\n    B --> Z([End])"), "EML262");
 

@@ -73,6 +73,11 @@ const BUILT_IN = {
     label: "dance-studio.eml.mmd",
     name: "Acme Dance Studio",
   },
+  investment: {
+    path: "models/investment-planning-wealth-management-system.eml.mmd",
+    label: "investment-planning-wealth-management-system.eml.mmd",
+    name: "Investment Planning and Wealth Management",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -178,6 +183,7 @@ const choices = [
   [$("choice-drug"), "drug"],
   [$("choice-hospital"), "hospital"],
   [$("choice-dance"), "dance"],
+  [$("choice-investment"), "investment"],
   [$("choice-upload"), "upload"],
 ];
 
