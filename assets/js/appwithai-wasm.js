@@ -800,6 +800,7 @@ var appwithai_language_default = {
       directive: "%%step <nodeId> <stepType> <key>: <value> ...",
       propertyForm: "Space-separated `key: value` pairs. A value runs to the next `<key>:` token or the end of the line, so it may contain spaces. `fields` is JSON and must be the last key on the line.",
       variables: "Steps share a context: the triggering record's columns, plus every variable a previous step published. CreateEntity publishes the new row's id under `as`; Formula publishes under `target`. A later step reads one by naming it in `source` or `targetSource`. This is what lets a workflow reach a row it created earlier.",
+      loopMembership: "`in: <loopId>` joins a step to a %%loop declared in the same section. It is read off every step type alike, before the type is consulted at all, so it belongs to no single contract below and is deliberately absent from their `optional` lists. A reader validating step properties must treat it as known for every type — see automations.loops and the %%loop directive.",
       types: [
         {
           name: "UpdateEntity",
@@ -1137,12 +1138,13 @@ var appwithai_language_default = {
           "language/composer.ts (section classification and round-trip)",
           "packages/generator/src/eml (section extraction via composer)"
         ],
-        purpose: "Document/section metadata: name, kind (erd|rules|workflow), version, entity binding, description, stack.",
+        purpose: "Document/section metadata: name, kind (erd|rules|workflow), version, entity binding, description (application summary seeded into sys_system.APP_DESCRIPTION and the generated manual), stack.",
         examples: [
           "%%meta name: CRM Core",
           "%%meta kind: rules",
           "%%meta entity: Order",
-          "%%meta version: 1.0.0"
+          "%%meta version: 1.0.0",
+          "%%meta description: This application manages customer relationships, sales pipelines, and support tickets for mid-market B2B companies."
         ]
       },
       {
@@ -1648,7 +1650,8 @@ var HOOK_TYPES = [
   "customValidate"
 ];
 var HOOK_TYPE_SET = new Set(HOOK_TYPES);
-var DIRECTIVE = /%%hook\s+(\w+)\s+([A-Za-z_]\w*)\s+on\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?/;
+var DIRECTIVE = /^%%+hook\s+(\w+)\s+([A-Za-z_]\w*)\s+on\s+([A-Za-z_]\w*)\s*(\[[^\]]*\])?/;
+var DIRECTIVE_LINE = /^%%+hook\b/;
 function parseFields(bracket) {
   if (!bracket)
     return;
@@ -1670,7 +1673,7 @@ function compileHooks(source, knownEntities = [], onWarn = () => {}) {
   for (const rawLine of (source ?? "").split(`
 `)) {
     const line = rawLine.trim();
-    if (!line.includes("%%hook"))
+    if (!DIRECTIVE_LINE.test(line))
       continue;
     const match = line.match(DIRECTIVE);
     if (!match) {
@@ -2079,7 +2082,7 @@ class MermaidParser {
       sourceEntity,
       targetEntity,
       cardinality,
-      foreignKey: this.generateForeignKey(targetEntity, cardinality)
+      foreignKey: this.generateForeignKey(sourceEntity, targetEntity, cardinality)
     };
   }
   parseAttribute(line) {
@@ -2150,8 +2153,9 @@ class MermaidParser {
   normalizeRelationshipName(name) {
     return name.trim().replace(/\s+/g, "_").toLowerCase();
   }
-  generateForeignKey(targetEntity, _cardinality) {
-    const snakeName = this.toSnakeCase(targetEntity);
+  generateForeignKey(sourceEntity, targetEntity, cardinality) {
+    const referenced = cardinality === "oneToMany" ? sourceEntity : targetEntity;
+    const snakeName = this.toSnakeCase(referenced);
     const cleanName = snakeName.replace(/^bus_/, "");
     return `${cleanName}_id`;
   }
@@ -2506,16 +2510,26 @@ function buildEditorDecisionTable(ruleName, table) {
     ]
   };
 }
+var RUNTIME_ACTION = {
+  "validation-error": "prevent"
+};
+function transformDataCell(action) {
+  const field = (action.props.field ?? "").trim();
+  if (action.type !== "transform" || !field)
+    return zenLiteral("");
+  return zenLiteral(JSON.stringify({ [field]: action.props.value ?? "" }));
+}
 function buildActionDecisionTable(ruleName, actions) {
   const cells = [
-    (action) => zenLiteral(action.type),
+    (action) => zenLiteral(RUNTIME_ACTION[action.type] ?? action.type),
     (action) => zenLiteral(action.props.message ?? `${ruleName}: ${action.name}`),
     () => zenLiteral(ruleName),
     (action) => zenLiteral(action.props.workflow ?? ""),
     (action) => zenLiteral(action.props.field ?? ""),
     (action) => zenLiteral(action.props.value ?? ""),
     (action) => zenLiteral(action.props.targetEntity ?? ""),
-    (action) => zenLiteral(action.props.linkField ?? "")
+    (action) => zenLiteral(action.props.linkField ?? ""),
+    transformDataCell
   ];
   const rows = actions.map((action) => {
     const row = {
@@ -2545,7 +2559,8 @@ function buildActionDecisionTable(ruleName, actions) {
             { id: "o5", name: "Field", field: "field" },
             { id: "o6", name: "Value", field: "value" },
             { id: "o7", name: "Target Entity", field: "targetEntity" },
-            { id: "o8", name: "Link Field", field: "linkField" }
+            { id: "o8", name: "Link Field", field: "linkField" },
+            { id: "o9", name: "Transform Data", field: "transformData" }
           ],
           rules: rows
         }
@@ -2654,7 +2669,7 @@ function sagaPropsFromAutomation(type, props) {
   }
   return out;
 }
-var PROP_SPLIT = /\s+(?=[A-Za-z_]\w*:)/;
+var PROP_SPLIT = /\s+(?=[A-Za-z_]\w*:(?!\/\/))/;
 function parseStepProps(rest) {
   const props = {};
   const trimmed = rest.trim();
@@ -3126,6 +3141,8 @@ function parseDirective(line, n, model) {
     case "hook": {
       const m = rest.match(/^(\w+)\s+(\w+)\s+on\s+(\w+)\s*(\[[^\]]*\])?/);
       if (!m) {
+        if (/^\w+\s+on\s+\w+\s*$/.test(rest))
+          return;
         model.diagnostics.push({
           severity: "error",
           code: "EML201",
@@ -3599,6 +3616,50 @@ var MANAGED_COLUMN_NAMES = new Set([
   "deleted_at",
   "deleted_by"
 ]);
+var AUTOMATION_WORKFLOW = /^%%workflow\s+name:\s*\S/;
+var AUTO_TYPE_DIRECTIVE2 = /^%%step\s+([A-Za-z_]\w*)\s+type:\s*([A-Za-z]\w*)\s*(.*)$/;
+var AUTO_PROP_DIRECTIVE2 = /^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z_]\w*):\s*(.*)$/;
+function sagaPropsFromAutomation2(type, props) {
+  const out = { ...props };
+  const ref = (value) => value?.trim().match(/^\{\{\s*([^}]+?)\s*\}\}$/)?.[1] ?? null;
+  const move = (from, to) => {
+    const value = out[from];
+    if (value !== undefined && out[to] === undefined)
+      out[to] = value;
+    delete out[from];
+  };
+  if (type === "Decision") {
+    move("ruleTable", "rule");
+    move("table", "decisionTable");
+    delete out.inputs;
+  } else if (type === "CreateEntity") {
+    move("values", "fields");
+  } else if (type === "UpdateEntity" || type === "DeleteEntity") {
+    const target = ref(out.target);
+    if (target) {
+      out.targetSource = out.targetSource ?? target;
+      delete out.target;
+    } else
+      move("target", "targetField");
+    const value = ref(out.value);
+    if (value) {
+      out.source = out.source ?? value;
+      delete out.value;
+    }
+  } else if (type === "Formula") {
+    move("as", "target");
+    const left = ref(out.left);
+    if (left)
+      out.source = out.source ?? left;
+    else if (out.left !== undefined)
+      out.value = out.value ?? out.left;
+    delete out.left;
+    move("right", "operand");
+  } else if (type === "REST") {
+    move("body", "bodyTemplate");
+  }
+  return out;
+}
 var PERSON_ROLE_COLUMN_NAMES = new Set([
   "assigned_to",
   "author_id",
@@ -3636,7 +3697,7 @@ class CheckEngine {
     "parent"
   ]);
   validFieldKeys = new Set(["enum", "ui", "default", "min", "max", "help", "format"]);
-  validMetaKeys = new Set(["name", "kind", "version", "entity", "stack"]);
+  validMetaKeys = new Set(["name", "kind", "version", "entity", "stack", "description"]);
   validWorkflowKinds = new Set(["hook", "state", "saga"]);
   validTriggerSources = /^(cron:|webhook:|message:)/;
   validRoleExpr = /^role:[A-Za-z][A-Za-z0-9_]*(\|(?:role:)?[A-Za-z][A-Za-z0-9_]*)*$/;
@@ -3677,6 +3738,7 @@ class CheckEngine {
     this.checkIndexDirectives();
     this.checkEntityDirectives();
     this.checkHooks();
+    this.checkAutomationTriggers();
     this.checkGuards();
     this.checkRbac();
     this.checkTriggers();
@@ -4331,15 +4393,38 @@ class CheckEngine {
       }
     }
   }
+  checkAutomationTriggers() {
+    const entityNames = new Set(this.model.entities.map((e) => e.name));
+    for (const { lineNo, text } of this.src.findAll(/^\s*%%hook\b/)) {
+      const m = text.trim().match(/^%%hook\s+(\w+)\s+on\s+(\w+)\s*$/);
+      if (!m)
+        continue;
+      const [event, entity] = caps(m, 2);
+      if (!this.validHookTypes.has(event)) {
+        this.error("EML205", `Automation trigger uses unknown event "${event}".`, {
+          line: lineNo,
+          hint: `Valid events: ${[...this.validHookTypes].join(", ")}.`
+        });
+      }
+      if (!entityNames.has(entity)) {
+        this.warn("EML206", `Automation trigger references undeclared entity "${entity}".`, {
+          line: lineNo,
+          hint: `Declare "${entity}" in the erDiagram section.`
+        });
+      }
+    }
+  }
   checkWorkflowDirectives() {
     const entityNames = new Set(this.model.entities.map((e) => e.name));
     const workflowLines = this.src.findAll(/^%%workflow\b/);
     for (const { lineNo, text } of workflowLines) {
+      if (AUTOMATION_WORKFLOW.test(text.trim()))
+        continue;
       const m = text.trim().match(/^%%workflow\s+(\w+)\s+entity:\s*(\w+)\s+kind:\s*(\w+)/);
       if (!m) {
         this.error("EML240", `Invalid %%workflow syntax: "${text.trim()}"`, {
           line: lineNo,
-          hint: "Syntax: %%workflow <name> entity: <Entity> kind: <hook|state|saga>"
+          hint: "Syntax: %%workflow <name> entity: <Entity> kind: <hook|state|saga>, or %%workflow name: <name> for an automation"
         });
         continue;
       }
@@ -4437,16 +4522,7 @@ class CheckEngine {
       for (const attribute of trigger?.attributes ?? [])
         published.add(attribute.name);
       const bound = new Set;
-      for (const { lineNo, text } of section.steps) {
-        const match = text.trim().match(/^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z]\w*)\s*(.*)$/);
-        if (!match) {
-          this.error("EML260", `Invalid %%step syntax: "${text.trim()}"`, {
-            line: lineNo,
-            hint: "Syntax: %%step <nodeId> <StepType> <key>: <value> ..."
-          });
-          continue;
-        }
-        const [, nodeId, typeName, rest] = match;
+      for (const { lineNo, nodeId, typeName, props, automation } of this.stepEntries(section.steps)) {
         const contract = stepTypes.get(typeName);
         if (!contract) {
           this.error("EML261", `%%step on node ${nodeId} has unknown type "${typeName}".`, {
@@ -4455,7 +4531,7 @@ class CheckEngine {
           });
           continue;
         }
-        if (bound.has(nodeId)) {
+        if (!automation && bound.has(nodeId)) {
           this.error("EML270", `Node "${nodeId}" has more than one %%step.`, {
             line: lineNo,
             hint: "Only the first binding runs. Give the second step its own node."
@@ -4469,7 +4545,6 @@ class CheckEngine {
             hint: `Add a node "${nodeId}" to the flowchart, or bind the step to an existing one.`
           });
         }
-        const props = this.parseStepProps(rest ?? "");
         const has = (key) => (props[key] ?? "").trim().length > 0;
         const missing2 = [];
         for (const key of contract.required ?? []) {
@@ -4497,7 +4572,9 @@ class CheckEngine {
           ...contract.required ?? [],
           ...contract.optional ?? [],
           ...(contract.oneOf ?? []).flat(),
-          ...typeName === "Formula" ? ["source", "operand", "value"] : []
+          ...typeName === "Formula" ? ["source", "operand", "value"] : [],
+          "in",
+          ...automation ? ["as"] : []
         ]);
         for (const key of Object.keys(props)) {
           if (!known.has(key)) {
@@ -4587,13 +4664,82 @@ class CheckEngine {
     for (const { lineNo, text } of this.src.findAll(/^\s*%%step\b/)) {
       if (this.sagaStepLines.has(lineNo))
         continue;
-      this.warn("EML269", `%%step is only read inside a "kind: saga" workflow: "${text.trim()}"`, {
+      this.warn("EML269", `%%step is only read inside a saga or automation workflow: "${text.trim()}"`, {
         line: lineNo,
-        hint: "Move it into a %%workflow ... kind: saga section, or delete it."
+        hint: "Move it into a %%workflow ... kind: saga or %%workflow name: ... section, or delete it."
       });
     }
   }
   sagaStepLines = new Set;
+  stepEntries(steps2) {
+    const order = [];
+    const auto = new Map;
+    const entryFor = (nodeId, lineNo, text) => {
+      const existing = auto.get(nodeId);
+      if (existing)
+        return existing;
+      const created = {
+        lineNo,
+        text,
+        nodeId,
+        typeName: "",
+        props: {},
+        automation: true
+      };
+      auto.set(nodeId, created);
+      order.push(created);
+      return created;
+    };
+    for (const { lineNo, text } of steps2) {
+      const line = text.trim();
+      const typeLine = line.match(AUTO_TYPE_DIRECTIVE2);
+      if (typeLine) {
+        const [, nodeId2 = "", typeName2 = "", rest2 = ""] = typeLine;
+        const entry = entryFor(nodeId2, lineNo, text);
+        entry.typeName = typeName2;
+        entry.lineNo = lineNo;
+        entry.text = text;
+        Object.assign(entry.props, this.parseStepProps(rest2));
+        continue;
+      }
+      const propLine = line.match(AUTO_PROP_DIRECTIVE2);
+      if (propLine && propLine[2] !== "type") {
+        const [, nodeId2 = "", key = "", value = ""] = propLine;
+        entryFor(nodeId2, lineNo, text).props[key] = value.trim();
+        continue;
+      }
+      const match = line.match(/^%%step\s+([A-Za-z_]\w*)\s+([A-Za-z]\w*)\s*(.*)$/);
+      if (!match) {
+        this.error("EML260", `Invalid %%step syntax: "${line}"`, {
+          line: lineNo,
+          hint: "Syntax: %%step <nodeId> <StepType> <key>: <value> ..., or %%step <nodeId> type: <StepType> for an automation"
+        });
+        continue;
+      }
+      const [, nodeId = "", typeName = "", rest = ""] = match;
+      order.push({
+        lineNo,
+        text,
+        nodeId,
+        typeName,
+        props: this.parseStepProps(rest),
+        automation: false
+      });
+    }
+    for (const entry of order) {
+      if (!entry.automation)
+        continue;
+      if (!entry.typeName) {
+        this.error("EML274", `%%step node "${entry.nodeId}" has no "type:" line.`, {
+          line: entry.lineNo,
+          hint: `Add %%step ${entry.nodeId} type: <StepType>. Without it the step compiles as a Formula.`
+        });
+        continue;
+      }
+      entry.props = sagaPropsFromAutomation2(entry.typeName, entry.props);
+    }
+    return order.filter((entry) => entry.typeName);
+  }
   sagaSections() {
     const sections = [];
     let current = null;
@@ -4602,6 +4748,13 @@ class CheckEngine {
     const all = this.src.findAll(/.*/);
     for (const { lineNo, text } of all) {
       const trimmed = text.trim();
+      const automation = trimmed.match(/^%%workflow\s+name:\s*(.+?)\s*$/);
+      if (automation) {
+        if (current)
+          sections.push(current);
+        current = { name: automation[1], entity: "", nodeIds: new Set, steps: [] };
+        continue;
+      }
       const workflow = trimmed.match(/^%%workflow\s+(\w+)\s+entity:\s*(\w+)\s+kind:\s*(\w+)/);
       if (workflow) {
         if (current)
@@ -4617,6 +4770,11 @@ class CheckEngine {
       }
       if (!current)
         continue;
+      const trigger = trimmed.match(/^%%hook\s+\w+\s+on\s+(\w+)\s*$/);
+      if (trigger && !current.entity) {
+        current.entity = trigger[1];
+        continue;
+      }
       if (trimmed.startsWith("%%step")) {
         current.steps.push({ lineNo, text });
         this.sagaStepLines.add(lineNo);
@@ -4683,7 +4841,7 @@ class CheckEngine {
     const trimmed = rest.trim();
     if (!trimmed)
       return props;
-    for (const chunk of trimmed.split(/\s+(?=[A-Za-z_]\w*:)/)) {
+    for (const chunk of trimmed.split(/\s+(?=[A-Za-z_]\w*:(?!\/\/))/)) {
       const at = chunk.indexOf(":");
       if (at <= 0)
         continue;
@@ -11464,6 +11622,90 @@ export function queryString(params) {
   return rendered ? \`?\${rendered}\` : "";
 }
 `,
+  "ui/csv.js": `/**
+ * CSV export for the browser application's grids.
+ *
+ * The same contract as the NestJS stack's \`frontend/src/lib/csv.ts\`, and
+ * deliberately a separate file rather than a shared one: this application is
+ * plain ES modules served from a Service Worker with no build step, and that
+ * one is TypeScript compiled by vinxi. Neither can import the other. What has
+ * to match is the behaviour — the cap, the quoting, the formula defusing and
+ * the byte order mark — so a reader who exports the same model from either
+ * application gets the same file.
+ */
+
+/**
+ * The most rows any one export contains.
+ *
+ * A convenience export, not a data dump: a browser building the whole string in
+ * memory and a server paging an unbounded table are both worth avoiding. The
+ * NestJS stack uses the same number.
+ */
+export const CSV_EXPORT_LIMIT = 500;
+
+/**
+ * One field, quoted the way RFC 4180 asks.
+ *
+ * Quotes are doubled and the field is wrapped whenever it holds a comma, a
+ * quote, a line break or leading/trailing space — an unwrapped newline silently
+ * becomes an extra row, so the file imports as a different table from the one
+ * exported.
+ */
+function escapeField(value) {
+  const needsQuotes = /[",\\r\\n]/.test(value) || value !== value.trim();
+  return needsQuotes ? \`"\${value.replace(/"/g, '""')}"\` : value;
+}
+
+/**
+ * Defuse a field a spreadsheet would treat as a formula.
+ *
+ * Excel, LibreOffice and Sheets all evaluate a cell that opens with \`=\`, \`+\`,
+ * \`-\`, \`@\` or a control character, so a record whose name a user typed as
+ * \`=HYPERLINK(...)\` executes when the file is opened. Numbers are left alone: a
+ * leading \`-\` on something that parses as a number is a minus sign.
+ */
+function defuseFormula(value) {
+  if (value === "") return value;
+  if (!/^[=+\\-@\\t\\r]/.test(value)) return value;
+  if (/^-?\\d+(\\.\\d+)?$/.test(value)) return value;
+  return \`'\${value}\`;
+}
+
+/** A CSV document: one header row, then the rows, CRLF-separated per RFC 4180. */
+export function toCsv(headers, rows) {
+  return [headers, ...rows]
+    .map((cells) => cells.map((cell) => escapeField(defuseFormula(cell ?? ""))).join(","))
+    .join("\\r\\n");
+}
+
+/**
+ * Hand the CSV to the browser as a download.
+ *
+ * The byte order mark is what makes Excel read the file as UTF-8; without it
+ * every non-ASCII name arrives mojibaked.
+ */
+export function downloadCsv(fileName, csv) {
+  const blob = new Blob([\`\uFEFF\${csv}\`], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName.endsWith(".csv") ? fileName : \`\${fileName}.csv\`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/** \`class-session\` on 2026-09-04 → \`class-session-2026-09-04.csv\`. */
+export function csvFileName(route) {
+  const stem = String(route ?? "")
+    .replace(/^bus_/, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
+  return \`\${stem || "export"}-\${new Date().toISOString().slice(0, 10)}.csv\`;
+}
+`,
   "ui/dom.js": `/**
  * A hundred lines instead of a framework.
  *
@@ -13409,6 +13651,7 @@ const title = (value) =>
  */
 
 import { el, mount, spinner, empty, displayValue, toast } from "../dom.js";
+import { CSV_EXPORT_LIMIT, csvFileName, downloadCsv, toCsv } from "../csv.js";
 import { api, queryString } from "../api.js";
 import { setActions, setHelp } from "../main.js";
 import { recordPanel } from "./entity-form.js";
@@ -13592,6 +13835,68 @@ export async function entityListView(root, { entity, recordId, navigate }) {
     }
   }
 
+  /**
+   * Download the list as CSV.
+   *
+   * The rows are fetched rather than read off the screen: \`page.data\` holds one
+   * page and the reader asked for the list, so this asks for the first
+   * CSV_EXPORT_LIMIT rows under the same search and filters the grid is
+   * showing. Cells go through \`displayValue\` and the server's own \`labels\` map,
+   * the two things the table itself renders with, so a date, a boolean and a
+   * referenced record read in the file exactly as they read on screen.
+   */
+  async function exportCsv() {
+    if (!loaded) return;
+    const columns = loaded.fields.length
+      ? loaded.fields
+      : entity.attributes
+          .slice(0, 6)
+          .map((attribute) => ({ column_name: attribute.columnName, name: attribute.displayName }));
+    try {
+      const full = await api.get(
+        \`/bus/\${entity.routeName}\${queryString({
+          page: 1,
+          limit: CSV_EXPORT_LIMIT,
+          search: state.search,
+          sort: state.sort,
+          order: state.order,
+          ...searchParams(),
+        })}\`
+      );
+
+      const body = (full.data ?? []).map((row) =>
+        columns.map((column) => {
+          const value = row[column.column_name];
+          const label = full.labels?.[column.column_name]?.[value];
+          if (label !== undefined) return String(label);
+          // An em dash is how the table draws an empty cell; a CSV says the
+          // same thing with an empty field, and a literal "—" would import as
+          // data.
+          const shown = displayValue(value, column);
+          return shown === "—" ? "" : shown;
+        })
+      );
+
+      downloadCsv(
+        csvFileName(entity.routeName),
+        toCsv(
+          columns.map((column) => column.name ?? column.column_name),
+          body
+        )
+      );
+
+      if ((full.total ?? 0) > body.length) {
+        toast(
+          \`Exported \${body.length} of \${full.total} rows — a download holds at most \` +
+            \`\${CSV_EXPORT_LIMIT}. Narrow the list to export the rest.\`,
+          "info"
+        );
+      }
+    } catch (error) {
+      toast(error.message, "error");
+    }
+  }
+
   function paint() {
     if (!loaded) return;
     const { fields, page } = loaded;
@@ -13614,6 +13919,17 @@ export async function entityListView(root, { entity, recordId, navigate }) {
       const bar = el(
         "div.listbar",
         el("div.listbar__search", filterInput),
+        el(
+          "button.btn.btn--ghost",
+          {
+            type: "button",
+            onclick: exportCsv,
+            disabled: page.total === 0,
+            title: \`Download this list as CSV (at most \${CSV_EXPORT_LIMIT} rows)\`,
+            "data-testid": "export-csv",
+          },
+          "CSV"
+        ),
         el(
           "span.listbar__count",
           state.filter
@@ -14032,7 +14348,7 @@ const initials = (name) =>
     .join("") || "AP";
 `
 });
-var RUNTIME_BYTES = 323844;
+var RUNTIME_BYTES = 329459;
 
 // node_modules/.bun/zod@3.25.76/node_modules/zod/v3/external.js
 var exports_external = {};
@@ -18326,11 +18642,18 @@ function attributeReferenceId(attr, entityPrimaryKey) {
 function isForeignKeyColumnName2(columnName) {
   return columnName.endsWith("_id") || columnName.endsWith("_by");
 }
+function foreignKeyLabelStem(attr, entityPrimaryKey) {
+  const isTableDirect = attributeReferenceId(attr, entityPrimaryKey) === ReferenceType.TABLE_DIRECT;
+  if (isTableDirect && attr.name.endsWith("_id") && !attr.name.endsWith("_by_id")) {
+    return attr.name.slice(0, -"_id".length);
+  }
+  return attr.name;
+}
 function attributeToBusAttribute(attr, index, entityPrimaryKey) {
   return {
     ...attr,
     columnName: attr.name,
-    displayName: formatDisplayName(attr.name),
+    displayName: formatDisplayName(foreignKeyLabelStem(attr, entityPrimaryKey)),
     referenceId: attributeReferenceId(attr, entityPrimaryKey),
     seqNo: (index + 1) * 10,
     isIdentifier: false
@@ -19614,6 +19937,7 @@ tbody tr:last-child td { border-bottom: none; }
 .missing { color: var(--muted); font-style: italic; }
 .unset { color: var(--muted); }
 .detail { margin-top: 5px; font-size: 13px; color: var(--soft); }
+.app-overview { margin: 18px 0; padding: 16px 20px; background: var(--surface); border-left: 4px solid var(--accent); border-radius: 4px; font-size: 15px; line-height: 1.7; }
 ul.plain { margin: 4px 0 12px; padding-left: 20px; }
 .process { border-left: 3px solid var(--border); padding-left: 16px; margin: 18px 0; }
 .back { margin-top: 18px; font-size: 13px; }
@@ -19642,7 +19966,8 @@ ${contents}
 
   <section id="overview">
     <h2>What this application is</h2>
-    <p>${escapeHtml(options.name)} keeps ${model.entities.length} kinds of record${model.entities.length === 1 ? "" : "s"}${model.categories.length ? `, grouped into ${model.categories.length} areas of the business` : ""}. Every screen in it &mdash; every list, every form, every field label and every dropdown &mdash; is drawn from a description of those records held in the application itself, so the application can be changed by changing that description rather than by editing code.</p>
+${options.description && options.description !== "A generated full-stack application" ? `    <div class="app-overview"><p>${escapeHtml(options.description)}</p></div>
+` : ""}    <p>${escapeHtml(options.name)} keeps ${model.entities.length} kinds of record${model.entities.length === 1 ? "" : "s"}${model.categories.length ? `, grouped into ${model.categories.length} areas of the business` : ""}. Every screen in it &mdash; every list, every form, every field label and every dropdown &mdash; is drawn from a description of those records held in the application itself, so the application can be changed by changing that description rather than by editing code.</p>
     <p>This manual is generated from the same description. It cannot describe a record type the application does not have, and it cannot miss one it does.</p>
 ${model.categories.length ? `    <table>
       <thead><tr><th>Area</th><th>Records</th></tr></thead>

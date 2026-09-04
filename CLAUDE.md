@@ -493,8 +493,12 @@ fire on it and the roles that may read it.
 **Constraints to respect**
 
 - The page must be served over `http://` or `https://` — a Service Worker cannot register from `file://`.
-- `#upload` in the URL opens the chapter with the upload choice selected. The home page's
-  "Try It Yourself" section links here that way — do not break the hash.
+- **`#<key>` in the URL opens the chapter with that model already chosen**, for any key of
+  `BUILT_IN` — `#crm`, `#dance`, `#hospital`, `#drug`, `#investment` — plus `#upload`, which
+  selects the upload choice and scrolls the dropzone into view. An unknown hash falls back to the
+  CRM rather than to an empty page. The home page and `try-it-yourself.html` both link here that
+  way, so **a model added to `BUILT_IN` needs its card added to the examples box in
+  `try-it-yourself.html` too**, or that box offers something the page cannot select.
 - Paths in `run-in-browser.js` are resolved against the page URL (`models/…`, `wasm-app/…`), so the page,
   `guide/models/` and `guide/wasm-app/` must stay siblings.
 - `guide-demo.css` is scoped entirely to `.guide-demo` so that the demo's own `.btn`, `.card`, `.stage`
@@ -567,7 +571,7 @@ Where each one comes from:
 | `assets/js/appwithai-fullstack.js` | `html/assets/appwithai-fullstack.js` | the same build |
 | `assets/vendor/stack-templates.json` | `html/assets/stack-templates.json` (gitignored there) | `bun run build:stack-templates` |
 | `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
-| `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd` | `html/models/*.eml.mmd` | — |
+| `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `llmdetailed.txt` | `llmtext/llmdetailed.txt` | — |
 
@@ -585,7 +589,8 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
-| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes four models where upstream's pages offer two |
+| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes five models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
+| `assets/js/run-in-browser.js` | Any `BUILT_IN` key works as a URL hash, not only `#upload` | `try-it-yourself.html` links straight to a named example. An unknown hash falls back to the CRM |
 | `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
 
 `guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
