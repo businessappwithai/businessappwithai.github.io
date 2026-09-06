@@ -79,6 +79,9 @@
     [/\/guide\/11-check-a-model\.html$/, "checker"],
     [/\/guide\//, "guide"],
     [/\/try-it-yourself\.html$/, "try-it-yourself"],
+    /* Before the home pattern, which matches any directory index and would
+       otherwise label /viewers/ as the landing page. */
+    [/\/viewers\/(index\.html)?$/, "viewers"],
     [/\/contact\.html$/, "contact"],
     [/\/pricing\.html$/, "pricing"],
     [/(\/|\/index\.html)$/, "home"],

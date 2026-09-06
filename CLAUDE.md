@@ -49,6 +49,19 @@ businessappwithai.github.io/
 │   │                         # drug-discovery, hospital-management-system,
 │   │                         # dance-studio)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
+├── viewers/                  # The model viewers — appwithai.org/viewers. Vendored
+│   │                         # from `website/viewers/` upstream; only index.html
+│   │                         # differs, and only by the site chrome
+│   ├── index.html            # The page
+│   ├── eml-model.js          # Vendored, BUILT: the generator's own reader
+│   ├── canvas.js             # Pan, zoom, fit, select — the shared surface
+│   ├── layout.js             # Layered graph placement, no dependency
+│   ├── erd-viewer.js         # Entity boxes and crow's-foot relationships
+│   ├── workflow-viewer.js    # State machines, saga ladders, hook lists
+│   ├── rules-viewer.js       # Decision flows and what a rule emits
+│   ├── decision-table.js     # A Decision step's table, as a table
+│   ├── model-viewer.js       # The page controller: input, tabs, inspector
+│   └── viewers.css           # Scoped to `.awv-root`; light and dark palettes
 ├── llms-full.txt             # EML language specification, for language models
 ├── llmdetailed.txt           # The whole system, and §10's *interactive* authoring
 │                             # protocol — the enterprise path. Vendored from
@@ -126,6 +139,7 @@ Deployment is fully automatic:
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
 | `guide/11-check-a-model.html` | Chapter 11: the authoring protocol, and the published validators running live |
+| `viewers/index.html` | The model viewer: an `.eml.mmd` drawn in full — entities, state machines, sagas, business rules and access — by the generator's own parser and compilers. Linked from the home page, `try-it-yourself.html#enterprise-prompt`, chapter 11 and every footer |
 | `llms-full.txt` | The EML language specification language models are pointed at — the language only, deliberately not the generator or the framework |
 | `llmdetailed.txt` | The same language, plus the generator, the templates and the generated application — and an *interactive* authoring protocol in §10. The professional/enterprise path, linked from `try-it-yourself.html#enterprise-prompt` and the home page |
 
@@ -557,6 +571,51 @@ modules already returned — not decisions of their own:
   as a fenced block in a chat report gets a real `.mmd` out of the paste box, which is the path the
   home page now points them at.
 
+## The model viewers — `/viewers/`
+
+`viewers/index.html` draws an `.eml.mmd` in full. It exists because Mermaid draws
+the ERD and nothing else: the business rules, the workflows, the enums and the
+access control live in `%%` directives every renderer treats as comments, and
+that is the half a reader most needs while a model is still being written.
+
+**Nothing on this site reads a model.** `viewers/eml-model.js` is the parser, the
+rule and workflow compilers, the RBAC derivation and the checker from
+`businessappwithai/app-with-ai-tanstack`, bundled by `bun run build:viewers` —
+the same code `appwithai generate` runs. The eight modules beside it decide how a
+column, a state or a step *looks*, never what it is. Adding a rule about a model
+to any of them is the same mistake as adding sample-data logic to
+`run-in-browser.js`, and has the same consequence: the page showing something the
+generator would not.
+
+- **The whole directory is vendored except `index.html`.** That one is authored
+  here, because it carries the site's header, footer and prose. It differs from
+  upstream's copy in one more way that matters: `data-awv-theme="dark"` on the
+  root. The site serves one theme to everybody, so leaving the palette to
+  `prefers-color-scheme` would put a white diagram on a near-black page for every
+  reader whose machine is set to light.
+- **`viewers.css` is scoped entirely to `.awv-root` and prefixed `awv-`**, the
+  same arrangement `guide-demo.css` uses for chapter 09 and for the same reason.
+  Its palette is the design tool's — a rule's Decision is amber in the generator
+  and amber here — stated once as custom properties at the top. Change those, not
+  the rules that use them.
+- **It carries a second copy of the checker**, and reports the same verdict
+  chapter 11 does. That is deliberate and it is one engine, not two: the same
+  `language/checker.ts`, built by a different bundler entry. `scripts/check-spec.mjs`
+  asserts `llmdetailed.txt` §10's instructions still match this page — the URL,
+  the three tabs it names, and the browser requirement for watching a file.
+- **Watching a file needs the File System Access API**, so the button is hidden
+  where it is missing rather than offered and broken. Opening and pasting work
+  everywhere.
+- **`llmdetailed.txt` §10 sends readers here** at Phase 3, at Gate C, in the
+  Phase 5 coverage sweep, on the Phase 6 tooling ladder and at delivery. A rename
+  or a move breaks a walkthrough in the middle; `check-spec.mjs` is what notices.
+- **Session replay is off here**, deliberately: `REPLAY_SURFACES` in
+  `analytics.js` is unchanged, and the surface is named `viewers` by a pattern
+  placed *before* the home-page catch-all, which would otherwise label any
+  directory index as the landing page. The one event is `model_viewed`, and it
+  carries counts only — never a name, a column or a line of a model.
+  `privacy.html` lists it.
+
 ## Vendored files
 
 Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
@@ -573,7 +632,8 @@ Where each one comes from:
 | `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
-| `llmdetailed.txt` | `llmtext/llmdetailed.txt` | — |
+| `llmdetailed.txt` | `website/llmtext/llmdetailed.txt` | — |
+| `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
 The five generator artifacts move together. Re-vendoring `checker.js` without
 `appwithai-wasm.js` leaves chapter 11 disagreeing with chapter 09 about the same
@@ -592,6 +652,7 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes five models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
 | `assets/js/run-in-browser.js` | Any `BUILT_IN` key works as a URL hash, not only `#upload` | `try-it-yourself.html` links straight to a named example. An unknown hash falls back to the CRM |
 | `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
+| `viewers/index.html` | **Not vendored — authored here.** The site's header, footer and prose around the same viewer markup, plus `data-awv-theme="dark"` | Upstream's copy is a bare page for running the viewers without the site. The nine files beside it are straight copies |
 
 `guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
 `ignoreMethod: true` in `serve()`, because the Cache API matches GET only and
