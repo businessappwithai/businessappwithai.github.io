@@ -852,10 +852,25 @@ and the two documents stop agreeing about a language they both define.
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
   entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
   restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`.
-  The hospital model used to be the one that did not — it declared no `%%hook` — and now
-  scores 20/20 as well, with four `kind: hook` sections, 17 hooks, 22 `%%index`
-  declarations and a `%%meta description:`. **Run the scorer on a model before publishing
-  it**, not only the checker: a model can be 0/0 and still be missing half the language.
+  The hospital model scores 20/20 as well, and is the larger worked example: **30
+  entities, 323 columns, 39 enums, 10 state machines, 10 sagas, 18 rules, 27 hooks and
+  132 access rules**, 0 errors and 0 warnings. It was rebuilt end to end through §10's
+  interactive protocol — seven gates, a dossier per entity — and the record of that build
+  is what the section's claims are evidence for. **Run the scorer on a model before
+  publishing it**, not only the checker: a model can be 0/0 and still be missing half the
+  language.
+
+  **Its rules were rewritten once, late, and the reason is worth knowing before editing
+  any model's `%%action` lines.** The generated `bus.service.ts` runs the `beforeCreate` /
+  `beforeUpdate` hooks and only then `enforceBusinessRules(tableName, data, action)` — so
+  a rule is evaluated against **the record being written and nothing else**, exactly as
+  `ruleNodes.actions.whenForm` in `appwithai-language.json` says. A condition naming a
+  parent's column or a count of children is undefined at evaluation, the comparison is
+  false, and the rule silently never fires: seeded, visible in the admin screen, drawn by
+  the viewer, and inert. Sixteen of this model's actions were written that way. The fix
+  is the order the generated service already implies — **a handler resolves, the rule
+  decides and acts**: a `%%hook` puts the fact on the row, and the rule reads it as an
+  ordinary column.
   Dance studio comes from
   `language/examples/` upstream, **not** `html/models/`, so the
   byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
