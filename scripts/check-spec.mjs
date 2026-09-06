@@ -426,6 +426,29 @@ for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js
   held(existsSync(root + rung) && detailed.includes(rung.replace("guide/", "")),
     `the ladder's ${rung} is published here and named in the document`);
 
+/* The viewers. Section 10 sends a reader to /viewers/ at Phase 3 and names
+ * three of its tabs; the page can move and a tab can be renamed, and a model
+ * following a stale instruction sends its user to a 404 in the middle of a
+ * walkthrough. The upstream repository holds the document to the same claims
+ * where it is authored; this holds the copy to what *this host* serves. */
+held(detailed.includes("https://appwithai.org/viewers/"),
+  "section 10 names the model viewers by their published URL");
+for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
+  held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
+
+const viewerPage = readFileSync(root + "viewers/index.html", "utf8");
+const viewerTabs = [...viewerPage.matchAll(/data-tab="[^"]+">([^<]+)</g)].map((m) => m[1].trim());
+for (const named of ["Workflows", "Business rules", "Access"])
+  held(viewerTabs.includes(named) && detailedProse.includes(`**${named}**`),
+    `the "${named}" tab section 10 names exists on the viewer page`);
+
+/* Watching a file is Chromium-only. Recommending it without saying so is how a
+ * reader on Firefox concludes the page is broken. */
+held(/File System Access API/.test(detailedProse) && /Watch a file/.test(detailedProse),
+  "section 10 says which browsers can watch a file");
+held(readFileSync(root + "viewers/model-viewer.js", "utf8").includes("showOpenFilePicker"),
+  "the viewers really gate watching on the File System Access API");
+
 // Cross-references inside the file must resolve, or the ladder sends a reader nowhere.
 const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
 const referenced = [...new Set([...detailed.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))];
