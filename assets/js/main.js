@@ -223,6 +223,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // Click-to-load video players.
+  //
+  // The YouTube iframe is deliberately absent from the markup: embedding one
+  // makes the request — cookies, fonts, player script — before anybody has
+  // asked to watch anything. The button carries the video id, and only a click
+  // builds the player, on the nocookie host. privacy.html says so too.
+  document.querySelectorAll('.video-play[data-video-id]').forEach(button => {
+    button.addEventListener('click', () => {
+      const frame = button.closest('.video-frame');
+      const id = button.dataset.videoId;
+      if (!frame || !id) return;
+
+      const player = document.createElement('iframe');
+      player.src = 'https://www.youtube-nocookie.com/embed/' +
+        encodeURIComponent(id) + '?autoplay=1&rel=0';
+      player.title = button.dataset.videoTitle || 'Video';
+      player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      player.referrerPolicy = 'strict-origin-when-cross-origin';
+      player.allowFullscreen = true;
+
+      button.remove();
+      frame.appendChild(player);
+    });
+  });
+
   console.log('AppWithAI website loaded successfully 🚀');
 });
 

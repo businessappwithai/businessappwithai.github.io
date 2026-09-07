@@ -77,6 +77,63 @@
     </div>
   </section>
 
+  <!-- Videos — the argument, in two talks.
+       The players are click-to-load facades: nothing is requested from YouTube
+       until a reader presses play. The poster is drawn from design tokens, and
+       main.js swaps the button for the iframe. See privacy.html. -->
+  <section class="section section-gray" id="watch">
+    <div class="container">
+      <div class="section-header">
+        <span class="hero-badge">Watch &middot; Two Videos</span>
+        <h2>Let&rsquo;s Use AI for Good &mdash; Only, Don&rsquo;t Let It Destroy Us</h2>
+        <p class="section-subtitle">That is the whole position, and it is why this project puts a human review gate in the middle of the pipeline and publishes every model, checker and generated line for you to read. Start with these two.</p>
+      </div>
+
+      <div class="grid grid-2 video-grid">
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="zqCGxY1Ea8k"
+                    data-video-title="AI for Good — why this project exists"
+                    aria-label="Play the video: AI for Good — why this project exists">
+              <span class="video-play__index" aria-hidden="true">01</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>AI for Good &mdash; why this project exists</h3>
+            <p class="text-muted">The case for putting engineering judgement into the platform rather than hoping every team can hire it.</p>
+            <a href="https://youtu.be/zqCGxY1Ea8k" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="BiZ-TXmZODg"
+                    data-video-title="The other half — keeping AI in check"
+                    aria-label="Play the video: The other half — keeping AI in check">
+              <span class="video-play__index" aria-hidden="true">02</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>The other half &mdash; keeping AI in check</h3>
+            <p class="text-muted">Where generated software goes wrong, and the review gate, validators and audit trail that exist to catch it.</p>
+            <a href="https://youtu.be/BiZ-TXmZODg" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+      </div>
+
+      <p class="video-note text-sm text-muted text-center mt-4">
+        Neither player is embedded until you press it &mdash; this page asks YouTube for nothing until you ask it to.
+        <a href="privacy.html">What this site collects &rarr;</a>
+      </p>
+    </div>
+  </section>
+
   <!-- Stats Section -->
   <section class="section section-white">
     <div class="container">
