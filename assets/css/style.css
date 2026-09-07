@@ -1219,10 +1219,6 @@ pre {
 
 .video-card__body h3 {
   font-size: var(--text-xl);
-  margin-bottom: var(--spacing-sm);
-}
-
-.video-card__body p {
   margin-bottom: var(--spacing-md);
 }
 
