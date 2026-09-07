@@ -77,6 +77,60 @@
     </div>
   </section>
 
+  <!-- Videos — the argument, in two talks.
+       The players are click-to-load facades: nothing is requested from YouTube
+       until a reader presses play. The poster is drawn from design tokens, and
+       main.js swaps the button for the iframe. See privacy.html. -->
+  <section class="section section-gray" id="watch">
+    <div class="container">
+      <div class="section-header">
+        <span class="hero-badge">Watch &middot; Two Videos</span>
+        <h2>Let&rsquo;s Use AI for Good &mdash; Only, Don&rsquo;t Let It Destroy Us</h2>
+      </div>
+
+      <div class="grid grid-2 video-grid">
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="zqCGxY1Ea8k"
+                    data-video-title="Dooms day predictions..Let's use AI for Good only."
+                    aria-label="Play the video: Dooms day predictions..Let's use AI for Good only.">
+              <span class="video-play__index" aria-hidden="true">01</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>Dooms day predictions..Let&rsquo;s use AI for Good only.</h3>
+            <a href="https://youtu.be/zqCGxY1Ea8k" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="BiZ-TXmZODg"
+                    data-video-title="Our only hope"
+                    aria-label="Play the video: Our only hope">
+              <span class="video-play__index" aria-hidden="true">02</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>Our only hope</h3>
+            <a href="https://youtu.be/BiZ-TXmZODg" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+      </div>
+
+      <p class="video-note text-sm text-muted text-center mt-4">
+        Neither player is embedded until you press it &mdash; this page asks YouTube for nothing until you ask it to.
+        <a href="privacy.html">What this site collects &rarr;</a>
+      </p>
+    </div>
+  </section>
+
   <!-- Stats Section -->
   <section class="section section-white">
     <div class="container">

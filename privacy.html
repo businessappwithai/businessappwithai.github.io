@@ -185,11 +185,21 @@
         (<a href="https://formsubmit.co/" target="_blank" rel="noopener noreferrer">FormSubmit</a>),
         which forwards it to us by email. Only what you typed is sent, and it is used to answer you.
       </p>
+      <h3>The videos on the home page</h3>
+      <p>
+        The two videos are hosted on YouTube, and their players are <strong>not</strong> embedded until
+        you press play. Until then the page holds a picture of a play button drawn in CSS and asks
+        YouTube for nothing &mdash; no player script, no fonts, no cookies. Pressing play loads the
+        player from <code>youtube-nocookie.com</code>, at which point YouTube sees the request and
+        applies its own terms; the section says as much next to the buttons. Not pressing play is a
+        complete opt-out, and needs no setting.
+      </p>
       <h3>Hosting</h3>
       <p>
         The site is served by GitHub Pages, which keeps its own request logs. The guide&rsquo;s chapter 10
-        downloads its runtime from StackBlitz and its packages from npm when you run it &mdash; that is
-        the only page that reaches a host other than this one to do its work, and it says so.
+        downloads its runtime from StackBlitz and its packages from npm when you run it. That and the
+        video players above are the only things on this site that reach a host other than this one, and
+        both of them say so where they are.
       </p>
       <h3>Questions</h3>
       <p>
