@@ -33,7 +33,7 @@ businessappwithai.github.io/
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
-│       └── stack-templates.json  # 327 stack templates for chapters 09 and 10
+│       └── stack-templates.json  # 353 stack templates for chapters 09 and 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
@@ -463,7 +463,7 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 428 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 445 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
 - **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
@@ -542,7 +542,7 @@ fire on it and the roles that may read it.
 
 ## Chapter 10 — the real stack in a WebContainer
 
-`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 425 files — and
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 451 files — and
 runs it in a WebContainer. It needs two things chapter 09 does not.
 
 - **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
@@ -552,7 +552,7 @@ runs it in a WebContainer. It needs two things chapter 09 does not.
   through** — do not widen it. Isolation is a constraint, not an upgrade, and the other chapters must
   stay outside it.
 - **The network.** The WebContainer runtime comes from StackBlitz and the packages from npm. Everything
-  else — the API, the 327 templates, the fonts — is served from `assets/vendor/`.
+  else — the API, the 353 templates, the fonts — is served from `assets/vendor/`.
 
 The nine binary font templates cannot travel in `stack-templates.json` (it is JSON), so they are shipped
 in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` before it is mounted.
