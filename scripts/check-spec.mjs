@@ -132,7 +132,11 @@ t("step Formula set", saga("    %%step B Formula target: label operation: set va
 t("step Formula copy", saga("    %%step B Formula target: copied operation: copy source: name", "    A([Start]) --> B(Compute)\n    B --> Z([End])"));
 t("step Decision inline table", saga('    %%step B Decision decisionTable: {"hitPolicy":"first","inputs":[{"id":"i1","name":"Qty","field":"qty"}],"outputs":[{"id":"o1","name":"Band","field":"band"}],"rules":[{"_id":"hi","i1":"> 10","o1":"\'high\'"},{"_id":"rest","i1":"","o1":"\'low\'"}]}', "    A([Start]) --> B{Decide}\n    B --> Z([End])"));
 t("step REST url closed up to its key", saga("    %%step B REST method: POST url:https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"));
-t("step REST with a space before https raises EML262", saga("    %%step B REST method: POST url: https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"), "EML262");
+// Both spellings are accepted now. The parser used to end a value at the next
+// `<key>:` token, and `https:` looked like one, so the spaced form raised
+// EML262 + EML268 for a line that read perfectly correctly. It recognises a
+// scheme and reads through it now — §5.3 says so, and this is what holds it.
+t("step REST with a space before https", saga("    %%step B REST method: POST url: https://hooks.example.com/notify", "    A([Start]) --> B(Call)\n    B --> Z([End])"));
 t("step Agent needs agentId", saga("    %%step B Agent agentId: triage-v1", "    A([Start]) --> B(Agent)\n    B --> Z([End])"));
 t("step Agent without agentId raises EML262", saga("    %%step B Agent", "    A([Start]) --> B(Agent)\n    B --> Z([End])"), "EML262");
 
@@ -421,6 +425,29 @@ held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can
 for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js", "guide/11-check-a-model.html"])
   held(existsSync(root + rung) && detailed.includes(rung.replace("guide/", "")),
     `the ladder's ${rung} is published here and named in the document`);
+
+/* The viewers. Section 10 sends a reader to /viewers/ at Phase 3 and names
+ * three of its tabs; the page can move and a tab can be renamed, and a model
+ * following a stale instruction sends its user to a 404 in the middle of a
+ * walkthrough. The upstream repository holds the document to the same claims
+ * where it is authored; this holds the copy to what *this host* serves. */
+held(detailed.includes("https://appwithai.org/viewers/"),
+  "section 10 names the model viewers by their published URL");
+for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
+  held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
+
+const viewerPage = readFileSync(root + "viewers/index.html", "utf8");
+const viewerTabs = [...viewerPage.matchAll(/data-tab="[^"]+">([^<]+)</g)].map((m) => m[1].trim());
+for (const named of ["Workflows", "Business rules", "Access"])
+  held(viewerTabs.includes(named) && detailedProse.includes(`**${named}**`),
+    `the "${named}" tab section 10 names exists on the viewer page`);
+
+/* Watching a file is Chromium-only. Recommending it without saying so is how a
+ * reader on Firefox concludes the page is broken. */
+held(/File System Access API/.test(detailedProse) && /Watch a file/.test(detailedProse),
+  "section 10 says which browsers can watch a file");
+held(readFileSync(root + "viewers/model-viewer.js", "utf8").includes("showOpenFilePicker"),
+  "the viewers really gate watching on the File System Access API");
 
 // Cross-references inside the file must resolve, or the ladder sends a reader nowhere.
 const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));

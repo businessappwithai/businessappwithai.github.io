@@ -53,6 +53,11 @@ const BUILT_IN = {
     label: "dance-studio.eml.mmd",
     name: "Acme Dance Studio",
   },
+  investment: {
+    path: "models/investment-planning-wealth-management-system.eml.mmd",
+    label: "investment-planning-wealth-management-system.eml.mmd",
+    name: "Investment Planning and Wealth Management",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -180,6 +185,7 @@ const choices = [
   [$("choice-drug"), "drug"],
   [$("choice-hospital"), "hospital"],
   [$("choice-dance"), "dance"],
+  [$("choice-investment"), "investment"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -191,7 +197,11 @@ async function selectChoice(kind) {
   for (const [button, candidate] of choices) {
     button.setAttribute("aria-pressed", String(candidate === kind));
   }
-  $("dropzone").hidden = kind !== "upload";
+  /* Nothing to show or hide: the dropzone is part of the "Upload your own"
+     card now, so it is on screen from the start. It used to be a separate box
+     revealed only once that card was pressed, which put the one control a
+     reader arriving with their own model came here to use behind a click they
+     had no reason to make. */
 
   if (kind === "upload") {
     state.origin = "upload";
@@ -228,14 +238,17 @@ $("file").addEventListener("change", (event) => {
   // looking at the stale findings with nothing having happened.
   input.value = "";
 });
+/* Listen on the whole card, highlight the panel inside it. The drop target a
+   reader aims at is the card; the dashed panel is only what tells them so. */
+const uploadCard = $("choice-upload");
 for (const type of ["dragenter", "dragover"]) {
-  dropzone.addEventListener(type, (event) => {
+  uploadCard.addEventListener(type, (event) => {
     event.preventDefault();
     dropzone.classList.add("is-over");
   });
 }
 for (const type of ["dragleave", "drop"]) {
-  dropzone.addEventListener(type, (event) => {
+  uploadCard.addEventListener(type, (event) => {
     event.preventDefault();
     dropzone.classList.remove("is-over");
     if (type === "drop" && event.dataTransfer.files[0]) readFile(event.dataTransfer.files[0]);
@@ -1223,9 +1236,18 @@ await findVendoredPglite();
  * them elsewhere, and telling someone to "upload your file" and then landing
  * them on a page showing the CRM example is a small broken promise. The hash
  * selects the upload choice and scrolls the dropzone into view instead.
+ *
+ * Every other key of BUILT_IN works the same way — `#investment`, `#hospital` —
+ * so `try-it-yourself.html` can send a reader straight to the example that
+ * looks like their business rather than to the CRM and a list to scroll.
+ * An unknown hash falls back to the CRM rather than to an empty page.
  */
-const wantsUpload = window.location.hash === "#upload";
-await selectChoice(wantsUpload ? "upload" : "crm");
+const requested = window.location.hash.replace(/^#/, "");
+const wantsUpload = requested === "upload";
+const choice = wantsUpload || requested in BUILT_IN ? requested : "crm";
+await selectChoice(choice);
 if (wantsUpload) {
   $("dropzone").scrollIntoView({ block: "center", behavior: "smooth" });
+} else if (choice !== "crm") {
+  $("step-model").scrollIntoView({ block: "start", behavior: "smooth" });
 }

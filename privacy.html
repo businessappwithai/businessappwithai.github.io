@@ -109,6 +109,7 @@
           <tr><td><code>run_started</code></td><td>Run the application is pressed</td><td>Whether it is a fresh database</td></tr>
           <tr><td><code>app_ready</code> / <code>run_failed</code></td><td>The generated server answers, or does not</td><td>Milliseconds from press to answer</td></tr>
           <tr><td><code>app_interaction</code></td><td>The first click or keystroke lands inside the running application</td><td>Milliseconds since it became ready</td></tr>
+          <tr><td><code>model_viewed</code></td><td>A model is drawn by the <a href="viewers/index.html">model viewer</a></td><td>How many entities, relationships, rules, state machines and sagas it declares, and the checker&rsquo;s error and warning counts &mdash; never a name, a column or a line of it</td></tr>
           <tr><td><code>app_downloaded</code>, <code>stack_downloaded</code>, <code>model_downloaded</code></td><td>A download is started</td><td>File count and archive size</td></tr>
           <tr><td><code>github_clicked</code>, <code>guide_clicked</code></td><td>A link to the source or to the guide is followed</td><td>The link&rsquo;s address and its text</td></tr>
           <tr><td><code>contact_submitted</code></td><td>The contact form is submitted</td><td>&mdash; (the form&rsquo;s own contents go to email, not to analytics)</td></tr>
@@ -128,7 +129,8 @@
       <p>
         Four pages record the page itself, so that a reader stuck at a dropzone or staring at a
         report they cannot read is something we can actually see: <b>Try It Yourself</b>, and guide
-        chapters <b>09</b>, <b>10</b> and <b>11</b>. The marketing pages do not.
+        chapters <b>09</b>, <b>10</b> and <b>11</b>. The marketing pages do not, and neither does
+        the <a href="viewers/index.html">model viewer</a>.
       </p>
       <p>A recording is of this site&rsquo;s own interface, and three things are blanked out of it:</p>
       <ul>
@@ -184,11 +186,21 @@
         (<a href="https://formsubmit.co/" target="_blank" rel="noopener noreferrer">FormSubmit</a>),
         which forwards it to us by email. Only what you typed is sent, and it is used to answer you.
       </p>
+      <h3>The videos on the home page</h3>
+      <p>
+        The two videos are hosted on YouTube, and their players are <strong>not</strong> embedded until
+        you press play. Until then the page holds a picture of a play button drawn in CSS and asks
+        YouTube for nothing &mdash; no player script, no fonts, no cookies. Pressing play loads the
+        player from <code>youtube-nocookie.com</code>, at which point YouTube sees the request and
+        applies its own terms; the section says as much next to the buttons. Not pressing play is a
+        complete opt-out, and needs no setting.
+      </p>
       <h3>Hosting</h3>
       <p>
         The site is served by GitHub Pages, which keeps its own request logs. The guide&rsquo;s chapter 10
-        downloads its runtime from StackBlitz and its packages from npm when you run it &mdash; that is
-        the only page that reaches a host other than this one to do its work, and it says so.
+        downloads its runtime from StackBlitz and its packages from npm when you run it. That and the
+        video players above are the only things on this site that reach a host other than this one, and
+        both of them say so where they are.
       </p>
       <h3>Questions</h3>
       <p>
@@ -212,6 +224,7 @@
           <ul class="footer-links">
             <li><a href="justification.html">Why AppWithAI</a></li>
             <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="viewers/index.html">Model Viewer</a></li>
             <li><a href="features.html">Features</a></li>
             <li><a href="how-it-works.html">How It Works</a></li>
             <li><a href="technology.html">Technology</a></li>

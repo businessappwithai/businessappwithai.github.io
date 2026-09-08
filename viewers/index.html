@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="See an EML model while it is being written: the entities and their links, the state machines, the sagas, the business rules and who can read what — drawn by the generator's own parser and compilers.">
+  <meta name="keywords" content="AppWithAI, EML viewer, ERD viewer, entity relationship diagram, workflow designer, business rules, state machine, decision table, .mmd, Mermaid">
+  <title>Model Viewer — See the Entities, Workflows and Rules</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/dark-theme.css">
+  <!-- The viewers' own styles. Everything in it is prefixed `awv-` and scoped
+       to `.awv-root`, so it cannot collide with Lunaris. -->
+  <link rel="stylesheet" href="viewers.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="../index.html" class="logo" aria-label="AppWithAI — home" title="AppWithAI — home">
+        <span class="logo-mark" aria-hidden="true">A</span>
+        <span class="logo-word">App<span class="logo-word-dim">With</span><span class="logo-word-ai">AI</span></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="../justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="../try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
+          <li><a href="../features.html" class="nav-link">Features</a></li>
+          <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="../technology.html" class="nav-link">Technology</a></li>
+          <li><a href="../guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="../pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="../guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="../contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero. Headings carry an explicit `color: var(--gray-900)` in the design
+       system, so `color: white` has to be on the heading itself. -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-2xl) 0;">
+    <div class="container text-center">
+      <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">Nothing Installed &middot; Nothing Uploaded</span>
+      <h1 style="margin-top: var(--spacing-lg); color: white;">See the model, <span style="color: var(--accent-300);">not just the file</span></h1>
+      <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">A model is a Mermaid document, and Mermaid draws only half of it. The business rules, the workflows, the enumerated values and the access control live in <code style="color: var(--accent-300);">%%</code> directives it treats as comments — which is the half worth checking while the model is still being written. This page draws all of it.</p>
+    </div>
+  </section>
+
+  <!-- The viewer -->
+  <section class="section section-white" style="padding-top: var(--spacing-xl);">
+    <div class="container-wide">
+
+      <!-- `data-awv-theme` is this page telling the viewers which theme it serves.
+           The site is dark for everybody (`dark-theme.css` sets `color-scheme:
+           dark` outright), so leaving it to the operating system would put a
+           white diagram on a near-black page for every reader whose machine is
+           set to light. -->
+      <div class="awv-root" id="viewer" data-awv-theme="dark">
+        <div class="awv-shell">
+          <div class="awv-bar">
+            <button type="button" class="awv-button is-primary" data-role="watch" hidden>
+              Watch a file
+            </button>
+            <button type="button" class="awv-button" data-role="open">Open a file</button>
+            <input type="file" accept=".mmd,.md,.txt" data-role="file-input" hidden>
+            <span class="awv-watch-state" data-role="watch-state" hidden></span>
+            <p class="awv-status" data-role="status"></p>
+            <span class="awv-verdict" data-role="verdict" data-needs-model></span>
+            <button type="button" class="awv-button" data-role="copy-report" data-needs-model>
+              Copy the checker's report
+            </button>
+          </div>
+
+          <ul class="awv-diagnostics" data-role="diagnostics" data-needs-model></ul>
+          <div class="awv-stats" data-role="stats" data-needs-model></div>
+
+          <nav class="awv-tabs" aria-label="What to look at">
+            <button type="button" class="awv-tab is-active" data-tab="entities">Entities</button>
+            <button type="button" class="awv-tab" data-tab="workflows">Workflows</button>
+            <button type="button" class="awv-tab" data-tab="rules">Business rules</button>
+            <button type="button" class="awv-tab" data-tab="access">Access</button>
+            <button type="button" class="awv-tab" data-tab="source">Source</button>
+          </nav>
+
+          <section class="awv-panel" data-panel="entities">
+            <div class="awv-bar">
+              <label for="erd-filter">Filter</label>
+              <input id="erd-filter" type="search" class="awv-button" data-role="erd-filter" placeholder="entity, table, category or column">
+            </div>
+            <div class="awv-split is-canvas-first">
+              <div data-role="erd-canvas"></div>
+              <aside class="awv-inspector" data-role="inspector"></aside>
+            </div>
+          </section>
+
+          <section class="awv-panel" data-panel="workflows" hidden>
+            <div class="awv-split">
+              <div class="awv-list" data-role="workflow-list"></div>
+              <div data-role="workflow-detail"></div>
+            </div>
+          </section>
+
+          <section class="awv-panel" data-panel="rules" hidden>
+            <div class="awv-split">
+              <div class="awv-list" data-role="rule-list"></div>
+              <div data-role="rule-detail"></div>
+            </div>
+          </section>
+
+          <section class="awv-panel" data-panel="access" hidden>
+            <div data-role="access"></div>
+          </section>
+
+          <section class="awv-panel" data-panel="source" hidden>
+            <pre class="awv-source" data-role="source-view"></pre>
+          </section>
+
+          <section style="margin-top: var(--spacing-xl);">
+            <h2 style="font-size: 1.15rem; margin-bottom: var(--spacing-sm);">Paste a model</h2>
+            <textarea class="awv-paste ph-no-capture" data-role="paste" spellcheck="false" placeholder="%%meta name: ..." aria-label="Paste an EML model"></textarea>
+            <div class="awv-drop" data-role="drop">&hellip;or drop a <code>.eml.mmd</code> file anywhere on this page.</div>
+
+            <!-- The five worked models this site publishes. They are the same
+                 files chapter 09 generates applications from, so a reader can
+                 look at one here and run it there. -->
+            <p class="text-sm text-muted mt-3 mb-1">Or open one of the five worked examples:</p>
+            <div class="awv-examples">
+              <button type="button" class="awv-button" data-example="../guide/models/crm.eml.mmd">Sales CRM</button>
+              <button type="button" class="awv-button" data-example="../guide/models/dance-studio.eml.mmd">Dance studio</button>
+              <button type="button" class="awv-button" data-example="../guide/models/hospital-management-system.eml.mmd">Hospital management</button>
+              <button type="button" class="awv-button" data-example="../guide/models/drug-discovery.eml.mmd">Drug discovery</button>
+              <button type="button" class="awv-button" data-example="../guide/models/investment-planning-wealth-management-system.eml.mmd">Wealth management</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- What it draws, and why that is not obvious from the file -->
+  <section class="section section-gray">
+    <div class="container">
+      <div class="section-header">
+        <h2>What Mermaid does not draw</h2>
+        <p class="section-subtitle">An <code>.eml.mmd</code> describes a whole application, and the ERD is the smallest part of it. Everything below lives in <code>%%</code> directives, which every Mermaid renderer treats as a comment.</p>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card">
+          <div class="card-icon">&#128202;</div>
+          <h3>Entities</h3>
+          <p>Every column with the type the generator resolved it to, its key modifiers, the enumerated values it is bound to and the help text that becomes its label in the generated application. Relationships in crow's foot notation, because the glyph pair is what decides which table carries the foreign key. Double-click a box to open it in full.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128260;</div>
+          <h3>Workflows</h3>
+          <p>Each state machine as a canvas: green where a record starts, grey where the process ends, and one arrow per move the generated API will allow — a move with no arrow is refused with a 403, for every caller including the administrator. A move restricted by role is drawn differently and names its roles. Multi-step sagas are an ordered ladder, one rung per step, with what each step publishes for the next.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9878;&#65039;</div>
+          <h3>Business rules</h3>
+          <p>Each decision flow in the five colours the design tool uses — start, decision, action, compute, end — with the branch conditions on the arrows. Beside it, what the rule <em>emits</em>: the refusals, the transforms and the workflow triggers that Mermaid renders identically whether they are there or not. A decision table is drawn as a table.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mt-4">
+        <div class="card">
+          <div class="card-icon">&#128273;</div>
+          <h3>Access</h3>
+          <p>The roles the model declares, the account each one is seeded as, and how many of the entities each can read. A role that reads 0 of 14 entities signs in to an empty application, and that is worth knowing before the application exists rather than after.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9989;</div>
+          <h3>The checker's verdict</h3>
+          <p>The same verdict <a href="../guide/11-check-a-model.html">chapter 11</a> prints, from the same engine, on every change — with the codes the fixer can repair marked as such. The page carries one copy of one checker; it does not have an opinion of its own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why it can be trusted -->
+  <section class="section section-white">
+    <div class="container container-narrow">
+      <h2>It is the generator's own reading</h2>
+      <p>Nothing on this page parses a model. <code>viewers/eml-model.js</code> is the parser, the rule compiler, the workflow compiler, the access-control derivation and the checker from <a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">the generator repository</a>, bundled for a browser tab — the same code <code>appwithai generate</code> runs. The modules beside it decide how a column, a state or a step <em>looks</em>, never what it is.</p>
+      <p>That distinction is the whole point. A viewer with a parser of its own would eventually disagree with the generator about which columns are foreign keys, which enum binding took, or which transition is legal — and the author would find out only after generating. CI in that repository rebuilds this bundle and compares it byte for byte, so it cannot fall behind the code it claims to be.</p>
+      <p>The page makes no request to any other host. Your model is read in your tab, and nothing about its contents is recorded — the analytics on this site count that a model was viewed and how big it was, never a line of it. <a href="../privacy.html">The privacy page lists every event by name.</a></p>
+
+      <h3 class="mt-4">Written by a language model?</h3>
+      <p>Then this page is the other half of the loop. <a href="../try-it-yourself.html#enterprise-prompt">The enterprise prompt</a> points a model at <a href="../llmdetailed.txt"><code>llmdetailed.txt</code></a>, whose §10 walks a business end to end and builds the <code>.eml.mmd</code> on disk one phase at a time. Press <strong>Watch a file</strong>, pick that file, and the diagram fills in as the walkthrough runs — so what you are approving at each step is something you have seen, not something you have been told about. Watching needs the File System Access API, which today means a Chromium-family browser; <strong>Open a file</strong> and pasting work everywhere.</p>
+
+      <div class="mt-4" style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+        <a href="../try-it-yourself.html" class="btn btn-primary">Get a model written for you</a>
+        <a href="../guide/run-in-browser.html" class="btn btn-outline">Run one as an application</a>
+        <a href="../guide/11-check-a-model.html" class="btn btn-outline">Check one against the spec</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h4>AppWithAI</h4>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul class="footer-links">
+            <li><a href="../justification.html">Why AppWithAI</a></li>
+            <li><a href="../try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="index.html">Model Viewer</a></li>
+            <li><a href="../features.html">Features</a></li>
+            <li><a href="../how-it-works.html">How It Works</a></li>
+            <li><a href="../technology.html">Technology</a></li>
+            <li><a href="../guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="../todo.html">Todo</a></li>
+            <li><a href="../pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul class="footer-links">
+            <li><a href="../contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="../privacy.html">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="../guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/analytics.js"></script>
+  <script src="../assets/js/main.js"></script>
+  <script type="module">
+    import { ModelViewer } from "./model-viewer.js";
+    new ModelViewer(document.getElementById("viewer"));
+  </script>
+</body>
+</html>

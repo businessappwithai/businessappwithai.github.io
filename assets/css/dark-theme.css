@@ -882,3 +882,26 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
 .guide-content .steps li { color: #94a3b8 !important; }
 .guide-content .steps h3 { color: #f1f5f9 !important; }
 .guide-content .steps p  { color: #94a3b8 !important; }
+
+/* ── Videos ─────────────────────────────────────────────────────────────── */
+/* The poster keeps its indigo gradient — it is the one bright surface in the
+   section, and the play control sits on it. Only the card around it changes. */
+.video-card {
+  background: #111827;
+  border-color: #1f2937;
+  box-shadow: none;
+}
+
+.video-card:hover {
+  box-shadow: 0 0 0 1px #6366f1;
+}
+
+.video-card__body h3 { color: #f1f5f9; }
+.video-card__body a  { color: #818cf8; }
+.video-card__body a:hover { color: #a5b4fc; }
+
+.video-frame {
+  background: linear-gradient(135deg, #312e81 0%, #6d28d9 100%);
+}
+
+.video-note a { color: #818cf8; }

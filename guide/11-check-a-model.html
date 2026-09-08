@@ -175,13 +175,18 @@ console.log(formatReport(report));</code></pre>
         </button>
         <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
           <span class="choice__name">The hospital model</span>
-          <span class="choice__desc">Twenty-eight entities, no <code>User</code> entity — the person columns resolve to <code>Staff</code>. Clean, with one warning worth reading.</span>
+          <span class="choice__desc">Twenty-eight entities, no <code>User</code> entity — the person columns resolve to <code>Staff</code>. Clean, and the widest use of the language published here: nine state machines, three sagas, seventeen hooks and twenty-two declared indexes.</span>
           <span class="choice__meta">hospital-management-system.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-dance" aria-pressed="false">
           <span class="choice__name">The dance-studio model</span>
           <span class="choice__desc">Nine entities: a booking business, and the worked example for the interactive protocol in <code>llmdetailed.txt</code> §10. It comes back clean, which is what a model written against that section is supposed to do.</span>
           <span class="choice__meta">dance-studio.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-investment" aria-pressed="false">
+          <span class="choice__name">The wealth-management model</span>
+          <span class="choice__desc">Ninety-one entities, eight rules, eleven state machines and three sagas — the largest model published here, and the one worth running the checker against if you want to know how it behaves at enterprise size. Clean, with five notes it explains.</span>
+          <span class="choice__meta">investment-planning-wealth-management-system.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-broken" aria-pressed="false">
           <span class="choice__name">A broken model</span>
@@ -402,6 +407,16 @@ node check-model.mjs my-business.mmd</code></pre>
     </main>
   </div>
 
+  <!-- Next: see it, not just check it -->
+  <section class="section section-gray">
+    <div class="container container-narrow">
+      <h2>A clean model is not the same as the right model</h2>
+      <p>This chapter answers one question: would the generator accept this document? It cannot answer the other one &mdash; is this the business you meant. Nothing here is wrong in a model whose <code>Invoice</code> lifecycle can reach <code>paid</code> without passing through <code>approved</code>, or whose support agents can read every entity in the company.</p>
+      <p><a href="../viewers/index.html">The model viewer</a> draws what the checker only validates: every entity with its columns and their controls, each state machine with the moves the generated API will allow, each business rule&rsquo;s branches and what it emits, each multi-step process as an ordered ladder, and the roles with the number of entities each one can read. It carries this same checker, so the verdict on this page is the verdict there.</p>
+      <p><a href="../viewers/index.html" class="btn btn-primary mt-3">Open the model viewer &rarr;</a></p>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="container">
@@ -416,6 +431,7 @@ node check-model.mjs my-business.mmd</code></pre>
           <ul class="footer-links">
             <li><a href="../justification.html">Why AppWithAI</a></li>
             <li><a href="../try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="../viewers/index.html">Model Viewer</a></li>
             <li><a href="../features.html">Features</a></li>
             <li><a href="../how-it-works.html">How It Works</a></li>
             <li><a href="../technology.html">Technology</a></li>

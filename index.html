@@ -78,6 +78,60 @@
     </div>
   </section>
 
+  <!-- Videos — the argument, in two talks.
+       The players are click-to-load facades: nothing is requested from YouTube
+       until a reader presses play. The poster is drawn from design tokens, and
+       main.js swaps the button for the iframe. See privacy.html. -->
+  <section class="section section-gray" id="watch">
+    <div class="container">
+      <div class="section-header">
+        <span class="hero-badge">Watch &middot; Two Videos</span>
+        <h2>Let&rsquo;s Use AI for Good &mdash; Only, Don&rsquo;t Let It Destroy Us</h2>
+      </div>
+
+      <div class="grid grid-2 video-grid">
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="zqCGxY1Ea8k"
+                    data-video-title="Dooms day predictions..Let's use AI for Good only."
+                    aria-label="Play the video: Dooms day predictions..Let's use AI for Good only.">
+              <span class="video-play__index" aria-hidden="true">01</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>Dooms day predictions..Let&rsquo;s use AI for Good only.</h3>
+            <a href="https://youtu.be/zqCGxY1Ea8k" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+
+        <figure class="video-card">
+          <div class="video-frame">
+            <button type="button" class="video-play"
+                    data-video-id="BiZ-TXmZODg"
+                    data-video-title="Our only hope"
+                    aria-label="Play the video: Our only hope">
+              <span class="video-play__index" aria-hidden="true">02</span>
+              <span class="video-play__icon" aria-hidden="true"></span>
+              <span class="video-play__label">Play &middot; loads YouTube</span>
+            </button>
+          </div>
+          <figcaption class="video-card__body">
+            <h3>Our only hope</h3>
+            <a href="https://youtu.be/BiZ-TXmZODg" target="_blank" rel="noopener noreferrer">Watch on YouTube &rarr;</a>
+          </figcaption>
+        </figure>
+      </div>
+
+      <p class="video-note text-sm text-muted text-center mt-4">
+        Neither player is embedded until you press it &mdash; this page asks YouTube for nothing until you ask it to.
+        <a href="privacy.html">What this site collects &rarr;</a>
+      </p>
+    </div>
+  </section>
+
   <!-- Stats Section -->
   <section class="section section-white">
     <div class="container">
@@ -278,6 +332,7 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
             <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">Not ready to write your own? <a href="guide/run-in-browser.html">Run the seventeen-entity CRM</a> the guide builds &mdash; same page, one click, no file needed.</p>
             <p class="text-muted text-sm">Want the longer version &mdash; what the model file actually contains, and how to check it? <a href="try-it-yourself.html">The Try It Yourself page</a> walks all of it.</p>
             <p class="text-muted text-sm">Building professional or enterprise software rather than a first model? Point the same prompt at <a href="llmdetailed.txt">the detailed specification</a> and follow its section 10 &mdash; a phased walkthrough with approval gates instead of one pass. <a href="try-it-yourself.html#enterprise-prompt">The prompt for it is here</a>.</p>
+            <p class="text-muted text-sm">Whichever prompt you use, you get a Mermaid file back &mdash; and Mermaid draws only its entity diagram. <a href="viewers/index.html">The model viewer</a> draws the rest: the business rules, the state machines, the multi-step processes and who can see what.</p>
           </div>
         </div>
       </div>
@@ -529,6 +584,7 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
           <ul class="footer-links">
             <li><a href="justification.html">Why AppWithAI</a></li>
             <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="viewers/index.html">Model Viewer</a></li>
             <li><a href="features.html">Features</a></li>
             <li><a href="how-it-works.html">How It Works</a></li>
             <li><a href="technology.html">Technology</a></li>

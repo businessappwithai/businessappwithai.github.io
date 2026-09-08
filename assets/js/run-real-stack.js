@@ -73,6 +73,11 @@ const BUILT_IN = {
     label: "dance-studio.eml.mmd",
     name: "Acme Dance Studio",
   },
+  investment: {
+    path: "models/investment-planning-wealth-management-system.eml.mmd",
+    label: "investment-planning-wealth-management-system.eml.mmd",
+    name: "Investment Planning and Wealth Management",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -178,6 +183,7 @@ const choices = [
   [$("choice-drug"), "drug"],
   [$("choice-hospital"), "hospital"],
   [$("choice-dance"), "dance"],
+  [$("choice-investment"), "investment"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -187,7 +193,11 @@ async function selectChoice(kind) {
   for (const [button, candidate] of choices) {
     button.setAttribute("aria-pressed", String(candidate === kind));
   }
-  $("dropzone").hidden = kind !== "upload";
+  /* Nothing to show or hide: the dropzone is part of the "Upload your own"
+     card now, so it is on screen from the start. It used to be a separate box
+     revealed only once that card was pressed, which put the one control a
+     reader arriving with their own model came here to use behind a click they
+     had no reason to make. */
   if (kind === "upload") return setModel("", "");
 
   const built = BUILT_IN[kind];
@@ -210,14 +220,16 @@ $("file").addEventListener("change", (event) => {
   // fires no `change` and the stale findings simply stay on screen.
   input.value = "";
 });
+/* Listen on the whole card, highlight the panel inside it. The drop target a
+   reader aims at is the card; the dashed panel is only what tells them so. */
 for (const type of ["dragenter", "dragover"]) {
-  $("dropzone").addEventListener(type, (event) => {
+  $("choice-upload").addEventListener(type, (event) => {
     event.preventDefault();
     $("dropzone").classList.add("is-over");
   });
 }
 for (const type of ["dragleave", "drop"]) {
-  $("dropzone").addEventListener(type, (event) => {
+  $("choice-upload").addEventListener(type, (event) => {
     event.preventDefault();
     $("dropzone").classList.remove("is-over");
     if (type === "drop" && event.dataTransfer.files[0]) readFile(event.dataTransfer.files[0]);

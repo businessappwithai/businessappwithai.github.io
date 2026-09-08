@@ -49,6 +49,42 @@
         <a href="#the-prompt" class="btn btn-accent btn-lg">Start with the prompt &darr;</a>
         <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.6); color: white;">Or run the ready-made CRM</a>
       </div>
+
+      <!-- Every model this site publishes, each a link that opens chapter 09
+           with that model already chosen. The hash is read by
+           assets/js/run-in-browser.js: any key of its BUILT_IN map works, and
+           an unknown one falls back to the CRM. Add a model there and here
+           together, or this box offers something the page cannot select. -->
+      <div style="margin-top: var(--spacing-2xl); border: 1px solid rgba(255,255,255,0.35); border-radius: var(--radius-lg); padding: var(--spacing-xl); background: rgba(255,255,255,0.07); text-align: left; max-width: 62rem; margin-left: auto; margin-right: auto;">
+        <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the five worked examples</p>
+        <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas and access control. Pick the one nearest your business; it opens in the browser runtime with the model already loaded, and nothing is installed or uploaded.</p>
+        <div class="grid grid-3" style="gap: var(--spacing-md);">
+          <a href="guide/run-in-browser.html#crm" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <strong style="color: white; display: block;">Sales CRM</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">17 entities. Leads, accounts, opportunities, quotes, contracts and support cases. Eight rules, five state machines, five sagas.</span>
+          </a>
+          <a href="guide/run-in-browser.html#dance" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <strong style="color: white; display: block;">Dance studio</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">9 entities. Classes, sessions, bookings, a waitlist and class packs — the smallest, and the quickest to read end to end.</span>
+          </a>
+          <a href="guide/run-in-browser.html#hospital" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <strong style="color: white; display: block;">Hospital management</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">28 entities. Admissions, wards and beds, orders and results, billing and stock. Nine state machines, 87 access restrictions.</span>
+          </a>
+          <a href="guide/run-in-browser.html#drug" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <strong style="color: white; display: block;">Drug discovery</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">A regulated lab: compound registry, experiments, instrument bookings, deviations and CAPAs. The one where rules refuse a write in front of you.</span>
+          </a>
+          <a href="guide/run-in-browser.html#investment" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <strong style="color: white; display: block;">Wealth management</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">91 entities. Households and advisors, compliance, financial plans, a security master, portfolios, orders, recommendations and commissions. The enterprise-scale one.</span>
+          </a>
+          <a href="guide/run-in-browser.html#upload" style="display: block; padding: var(--spacing-md); border: 1px dashed rgba(255,255,255,0.45); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.05);">
+            <strong style="color: white; display: block;">Your own model</strong>
+            <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Already have a <code>.mmd</code> from the prompt below? Drop it in. It is read in your tab and uploaded nowhere.</span>
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -153,8 +189,10 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
             <button type="button" class="btn btn-primary" data-copy="enterprise-research-prompt">Copy the detailed prompt</button>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
             <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps the <code>.mmd</code> on disk as it goes rather than holding it in the conversation. It ends where the prompt above ends — one file, checked clean, that you upload and run here.</p>
+            <p class="text-muted text-sm"><strong>Watch it being written.</strong> Open the <a href="viewers/index.html">model viewer</a> and point it at that file, and the diagram fills in as the walkthrough runs — the entities and their links, each lifecycle&rsquo;s legal moves, each rule&rsquo;s branches, and who ends up able to see what. Approving a gate is worth more when you have seen the thing you are approving, and Mermaid on its own draws none of it.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="llmdetailed.txt" class="btn btn-outline">Read the detailed specification &rarr;</a>
+              <a href="viewers/index.html" class="btn btn-outline">Open the model viewer &rarr;</a>
             </div>
           </div>
         </div>
@@ -289,6 +327,7 @@ node check-model.mjs my-business.mmd</pre>
           <ul class="footer-links">
             <li><a href="justification.html">Why AppWithAI</a></li>
             <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="viewers/index.html">Model Viewer</a></li>
             <li><a href="features.html">Features</a></li>
             <li><a href="how-it-works.html">How It Works</a></li>
             <li><a href="technology.html">Technology</a></li>
