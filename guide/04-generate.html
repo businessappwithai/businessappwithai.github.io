@@ -242,7 +242,7 @@ bun run db:setup   <span class="c-com"># migrations, then every seed in order</s
 <h2>What lands on disk</h2>
 
 <div class="code">
-  <div class="code-head"><span class="tag">tree</span><span>generated-projects/crm — 403 files</span></div>
+  <div class="code-head"><span class="tag">tree</span><span>generated-projects/crm — 454 files</span></div>
 <pre><code>crm/
 ├── backend/                 <span class="c-com"># NestJS + Fastify + Kysely</span>
 │   ├── migrations/          <span class="c-com"># bus_ tables, sys_ dictionary, indexes</span>
@@ -256,12 +256,12 @@ bun run db:setup   <span class="c-com"># migrations, then every seed in order</s
 │       ├── hooks/handlers/  <span class="c-com"># ⭐ your hook bodies live here, never overwritten</span>
 │       ├── audit/           <span class="c-com"># append-only change log</span>
 │       └── auth/            <span class="c-com"># sessions, roles, permissions</span>
-├── frontend/                <span class="c-com"># TanStack Start + React 19 (192 files)</span>
+├── frontend/                <span class="c-com"># TanStack Start + React 19 (198 files)</span>
 │   └── src/
 │       ├── routes/          <span class="c-com"># one screen per entity, plus /admin/*</span>
 │       ├── components/      <span class="c-com"># dynamic table, dynamic form, admin shells</span>
 │       └── hooks/           <span class="c-com"># entity, field and lookup queries</span>
-├── tests/                   <span class="c-com"># generated bun:test end-to-end suite (61 files)</span>
+├── tests/                   <span class="c-com"># generated bun:test end-to-end suite (77 files)</span>
 ├── model/                   <span class="c-com"># the .mmd this was generated from, shipped along</span>
 ├── docker/ · Dockerfile · docker-compose.yml
 └── .github/workflows/       <span class="c-com"># CI for both halves</span></code></pre>

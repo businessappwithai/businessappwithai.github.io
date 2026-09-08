@@ -786,7 +786,7 @@ $("download-stack").addEventListener("click", async () => {
       stackCache.templates = await stackCache.module.loadTemplates(STACK_TEMPLATES_URL);
     }
 
-    button.innerHTML = '<span class="working"></span>Writing 400 files';
+    button.innerHTML = '<span class="working"></span>Writing the application source';
     const result = await stackCache.module.generateFullStack({
       source: state.source,
       templates: stackCache.templates,
