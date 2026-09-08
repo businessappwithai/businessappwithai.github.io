@@ -369,6 +369,17 @@ a:hover {
   color: transparent;
 }
 
+/* Forced colours strip the gradient but not the transparent fill, which would
+   leave the brand reading "AppWith". The two letters take the system colour
+   instead — the wordmark is the site's name, so it may not go missing. */
+@media (forced-colors: active) {
+  .logo-word-ai {
+    -webkit-text-fill-color: currentColor;
+    color: currentColor;
+    background: none;
+  }
+}
+
 /* Every page's logo goes home, and a wordmark leaves that to convention. This
    pill says it outright on hover and on keyboard focus. It is positioned out
    of flow on purpose: the header carries seven nav items plus two buttons at
