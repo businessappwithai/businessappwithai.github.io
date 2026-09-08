@@ -26,14 +26,14 @@ businessappwithai.github.io/
 │   │   ├── run-real-stack.js     # Controller for chapter 10
 │   │   ├── validator.js          # Controller for chapter 11
 │   │   ├── zip.js                # Dependency-free ZIP writer (the deployable download)
-│   │   ├── erdwithai-wasm.js     # Vendored: browser generator (parser + compilers)
-│   │   └── erdwithai-fullstack.js# Vendored: full NestJS/TanStack generator
+│   │   ├── appwithai-wasm.js     # Vendored: browser generator (parser + compilers)
+│   │   └── appwithai-fullstack.js# Vendored: full NestJS/TanStack generator
 │   └── vendor/                   # Third-party payloads, served from this origin
 │       ├── posthog/              # posthog-js, the no-external build (~640KB)
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
-│       └── stack-templates.json  # 313 stack templates for chapter 10
+│       └── stack-templates.json  # 327 stack templates for chapters 09 and 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
@@ -46,11 +46,17 @@ businessappwithai.github.io/
 │   ├── check-model.mjs       # Site-authored CLI runner for both of the above
 │   ├── coi-sw.js             # Service Worker that isolates chapter 10
 │   ├── img/                  # Screenshots used by the chapters
-│   ├── models/               # Example EML models the chapters load
+│   ├── models/               # Example EML models the chapters load (crm,
+│   │                         # drug-discovery, hospital-management-system,
+│   │                         # dance-studio)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── llms-full.txt             # EML language specification, for language models
+├── llmdetailed.txt           # The whole system, and §10's *interactive* authoring
+│                             # protocol — the enterprise path. Vendored from
+│                             # `llmtext/llmdetailed.txt`, unlike llms-full.txt
 ├── scripts/
-│   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js
+│   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js,
+│   │                         # plus llmdetailed.txt §10's tooling claims
 │   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
@@ -115,13 +121,14 @@ Deployment is fully automatic:
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
-| `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: autonomous application delivery on OpenClaw and NVIDIA OpenShell. One line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
+| `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: completely agentic workflows on the DeepSeek Harness. The five before 1.0.0 are one line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. The after-1.0.0 item is the one exception to that brevity: it carries a six-card brief on *how* it would be built, because the harness is new and the item is meaningless without it. Each card maps a step of the AppWithAI pipeline onto a mechanism the harness actually documents — Cordis plugins and bundles, `ctx.tools`, `ask_user_question`, the `ctx.subagents` seam and `ralph`, the sandboxed filesystem/subprocess providers, and the `web`/`headless`/`sdk` profiles with their durable session log. Those come from the harness's own `docs/` (architecture, agent-lifecycle, capability-seams, tool-catalog), which the page cites — **check them before editing a claim there**, since the harness is in developer preview and expects breaking changes. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
 | `guide/11-check-a-model.html` | Chapter 11: the authoring protocol, and the published validators running live |
 | `llms-full.txt` | The EML language specification language models are pointed at — the language only, deliberately not the generator or the framework |
+| `llmdetailed.txt` | The same language, plus the generator, the templates and the generated application — and an *interactive* authoring protocol in §10. The professional/enterprise path, linked from `try-it-yourself.html#enterprise-prompt` and the home page |
 
 ## Design System (Lunaris)
 
@@ -169,8 +176,14 @@ The CSS is organized as a complete design system. Use existing classes — do no
 > stays crisp at any density and costs no request. `.logo::after` is the
 > **HOME** pill that appears on hover and on keyboard focus; it is positioned
 > out of flow on purpose, because the header is at its width ceiling at 1024px
-> and the home link must not grow by a pixel to say what it is. The mark and
-> the type both step down in the 1024–1279px query for the same reason.
+> and the home link must not grow by a pixel to say what it is.
+>
+> **Height is the only axis with room.** The wordmark replaced a 76px image —
+> `60875c5` had just doubled it — so the tile is deliberately large (48px) while
+> the type beside it keeps a 1.1875rem measure. Growing the *type* is what
+> overflows the nav: at 1.5rem the last button ran 12px past the container at
+> 1440px, measured. The mark and the type both step down in the 1024–1279px
+> query. Re-measure at 1024 **and** 1440 after any change here.
 
 **Badges and stats:** `.hero-badge`, `.stats-grid`, `.stat-card`, `.stat-value`, `.stat-label`
 
@@ -207,7 +220,24 @@ Both carry the GitHub source link.
 | `max-width: 767px` | Single-column layouts, full-width buttons, scrollable comparison tables |
 
 Design is desktop-first with mobile overrides. Test any new section at **767px** and
-any navigation change at **1024px**.
+any navigation change at **1024px**. **767px is not narrow enough on its own** — a
+real phone is 360–390px, and the overflow below was invisible at 767 and obvious at
+390. Check a new section at **390px** too.
+
+> **`.grid > * { min-width: 0 }` and `pre { overflow-wrap: anywhere }` are load-bearing.**
+> A grid item defaults to `min-width: auto`, which floors its track at the item's
+> *min-content* width — so `grid-template-columns: 1fr` is not actually free to
+> shrink. Where that item held a `<pre>` with a URL in it, and a URL offers no
+> break opportunity, the column came out wider than a phone screen and every line
+> in the card rendered outside the card's own box. Both rules are needed: the item
+> has to be allowed to shrink, *and* the long token needs somewhere to break.
+>
+> `overflow-wrap` only affects a block that already wraps, so a `<pre>` left at the
+> default `white-space: pre` still scrolls inside its own `overflow-x: auto` box —
+> which is what the worked model listing and the `curl` command want. That is why
+> the rule is `anywhere` on `pre` rather than `word-break: break-all`, and why
+> adding `white-space: pre-wrap` to a code block is a decision about whether its
+> lines may be broken, not a formatting detail.
 
 ## JavaScript Conventions
 
@@ -271,7 +301,8 @@ Do not reintroduce a demo the site cannot serve itself.
 The section on the home page (`index.html#try-it-yourself`) is the site's main call to
 action, and `try-it-yourself.html` is the same path with room to explain itself — the
 nav points at the page, the home page keeps the short version and links to it. Between
-them the path spans five files. If you change one, check the others.
+them the path spans five files. If you change one, check the others. There are now
+**two prompts, not one** — see item 6.
 
 1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
    visitor copies a link to the host they are actually on. The copy button is
@@ -290,6 +321,14 @@ them the path spans five files. If you change one, check the others.
    explained, the four dictionary habits, and both ways to run the checker. **Its example
    model is checker-clean** — `node guide/check-model.mjs` it after any edit, the same way
    `llms-full.txt`'s examples are held to.
+6. **The second prompt — `try-it-yourself.html#enterprise-prompt`.** Same card layout, a
+   `<pre id="enterprise-research-prompt">` and its own `[data-copy]` button, and a
+   `[data-url]` span naming `llmdetailed.txt`. **Its body is the first prompt word for
+   word**; only the document and the section number differ, because the two
+   specifications number their protocols differently — `llms-full.txt` §1 is the batch
+   protocol, `llmdetailed.txt` §10 is the interactive one. If you edit one prompt, edit
+   the other, or the claim on the page that they are identical stops being true. The
+   home page carries a one-line pointer to it and nothing more.
 
 ## Key Conventions for AI Assistants
 
@@ -330,6 +369,25 @@ them the path spans five files. If you change one, check the others.
     (`.hero-notice`) and again in the footer, both linking the source on GitHub.
     Do not quietly soften, move or delete either one: a reader deciding whether
     to trust this needs the caveat before the claims, not after them.
+13. **Security is Better Auth, and nothing else is claimed.** Sign-in in the
+    generated application is Better Auth configured for **email and password with
+    server-side sessions** — that is the whole of what
+    `templates/.../backend/src/lib/better-auth.ts.hbs` enables. There are no
+    `socialProviders`, no second factor, no SSO; read that template before writing
+    otherwise. Everything else the pages call security is *authorization* —
+    roles, table and field permissions, row policies, the audit trail — derived
+    from the model and enforced in the generated API, which is real and may be
+    described as such.
+
+    `features.html` used to carry a four-card grid reading **SOX Ready · GDPR
+    Compliant · ISO 27001 Aligned**, and `technology.html` and `features.html`
+    both claimed OAuth and "MFA-ready flows". None of it had been assessed or
+    was implemented. It has been replaced by a card that says so plainly and
+    points at `todo.html`, where the security assessment is one of the five
+    items before 1.0.0. **Do not reintroduce a compliance badge.** A compliance
+    programme audits an organization, not a code generator; the access control
+    and the audit trail are evidence a reader would bring to one, and saying more
+    than that is the same failure convention 12 exists to prevent.
 
 ## The In-Browser Demo (Chapter 09)
 
@@ -339,7 +397,7 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 **How it works**
 
 1. `assets/js/run-in-browser.js` (an ES module) reads a model from `guide/models/`, or from a file the
-   visitor picks, and compiles it with `assets/js/erdwithai-wasm.js` — the generator bundled for the browser.
+   visitor picks, and compiles it with `assets/js/appwithai-wasm.js` — the generator bundled for the browser.
 2. The generated files are posted to the Service Worker at `guide/wasm-app/sw.js`, which serves them
    from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
 3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
@@ -377,7 +435,7 @@ exactly that reason.
 - **No sample-data logic lives on this site.** `run-in-browser.js` reads the select, passes
   `sampleRecords` and `sampleSeed` to `generateFromSource`, and renders `summary.sampleRows`. Everything
   else — the vocabulary, the typing, the ordering — is in the vendored bundle, the same code
-  `erdwithai-wasm generate --standalone` runs. Adding a rule here would mean the page showing records
+  `appwithai-wasm generate --standalone` runs. Adding a rule here would mean the page showing records
   the CLI would not write.
 - **The seed is the application's name**, so two readers who leave the field alone see the same records
   and can talk about row four.
@@ -391,15 +449,35 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 419 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 428 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
-- **It is chapter 10's machinery, used differently.** `erdwithai-fullstack.js`
+- **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
   and `assets/vendor/stack-templates.json` are what `run-real-stack.html`
   already loads; here the file map is zipped instead of mounted in a
   WebContainer. Both are imported **lazily, on the click** — three quarters of a
   megabyte and nearly two more — because a reader who came for the browser
   application should not pay for either.
+- **The download passes `overlay: false`, and that is the whole difference
+  between the two callers.** `generateFullStack` applies the WASM overlay by
+  default, because chapter 10 mounts its output in a WebContainer, which has
+  neither a database server nor bun. This caller is the opposite case: the
+  reader unzips the archive and runs `docker compose up --build`, and compose
+  starts a real PostgreSQL. The zip shipped the overlay until it was found —
+  `"pg": "file:./pg-wasm"` in `backend/package.json` and `DATABASE_URL=./pgdata`
+  in `backend/.env`, so the database container came up and nothing spoke to it.
+  With the flag off the archive is what `appwithai generate` writes: verified
+  against a real CLI run on the CRM model, 0 files the browser wrote that the
+  CLI did not, and 413 of 419 byte-identical once the generation timestamp is
+  normalised. **Do not drop the flag when re-vendoring, and do not add it to
+  `run-real-stack.js`** — chapter 10 needs the overlay.
+- **The zip has no `bun.lock` and no `frontend/src/routeTree.gen.ts`**, because
+  the CLI writes those by installing and running the router generator, and a
+  browser can do neither. Both are produced by the Docker build:
+  `frontend/app.config.ts` carries the `tsr` block that makes `vinxi build`
+  generate the route tree and add the `createFileRoute` imports, and the
+  Dockerfile's install step handles a missing lockfile
+  (`if [ -f bun.lock ]; then … else bun install; fi`).
 - **`assets/js/zip.js` is the archive writer, and it has no dependency.**
   Compression is `CompressionStream("deflate-raw")`, which is the browser's own
   zlib and exactly what a ZIP's method 8 wants; where it is missing an entry is
@@ -446,7 +524,7 @@ fire on it and the roles that may read it.
 
 ## Chapter 10 — the real stack in a WebContainer
 
-`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 410 files — and
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 425 files — and
 runs it in a WebContainer. It needs two things chapter 09 does not.
 
 - **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
@@ -456,7 +534,7 @@ runs it in a WebContainer. It needs two things chapter 09 does not.
   through** — do not widen it. Isolation is a constraint, not an upgrade, and the other chapters must
   stay outside it.
 - **The network.** The WebContainer runtime comes from StackBlitz and the packages from npm. Everything
-  else — the API, the 313 templates, the fonts — is served from `assets/vendor/`.
+  else — the API, the 327 templates, the fonts — is served from `assets/vendor/`.
 
 The nine binary font templates cannot travel in `stack-templates.json` (it is JSON), so they are shipped
 in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` before it is mounted.
@@ -498,18 +576,47 @@ modules already returned — not decisions of their own:
 
 ## Vendored files
 
-Everything under `assets/vendor/`, plus `assets/js/erdwithai-*.js`, `assets/js/run-*.js`,
-`guide/wasm-app/sw.js`, `guide/checker.js` and `guide/fixer.js` comes from
-`businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand. The local deltas,
+Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
+`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llmdetailed.txt` comes
+from `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand.
+Where each one comes from:
+
+| Here | Upstream | Rebuilt upstream with |
+|---|---|---|
+| `guide/checker.js`, `guide/fixer.js` | `html/checker.js`, `html/fixer.js` | `bun run build:language-tools` |
+| `assets/js/appwithai-wasm.js` | `html/assets/appwithai-wasm.js` | `bun run build:wasm-browser` |
+| `assets/js/appwithai-fullstack.js` | `html/assets/appwithai-fullstack.js` | the same build |
+| `assets/vendor/stack-templates.json` | `html/assets/stack-templates.json` (gitignored there) | `bun run build:stack-templates` |
+| `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
+| `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd` | `html/models/*.eml.mmd` | — |
+| `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
+| `llmdetailed.txt` | `llmtext/llmdetailed.txt` | — |
+
+The five generator artifacts move together. Re-vendoring `checker.js` without
+`appwithai-wasm.js` leaves chapter 11 disagreeing with chapter 09 about the same
+model — they carry two copies of the same engine. The local deltas,
 all deliberate and all commented at the point of change:
 
 | File | Local change | Why |
 |---|---|---|
 | `assets/js/run-in-browser.js` | Probes `assets/vendor/pglite/` and mounts a re-export shim at the app's `vendor/pglite/index.js` | This site vendors PGlite, so no CDN is ever reached |
 | `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
-| `guide/wasm-app/sw.js` | `ignoreMethod: true` in `serve()` | The Cache API matches GET only, so HEAD probes escaped to the network and 404'd |
+| `assets/js/run-in-browser.js` | Imports `checkAndFix` from `../../guide/fixer.js`, not upstream's `../fixer.js` | The validators are published under `guide/` here; this module lives under `assets/js/` |
+| `assets/js/run-real-stack.js` | The same import path | The same |
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
+| `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
+| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes four models where upstream's pages offer two |
+| `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
+
+`guide/wasm-app/sw.js` **is now a plain copy again.** It used to carry
+`ignoreMethod: true` in `serve()`, because the Cache API matches GET only and
+the generated application's HEAD probes were escaping to the network. Upstream
+now matches on `request.url` rather than on the Request, which fixes that and
+the Safari failure beside it — a `cache: "no-store"` request WebKit would not
+match, which 404'd `app/schema.sys.sql` against a file the worker was holding.
+Both properties are gone from the lookup, so there is nothing left to re-apply:
+copy it straight.
 
 **Re-vendoring one of the last two loses its `awTrack` lines.** They are
 deliberately greppable: `grep -n awTrack assets/js/*.js` finds every one, and
@@ -582,7 +689,7 @@ modelling tool. **It is now a different document**: the EML language and nothing
 thing a language model has to produce is a model file.
 
 - **Do not overwrite it from upstream.** Re-copying loses the rewrite. Take language changes across by
-  hand, and use `language/erdwithai-language.json` in the generator repository as the authority.
+  hand, and use `language/appwithai-language.json` in the generator repository as the authority.
 - **§1 is the authoring protocol** — the four steps a model follows to answer "build me an app for X".
   The home page's prompt block quotes that section number.
 - **§1.0 states the deliverable**, and it is there for one reason: the observed failure is a model
@@ -627,7 +734,7 @@ thing a language model has to produce is a model file.
   `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
   with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
-  derivation table against `erdwithai-wasm.js` and asserts that the three codes fire;
+  derivation table against `appwithai-wasm.js` and asserts that the three codes fire;
   `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
   where an older checker is vendored.
 - **§3.7 also carries the display value** — what a reference shows in place of its uuid. The dictionary
@@ -636,7 +743,7 @@ thing a language model has to produce is a model file.
   parents resolved through *their* labels (`Spring Promo — Omar Kowalski`), else the first text column,
   else the uuid. The key is never an identifier. Only the first two parents, only one level deep, and
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
-  all of it against `erdwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
+  all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at. **`formatReport` prints the diagnostics first and the
   verdict last** — `OK — 0 errors, 0 warnings, 2 notes (EML 1.2.0)` — so the final line of a run is
@@ -662,6 +769,51 @@ file — the Pages source is GitHub Actions, which keeps a custom domain in repo
 than in the tree — so the page never trusts that string: every URL it shows carries a `data-url`
 attribute and `validator.js` resolves it against `window.location`, so the text always names the host
 that is actually answering. Keep that mechanism if you edit those URLs.
+
+## `llmdetailed.txt` — the enterprise path, and it *is* vendored
+
+Unlike `llms-full.txt`, this one is a **straight copy of `llmtext/llmdetailed.txt`** in
+`businessappwithai/app-with-ai-tanstack`. Re-copy it when it changes upstream; do not
+rewrite it here, or it acquires the same maintenance problem the section above describes
+and the two documents stop agreeing about a language they both define.
+
+- **It is the whole system**, not the language alone: repository topology, the generator
+  pipeline, the templates, the generated application, the modelling tool. That is the
+  opposite of the decision taken for `llms-full.txt`, and deliberately so — the reader it
+  is written for is a model that will be asked about the system, not only asked to emit a
+  file.
+- **§10 is why the site publishes it.** `llms-full.txt` §1 is the *batch* authoring
+  protocol: read the brief, infer the model, write it, validate, deliver. `llmdetailed.txt`
+  §10 is the *interactive* one: seven phases separated by approval gates, the entities
+  walked one at a time, the `.mmd` built on disk as the walkthrough runs. Neither
+  supersedes the other, and the file says so in its own header. **The page must quote §10,
+  not §1** — the same prompt against the wrong section number gets the wrong protocol.
+- **It already points at this site's validators**, `https://appwithai.org/guide/checker.js`
+  and `…/fixer.js`, at exactly the paths chapter 11 publishes. That is one more reason not
+  to move or rename those two modules.
+- **`scripts/check-spec.mjs` audits this file too, but only for its tooling claims.**
+  The language itself is checked upstream, where the file is authored; what is held
+  here is §10's account of *what a model is told to run* — that every `EML` code it
+  cites is one the checker can emit, that the auto-fixable table matches
+  `AUTO_FIXABLE` exactly, that `--write`, `--base` and the three exit codes are real,
+  that every rung of its ladder names a file this site actually serves, and that
+  `check-model.mjs` still reaches no GitHub host. Those are exactly the claims that
+  rot when the file is re-vendored or the runner changes underneath it, and each one
+  was verified by hand once before the check existed. Add to that section rather than
+  re-verifying by hand.
+- **`guide/models/dance-studio.eml.mmd` is §10's worked example.** The section walks a
+  booking business end to end and holds the model it builds to a standard — help text on
+  every entity and every column, one `%%rbac … .read` per entity, every state backed by a
+  declared `%%enum` — so the model is the evidence the standard is reachable. Nine
+  entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
+  restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`
+  (the hospital model is the one that does not — no `%%hook` directives). It comes from
+  `language/examples/` upstream, **not** `html/models/`, so the
+  byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
+  step with `language/examples/dance-studio.eml.mmd` instead.
+- It is linked from `try-it-yourself.html` (the section subtitle and the
+  `#enterprise-prompt` card) and from one line on the home page. It is **not** in the
+  primary nav, which is at its seven-item ceiling.
 
 ## CI/CD Pipeline
 

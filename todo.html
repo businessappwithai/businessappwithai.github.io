@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Five items before AppWithAI is 1.0.0 — comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration and the reporting application — and one after it: autonomous application delivery on OpenClaw and NVIDIA OpenShell.">
-  <meta name="keywords" content="AppWithAI, todo, roadmap, 1.0.0, testing, security testing, manual, DeepSeek harness, OpenClaw, NVIDIA OpenShell, autonomous app building">
+  <meta name="description" content="Six items before AppWithAI is 1.0.0 — comprehensive testing, security assessment, product documentation, DeepSeek Harness integration, reporting application, and controlled external access to generated applications — followed by completely agentic application delivery.">
+  <meta name="keywords" content="AppWithAI, todo, roadmap, 1.0.0, testing, security testing, manual, DeepSeek Harness, external access, firewall, agentic workflows, autonomous app building, Cordis, subagents">
   <title>Todo — The Road to 1.0.0</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/dark-theme.css">
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="header-container">
       <a href="index.html" class="logo" aria-label="AppWithAI — home" title="AppWithAI — home">
@@ -39,12 +38,11 @@
     </div>
   </header>
 
-  <!-- Hero -->
   <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-3xl) 0;">
     <div class="container container-narrow">
       <h1 style="color: white;">Todo</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
-        Five items remain before the <b>1.0.0</b> release. One follows it.
+        Six items remain before the <b>1.0.0</b> release. One follows it.
       </p>
     </div>
   </section>
@@ -76,7 +74,7 @@
 
         <div class="timeline-item">
           <span class="hero-badge">4</span>
-          <h3>DeepSeek harness integration</h3>
+          <h3>DeepSeek Harness integration</h3>
           <p>The complete generation pipeline running on the DeepSeek harness.</p>
         </div>
 
@@ -90,10 +88,24 @@
           </p>
         </div>
 
+        <div class="timeline-item">
+          <span class="hero-badge">6</span>
+          <h3>Controlled external access to generated applications</h3>
+          <p>
+            Enable selected parts of each generated application's URL space to be securely exposed to
+            the public internet through the customer's firewall, allowing authorised customers,
+            suppliers and other external users to interact with designated application functions.
+            External exposure will be limited to explicitly approved routes and services, with
+            authentication, authorisation, transport security and appropriate network controls applied
+            so that public access does not require exposing the application's internal services or
+            infrastructure.
+          </p>
+        </div>
+
       </div>
 
       <div class="card mt-4" style="border-left: 4px solid var(--primary-500);">
-        <h3 style="margin-bottom: var(--spacing-xs);">These five constitute the 1.0.0 release</h3>
+        <h3 style="margin-bottom: var(--spacing-xs);">These six constitute the 1.0.0 release</h3>
         <p class="text-sm text-muted" style="margin: 0;">
           The repository currently reads 5.1.1. That number tracked releases rather than production
           readiness, so 1.0.0 is a deliberate reset.
@@ -109,18 +121,101 @@
       </div>
       <div class="timeline">
         <div class="timeline-item">
-          <span class="hero-badge">6</span>
-          <h3>Autonomous application delivery</h3>
+          <span class="hero-badge">7</span>
+          <h3>Completely agentic workflows on the DeepSeek Harness</h3>
           <p>
-            Integration with <b>OpenClaw</b> as the agent runtime and
-            <a href="https://github.com/NVIDIA/OpenShell" target="_blank" rel="noopener noreferrer">NVIDIA OpenShell</a>
-            as its sandbox, for fully autonomous application building.
+            The whole path — business description, model, review, generated application, migrations,
+            tests, deployment — driven end to end by agents on
+            <a href="https://github.com/deepseek-ai/deepseek-harness" target="_blank" rel="noopener noreferrer">DeepSeek Harness</a>,
+            with the human at the review gate rather than at the keyboard.
           </p>
         </div>
       </div>
+
+      <div class="section-header mt-5">
+        <h3>How that would be built</h3>
+        <p class="section-subtitle">
+          Item 4 puts the existing pipeline <em>on</em> the harness. This item makes the pipeline
+          <em>agentic</em>: the harness supplies the loop, the delegation and the sandbox, and
+          AppWithAI supplies the tools and the standards those agents are held to.
+        </p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h4>Ship a bundle, not a fork</h4>
+          <p>
+            The harness is built on Cordis, where the model adapter, the tool registry, the session log
+            and the agent loop are all plugins on a shared context — there is no privileged core to
+            patch. AppWithAI mounts beside them as a bundle, so a harness release does not become a
+            merge.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>The pipeline becomes tools</h4>
+          <p>
+            Domain analysis, ERD design, the Application Dictionary and generation register on
+            <code>ctx.tools</code>, and so do the published validators — <code>checker.js</code> and
+            <code>fixer.js</code>. An agent then meets the same diagnostics a person does, and a model
+            that would fail the checker cannot reach code generation.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>The human gate stays a gate</h4>
+          <p>
+            Human-in-the-loop review of the model is step 3 of the pipeline and does not move. The
+            harness has <code>ask_user_question</code> for exactly this, plus approval gates on
+            operations that need explicit consent — autonomy up to the model, and a stop there.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Delegation through the subagent seam</h4>
+          <p>
+            <code>ctx.subagents</code> is a swappable seam: spawn or fork in process, or delegate to an
+            external coding agent over ACP. One subagent per entity or module, and the harness's
+            <code>ralph</code> loop — fresh agent, same task, until it holds — to iterate on a
+            generated application until the checks are clean.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Build it where it cannot reach the host</h4>
+          <p>
+            Filesystem and subprocess are seams too, with sandboxed providers alongside the local ones.
+            The generated application gets built, migrated and tested in that sandbox. This is the part
+            that makes unattended delivery safe rather than merely possible.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Headless is a profile, and sessions are durable</h4>
+          <p>
+            The same composition boots as <code>web</code>, <code>headless</code> or <code>sdk</code>, so
+            a delivery can run from CI with no terminal attached. The session log is the authoritative
+            context and survives reloads, so a run that fails in its third hour resumes instead of
+            starting again.
+          </p>
+        </div>
+      </div>
+
+      <div class="card mt-4" style="border-left: 4px solid var(--accent-500);">
+        <h4 style="margin-bottom: var(--spacing-xs);">Why this is after 1.0.0 and not before it</h4>
+        <p class="text-sm text-muted" style="margin: 0;">
+          DeepSeek Harness is in developer preview under the MIT licence and expects
+          compatibility-breaking changes. Building the autonomous path on it is the right target and
+          the wrong thing to make a release depend on — so 1.0.0 is the pipeline running on the
+          harness, and this is the pipeline running itself.
+        </p>
+      </div>
+
       <p class="text-sm text-muted mt-4">
         Detailed scope and acceptance criteria for each item are maintained with the source:
         <a href="https://github.com/businessappwithai/app-with-ai-tanstack/blob/main/ROADMAP.md" target="_blank" rel="noopener noreferrer">ROADMAP.md</a>.
+        The harness behaviour described above is taken from its own
+        <a href="https://github.com/deepseek-ai/deepseek-harness/tree/master/docs" target="_blank" rel="noopener noreferrer">architecture, agent-lifecycle, capability-seams and tool-catalog documentation</a>.
       </p>
     </div>
   </section>

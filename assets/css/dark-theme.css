@@ -75,6 +75,12 @@ a:hover { color: #a5b4fc; }
 }
 
 /* ── Hero ───────────────────────────────────────────────────────────────── */
+/* The epigraph band under the nav — see .quote-bar in style.css. */
+.quote-bar { background: #0d0d16; border-bottom-color: #1e1e2e; }
+.quote-bar__text { color: #cbd5e1; }
+.quote-bar__attribution { color: #6b7280; }
+.quote-bar__attribution a:hover { color: #a5b4fc; }
+
 .hero {
   background: radial-gradient(ellipse 80% 60% at 50% -10%,
               rgba(99, 102, 241, 0.18) 0%, transparent 70%), #0a0a0a;
@@ -725,8 +731,10 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
 
 /* guide.css hardcoded white backgrounds */
 .guide-shell { background: #0a0a0a !important; }
+.guide-main  { background: #0a0a0a !important; }
 .guide-content { background: #0a0a0a !important; color: #94a3b8 !important; }
 .guide-content figure { background: #111827 !important; border-color: #1f2937 !important; }
+.guide-content figure img { background: #111827 !important; border-color: #1f2937 !important; }
 .guide-content .table-wrap,
 .guide-content table { background: #111827 !important; border-color: #1f2937 !important; }
 .guide-toc { background: transparent; }
@@ -845,3 +853,32 @@ select.model-select { background: #1e2736; color: #f1f5f9; border-color: #374151
 /* The application runs in this frame with its own design system; the page owns
    only the border around it. */
 .guide-demo .stage iframe { background: #0f0f1a; }
+
+/* ── Brought across from main's own pass at this section ────────────────── */
+/* main fixed the same problem rule by rule while this branch fixed the ramp;
+   the ramp covers all but these, which name components the ramp cannot reach. */
+
+/* The storage permission dialog renders in the top layer, outside
+   `.guide-demo`, so the bridge above cannot reach it. Same palette, restated. */
+.storage-ask {
+  --ask-surface:    #111827;
+  --ask-border:     #1f2937;
+  --ask-text:       #e2e8f0;
+  --ask-text-soft:  #94a3b8;
+  --ask-btn-bg:     #1e2736;
+  --ask-btn-border: #374151;
+  --ask-btn-hover:  #253044;
+}
+
+.guide-content .eyebrow {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #a5b4fc !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+.guide-content hr { border-top-color: #1f2937 !important; }
+.guide-sidebar-foot { border-top-color: #1f2937 !important; }
+.guide-content figcaption b { color: #94a3b8 !important; }
+.guide-content .code pre code { background: none !important; color: inherit !important; }
+.guide-content .steps li { color: #94a3b8 !important; }
+.guide-content .steps h3 { color: #f1f5f9 !important; }
+.guide-content .steps p  { color: #94a3b8 !important; }

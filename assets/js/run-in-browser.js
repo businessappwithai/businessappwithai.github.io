@@ -5,9 +5,9 @@
  *
  *   1. A model is read — from `models/*.eml.mmd` beside this page, or from a
  *      file the reader picks. Reading a picked file never leaves the tab.
- *   2. `erdwithai-wasm.js` compiles it. That bundle is built from the same
+ *   2. `appwithai-wasm.js` compiles it. That bundle is built from the same
  *      source the CLI uses, so the application produced here is the application
- *      `erdwithai-wasm generate` would have written.
+ *      `appwithai-wasm generate` would have written.
  *   3. The files are posted to a Service Worker, which serves them as if they
  *      had come off a web server, and an iframe is pointed at the result.
  *
@@ -19,7 +19,17 @@
  * keeps the generated application byte-identical to the one you would deploy.
  */
 
-import { generateFromSource, reviewModel } from "./erdwithai-wasm.js";
+// The published validator, not the copy inside the generator bundle. Same engine
+// either way — but this is the file `llms-full.txt` §1.3 and §8 tell a model to
+// validate against, so the page and the protocol cannot drift into disagreeing
+// about whether a document is acceptable. `fixer.js` carries the checker with
+// it, which is what lets it re-check what it repaired.
+//
+// Local delta: `../../guide/fixer.js` rather than upstream's `../fixer.js`,
+// because this site publishes the validators under `guide/` while this module
+// lives under `assets/js/`. Same file, same URL the spec quotes.
+import { checkAndFix } from "../../guide/fixer.js";
+import { generateFromSource } from "./appwithai-wasm.js";
 import { createZip } from "./zip.js";
 
 const BASE = new URL("wasm-app/run/", window.location.href).pathname;
@@ -32,6 +42,16 @@ const BUILT_IN = {
     path: "models/drug-discovery.eml.mmd",
     label: "drug-discovery.eml.mmd",
     name: "Drug Discovery",
+  },
+  hospital: {
+    path: "models/hospital-management-system.eml.mmd",
+    label: "hospital-management-system.eml.mmd",
+    name: "Hospital Management System",
+  },
+  dance: {
+    path: "models/dance-studio.eml.mmd",
+    label: "dance-studio.eml.mmd",
+    name: "Acme Dance Studio",
   },
 };
 
@@ -147,7 +167,7 @@ const build = {
 
     $("build-phases").innerHTML = PHASES.map(
       (phase) =>
-        `<li class="build__phase" data-state="${this.status[phase.id]}">` +
+        `<li class="build__phase" data-phase="${phase.id}" data-state="${this.status[phase.id]}">` +
         `<span class="build__tick"></span>${escapeHtml(phase.label)}</li>`
     ).join("");
   },
@@ -158,6 +178,8 @@ const build = {
 const choices = [
   [$("choice-crm"), "crm"],
   [$("choice-drug"), "drug"],
+  [$("choice-hospital"), "hospital"],
+  [$("choice-dance"), "dance"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -197,8 +219,14 @@ async function selectChoice(kind) {
 
 const dropzone = $("dropzone");
 $("file").addEventListener("change", (event) => {
-  const file = event.target.files && event.target.files[0];
+  const input = event.target;
+  const file = input.files?.[0];
   if (file) readFile(file);
+  // Clearing the value is what makes "fix it and choose it again" work. A file
+  // input fires no `change` when the same filename is picked twice, so a reader
+  // who edited the file the checker just refused and re-selected it would sit
+  // looking at the stale findings with nothing having happened.
+  input.value = "";
 });
 for (const type of ["dragenter", "dragover"]) {
   dropzone.addEventListener(type, (event) => {
@@ -321,7 +349,11 @@ function setModel(source, label) {
 function checkModel(source) {
   let review;
   try {
-    review = reviewModel(source);
+    // `checkAndFix` repairs what it can, then checks again — so the findings
+    // shown are the ones that survive the repair rather than the ones that
+    // arrived. `remaining` is that second reading.
+    const result = checkAndFix(source);
+    review = { ...result, issues: result.remaining };
   } catch (error) {
     // A document the parser cannot read at all — not a finding, a refusal.
     review = {
@@ -351,14 +383,25 @@ function checkModel(source) {
 }
 
 function describeReview(review) {
-  const { errors, warnings, infos } = review.counts;
+  const { errors } = review.counts;
+  return [`${errors} error${errors === 1 ? "" : "s"}`, ...describeRest(review)].join(" · ");
+}
+
+/**
+ * The counts other than errors.
+ *
+ * Split out because the diagnostics header already states the error count in its
+ * own sentence, and repeating it in the sub-line read as "refused this model —
+ * 1 error · 1 error".
+ */
+function describeRest(review) {
+  const { warnings, infos } = review.counts;
   const applied = review.fixes.filter((fix) => fix.applied).length;
   const parts = [];
   if (applied) parts.push(`${applied} auto-fix${applied === 1 ? "" : "es"} applied`);
-  parts.push(`${errors} error${errors === 1 ? "" : "s"}`);
   if (warnings) parts.push(`${warnings} warning${warnings === 1 ? "" : "s"}`);
   if (infos) parts.push(`${infos} info`);
-  return parts.join(" · ");
+  return parts;
 }
 
 const SEVERITY_LABEL = { error: "error", warning: "warning", info: "info" };
@@ -395,7 +438,7 @@ function renderDiagnostics(review) {
           ? "The checker accepted this model"
           : `The checker refused this model — ${review.counts.errors} error${review.counts.errors === 1 ? "" : "s"}`
       }</b>
-      <span>${escapeHtml(describeReview(review))}</span>
+      <span>${escapeHtml(describeRest(review).join(" · "))}</span>
     </div>
     ${
       applied.length
@@ -420,9 +463,13 @@ function renderDiagnostics(review) {
     ${
       review.ok
         ? ""
-        : `<p class="diag__foot">Nothing was generated. The command-line tool stops here too —
-             <code>erdwithai-wasm generate</code> refuses a model with errors unless you pass
-             <code>--skip-check</code>.</p>`
+        : `<p class="diag__foot"><b>Nothing was generated.</b> Fix the ${
+            review.counts.errors === 1 ? "line above" : "lines above"
+          } in your
+             <code>.mmd</code> file, save it, and choose it again — this page re-checks every
+             time a model is loaded, so you can correct and re-submit until it passes. The
+             command-line tool stops here too: <code>appwithai-wasm generate</code> refuses a
+             model with errors unless you pass <code>--skip-check</code>.</p>`
     }`;
 }
 
@@ -613,7 +660,7 @@ $("download").addEventListener("click", () => {
 
   const script = [
     "#!/bin/sh",
-    "# Generated by ERDwithAI (browser stack). Writes the application into ./" + name,
+    `# Generated by APPWITHAI (browser stack). Writes the application into ./${name}`,
     "# Read it before you run it; every file below is plain text.",
     "set -e",
     `mkdir -p "${name}"`,
@@ -621,9 +668,9 @@ $("download").addEventListener("click", () => {
     "",
     ...Object.entries(state.files).flatMap(([path, contents]) => [
       `mkdir -p "$(dirname "${path}")"`,
-      `cat > "${path}" <<'ERDWITHAI_EOF'`,
+      `cat > "${path}" <<'APPWITHAI_EOF'`,
       contents.replace(/\r/g, ""),
-      "ERDWITHAI_EOF",
+      "APPWITHAI_EOF",
       "",
     ]),
     `echo "Wrote ${Object.keys(state.files).length} files into ${name}/"`,
@@ -656,7 +703,7 @@ $("download").addEventListener("click", () => {
  * and handed over instead, which is the shorter path to the same artifact and
  * the one that survives closing the tab.
  *
- * Both halves are lazy on purpose. `erdwithai-fullstack.js` is three quarters
+ * Both halves are lazy on purpose. `appwithai-fullstack.js` is three quarters
  * of a megabyte and the stack templates are close to two, and a reader who came
  * to look at the browser application should not pay for either.
  */
@@ -719,7 +766,7 @@ $("download-stack").addEventListener("click", async () => {
   try {
     if (!stackCache.module) {
       button.innerHTML = '<span class="working"></span>Fetching the generator';
-      stackCache.module = await import("./erdwithai-fullstack.js");
+      stackCache.module = await import("./appwithai-fullstack.js");
     }
     if (!stackCache.templates) {
       button.innerHTML = '<span class="working"></span>Fetching the stack templates';
@@ -731,7 +778,15 @@ $("download-stack").addEventListener("click", async () => {
       source: state.source,
       templates: stackCache.templates,
       name: $("app-name").value.trim() || "Generated App",
-      description: "Generated by ERDwithAI",
+      description: "Generated by APPWITHAI",
+      /* Chapter 10 wants the WASM overlay — a WebContainer has no database
+         server and no bun. This is the other case: the reader unzips this and
+         runs `docker compose up --build`, which starts a real PostgreSQL. With
+         the overlay on, the backend would carry `"pg": "file:./pg-wasm"` and a
+         DATABASE_URL of `./pgdata`, open a PGlite directory, and never speak to
+         the database its own compose file just brought up. Off, this is what
+         `appwithai generate` writes. */
+      overlay: false,
     });
 
     button.innerHTML = '<span class="working"></span>Packing the archive';
@@ -781,6 +836,98 @@ $("download-stack").addEventListener("click", async () => {
   }
 });
 
+/* ------------------------------------------------- storage, and asking first */
+
+/*
+ * Every run of the generated application keeps a real PostgreSQL in IndexedDB,
+ * and nothing has ever cleared it. That is deliberate — the page promises a
+ * reload picks up where you left off — but it compounds: each model, each run,
+ * another ten megabytes, until the origin hits its quota and PGlite aborts
+ * inside `callMain` with a message about WebAssembly that has nothing to do
+ * with what went wrong.
+ *
+ * So the page now says what it is holding and asks before it clears it. Asked,
+ * not assumed: a reader who came back for the data they entered last time
+ * should not lose it because the page decided to tidy up.
+ */
+
+const PGLITE_DB = /^\/pglite\//;
+
+/** What this origin is holding, or null when it cannot be known or is empty. */
+async function surveyStorage() {
+  try {
+    if (typeof indexedDB.databases !== "function") return null;
+    const names = (await indexedDB.databases())
+      .map((entry) => entry.name)
+      .filter((name) => typeof name === "string" && PGLITE_DB.test(name));
+    if (!names.length) return null;
+
+    let bytes = 0;
+    try {
+      bytes = (await navigator.storage.estimate()).usage || 0;
+    } catch {
+      // A number we cannot get is one we simply do not show.
+    }
+    return { names, bytes };
+  } catch {
+    return null;
+  }
+}
+
+async function dropDatabases(names) {
+  await Promise.all(
+    names.map(
+      (name) =>
+        new Promise((resolve) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.onsuccess = request.onerror = request.onblocked = () => resolve();
+        })
+    )
+  );
+}
+
+/**
+ * Ask whether to clear the databases earlier runs left behind.
+ *
+ * Returns only after the reader has answered. Declining is a first-class
+ * answer and simply starts the application on top of what is already there,
+ * which is what every run before this one did.
+ */
+async function askToReclaimStorage() {
+  const held = await surveyStorage();
+  if (!held) return;
+
+  const dialog = $("storage-ask");
+  if (!dialog || typeof dialog.showModal !== "function") return;
+
+  const megabytes = held.bytes ? (held.bytes / 1048576).toFixed(0) : null;
+  const count = held.names.length;
+
+  $("storage-ask-detail").textContent =
+    `${count} database${count === 1 ? "" : "s"} from earlier runs ${count === 1 ? "is" : "are"} ` +
+    `stored in this browser${megabytes ? `, using about ${megabytes} MB` : ""}. ` +
+    "Clearing them frees the space and starts this application with empty tables. " +
+    "Keeping them leaves any records you entered before exactly where they were.";
+
+  const answer = await new Promise((resolve) => {
+    dialog.addEventListener("close", () => resolve(dialog.returnValue), { once: true });
+    dialog.showModal();
+  });
+
+  if (answer !== "clear") {
+    window.awTrack?.("storage_kept", { databases: count, bytes: held.bytes });
+    return;
+  }
+
+  await dropDatabases(held.names);
+  window.awTrack?.("storage_cleared", { databases: count, bytes: held.bytes });
+  say(
+    `Cleared ${count} database${count === 1 ? "" : "s"}` +
+      (megabytes ? `, freeing about ${megabytes} MB` : ""),
+    "ok"
+  );
+}
+
 /* ------------------------------------------------------------------ step 3 */
 
 $("run").addEventListener("click", () => run(false));
@@ -805,6 +952,11 @@ async function run(fresh) {
   const log = $("log");
   log.hidden = false;
   log.innerHTML = "";
+  // Before anything is mounted, because this is the last moment the answer is
+  // cheap: once PGlite has opened a data directory, clearing it out from under
+  // the running application is not a thing the reader can be offered.
+  await askToReclaimStorage();
+
   build.start("mount", "Handing the files to the Service Worker");
 
   try {
@@ -869,9 +1021,20 @@ async function run(fresh) {
   } catch (error) {
     build.fail("mount", error.message);
     say(error.message, "bad");
+    /*
+     * The hint has to earn its place, the same way boot.js's does. This used to
+     * print the file:// advice after every failure — on a page plainly served
+     * over https, which sends the reader to a problem they do not have and away
+     * from the one they do. A Service Worker that will not register on http(s)
+     * is nearly always the browser refusing it, not the protocol.
+     */
     say(
-      "This page needs to be served over http:// or https:// — a Service Worker cannot be registered " +
-        "from a file:// URL.",
+      window.location.protocol === "file:"
+        ? "This page needs to be served over http:// or https:// — a Service Worker cannot be " +
+            "registered from a file:// URL."
+        : "The browser refused to register the Service Worker that serves this application. A " +
+            "private window, a storage-blocking setting or an enterprise policy will all do it; " +
+            "reloading the page clears a worker left in a bad state.",
       "bad"
     );
   } finally {
@@ -907,7 +1070,7 @@ const BOOT_MARKS = [
 
 window.addEventListener("message", (event) => {
   const message = event.data;
-  if (!message || message.source !== "erdwithai-boot") return;
+  if (message?.source !== "appwithai-boot") return;
 
   if (message.type === "status" || message.type === "log") {
     const text = message.status ?? message.message ?? "";

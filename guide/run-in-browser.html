@@ -172,7 +172,7 @@
           <span class="choice__name">Use the CRM example</span>
           <span class="choice__desc">
             The seventeen-entity CRM from this guide: eight rules, five state machines, five sagas and
-            fifteen access restrictions. Nothing to download.
+            thirty-two access restrictions. Nothing to download.
           </span>
           <span class="choice__meta">language/examples/crm.eml.mmd</span>
         </button>
@@ -183,6 +183,25 @@
             CAPAs. Useful for seeing rules refuse a write.
           </span>
           <span class="choice__meta">examples/drug-discovery.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
+          <span class="choice__name">Use the hospital example</span>
+          <span class="choice__desc">
+            Twenty-eight entities across admissions, wards and beds, orders and results, billing and
+            stock — nine state machines and eighty-seven access restrictions. The one where the person
+            entity is <code>Staff</code> rather than <code>User</code>.
+          </span>
+          <span class="choice__meta">examples/hospital-management-system.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-dance" aria-pressed="false">
+          <span class="choice__name">Use the dance-studio example</span>
+          <span class="choice__desc">
+            A booking business in nine entities: classes, sessions, bookings and a waitlist, with both
+            state machines a booking business has and the saga that promotes a waitlisted member when
+            someone cancels. The smallest of the four — nine entities against seventeen and
+            twenty-eight — so it is the quickest one to read all the way through.
+          </span>
+          <span class="choice__meta">examples/dance-studio.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-upload" aria-pressed="false">
           <span class="choice__name">Upload your own</span>
@@ -213,7 +232,7 @@
       <span class="flow-step__num">2</span>
       <div>
         <h2 class="flow-step__title">Generate the application</h2>
-        <p class="flow-step__hint">The same parser and compiler the <code>erdwithai-wasm</code> command runs, bundled for the browser.</p>
+        <p class="flow-step__hint">The same parser and compiler the <code>appwithai-wasm</code> command runs, bundled for the browser.</p>
       </div>
     </header>
     <div class="flow-step__body">
@@ -281,7 +300,6 @@
 
       <div class="credentials" id="credentials" hidden></div>
       <div class="log" id="log" hidden></div>
-
       <div class="stage" id="stage">
         <div class="stage__bar">
           <span class="stage__dot"></span>
@@ -433,6 +451,25 @@ bun run wasm serve ./crm</code></pre>
       </div>
     </div>
   </footer>
+
+
+    <!--
+      Asked before the application boots, and only when there is something to
+      clear. Each run keeps a real PostgreSQL in IndexedDB; left alone they
+      accumulate until the browser's quota for this site runs out, and the
+      failure that follows names WebAssembly rather than storage. Clearing is
+      the reader's call, because the data is theirs.
+    -->
+    <dialog class="storage-ask" id="storage-ask" aria-labelledby="storage-ask-title">
+      <form method="dialog">
+        <h3 class="storage-ask__title" id="storage-ask-title">Clear the databases from earlier runs?</h3>
+        <p class="storage-ask__detail" id="storage-ask-detail"></p>
+        <div class="storage-ask__actions">
+          <button type="submit" class="btn" value="keep">Keep them</button>
+          <button type="submit" class="btn btn--go" value="clear" autofocus>Clear and continue</button>
+        </div>
+      </form>
+    </dialog>
 
   <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>

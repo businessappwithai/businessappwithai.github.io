@@ -1,4 +1,4 @@
-/* ERDwithAI - Professional Design System */
+/* AppWithAI - Professional Design System */
 /* Based on Lunaris Design System */
 
 :root {
@@ -315,18 +315,21 @@ a:hover {
   line-height: 1;
 }
 
+/* Sized to keep the presence the image had after `60875c5` doubled it: the
+   wordmark replaces a 76px-tall picture, so it is deliberately larger than a
+   default nav mark. It steps down twice below — see the media queries. */
 .logo-mark {
   position: relative;
   isolation: isolate;
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
   flex: none;
   display: grid;
   place-items: center;
-  border-radius: 11px;
+  border-radius: 14px;
   background: linear-gradient(135deg, var(--primary-500) 0%, var(--secondary-500) 100%);
   color: white;
-  font-size: 1.0625rem;
+  font-size: 1.375rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   box-shadow: 0 6px 16px -8px var(--primary-600);
@@ -478,6 +481,49 @@ a:hover {
 }
 
 /* Hero Section */
+/* The Karpathy line, between the nav and the hero. A quiet band rather than a
+   banner: it is an epigraph for the page, not a claim the page is making. */
+.quote-bar {
+  border-bottom: 1px solid var(--gray-200);
+  background: var(--gray-50);
+}
+
+.quote-bar__quote {
+  margin: 0;
+  padding: var(--spacing-md) 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.quote-bar__text {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, 'Times New Roman', serif);
+  font-style: italic;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--gray-800);
+}
+
+.quote-bar__attribution {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+.quote-bar__attribution a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.quote-bar__attribution a:hover {
+  color: var(--primary-600);
+}
+
 .hero {
   padding: var(--spacing-4xl) 0;
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
@@ -654,6 +700,32 @@ a:hover {
 .grid {
   display: grid;
   gap: var(--spacing-xl);
+}
+
+/*
+ * A grid item defaults to `min-width: auto`, which floors its track at the
+ * item's min-content width — so a `1fr` column is not actually free to shrink.
+ * In the two prompt cards on try-it-yourself.html that item holds a <pre> with
+ * a URL in it, and a URL offers no break opportunity: on a phone the column
+ * came out wider than the screen, and every line in the card — the pre, the
+ * heading, the list beside it — rendered outside the card's own box.
+ *
+ * This is half the fix. The other half is `pre` below: the column can only
+ * shrink to what its contents will allow, so the long token needs somewhere
+ * to break.
+ */
+.grid > * {
+  min-width: 0;
+}
+
+/*
+ * Only affects a block that already wraps. A <pre> left at the default
+ * `white-space: pre` does not wrap at all, so it keeps scrolling inside its
+ * own `overflow-x: auto` box — which is what the worked model listing wants,
+ * and why this is not `word-break: break-all`.
+ */
+pre {
+  overflow-wrap: anywhere;
 }
 
 .grid-2 {
@@ -1028,7 +1100,7 @@ a:hover {
      1024px with the logo at this size — measured, and the reason the mark and
      the type both step down rather than only one of them. */
   .logo { gap: 0.5rem; }
-  .logo-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 0.9375rem; }
+  .logo-mark { width: 38px; height: 38px; border-radius: 11px; font-size: 1.125rem; }
   .logo-word { font-size: 1.0625rem; }
 }
 
@@ -1068,8 +1140,8 @@ a:hover {
   }
 
   .logo { gap: 0.5rem; }
-  .logo-mark { width: 32px; height: 32px; border-radius: 10px; font-size: 0.9375rem; }
-  .logo-word { font-size: 1.0625rem; }
+  .logo-mark { width: 44px; height: 44px; border-radius: 13px; font-size: 1.25rem; }
+  .logo-word { font-size: 1.125rem; }
 
   h1 { font-size: var(--text-4xl); }
   h2 { font-size: var(--text-3xl); }
