@@ -586,6 +586,39 @@ a:hover {
   box-shadow: var(--shadow-md);
 }
 
+/* The hero's first line — the badge, and the credit beside it. The credit is
+   here rather than beside the wordmark because the header bar has no
+   horizontal room left: at 1280px the logo and the nav together already reach
+   the padding edge, with 14px between them (measured), which is why
+   `.logo::after` puts even the one-word HOME pill out of flow. This line is
+   centred with the rest of `.hero-content`, and below 640px the credit drops
+   under the badge instead of shrinking to nothing. */
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.hero-meta .hero-badge {
+  margin-bottom: 0;
+}
+
+.hero-credit {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--gray-500);
+}
+
+.hero-credit__name {
+  font-weight: 700;
+  color: var(--gray-700);
+}
+
 .hero h1 {
   font-size: var(--text-5xl);
   margin-bottom: var(--spacing-lg);

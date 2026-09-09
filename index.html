@@ -61,7 +61,13 @@
   <section class="hero">
     <div class="container">
       <div class="hero-content fade-in">
-        <span class="hero-badge">Open Source · Apache License 2.0 · Powered by Claude, OpenAI, and Ollama</span>
+        <!-- The badge and the credit share one line: the header bar is at its
+             width ceiling (see `.logo::after` in style.css), so the attribution
+             sits on the first line of the hero instead, above the headline. -->
+        <div class="hero-meta">
+          <span class="hero-badge">Open Source · Apache License 2.0 · Powered by Claude, OpenAI, and Ollama</span>
+          <p class="hero-credit">Written by <span class="hero-credit__name">Claude Code</span> · idea by <span class="hero-credit__name">Pramod Koshy</span></p>
+        </div>
         <h1>Transform Your Business Domain Into a <span class="text-gradient">Production-Ready Application</span> in Hours, Not Months</h1>
         <p class="hero-notice">
           <strong>This is experimental software and is not fully tested.</strong>
