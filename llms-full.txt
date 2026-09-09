@@ -1439,6 +1439,7 @@ the checker reads it.
 | `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`, `parent:`; the rest **validated**)* |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
+| `%%report` | `%%report <name> title: <T> [entity: <E>] [chart: bar\|line\|pie\|area x: <col> y: <col>] [help: <why>] sql: <query>` | **validated** *(compiled by the reporting platform)* |
 
 **`%%guard` used to mean access control**, and a model written from an older
 example still spells it `%%guard role:manager on Order.approve`. That sense moved
@@ -1446,6 +1447,35 @@ to `%%rbac`: a guard shaped like the old one is *skipped*, so the operation it
 appears to restrict is open to any authenticated caller. `EML223` reports it and
 prints the `%%rbac` line to write instead. A `%%guard` today is an automation
 condition — `%%guard status eq "open"`.
+
+**`%%report` is the one directive whose payload is SQL.** It declares a question
+the application's *users* ask, written as the query that answers it, and the
+query runs against the generated application's own database — so it names
+`bus_` tables, and it must filter `deleted_at IS NULL` or it quietly overstates
+every number it reports.
+
+The checker holds it to its shape and no further: a query must exist
+(`EML290`) and be named (`EML291`), the name must be unique because it is the
+key a report is stored under (`EML292`), the query must begin `SELECT` or
+`WITH` rather than write (`EML293`), a `chart:` must name both `x:` and `y:`
+(`EML294`), an `entity:` must be one the model declares (`EML295`), and a chart
+type must be one of `bar`, `line`, `pie`, `area` (`EML296`). It cannot tell you
+a column name is wrong — it has no database.
+
+`sql:` is always **last** on the line and takes the rest of it, because a query
+contains spaces and colons and would otherwise be shredded by the key scan.
+
+Reports do not change the application the generator writes. They are read by the
+reporting platform that ships beside it, which already derives a baseline from
+structure alone — a register per entity, a breakdown per `%%enum`-bound column,
+a lifecycle per state machine. That baseline describes the shape of the data and
+nothing about the business running on it; a `%%report` is where the thing only a
+person knows gets written down, and it travels with the model instead of being
+rebuilt by hand after every regeneration.
+
+```
+%%report unassigned-jobs title: Jobs with no engineer help: The dispatcher's first question every morning. sql: SELECT reference, scheduled_for FROM bus_job WHERE engineer_id IS NULL AND status = 'scheduled' AND deleted_at IS NULL ORDER BY scheduled_for
+```
 
 **Do not tell a user a directive "will do X" without checking its status.**
 `%%entity Order audited: true` is validated but not compiled: it will not make

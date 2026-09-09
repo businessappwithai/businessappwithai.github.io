@@ -834,6 +834,18 @@ thing a language model has to produce is a model file.
   else the uuid. The key is never an identifier. Only the first two parents, only one level deep, and
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
+- **`%%report` is documented here now, and the published checker validates it.**
+  The five models under `guide/models/` carry 147 of them between them, and for a
+  while the directive was in none of the specifications this site publishes and in
+  neither of its checkers — a reader who opened a model found lines `llms-full.txt`
+  never defined, and an author who added their own got a clean result from a checker
+  that was ignoring them. The directive is in `appwithai-language.json` upstream as
+  `validated`, the checker emits `EML290`-`EML296` for it, and `guide/checker.js`
+  carries that. **It is validated here and compiled elsewhere** — no generator in
+  `app-with-ai-tanstack` reads a report; `reporting-pack.ts` in
+  `app-and-report-with-ai-tanstack` is what turns one into a saved query, a report
+  and a chart. What the checker cannot do is tell you a column name is wrong, and
+  that is what `check-reporting-pack.ts` does against a real PostgreSQL.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at. **`formatReport` prints the diagnostics first and the
   verdict last** — `OK — 0 errors, 0 warnings, 2 notes (EML 1.2.0)` — so the final line of a run is
