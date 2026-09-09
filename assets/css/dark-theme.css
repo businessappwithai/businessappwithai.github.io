@@ -87,6 +87,11 @@ a:hover { color: #a5b4fc; }
 }
 .hero h1 { color: #f1f5f9; }
 .hero p { color: #94a3b8; }
+/* The credit line beside the badge — see .hero-meta in style.css. `.hero p`
+   above would otherwise win on specificity and give it the subtitle's weight
+   on the page; it reads as a caption, one step back from the headline. */
+.hero p.hero-credit { color: #8b95a5; }
+.hero p.hero-credit .hero-credit__name { color: #cbd5e1; }
 .hero-badge {
   background: rgba(99, 102, 241, 0.15);
   color: #a5b4fc;
