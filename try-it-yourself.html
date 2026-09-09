@@ -6,6 +6,8 @@
   <meta name="description" content="Describe your business to an AI you already use, bring back one Mermaid .mmd model file, and run the application it generates in this browser. The prompt, the language it produces, the checker, and the upload — all on one page.">
   <meta name="keywords" content="AppWithAI, try it yourself, EML, Mermaid model, erDiagram, .mmd, application generator, ChatGPT, Gemini Deep Research, model checker, in-browser demo">
   <title>Try It Yourself — Describe Your Business, Run the Application</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/dark-theme.css">
@@ -143,7 +145,7 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>
-            <h4>Then bring the file back</h4>
+            <h3>Then bring the file back</h3>
             <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
             <p class="text-muted text-sm">Got a report instead of a file? Some models can only answer with a document. Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download a real <code>.mmd</code> from there.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
@@ -244,7 +246,7 @@ erDiagram
 
         <div class="grid grid-2 mt-5">
           <div class="card">
-            <h4>Every line does one job</h4>
+            <h3>Every line does one job</h3>
             <ul class="footer-links" style="line-height: 1.9;">
               <li><code>%%meta name:</code> — names the model. The file opens with it.</li>
               <li><code>erDiagram</code> — your entities and their columns.</li>
@@ -257,7 +259,7 @@ erDiagram
             </ul>
           </div>
           <div class="card">
-            <h4>Four things worth checking yourself</h4>
+            <h3>Four things worth checking yourself</h3>
             <p class="text-sm">The generated application reads a live <strong>Application Dictionary</strong> — one row per table, column, tab and lookup — and it is derived from this file alone. Four habits decide whether the screens come out usable:</p>
             <ul class="footer-links" style="line-height: 1.9;">
               <li>Every reference column ends <code>_id</code> and carries <code>FK</code> — that is what makes it a dropdown instead of a box asking for a UUID.</li>
@@ -283,14 +285,14 @@ erDiagram
       <div class="grid grid-2" style="align-items: start;">
         <div class="card">
           <div class="card-icon">&#9000;</div>
-          <h4>In a terminal — two lines</h4>
+          <h3>In a terminal — two lines</h3>
           <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/check-model.mjs">https://appwithai.org/guide/check-model.mjs</span>
 node check-model.mjs my-business.mmd</pre>
           <p class="text-muted text-sm">It runs the three passes the protocol asks for, prints the checker's own report, and exits <code>0</code> when the file is clean, <code>1</code> when the generator would refuse it.</p>
         </div>
         <div class="card">
           <div class="card-icon">&#128269;</div>
-          <h4>In this browser — paste or drop the file</h4>
+          <h3>In this browser — paste or drop the file</h3>
           <p>The checker page runs the published <code>checker.js</code> and <code>fixer.js</code> in your tab, repairs what is repairable, explains what is not, and hands back a downloadable <code>.mmd</code> once the run is clean.</p>
           <p class="text-muted text-sm">It is the way in if your model arrived as a fenced block inside a chat report rather than as a file.</p>
           <a href="guide/11-check-a-model.html" class="btn btn-outline mt-3">Open the checker &rarr;</a>
@@ -318,12 +320,12 @@ node check-model.mjs my-business.mmd</pre>
     <div class="container">
       <div class="footer-grid">
         <div>
-          <h4>AppWithAI</h4>
+          <h3>AppWithAI</h3>
           <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
           <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
         </div>
         <div>
-          <h4>Product</h4>
+          <h3>Product</h3>
           <ul class="footer-links">
             <li><a href="justification.html">Why AppWithAI</a></li>
             <li><a href="try-it-yourself.html">Try It Yourself</a></li>
@@ -337,7 +339,7 @@ node check-model.mjs my-business.mmd</pre>
           </ul>
         </div>
         <div>
-          <h4>Company</h4>
+          <h3>Company</h3>
           <ul class="footer-links">
             <li><a href="contact.html">Contact</a></li>
             <li><a href="#">About Us</a></li>
@@ -346,7 +348,7 @@ node check-model.mjs my-business.mmd</pre>
           </ul>
         </div>
         <div>
-          <h4>Legal</h4>
+          <h3>Legal</h3>
           <ul class="footer-links">
             <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
             <li><a href="privacy.html">Privacy Policy</a></li>

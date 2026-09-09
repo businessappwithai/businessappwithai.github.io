@@ -71,6 +71,10 @@ businessappwithai.github.io/
 │   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js,
 │   │                         # plus llmdetailed.txt §10's tooling claims
 │   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
+├── favicon.svg               # The tab icon: `.logo-mark` restated in SVG. The A is a
+│                             #   path, not <text> — a favicon cannot assume a font
+├── favicon.ico               # The same mark at 16/32/48 for the browser's default
+│                             #   /favicon.ico probe, which no <link> prevents
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
@@ -292,6 +296,19 @@ utils.setCookie(name, value, days)
 - All external links: include `target="_blank"` and `rel="noopener noreferrer"`
 - Meta tags required on every page: `charset`, `viewport`, `description`, `keywords`
 - Keep navigation consistent across all pages (copy from an existing page)
+- **Every page declares the icon twice**, immediately above its first stylesheet:
+  `favicon.svg` (`type="image/svg+xml"`) and `favicon.ico` (`sizes="48x48"`). Both
+  hrefs are **relative** — `favicon.svg` at the root, `../favicon.svg` under
+  `guide/` and `viewers/` — for the same reason `[data-url]` exists: the site has
+  to be right on a fork, a staging host and `python3 -m http.server`. The `.ico`
+  is not redundant. A browser asks for `/favicon.ico` on its own, and before these
+  files existed every page load on the live site answered that with a 404
+- **Do not skip a heading level.** `h4` directly under an `h2` is a level a screen
+  reader reports as missing. Inside a card the right tag is `h3`, which is what
+  `.card h3` and `.feature-card h3` already style — an `h4` there is both a
+  hierarchy break and a size the rest of the site does not use. The footer's
+  column headings are `h3` for the same reason, pinned by `.footer h3` to the
+  size they rendered at as `h4`
 
 ## Navigation and the Live Demo
 
@@ -337,12 +354,15 @@ them the path spans five files. If you change one, check the others. There are n
    `llms-full.txt`'s examples are held to.
 6. **The second prompt — `try-it-yourself.html#enterprise-prompt`.** Same card layout, a
    `<pre id="enterprise-research-prompt">` and its own `[data-copy]` button, and a
-   `[data-url]` span naming `llmdetailed.txt`. **Its body is the first prompt word for
-   word**; only the document and the section number differ, because the two
-   specifications number their protocols differently — `llms-full.txt` §1 is the batch
-   protocol, `llmdetailed.txt` §10 is the interactive one. If you edit one prompt, edit
-   the other, or the claim on the page that they are identical stops being true. The
-   home page carries a one-line pointer to it and nothing more.
+   `[data-url]` span naming `llmdetailed.txt`. **Everything below its first line is the
+   first prompt word for word** — which is exactly what the page claims, and the claim
+   is scoped that way on purpose. The *first* line carries all four differences: the
+   document, the section number, the word "interactive", and one sentence the batch
+   protocol has no use for ("Do not skip a phase, and do not cross a gate I have not
+   approved"), because `llms-full.txt` §1 has no gates and `llmdetailed.txt` §10 is
+   seven phases separated by them. If you edit one prompt below its first line, edit
+   the other, or the claim on the page stops being true. The home page carries a
+   one-line pointer to it and nothing more.
 
 ## Key Conventions for AI Assistants
 
@@ -694,12 +714,16 @@ The whole of it is `assets/js/analytics.js`, loaded on every page before
 `main.js`. It vendors posthog-js (`assets/vendor/posthog/`, see the README
 there), and it is the only file that decides anything about measurement.
 
-**The one thing that has to be set.** `POSTHOG.key` at the top of
-`analytics.js` is empty in the repository. Until a project API key is pasted in,
-the library is never fetched and nothing is collected — the site behaves exactly
-as it did before. A PostHog project API key is a write-only, publish-safe
-credential and belongs in client source; nothing here is a secret. Change
-`POSTHOG.host` to `https://eu.i.posthog.com` for an EU-cloud project.
+**The key is set, and measurement is live.** `POSTHOG.key` at the top of
+`analytics.js` carries the project token for AppWithAI, project 578899 on US
+Cloud. This paragraph said the field was empty for as long as it was, and a
+reader who trusted that would conclude no request leaves the page and nothing is
+collected — neither of which is true now. A `phc_` project API key is
+write-only and publish-safe and belongs in client source; `phx_` (personal) and
+`phs_` (project secret) read private data and do not. Emptying the key is still
+the switch it always was: with no key the library is never fetched and nothing
+is collected. Change `POSTHOG.host` to `https://eu.i.posthog.com` for an
+EU-cloud project.
 
 **What is being measured is a funnel, not a page count.** The path this site
 exists to move people along runs:

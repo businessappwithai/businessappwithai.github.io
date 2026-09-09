@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="AppWithAI">
+  <title>AppWithAI</title>
+  <!--
+    The tab icon is the header's `.logo-mark`, restated in SVG.
+
+    `.logo-mark` in assets/css/style.css is a 48px tile, `border-radius: 14px`,
+    filled `linear-gradient(135deg, var(--primary-500), var(--secondary-500))`
+    and carrying the brand initial in white at weight 800, over a
+    `linear-gradient(155deg, rgba(255,255,255,.3), transparent 58%)` highlight.
+    Every number below is that rule scaled from 48 to 64 — the radius is 14/48,
+    and the two stops are #0ea5e9 and #a855f7 read off the tokens rather than
+    guessed.
+
+    The A is a stroked path, not `<text>`. A favicon renders in contexts with no
+    guarantee about which fonts resolve, and a letter that falls back to a
+    different face is a different logo; a path is the same sixteen pixels
+    everywhere.
+  -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0.45" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.3"/>
+      <stop offset="0.58" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="18" ry="18" fill="url(#tile)"/>
+  <rect width="64" height="64" rx="18" ry="18" fill="url(#sheen)"/>
+
+  <path d="M18 47 L32 17 L46 47 M24.2 37 L39.8 37"
+        fill="none" stroke="#ffffff" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

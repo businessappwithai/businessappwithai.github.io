@@ -1016,7 +1016,12 @@ pre {
   margin-bottom: var(--spacing-2xl);
 }
 
-.footer h4 {
+.footer h3 {
+  /* The footer's column headings sit under the page's own h2 sections, so they
+     are h3 and not h4 — a jump from h2 straight to h4 is a level a screen
+     reader reports as missing. The size is pinned to what h4 rendered at, so
+     re-levelling changed the outline and nothing a reader sees. */
+  font-size: var(--text-2xl);
   color: white;
   margin-bottom: var(--spacing-md);
 }

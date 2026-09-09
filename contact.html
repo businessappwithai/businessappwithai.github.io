@@ -6,6 +6,8 @@
   <meta name="description" content="Contact AppWithAI to schedule a live demo, request a technical consultation, or discuss your business application requirements.">
   <meta name="keywords" content="contact, demo, get started, consultation, technical support, open source, Apache 2.0">
   <title>Contact — AppWithAI</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
   <link rel="stylesheet" href="assets/css/style.css">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/dark-theme.css">
@@ -118,11 +120,11 @@
               <button type="submit" class="btn btn-primary" style="width: 100%; font-size: var(--text-lg); padding: var(--spacing-md);">Submit Request</button>
             </form>
             <div id="formSuccess" class="card mt-4" style="background: var(--success-50); border-color: var(--success-500); display: none;">
-              <h4 style="color: var(--success-700); margin-bottom: var(--spacing-sm);">Thank you for your request</h4>
+              <h3 style="color: var(--success-700); margin-bottom: var(--spacing-sm);">Thank you for your request</h3>
               <p style="margin-bottom: 0;">We have received your submission and will contact you at the email address provided within one business day.</p>
             </div>
             <div id="formError" class="card mt-4" style="background: var(--error-50); border-color: var(--error-500); display: none;" role="alert">
-              <h4 style="color: var(--error-600); margin-bottom: var(--spacing-sm);">We could not submit your request</h4>
+              <h3 style="color: var(--error-600); margin-bottom: var(--spacing-sm);">We could not submit your request</h3>
               <p style="margin-bottom: 0;">Something went wrong on our side. Please email us directly at <a id="errorMailto" href="mailto:admin@appwithai.org" style="color: var(--primary-600);">admin@appwithai.org</a> and we will respond within one business day.</p>
             </div>
           </div>
@@ -236,35 +238,35 @@
       </div>
       <div style="max-width: 800px; margin: 0 auto;">
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">Do I need technical expertise to use AppWithAI?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">Do I need technical expertise to use AppWithAI?</h3>
           <p class="text-muted">No. AppWithAI is designed for business analysts and domain experts. Describe your business process in plain English, and the AI pipeline handles all technical implementation. Technical users can also inspect and extend the generated code.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">What if the AI does not understand my process correctly?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">What if the AI does not understand my process correctly?</h3>
           <p class="text-muted">The mandatory Human-in-the-Loop review gate ensures you review the complete data model before any code is generated. You can modify, add, or remove any entity, attribute, or relationship in the visual ERD designer before approving.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">Is AppWithAI truly open source?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">Is AppWithAI truly open source?</h3>
           <p class="text-muted">Yes. AppWithAI is released under the Apache License 2.0 — one of the most permissive open source licenses available. You may use, modify, and distribute AppWithAI commercially without restriction. The full license text is available at apache.org/licenses/LICENSE-2.0.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">Who owns the generated application code?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">Who owns the generated application code?</h3>
           <p class="text-muted">You own 100% of the generated code. There is no vendor lock-in. Generated applications are standard TypeScript — you can modify, extend, commercialize, and maintain them independently, with no obligations to AppWithAI.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">Which AI providers are supported?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">Which AI providers are supported?</h3>
           <p class="text-muted">AppWithAI supports Anthropic Claude (primary), OpenAI-compatible endpoints, and any local model available via Ollama. You bring your own API key. Organizations with data sovereignty requirements can run entirely on local LLMs.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">Can generated applications integrate with existing systems?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">Can generated applications integrate with existing systems?</h3>
           <p class="text-muted">Yes. Generated applications expose standard RESTful JSON APIs for all entities, enabling integration with any modern enterprise system. The generated NestJS backend can be extended to support additional integration patterns.</p>
         </div>
         <div class="card mb-3">
-          <h4 style="margin-bottom: var(--spacing-sm);">What security features are included?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">What security features are included?</h3>
           <p class="text-muted">Sign-in is Better Auth — email and password with server-side sessions. On top of that, generated applications carry role-based access control, field-level security, row-level security and a complete audit trail, all derived from your model and enforced in the API. No compliance certification is claimed: a security assessment is still <a href="todo.html">outstanding before 1.0.0</a>.</p>
         </div>
         <div class="card">
-          <h4 style="margin-bottom: var(--spacing-sm);">What does the generated application technology stack look like?</h4>
+          <h3 style="margin-bottom: var(--spacing-sm);">What does the generated application technology stack look like?</h3>
           <p class="text-muted">Generated applications use TanStack Start (React 19+ with SSR) for the frontend, NestJS 10+ with Fastify for the backend API, Kysely for type-safe database access, and PostgreSQL for data persistence — with Playwright end-to-end tests and Docker configuration included.</p>
         </div>
       </div>
@@ -285,12 +287,12 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <h4>AppWithAI</h4>
+          <h3>AppWithAI</h3>
           <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
           <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
         </div>
         <div>
-          <h4>Product</h4>
+          <h3>Product</h3>
           <ul class="footer-links">
             <li><a href="justification.html">Why AppWithAI</a></li>
             <li><a href="try-it-yourself.html">Try It Yourself</a></li>
@@ -304,7 +306,7 @@
           </ul>
         </div>
         <div>
-          <h4>Company</h4>
+          <h3>Company</h3>
           <ul class="footer-links">
             <li><a href="contact.html">Contact</a></li>
             <li><a href="#">About Us</a></li>
@@ -313,7 +315,7 @@
           </ul>
         </div>
         <div>
-          <h4>Legal</h4>
+          <h3>Legal</h3>
           <ul class="footer-links">
             <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
             <li><a href="privacy.html">Privacy Policy</a></li>
