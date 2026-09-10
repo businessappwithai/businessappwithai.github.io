@@ -48,7 +48,8 @@ businessappwithai.github.io/
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load (crm,
 │   │                         # drug-discovery, hospital-management-system,
-│   │                         # dance-studio)
+│   │                         # dance-studio, investment-planning-…,
+│   │                         # education-management-system)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── viewers/                  # The model viewers — appwithai.org/viewers. Vendored
 │   │                         # from `website/viewers/` upstream; only index.html
@@ -673,6 +674,7 @@ Where each one comes from:
 | `guide/wasm-app/sw.js` | `html/wasm-app/sw.js` | — |
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
+| `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
 | `llmdetailed.txt` | `website/llmtext/llmdetailed.txt` | — |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
@@ -690,7 +692,7 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
-| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Two extra `BUILT_IN` entries — `hospital` and `dance` | The site publishes five models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
+| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Three extra `BUILT_IN` entries — `hospital`, `dance` and `education` | The site publishes six models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
 | `assets/js/run-in-browser.js` | Any `BUILT_IN` key works as a URL hash, not only `#upload` | `try-it-yourself.html` links straight to a named example. An unknown hash falls back to the CRM |
 | `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
 | `viewers/index.html` | **Not vendored — authored here.** The site's header, footer and prose around the same viewer markup, plus `data-awv-theme="dark"` | Upstream's copy is a bare page for running the viewers without the site. The nine files beside it are straight copies |
@@ -835,7 +837,7 @@ thing a language model has to produce is a model file.
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **`%%report` is documented here now, and the published checker validates it.**
-  The five models under `guide/models/` carry 147 of them between them, and for a
+  The six models under `guide/models/` carry 187 of them between them, and for a
   while the directive was in none of the specifications this site publishes and in
   neither of its checkers — a reader who opened a model found lines `llms-full.txt`
   never defined, and an author who added their own got a clean result from a checker
