@@ -1,0 +1,39 @@
+# The website's own checks. Node only — this repository has no package.json and
+# no build step, and these scripts have no dependencies, so there is nothing to
+# install.
+name: Website tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  checks:
+    name: Spec, models and end-to-end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # llms-full.txt's own examples and claims, against the published checker.
+      - name: Specification
+        run: node scripts/check-spec.mjs
+
+      # Every published model, through the runner the specification tells a
+      # language model to use.
+      - name: Models
+        run: |
+          for f in guide/models/*.eml.mmd; do
+            echo "── $f"
+            node guide/check-model.mjs "$f"
+          done
+
+      # Every figure the pages state about a model, against the model; every
+      # example offered, against what chapter 09 can select; and the vendored
+      # generator bundles, against the behaviour they are supposed to carry.
+      - name: Website end-to-end tests
+        run: node scripts/website-e2e.mjs
