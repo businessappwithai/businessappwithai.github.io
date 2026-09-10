@@ -191,7 +191,7 @@
           <span class="choice__desc">
             Twenty-eight entities across admissions, wards and beds, orders and results, billing and
             stock — nine state machines, three sagas, seventeen lifecycle hooks and eighty-seven access
-            restrictions. The widest use of the language of the five, and the one where the person
+            restrictions. The widest use of the language of the six, and the one where the person
             entity is <code>Staff</code> rather than <code>User</code>.
           </span>
           <span class="choice__meta">examples/hospital-management-system.mmd</span>
@@ -201,8 +201,8 @@
           <span class="choice__desc">
             A booking business in nine entities: classes, sessions, bookings and a waitlist, with both
             state machines a booking business has and the saga that promotes a waitlisted member when
-            someone cancels. The smallest of the four — nine entities against seventeen and
-            twenty-eight — so it is the quickest one to read all the way through.
+            someone cancels. The smallest of the six — nine entities against nineteen, twenty-eight
+            and ninety-one — so it is the quickest one to read all the way through.
           </span>
           <span class="choice__meta">examples/dance-studio.eml.mmd</span>
         </button>
@@ -216,6 +216,16 @@
             one to open if you want to see whether this holds up at enterprise size.
           </span>
           <span class="choice__meta">examples/investment-planning-wealth-management-system.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-education" aria-pressed="false">
+          <span class="choice__name">Use the education example</span>
+          <span class="choice__desc">
+            A school in nineteen entities: admissions, the roll, timetabled sections and sessions,
+            attendance, assessment, fees and discipline. Eleven state machines, five sagas and
+            sixty-eight access restrictions across eight roles &mdash; and forty <code>%%report</code>
+            directives, which is what the reporting platform builds a dashboard from.
+          </span>
+          <span class="choice__meta">examples/education-management-system.eml.mmd</span>
         </button>
         <!-- The upload choice *is* the file picker: a label wrapping the input,
              so one click both selects this option and opens the dialog. It used
