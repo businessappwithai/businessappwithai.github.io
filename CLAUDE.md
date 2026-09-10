@@ -940,6 +940,58 @@ and the two documents stop agreeing about a language they both define.
 
 ## CI/CD Pipeline
 
+Two workflows. `tests.yml` gates a pull request; `static.yml` deploys `main`.
+
+### `.github/workflows/tests.yml` — the checks
+
+Node only, no install step, because this repository has no `package.json` and
+the three scripts it runs have no dependencies.
+
+| Step | What it holds |
+|---|---|
+| `node scripts/check-spec.mjs` | `llms-full.txt`'s fenced examples and its claims, against the published checker |
+| `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
+| `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below |
+
+**`scripts/website-e2e.mjs` exists because three defects reached the live site,
+all of the same shape.** A page described a model it no longer matched
+(`try-it-yourself.html` claimed the hospital model had 28 entities, nine state
+machines and 87 access restrictions; it has 30, ten and 132 — and three guide
+chapters repeated it), and a vendored bundle fell behind the generator
+(`appwithai-fullstack.js` predated the acronym fix, so the deployable zip named
+a table `bus_k_y_c_record` while every reader of the same model called it
+`bus_kyc_record` — the application built, ran and answered, and only a query
+written in the model's own words found it).
+
+It asserts nothing by hand. Every figure is measured with **`viewers/eml-model.js`**,
+the generator's own reader that this site already vendors, so a disagreement
+means the page is stale rather than that the test counts differently. Four
+groups:
+
+1. every published model still checks clean through `guide/checker.js`;
+2. every figure any page states about a model equals the model's — entities,
+   state machines, sagas, rules, hooks, roles, access restrictions and
+   `%%report` directives, across `try-it-yourself.html` and guide chapters 09,
+   10 and 11;
+3. every example a page offers is one chapter 09 can actually select, and every
+   `BUILT_IN` key has a card — the two lists cannot drift apart;
+4. the vendored bundles still behave: an entity whose name begins with an
+   acronym resolves to `bus_kyc_record`, and `checker.js` and `eml-model.js`
+   report one language version.
+
+**"Roles" means the roles the model declares.** `readModel().stats.roles` is two
+higher — it adds the generated `administrator` and `user` that no model writes —
+and counting names in `%%rbac` lines is wrong in the other direction, because
+some models name `administrator` there and some do not, so that number silently
+means something different per model. The test counts the roles the reader marks
+`Declared by %%rbac`. Getting this wrong is not hypothetical: the CRM, hospital
+and wealth-management cards each overstated by one until the test was written.
+
+Run it locally with `node scripts/website-e2e.mjs`, or `--verbose` to print
+every assertion rather than only failures.
+
+### `.github/workflows/static.yml` — the deploy
+
 ```yaml
 # .github/workflows/static.yml
 Trigger: push to main (or manual dispatch)
