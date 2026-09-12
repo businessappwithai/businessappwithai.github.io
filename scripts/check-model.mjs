@@ -24,7 +24,7 @@ if (!path) {
 const raw = readFileSync(path);
 const src = raw.toString("utf8");
 const lines = src.split("\n");
-const ok = [], bad = [];
+const ok = [], bad = [], notes = [];
 const say = (cond, label) => (cond ? ok : bad).push(label);
 
 // §1.2 — the file contract
@@ -91,6 +91,40 @@ say((src.match(/kind: saga/g) || []).length > 0, `sagas declared (${(src.match(/
 say((src.match(/%%rbac /g) || []).length > 0, `%%rbac directives present (${(src.match(/%%rbac /g) || []).length})`);
 say((src.match(/%%hook /g) || []).length > 0, `%%hook directives present (${(src.match(/%%hook /g) || []).length})`);
 
+/* §10.10 — help, and whether it says anything.
+   The three-pass check below already fails on the warnings, but it reports them
+   as a count: a reader of this scorer should be told that help was audited and
+   what it was audited for, because it is the part of a model most often
+   delivered as coverage rather than as content. */
+{
+  const codes = check(src).issues.filter((i) => ["EML151", "EML152", "EML153"].includes(i.code));
+  const restated = codes.filter((i) => i.code === "EML151").length;
+  const missing = codes.filter((i) => i.code !== "EML151").length;
+  const entityHelp = (src.match(/%%entity \S+ (?:help|description):/g) || []).length;
+  const fieldHelp = (src.match(/%%field \S+ help:/g) || []).length;
+  say(codes.length === 0,
+    `help on every entity and every column, none of it restating its own name `
+    + `(${entityHelp} entities, ${fieldHelp} columns`
+    + (codes.length ? `; ${missing} missing, ${restated} restated` : "") + ")");
+}
+
+/* §10.11 — line items, and where the dictionary puts them.
+   EML150 is mechanical and fails here. EML149 is a judgement the checker cannot
+   make, so it is reported rather than scored: a candidate the author has walked
+   and rejected is a legitimate outcome, and one they have not seen is not. */
+{
+  const issues = check(src).issues;
+  const onDashboard = issues.filter((i) => i.code === "EML150");
+  const declared = (src.match(/%%entity \S+ parent:/g) || []).length;
+  const candidates = issues.filter((i) => i.code === "EML149");
+  say(onDashboard.length === 0,
+    `${declared} line items declared, and none of them left on the dashboard`
+    + (onDashboard.length ? ` (${onDashboard.length} still in a %%category)` : ""));
+  for (const c of candidates) {
+    notes.push(c.message.replace(/^"/, "").replace(/" looks like a line item of "/, " → ").replace(/" but declares no parent\.$/, ""));
+  }
+}
+
 // §10 — the handover: the three-run protocol over the file's own bytes
 let report = checkAndFix(src);
 const pass1 = { ...report.counts, repaired: report.repaired };
@@ -103,5 +137,16 @@ say(model === src, "the repaired bytes are the delivered bytes (no repairs were 
 console.log(`\n${path}\n`);
 ok.forEach((l) => console.log("  PASS  " + l));
 bad.forEach((l) => console.log("  FAIL  " + l));
+if (notes.length) {
+  /* Candidates, not faults. The checker cannot tell a line item from a
+     reference — that is a question about the business — so these are printed
+     for the author to answer rather than counted against the model. */
+  const plural = notes.length === 1
+    ? "1 entity looks like a line item and declares no parent."
+    : `${notes.length} entities look like line items and declare no parent.`;
+  console.log(`\n  ${plural}`);
+  console.log("  Walk each one and either declare it or decide against it (§3.5.1):");
+  notes.forEach((n) => console.log("    " + n));
+}
 console.log(`\n${ok.length} passed, ${bad.length} failed`);
 process.exit(bad.length === 0 ? 0 : 1);

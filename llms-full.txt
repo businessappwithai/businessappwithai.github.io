@@ -490,6 +490,10 @@ erDiagram
         string email UK
         string name
     }
+
+%%entity Customer help: A person or organisation that buys from us. Created when a lead converts, and never deleted while an unpaid invoice stands against it.
+%%field Customer.email help: The address invoices and order confirmations are sent to, and the customer's identity here. Unique, because two records on one address split a customer's history in two.
+%%field Customer.name help: The trading name to address on correspondence and to print on an invoice. Not necessarily the registered legal entity.
 ```
 
 ---
@@ -531,6 +535,24 @@ erDiagram
 
 %%field DanceClass.status enum: ClassStatus
 %%index DanceClass(instructor_id, starts_at)
+
+%%entity Instructor help: Somebody who teaches at the studio. Instructors are booked against classes, so deactivating one has to leave their past classes attributed rather than delete them.
+%%field Instructor.full_name help: The name that appears on the timetable, which is how members choose a class. Use the name the studio advertises, not the one on the contract.
+%%field Instructor.email help: Where the schedule and cancellation notices are sent, and how the instructor signs in. Unique, because it identifies the person.
+%%field Instructor.is_active help: Whether the instructor is currently teaching. Cleared instead of deleting, so the timetable history and the members' attendance records stay intact.
+
+%%entity Room help: A physical studio a class can be held in. Rooms are the constraint the timetable is built against: two classes cannot share one, and capacity is what caps a class's bookings.
+%%field Room.name help: What the room is called on the timetable and on the door. Members navigate by it, so keep it the name actually painted on the wall.
+%%field Room.capacity help: The most people the room legally holds, including the instructor. It is the ceiling on a class's own capacity, and it is a fire regulation rather than a preference.
+
+%%entity DanceClass help: One session at one time in one room with one instructor. The class is what a member books onto and what the studio is paid for, and its status is the single answer to whether it is going ahead.
+%%field DanceClass.instructor_id help: Who is teaching this session. Changing it is a substitution, and members who booked for a named instructor generally want to be told.
+%%field DanceClass.room_id help: Where the session is held. It caps the class's capacity and is what a member is looking for when they arrive.
+%%field DanceClass.title help: What the class is called on the timetable — the style and level a member is choosing between. "Beginners' salsa", not "Class 14".
+%%field DanceClass.status help: scheduled — open for bookings; running — under way; completed — taught, and countable in attendance; cancelled — called off, and every booking on it has to be refunded or moved.
+%%field DanceClass.starts_at help: When the session begins, in the studio's own time zone. It is what the timetable is ordered by and what a reminder is sent against.
+%%field DanceClass.capacity help: The most bookings this session will take, at or below the room's own limit. Set lower than the room where the style needs floor space.
+%%field DanceClass.price help: What a member pays for this session if they are not using a class pack. Empty where the class is included in a membership.
 ```
 
 One entity block per entity. One attribute per line: `<type> <name> [MODIFIERS]`.
@@ -723,10 +745,51 @@ already in the ERD, marked `sys_column.is_parent` and stored as
 drop the relationship line: the directive names the parent, the ERD still draws
 the edge.
 
-Two errors police it: `EML147` when the parent is not declared, or an entity
-names itself; `EML148` when the child has no foreign key back — a line item with
-nothing to link on loses its own window and gains no tab, which is an entity that
-has quietly left the application.
+Four codes police it:
+
+| Code | Severity | Fires when |
+|---|---|---|
+| `EML147` | error | the parent is not declared, or an entity names itself |
+| `EML148` | error | the child has no foreign key back — nothing for the tab to link on |
+| `EML149` | info | an entity is *shaped* like a line item and declares no `parent:` |
+| `EML150` | warning | a declared child is still named in a `%%category` |
+
+`EML147` and `EML148` are errors because a line item with nothing to link on
+loses its own window and gains no tab, which is an entity that has quietly left
+the application.
+
+`EML149` is an **info and never an error**, because the three questions above are
+about the business and not about the document: only you know whether a list of
+these records away from their owner is a screen anyone opens. The checker can
+only say that the shape is there, and it names both the candidate parent and the
+column a tab would link on. It fires on two shapes, each of which also requires
+that foreign key: an entity whose name **begins** with a declared entity's name
+(`InvoiceLine`/`Invoice`, `TeamMember`/`Team`,
+`FinancialPlanAssumption`/`FinancialPlan`), and an entity whose name **ends** in a
+line-item noun — `Line`, `LineItem`, `Item`, `Detail`, `Entry`, `Row` — whose
+foreign key resolves to a declared entity (`RecommendationItem` under
+`InvestmentRecommendation`).
+
+**Answer every `EML149` before you deliver.** Either declare the parent, or
+satisfy yourself that the entity is a thing in its own right and leave it — an
+`EML149` you have walked and rejected is not a fault, and the run still reports
+`OK`. What is not acceptable is not having looked: if nobody decides, the default
+is a dashboard card listing every line ever written and a parent record that does
+not show its own lines.
+
+`EML150` is a warning rather than an error because nothing breaks — but the two
+directives contradict each other. `parent:` takes the child's dashboard card
+away and the category asks for one, so the group counts an entity the reader can
+never open from it. Take the child out of the `entities:` list.
+
+**What the running application does with it.** Both stacks read the same three
+rows and nothing else. Opening a parent record shows one tab per line item below
+the form, each listing only the rows whose `is_parent` column holds that
+record's key, with a live count on the tab and a row click that opens the child.
+The dashboard and the navigation are built from the entities that have a window,
+so the child appears in neither. None of that is decided by a screen — it is
+`sys_tab.tab_level`, `sys_tab.link_column_id` and `sys_column.is_parent`, which
+is why the model's answer and the application's arrangement cannot drift apart.
 
 A child is still a real table with real rules, access control and a form. Only
 its *placement* changes. Leave it out of `%%category`: a category lists what
@@ -778,13 +841,74 @@ on every form is a label with nothing behind it.
 - **Nobody adds it later.** The model is the only place it can be written, and
   the moment it is being written is the only moment anyone knows the answer.
 
+**And it has to be domain knowledge, not the name in a sentence.** This is where
+the *business* lands in the model, and nothing else in the document carries it.
+The ERD says an entity has a `household_id`; only help says that a membership
+belongs to a family and that the family's screen is where it is read. Everything
+else — types, keys, cardinalities, states, roles — is structure, and structure
+is the half a reader can already see. Help is the half that has to be *known*:
+what the business calls this, why it keeps it, what depends on it, what goes
+wrong when it is wrong. Write it from the research and the brief, in the
+business's own vocabulary.
+
+**One test, applied to every line before you deliver: could this sentence have
+been written without knowing anything about this business?** If yes, it is not
+help.
+
+```
+Bad:   %%field HouseholdMember.household_id help: Household id for HouseholdMember.
+Good:  %%field HouseholdMember.household_id help: The family this membership is in. Listed inside the household's own screen — a membership away from its household is not something anybody looks up.
+
+Bad:   %%entity Address help: Address is a business record in the platform.
+Good:  %%entity Address help: A postal address belonging to a party, kept as its own record because a party has several — registered, correspondence, often an overseas one — and because a change of address is a KYC event that has to be evidenced rather than typed over the old one.
+```
+
+The first of each pair would pass any coverage check and leaves the reader
+exactly where they started.
+
+**Three codes report the three ways a model fails here, all warnings:**
+
+| Code | Fires when |
+|---|---|
+| `EML152` | an entity carries no `%%entity … help:` at all |
+| `EML153` | an entity has columns with no `%%field … help:` — reported once per entity, naming them |
+| `EML151` | help that restates its own subject instead of describing it |
+
+`EML151` catches three shapes: `Unique identifier for X`, the column name in
+prose (`Status for Client`), and a template sentence (`X is a business record in
+…`). It is deliberately narrow, so real help that happens to be short — *The day
+this offer expires.* — does not fire. It exists because coverage can be complete
+and the help still worthless: a published model once carried help on all 91 of
+its entities and all 551 of its columns, and 699 of those lines were of exactly
+these shapes.
+
+**The primary key needs no help, and `EML153` does not ask for any.** It is a
+generated uuid, read-only on every form, and the only sentence anybody could
+write about it restates its name — which is what `EML151` then reports. Leave it
+out.
+
+**What to say, per kind of column:**
+
+| Column | Say |
+|---|---|
+| A reference (`_id`) | what the reference is *for* — "the ward this bed stands in", never "the ward id" |
+| An enum-bound column | what each value means to the business, because the dictionary lists the values and nothing says what choosing one *does* |
+| A lifecycle column | which moves are possible from which state — the state machine enforces a topology no form can show |
+| A money column | gross or net, which currency, and what it is compared against |
+| A date | which business event it records, and what is true before it is set |
+| A flag | what turning it on permits or prevents, and who may do so |
+
 A delivery missing help is incomplete even though the checker returns zero
-errors — §10's checklist asks for both.
+errors — §10's checklist asks for all three codes.
 - **`%%index <E>(<a>[, <b>]) [unique]`** becomes a real index. Add one for every
   column combination the business searches or filters on, and no more — every
   index is paid for on every write.
 - **`%%category`** groups entities on the generated dashboard. `name` is the only
   required key; `entities` is a comma-separated list. Only `;` separates keys.
+  **There is no shorthand**: `%%category Sources: DataSource, SchemaEntity` reads
+  perfectly well and declares nothing, because the parser requires `name:` and
+  skips the line without it — the grouping is lost and every entity in it falls
+  into the default `General` category. Reported as `EML154`.
 
 ### 3.7 What the Application Dictionary makes of your ERD
 
@@ -965,6 +1089,13 @@ erDiagram
         string  rating OPTIONAL
     }
 
+%%entity Lead help: A company that has shown interest but has not yet been qualified by a salesperson. A lead becomes an account only on conversion, so nothing is sold against one.
+%%field Lead.company_name help: The organisation as it identified itself. It is what a salesperson searches by before creating a duplicate.
+%%field Lead.email help: The address the enquiry arrived from and where the first outreach goes. Unique, so two enquiries from one contact do not become two leads.
+%%field Lead.employee_count help: How big the company is, as stated or as researched. It is the only firmographic input to the scoring rule: a thousand or more adds 35 points, anything less adds 10.
+%%field Lead.score help: 0-100, written by the scoring rule at creation. Empty until then, and an override by hand is a deliberate exception to the rule rather than a correction of it.
+%%field Lead.rating help: hot at 70 points and above, warm below it. Set by the same rule, and it is what routes the lead to a salesperson rather than to a nurture sequence.
+
 %%meta name: Lead Scoring
 %%meta kind: rules
 %%rule leadScoring on Lead event: beforeCreate priority: 10
@@ -1059,6 +1190,10 @@ erDiagram
         string account_number UK OPTIONAL
     }
 
+%%entity Account help: A company the business actually sells to. Accounts are created on conversion from a lead and are never deleted while open business stands against them — the beforeDelete hook below is what enforces that.
+%%field Account.name help: The trading name to use on correspondence and invoices. Normalised on creation by the beforeCreate hook, so two spellings of one company do not become two accounts.
+%%field Account.account_number help: The finance system's own reference for this customer. Optional until finance issues one, unique once it exists, and checked by the customValidate hook rather than only by the database.
+
 %%meta name: Account Governance
 %%meta kind: workflow
 %%workflow AccountGovernance entity: Account kind: hook
@@ -1114,6 +1249,10 @@ erDiagram
     }
 
 %%field Booking.status enum: BookingStatus
+
+%%entity Booking help: One member's place on one session, from the moment they ask for it to the moment they turn up or do not. The booking is what the studio counts capacity against, so a cancelled one frees a place and a no-show does not.
+%%field Booking.status help: requested — asked for, not yet accepted; confirmed — the place is held; attended — the member came; cancelled — the place is released; no_show — the place was held and wasted, which is what a repeat-offender policy is built on. Only the moves the diagram draws are allowed.
+%%field Booking.requested_at help: When the member asked. It orders the waiting list, so it is the time of the request rather than of the confirmation.
 
 %%meta name: Booking Lifecycle
 %%meta kind: workflow
@@ -1235,6 +1374,25 @@ erDiagram
     User    ||--o{ Account : "owns"
 
 %%field Lead.status enum: LeadStatus
+
+%%entity Lead help: A company that has shown interest and is not yet a customer. Qualifying one is what starts the conversion saga below, which opens the account and its first contact.
+%%field Lead.company_name help: The organisation as it identified itself. It becomes the account's name on conversion, so a sloppy one propagates.
+%%field Lead.email help: The address the enquiry arrived from. It becomes the primary contact's address on conversion, which is why it is unique here.
+%%field Lead.status help: new — not yet picked up; working — being pursued; qualified — accepted by sales, and the value that fires the conversion saga; converted — an account exists; disqualified — not a fit, and kept so the same enquiry is not worked twice.
+%%field Lead.score help: 0-100, from the scoring rule. Above 85 the conversion saga opens the account at the strategic tier rather than as an SMB.
+%%field Lead.owner_id help: The salesperson pursuing it. They inherit the account on conversion, which is why it is set before qualification rather than after.
+
+%%entity Account help: A company the business sells to, opened by the conversion saga when a lead is qualified. It is the record everything commercial hangs off, and it outlives the lead that produced it.
+%%field Account.name help: The trading name on correspondence and invoices, copied from the lead's company name at conversion and correctable afterwards.
+%%field Account.tier help: strategic or smb, decided by the conversion saga from the lead's score. It sets the service level the account is entitled to, so changing it by hand is a commercial decision.
+%%field Account.owner_id help: The salesperson responsible. Inherited from the lead, and reassigned when the territory changes.
+
+%%entity Contact help: A person at an account. The conversion saga creates the first one from the lead's own email address, and the rest are added as the relationship widens.
+%%field Contact.account_id help: The company this person works for. It is what a deal or a case is filed under, so a contact on the wrong account misfiles everything about them.
+%%field Contact.email help: How this person is reached, and their identity here. Unique across contacts, because the same address at two accounts is one person who has moved.
+
+%%entity User help: Somebody at this business who owns leads and accounts. Users are the assignable side of the pipeline: an unowned lead is one nobody is working.
+%%field User.full_name help: The salesperson's name as it appears on a lead's owner field and in an account's history.
 
 %%meta name: Lead Qualification
 %%meta kind: rules
@@ -1782,6 +1940,40 @@ erDiagram
 %%index DanceClass(instructor_id, starts_at)
 %%index Booking(dance_class_id, status)
 
+%%entity Instructor help: Somebody who teaches at the studio. Instructors are booked against classes, so one who leaves is deactivated rather than deleted: their past classes stay attributed and the attendance history stays readable.
+%%field Instructor.full_name help: The name on the timetable, which is how members choose a class. Use the name the studio advertises rather than the one on the contract.
+%%field Instructor.email help: Where the schedule and any cancellation reach them, and how they sign in. Unique, because it identifies the person.
+%%field Instructor.phone help: A number reception can call on the morning of a class. Optional, and the reason a class is covered rather than cancelled when somebody is ill.
+%%field Instructor.is_active help: Whether they are currently teaching. Cleared instead of deleting; an inactive instructor should not appear when a new class is scheduled.
+
+%%entity Room help: A physical studio a class is held in. Rooms are the constraint the timetable is built against — two classes cannot share one at the same hour — and their capacity is the ceiling on every class booked into them.
+%%field Room.name help: What the room is called on the timetable and on the door. Unique, because a member navigating the building relies on it being unambiguous.
+%%field Room.capacity help: The most people the room legally holds, instructor included. It is a fire regulation rather than a preference, and no class may be booked above it.
+
+%%entity Member help: Somebody who books classes. The membership record carries the tier that decides what they may book and the credit balance a trial member spends, so it exists before any booking does.
+%%field Member.full_name help: The name reception greets them by and the name on the class register.
+%%field Member.email help: Where confirmations and cancellations are sent, and how the member signs in. Unique across members, so one person is one history.
+%%field Member.tier help: trial — pay-as-you-go from a credit balance; standard — a set number of classes a month; unlimited — no cap. The tier is what the admission rule reads before allowing a booking.
+%%field Member.joined_on help: When the membership began. It is what a length-of-relationship report is built on and what a renewal date is computed from.
+%%field Member.credits help: Classes a trial member has left to spend. The admission rule refuses a trial member with none, which is the only thing standing between a free trial and an unlimited one.
+
+%%entity DanceClass help: One session at one time in one room with one instructor. The class is what a member books onto and what the studio is paid for; its booked count is maintained by the booking saga rather than typed, because two people booking at once must not both be told there was a seat.
+%%field DanceClass.instructor_id help: Who is teaching. Changing it is a substitution, and members who booked for a named instructor generally expect to be told.
+%%field DanceClass.room_id help: Where it is held. It caps the class's own capacity and is what a member is looking for when they arrive.
+%%field DanceClass.title help: The class as it appears on the timetable — the style and the level a member is choosing between. "Beginners' salsa", not "Class 14".
+%%field DanceClass.status help: scheduled — open for bookings; running — under way; completed — taught, and countable in attendance; cancelled — called off, and every booking on it has to be moved or refunded. Only the moves the lifecycle draws are allowed.
+%%field DanceClass.starts_at help: When the session begins, in the studio's own time zone. It orders the timetable and it is what a reminder is sent against.
+%%field DanceClass.capacity help: The most bookings this session will take, at or below the room's limit. Set lower than the room where the style needs floor space.
+%%field DanceClass.booked_count help: How many places are taken. Maintained by the booking saga, and the figure the admission rule compares against capacity — a count that drifts is how a class comes to be oversold.
+%%field DanceClass.price help: What a member pays for this session if they are not drawing on a tier or a credit. Empty where the class is included in the membership.
+
+%%entity Booking help: One member's place on one session, from the moment they ask for it to the moment they turn up or do not. It is what capacity is counted against, so a cancellation frees a place and a no-show does not — which is the distinction the whole waiting list depends on.
+%%field Booking.member_id help: Who is booked. It is what the class register is built from and who a cancellation notice is sent to.
+%%field Booking.dance_class_id help: The session being booked. Its capacity and booked count are what the admission rule checks before the booking is accepted.
+%%field Booking.status help: requested — asked for, not yet accepted; confirmed — the place is held; attended — the member came; cancelled — the place is released; no_show — the place was held and wasted, which is what a repeat-offender policy is built on.
+%%field Booking.requested_at help: When the member asked, not when reception confirmed. It orders the waiting list, so it is the only fair basis for who gets a freed place.
+%%field Booking.cancellation_reason help: Why the place was given up, in the member's words. It is the difference between a member the studio should call and one who simply changed their mind.
+
 %%meta name: Booking Admission
 %%meta kind: rules
 %%rule bookingAdmission on Booking event: beforeCreate priority: 10
@@ -1860,15 +2052,22 @@ flowchart TD
    `%%enum` **and** a `%%field … enum:` binding it — without the binding the
    dictionary records free text (§3.7).
 10. **Every entity carries `%%entity <E> help:` and every column carries
-   `%%field <E>.<col> help:`** — no exceptions, including the self-evident ones.
-   That text is the whole of the application's help *and* the whole of its
-   generated manual, and no later pass adds it (§3.6, §3.7).
+   `%%field <E>.<col> help:`** — no exceptions, including the self-evident ones,
+   and the primary key the one thing that needs none. That text is the whole of
+   the application's help *and* the whole of its generated manual, and no later
+   pass adds it (§3.6, §3.7). **It has to be domain knowledge, not the name in a
+   sentence**: `Status for Client.` passes a coverage check and tells a reader
+   nothing. Clear every `EML151` (help that restates its subject), `EML152` (an
+   entity with none) and `EML153` (columns with none).
 11. **Every line item is declared as one.** Go through the entities and ask of
    each: is this a thing in its own right, or part of another thing? Every
    invoice line, order line, prescription item and delivery line gets
    `%%entity <Child> parent: <Parent>`, and is left out of `%%category`
    (§3.5.1). Missing it puts a card on the dashboard listing every line ever
-   written, which is a screen nobody opens.
+   written, which is a screen nobody opens — and leaves the parent record with
+   no sign of its own lines. The checker names every candidate it can see as
+   `EML149`; walk each one and either declare the parent or decide against it,
+   and clear any `EML150` by taking the child out of its category.
 12. Every entity with a status has a `kind: state` workflow, with an initial
    transition and a terminal state.
 13. Every rule that must *do* something has an `%%action` — not just a flowchart.
