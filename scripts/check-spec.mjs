@@ -48,10 +48,24 @@ console.log(`${blocks.length} mermaid examples, ${exampleFailures} not clean`);
 
 /* ------------------------------------------- 2. the claims it makes in prose */
 let pass = 0, fail = 0;
+
+/*
+ * The probes below are synthetic — `Thing { string id PK; string col_a }` and a
+ * directive under test — built to ask one question each: does `varchar` alias to
+ * `string`, is `beforeUpdate` a hook type, does `}o--||` parse. They are not
+ * models anybody would deliver, and they carry no help text, so EML151-EML153
+ * fire on every one of them and say nothing about the claim being tested. They
+ * are excluded here and nowhere else: the *authored* examples above are still
+ * held to zero warnings, help included, because those are what a reader copies.
+ */
+const HELP_CODES = new Set(["EML151", "EML152", "EML153"]);
+/* `check` reports under `issues`, `checkAndFix` under `remaining`. */
+const substantive = (r) => (r.issues ?? r.remaining ?? []).filter((i) => !HELP_CODES.has(i.code));
+
 const t = (name, src, expect = "clean") => {
   const r = check(src);
   const bad = expect === "clean"
-    ? r.counts.errors > 0 || r.counts.warnings > 0
+    ? r.counts.errors > 0 || substantive(r).some((i) => i.severity === "warning")
     : !r.issues.some((i) => i.code === expect);
   if (bad) {
     fail++;
@@ -266,8 +280,9 @@ for (const column of ["created_at", "updated_at", "version", "deleted_by"])
   const duplicated = `%%meta name: Duplicate Probe\n%%meta kind: erd\nerDiagram\n    Course {\n        string id PK\n        string title\n        string title OPTIONAL\n        string code OPTIONAL\n        string code UK\n        datetime created_at\n    }\n`;
   const fixed = checkAndFix(duplicated);
   say(fixed.repaired === true, "checkAndFix repairs a duplicated column and a managed one");
-  say(fixed.counts.errors === 0 && fixed.counts.warnings === 0,
-    `the repaired document is clean (${fixed.counts.errors}e/${fixed.counts.warnings}w)`);
+  const fixedSubstantive = substantive(fixed);
+  say(fixed.counts.errors === 0 && !fixedSubstantive.some((i) => i.severity === "warning"),
+    `the repaired document is clean (${fixed.counts.errors}e/${fixedSubstantive.length}w, help codes aside)`);
   const body = fixed.source;
   say((body.match(/^\s*string\s+title\b/gm) ?? []).length === 1, "the duplicate title is gone");
   say(/^\s*string\s+title\s*$/m.test(body), "title stayed required — OPTIONAL did not win");
@@ -338,8 +353,9 @@ say(helpColumn?.description === "The name on the invoice, not the trading name."
   `%%field help: becomes sys_column.description (${JSON.stringify(helpColumn?.description)})`);
 
 const silent = check(dictionaryDiagnostics);
-say(silent.counts.errors === 0 && silent.counts.warnings === 2,
-  `both downgrades are warnings, not errors — the generator still runs (${silent.counts.errors}e/${silent.counts.warnings}w)`);
+const silentWarnings = substantive(silent).filter((i) => i.severity === "warning");
+say(silent.counts.errors === 0 && silentWarnings.length === 2,
+  `both downgrades are warnings, not errors — the generator still runs (${silent.counts.errors}e/${silentWarnings.length}w)`);
 
 console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - failuresBefore} contradicted`);
 

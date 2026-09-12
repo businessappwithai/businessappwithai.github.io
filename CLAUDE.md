@@ -824,7 +824,15 @@ thing a language model has to produce is a model file.
   whole of the manual it generates**, which is why §3.7 now asks for help on every column rather than
   only the ambiguous ones. Both are diagnostics now,
   `EML119` and `EML146`, added upstream in `businessappwithai/app-with-ai-tanstack` and vendored here
-  with the checker; `EML223` reports the third member of the family, a `%%guard role:… on …` line — the
+  with the checker. Six more joined them, and they are the ones that police the two halves of a model
+  nothing used to check: **`EML149`** (info) names an entity shaped like a line item that declares no
+  `%%entity … parent:`, **`EML150`** reports a declared child still named in a `%%category`,
+  **`EML151`-`EML153`** report help that restates its own name, an entity with none and columns with
+  none, and **`EML154`** reports a `%%category` with no `name:` key — which the parser skips entirely,
+  so the grouping is silently lost. `EML151` is the one worth knowing about: coverage can be complete
+  and the help still worthless, and the wealth-management model carried 699 lines of
+  `Household id for HouseholdMember.` before it was rewritten. `EML223` reports the third member of the
+  first family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
   derivation table against `appwithai-wasm.js` and asserts that the three codes fire;
   `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
@@ -865,7 +873,8 @@ thing a language model has to produce is a model file.
   checker's own report, exit 0/1/2. It is what §8.4 tells a language model to `curl`.
 - **`node scripts/check-model.mjs <file.mmd>`** audits a delivered model against the mechanical half of
   §1.2's file contract and §10's checklist — shape, keys, enum bindings, state machines, rbac, and the
-  three checker passes over its own bytes. `guide/models/crm.eml.mmd` passes it 18/18.
+  three checker passes over its own bytes, plus help coverage and line-item placement.
+  `guide/models/crm.eml.mmd` passes it 22/22.
 
 **On the published domain.** The specification quotes the validators as
 `https://appwithai.org/guide/checker.js`, and chapter 11 prints them that way. There is no `CNAME`
@@ -910,8 +919,8 @@ and the two documents stop agreeing about a language they both define.
   every entity and every column, one `%%rbac … .read` per entity, every state backed by a
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
   entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
-  restrictions; 0 errors, 0 warnings, 0 notes, and 20/20 under `scripts/check-model.mjs`.
-  The hospital model scores 20/20 as well, and is the larger worked example: **30
+  restrictions; 0 errors, 0 warnings, 0 notes, and 22/22 under `scripts/check-model.mjs`.
+  The hospital model scores 22/22 as well, and is the larger worked example: **30
   entities, 323 columns, 39 enums, 10 state machines, 10 sagas, 18 rules, 27 hooks and
   132 access rules**, 0 errors and 0 warnings. It was rebuilt end to end through §10's
   interactive protocol — seven gates, a dossier per entity — and the record of that build
@@ -965,7 +974,7 @@ written in the model's own words found it).
 
 It asserts nothing by hand. Every figure is measured with **`viewers/eml-model.js`**,
 the generator's own reader that this site already vendors, so a disagreement
-means the page is stale rather than that the test counts differently. Four
+means the page is stale rather than that the test counts differently. Five
 groups:
 
 1. every published model still checks clean through `guide/checker.js`;
@@ -975,7 +984,14 @@ groups:
    10 and 11;
 3. every example a page offers is one chapter 09 can actually select, and every
    `BUILT_IN` key has a card — the two lists cannot drift apart;
-4. the vendored bundles still behave: an entity whose name begins with an
+4. every published model explains itself and puts its line items where they
+   belong — no `EML151`/`EML152`/`EML153` (help that restates its own name, an
+   entity with none, columns with none), no `EML150` (a line item still named in
+   a `%%category`), no `EML154` (a `%%category` with no `name:`, which the parser
+   drops silently). None of these would show up as a wrong figure: a model can be
+   re-vendored with complete coverage and worthless help, or having lost a
+   `parent:` directive, and every page still renders correctly;
+5. the vendored bundles still behave: an entity whose name begins with an
    acronym resolves to `bus_kyc_record`, and `checker.js` and `eml-model.js`
    report one language version.
 

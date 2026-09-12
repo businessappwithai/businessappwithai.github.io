@@ -183,5 +183,43 @@ const viewerCheck = await import(`file://${p("viewers", "eml-model.js")}`);
 is(viewerCheck.LANGUAGE_VERSION, LANGUAGE_VERSION, "checker.js and eml-model.js report one language version");
 
 // ---------------------------------------------------------------------------
+console.log("\nEvery published model explains itself, and puts its line items where they belong");
+/*
+ * Two properties nothing else on this site would notice going backwards.
+ *
+ * Help is the first: a model can be re-vendored with complete coverage and
+ * worthless content — `Household id for HouseholdMember.` on every reference —
+ * and every page still renders, every count still matches, and the generated
+ * manual reads as a list of labels printed twice. `EML151` is what sees it.
+ *
+ * Line items are the second: `%%entity <Child> parent: <Parent>` is the only
+ * thing that keeps an invoice line off the dashboard and inside its invoice,
+ * and a model that loses the directive loses the arrangement silently — the
+ * application still builds and still runs.
+ *
+ * Both are read from the published checker rather than counted here, so this
+ * agrees with what chapter 11 tells a reader about the same file.
+ */
+for (const name of readdirSync(p("guide", "models")).filter((f) => f.endsWith(".mmd")).sort()) {
+  const source = readFileSync(p("guide", "models", name), "utf8");
+  const issues = check(source).issues;
+
+  const helpFaults = issues.filter((i) => ["EML151", "EML152", "EML153"].includes(i.code));
+  helpFaults.length === 0
+    ? ok(`${name}: help on every entity and column, none of it restating a name`)
+    : fail(`${name}: help`, helpFaults.slice(0, 3).map((i) => `${i.code} ${i.message}`).join("; "));
+
+  const onDashboard = issues.filter((i) => i.code === "EML150");
+  onDashboard.length === 0
+    ? ok(`${name}: no line item is left on the dashboard`)
+    : fail(`${name}: line items`, onDashboard.map((i) => i.message).join("; "));
+
+  const namelessCategory = issues.filter((i) => i.code === "EML154");
+  namelessCategory.length === 0
+    ? ok(`${name}: every %%category declares a name, so none is silently dropped`)
+    : fail(`${name}: categories`, `${namelessCategory.length} %%category line(s) with no name: key`);
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);
