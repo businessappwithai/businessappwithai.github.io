@@ -182,6 +182,42 @@ is(probe.rbac.operations[0]?.tableName, "bus_kyc_record", "and its bus_ table li
 const viewerCheck = await import(`file://${p("viewers", "eml-model.js")}`);
 is(viewerCheck.LANGUAGE_VERSION, LANGUAGE_VERSION, "checker.js and eml-model.js report one language version");
 
+/*
+ * `stack-templates.json` is the third artifact in that set, and the one with no
+ * other reader here: `appwithai-fullstack.js` compiles the model, but the files
+ * it writes come out of this payload. So the bundle can be perfectly current
+ * and the deployable zip still ship last month's application — which is exactly
+ * what happened. The four templates the line-item work touched were left behind
+ * when the bundles beside them were re-vendored, and every zip a reader
+ * downloaded built an application whose line items had no window to appear in.
+ * Nothing else notices: the archive is internally consistent, it installs, it
+ * builds, and it runs.
+ *
+ * These assert the feature is present in the payload rather than comparing
+ * bytes against a generator checkout this repository does not have.
+ */
+const templates = JSON.parse(readFileSync(p("assets", "vendor", "stack-templates.json"), "utf8"));
+const template = (name) => templates[`tanstack-start-nestjs/${name}`] ?? "";
+const carries = (name, needle, what) =>
+  template(name).includes(needle)
+    ? ok(`stack-templates.json: ${what}`)
+    : fail(
+        `stack-templates.json: ${what}`,
+        `"${needle}" is absent from ${name} — the payload predates the feature. ` +
+          "Rebuild it upstream with `bun run build:stack-templates` and re-copy."
+      );
+
+carries(
+  "frontend/src/hooks/use-bus-entity-level.ts",
+  "childTabs",
+  "the entity hook resolves a parent's child tabs"
+);
+carries(
+  "backend/src/modules/sys/services/sys-category.service.ts.hbs",
+  "lineItemTables",
+  "the category service keeps line items off the dashboard"
+);
+
 // ---------------------------------------------------------------------------
 console.log("\nEvery published model explains itself, and puts its line items where they belong");
 /*
