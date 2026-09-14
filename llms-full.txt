@@ -1555,6 +1555,19 @@ Three consequences worth knowing before you write the lines:
   directives name — so `%%rbac` is something the reader can *see* rather than
   read about. The administrator bypasses every restriction, which is what makes
   it the account to compare the others against.
+- **Deployed beside the reporting platform, the same lines shape a second set of
+  roles.** The application and Enterprise Reporting come up together on one
+  origin — `/app` and `/report` — and one reporting role is created per declared
+  role, permitted to read exactly the `bus_` tables that role's `read` rules
+  admit. It is a **mirror, not a shared system**: separate databases, separate
+  user tables, separate sessions, separate sign-ins, and a role name that means
+  different things on each side — what you may *do* to a record, against which
+  tables your queries may *read*. The two addresses differ on purpose
+  (`sales.manager@<app>.example.com` against
+  `sales.manager@<app>.reports.example.com`) so neither is mistaken for the
+  other, and the origin's front door at `/` lists both pairs side by side. Only
+  `read` rules narrow a reporting role; a restriction on create, update or
+  delete means nothing to somebody who cannot write through that product.
 
 An entity no `read` line names stays visible to everyone, and a model that
 declares no `read` restrictions anywhere behaves exactly as models did before
