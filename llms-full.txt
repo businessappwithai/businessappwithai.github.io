@@ -1597,7 +1597,7 @@ the checker reads it.
 | `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`, `parent:`; the rest **validated**)* |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
-| `%%report` | `%%report <name> title: <T> [entity: <E>] [chart: bar\|line\|pie\|area x: <col> y: <col>] [help: <why>] sql: <query>` | **validated** *(compiled by the reporting platform)* |
+| `%%report` | `%%report <name> title: <T> [entity: <E>] [chart: bar\|line\|pie\|area x: <col> y: <col>] [help: <why>] sql: <query>` | compiled *(and again, separately, by the reporting platform)* |
 
 **`%%guard` used to mean access control**, and a model written from an older
 example still spells it `%%guard role:manager on Order.approve`. That sense moved
@@ -1623,13 +1623,34 @@ a column name is wrong — it has no database.
 `sql:` is always **last** on the line and takes the rest of it, because a query
 contains spaces and colons and would otherwise be shredded by the key scan.
 
-Reports do not change the application the generator writes. They are read by the
-reporting platform that ships beside it, which already derives a baseline from
-structure alone — a register per entity, a breakdown per `%%enum`-bound column,
-a lifecycle per state machine. That baseline describes the shape of the data and
-nothing about the business running on it; a `%%report` is where the thing only a
-person knows gets written down, and it travels with the model instead of being
-rebuilt by hand after every regeneration.
+**A report is compiled twice, by two readers, and neither replaces the other.**
+
+The generator puts each one into the application it writes. In the full NestJS
+stack that is a row in `sys_report`, served at `/sys/reports` and shown under
+**Admin → Analysis**; in the browser application it is an entry in `model.json`,
+served at `/api/reports` and shown under **Reports**. Both run the query on
+demand against the application's own database, so the answers change as the
+application is used. A model declaring no reports gets the screen anyway, saying
+so — an empty table would read as a failed query.
+
+Separately, the reporting platform that ships beside a *deployed* application
+reads the same directives, on top of a baseline it derives from structure alone
+— a register per entity, a breakdown per `%%enum`-bound column, a lifecycle per
+state machine. That baseline describes the shape of the data and nothing about
+the business running on it; a `%%report` is where the thing only a person knows
+gets written down, and it travels with the model instead of being rebuilt by
+hand after every regeneration. That platform is composed by docker-compose and
+is not part of the browser application or the downloadable zip; the screens
+above are.
+
+A report may only read, and that is refused three times over: by the checker
+while it is being written, by the compiler before the query can reach a seed
+file, and by each runtime before it executes.
+
+**Join on the keys directly — `ON c.account_id = p.id`.** Both columns are
+`UUID` in both stacks. A `::text` cast was needed while the browser stack typed
+a foreign key as `VARCHAR`; it is not any more, and a cast left in is now what
+breaks the query.
 
 ```
 %%report unassigned-jobs title: Jobs with no engineer help: The dispatcher's first question every morning. sql: SELECT reference, scheduled_for FROM bus_job WHERE engineer_id IS NULL AND status = 'scheduled' AND deleted_at IS NULL ORDER BY scheduled_for
