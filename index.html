@@ -316,7 +316,7 @@
           <div>
             <h4>The prompt — copy it as it is</h4>
             <p class="text-muted text-sm">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://www.appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
 
 My business:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
@@ -325,7 +325,7 @@ Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>

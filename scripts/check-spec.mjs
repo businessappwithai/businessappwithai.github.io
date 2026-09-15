@@ -363,7 +363,7 @@ console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - fa
 
 const runner = root + "guide/check-model.mjs";
 const specText = spec.join("\n");
-const command = "curl -sO https://appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
+const command = "curl -sO https://www.appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
 
 const scratch = mkdtempSync(join(tmpdir(), "eml-spec-"));
 const clean = join(scratch, "clean.mmd");
@@ -421,7 +421,10 @@ held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length =
   `section 10.6 counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
 
 // The runner it tells a model to use, and the flags it promises that runner has.
-held(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
+// `www` is canonical and the apex serves the same files, so either spelling
+// satisfies this — what is being held is that the line is there and runnable,
+// not which of the two hostnames it names.
+held(/curl -sO https:\/\/(?:www\.)?appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
   "section 10.6 carries the one-line way to run the checker without a checkout");
 for (const flag of ["--write", "--base"])
   held(detailed.includes(flag) && runnerSource.includes(flag),
@@ -447,7 +450,9 @@ for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js
  * following a stale instruction sends its user to a 404 in the middle of a
  * walkthrough. The upstream repository holds the document to the same claims
  * where it is authored; this holds the copy to what *this host* serves. */
-held(detailed.includes("https://appwithai.org/viewers/"),
+// Either hostname: `www` is canonical and the apex serves the same files. What
+// is held is that the viewers are named by their published URL at all.
+held(/https:\/\/(?:www\.)?appwithai\.org\/viewers\//.test(detailed),
   "section 10 names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
   held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);

@@ -16,10 +16,14 @@
 - **EML version**: 1.2.0 · **Based on**: Mermaid · **Updated**: 2026-08-29
 - **Authority**: `language/appwithai-language.json`. Where this document and that
   file disagree, that file wins.
-- **Validators** (§8): `https://appwithai.org/guide/checker.js` and
-  `https://appwithai.org/guide/fixer.js`
+- **Validators** (§8): `https://www.appwithai.org/guide/checker.js` and
+  `https://www.appwithai.org/guide/fixer.js`. The apex, `appwithai.org`, serves
+  the same files; `www` is canonical. **If neither host is reachable from your
+  environment, that is a fact about your network and not a reason to skip
+  validation or to stop** — §8.4's last two rows are the offline procedure, and
+  they are real runs with real counts.
 - **To check a model from a shell** (§1.3, §8.4) — nothing to install:
-  `curl -sO https://appwithai.org/guide/check-model.mjs` then
+  `curl -sO https://www.appwithai.org/guide/check-model.mjs` then
   `node check-model.mjs my-business.mmd`. Exit `0` means the generator accepts
   it; exit `1` means it does not, and the report says why.
 - **Every example in this document is a complete model that the checker accepts
@@ -287,7 +291,7 @@ accepts it. The two modules and their API are in §8.
 Node 18+, Bun or Deno, nothing to install:
 
 ```sh
-curl -sO https://appwithai.org/guide/check-model.mjs
+curl -sO https://www.appwithai.org/guide/check-model.mjs
 node check-model.mjs my-business.mmd
 ```
 
@@ -300,8 +304,8 @@ the rest, and the recipes for runtimes with no shell.)
 Written out, that is:
 
 ```js
-import { check, formatReport } from "https://appwithai.org/guide/checker.js";
-import { checkAndFix }          from "https://appwithai.org/guide/fixer.js";
+import { check, formatReport } from "https://www.appwithai.org/guide/checker.js";
+import { checkAndFix }          from "https://www.appwithai.org/guide/fixer.js";
 
 let model = /* the exact bytes of the .mmd you just wrote */;
 
@@ -365,10 +369,16 @@ deliver. First make sure that is actually true: §8.4 lists a row per runtime,
 and every observed case of "the checker could not be run" has been one row
 failing while the others went untried. A `curl` that is unavailable, a URL
 import Node declines, or a repository that will not clone are each one row, not
-a verdict on the environment. Walk §10 by hand instead, item by item, then hand over the file with one
+a verdict on the environment. **A host that will not resolve, or a proxy
+answering 403 or 502, is one row too** — and it is not the last one: the modules
+are two dependency-free files, and `check-model.mjs` runs against a local copy
+of them with no network at all (§8.4). Fetching them once, by any means, into
+the directory you are working in turns "cannot validate" into an ordinary run.
+
+Only when that is also impossible: walk §10 by hand instead, item by item, then hand over the file with one
 plain sentence: the checker could not be run here, this is what was verified by
 hand, and the user can validate it in their own browser in a few seconds at
-`https://appwithai.org/guide/11-check-a-model.html`, which runs these same two
+`https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same two
 modules with nothing to install. An unvalidated `.mmd` is still the deliverable.
 A specification handed over in place of one never is.
 
@@ -441,7 +451,7 @@ Alongside the file — in the reply, never inside it — give:
   hand;
 - anything you assumed, and anything still unresolved;
 - what to do next: upload the file at
-  `https://appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
+  `https://www.appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
   running application in the browser tab, with nothing installed and nothing
   uploaded to a server.
 
@@ -1697,16 +1707,16 @@ a document the generator will accept.
 
 | Module | URL | What it gives you |
 |---|---|---|
-| `checker.js` | `https://appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
-| `fixer.js` | `https://appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
+| `checker.js` | `https://www.appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
+| `fixer.js` | `https://www.appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
 
 ### 8.1 The API
 
 ```js
 import { check, formatIssue, formatReport, AUTO_FIXABLE, LANGUAGE_VERSION }
-  from "https://appwithai.org/guide/checker.js";
+  from "https://www.appwithai.org/guide/checker.js";
 import { fix, checkAndFix, applyFixes }
-  from "https://appwithai.org/guide/fixer.js";
+  from "https://www.appwithai.org/guide/fixer.js";
 ```
 
 `check(source)` returns:
@@ -1819,15 +1829,28 @@ usually gets skipped. Find your row and run it.
 
 | What you have | What to do |
 |---|---|
-| A shell with Node 18+, Bun or Deno | `curl -sO https://appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
-| Bun or Deno, writing the code yourself | `import { check } from "https://appwithai.org/guide/checker.js"` — a URL import works as it stands |
+| A shell with Node 18+, Bun or Deno | `curl -sO https://www.appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
+| Bun or Deno, writing the code yourself | `import { check } from "https://www.appwithai.org/guide/checker.js"` — a URL import works as it stands |
 | Node, writing the code yourself | Node has no network imports: fetch both files, write them into one directory, `import()` them from there (below) |
-| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
-| No network, or no JavaScript at all | Do not skip it silently: walk §10 by hand and tell the user, as §1.3 says |
+| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
+| A shell, but **no egress** — a sandbox, a proxy, an air-gapped runner | The modules are two dependency-free files and `check-model.mjs` prefers a local copy of them to the network. Put `checker.js` and `fixer.js` in the directory you are working in, or beside the script, or name their directory with `--base <dir>`, and run it exactly as above. **This is a real run**: same engines, same report, same exit codes, counts reportable |
+| No JavaScript runtime at all | Walk §10 by hand, and say in your delivery that the model was checked against the checklist and not against the checker |
 
-**One failed attempt is a finding about that attempt, not about the
-environment.** Work the rows above in order and stop at the first that runs;
-reach the last row by exhausting the others, not by inferring it.
+**A blocked network is not a failed validation, and it is not a stopping
+point.** An agent sandbox usually reports it as a DNS failure or as a gateway
+error — 403, 407, 502 — and both read like the site being down when the site is
+answering everyone else. Work the rows above in order and stop at the first that
+runs; reach the last row by exhausting the others, not by inferring it. `curl`
+returning nothing is one attempt with one host, not the end of the ladder.
+
+**And whatever happens, do not stall.** If you cannot obtain a checker result,
+finish the work and say so in one sentence — *"delivered unvalidated: the
+published checker was unreachable from this environment (403 from the proxy), so
+these counts are absent rather than estimated"*. What you must never do is
+invent counts, and what you must not do instead is hold a phase open waiting for
+a host that this environment is never going to reach. An unvalidated model
+delivered with that sentence attached is useful; a protocol stopped at a gate is
+not.
 
 **Nothing here needs a checkout, and nothing here needs GitHub.** There is no
 repository to clone, no credentials to hold and no `bun` to install: the two
@@ -1854,13 +1877,13 @@ taking it has skipped it — and the offer reads as diligence, which is what mak
 it hard to catch.
 
 ```sh
-curl -sO https://appwithai.org/guide/check-model.mjs
+curl -sO https://www.appwithai.org/guide/check-model.mjs
 node check-model.mjs my-business.mmd
 ```
 
 **`check-model.mjs`** is the one-command form of §1.3, published beside the
 modules it runs. It finds `checker.js` and `fixer.js` — beside itself if they
-were downloaded together, otherwise from `https://appwithai.org/guide/` — runs
+were downloaded together, otherwise from `https://www.appwithai.org/guide/` — runs
 `checkAndFix` and then two `check` passes over the repaired bytes, prints the
 report, and exits `0` when the model is clean, `1` when the generator would
 refuse it, `2` when it could not run at all. `--write` saves the repaired
@@ -1878,7 +1901,7 @@ import { pathToFileURL } from "node:url";
 
 const dir = mkdtempSync(join(tmpdir(), "eml-"));
 for (const name of ["checker.js", "fixer.js"]) {
-  const response = await fetch(`https://appwithai.org/guide/${name}`);
+  const response = await fetch(`https://www.appwithai.org/guide/${name}`);
   writeFileSync(join(dir, name), await response.text());
 }
 const { check, formatReport } = await import(pathToFileURL(join(dir, "checker.js")).href);

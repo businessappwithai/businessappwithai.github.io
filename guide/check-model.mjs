@@ -2,10 +2,10 @@
 /**
  * check-model.mjs — run the published EML checker over a model file.
  *
- *   curl -sO https://appwithai.org/guide/check-model.mjs
+ *   curl -sO https://www.appwithai.org/guide/check-model.mjs
  *   node check-model.mjs my-business.mmd
  *
- * §1.3 of https://appwithai.org/llms-full.txt asks a language model to validate
+ * §1.3 of https://www.appwithai.org/llms-full.txt asks a language model to validate
  * the `.mmd` it wrote before handing it over, by importing `checker.js` and
  * `fixer.js`. That is one line in Bun or Deno, which import straight from a URL,
  * and it is several in Node, which removed network imports — so a model with a
@@ -18,9 +18,10 @@
  * `checker.js` and `fixer.js` — the same engines `appwithai` runs.
  *
  * Options
- *   --base <url>   where to load checker.js and fixer.js from
- *                  (default: the directory this file was downloaded from, then
- *                  https://appwithai.org/guide/)
+ *   --base <url>   where to load checker.js and fixer.js from — a directory
+ *                  works too, which is how to run this with no network at all
+ *                  (default: this file's own directory, the working directory,
+ *                  ./guide/, then https://www.appwithai.org/guide/ and the apex)
  *   --write        save the repaired document back over the input file when
  *                  `checkAndFix` repaired something
  *   --quiet        print only the verdict line
@@ -33,7 +34,21 @@ import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const PUBLISHED = "https://appwithai.org/guide/";
+/**
+ * Where the published modules live, most canonical first.
+ *
+ * Two spellings because both answer — `www.appwithai.org` is the site's
+ * canonical name and the apex, `appwithai.org`, serves the same deployment —
+ * and because trying only one turns a DNS or proxy failure against that one
+ * name into "the validator is unavailable".
+ *
+ * Both are the published site and nothing else. This script deliberately
+ * reaches no code-hosting origin: §10.6 of `llmdetailed.txt` tells the reader
+ * so, and `scripts/check-spec.mjs` asserts it by reading this file. Both are tried before this script gives
+ * up, and giving up is still not the same as the model being unchecked: see
+ * `--base`, and `loadModules` below, which prefer anything local.
+ */
+const PUBLISHED = ["https://www.appwithai.org/guide/", "https://appwithai.org/guide/"];
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const option = (name) => {
@@ -48,24 +63,40 @@ if (!file) {
 }
 
 /**
- * The modules can come from three places, in this order: a `--base` the caller
- * named, the directory this script sits in (a clone of the site, or a folder the
- * three files were downloaded into together), and the published site. The local
- * cases keep the script working with no network at all.
+ * The modules can come from four places, in this order: a `--base` the caller
+ * named, the directory this script sits in, the working directory, and the
+ * published site under either of its names.
+ *
+ * The local cases come first and they are the point of the ordering: an agent
+ * running in a sandbox with no egress can put `checker.js` and `fixer.js`
+ * beside the model — or `--base ./`, or `--base ./guide/` in a clone of the
+ * site — and get a real run with a real report. A network that refuses is a
+ * fact about the network, not a reason to hand over an unvalidated model or to
+ * invent counts for it.
  */
 async function loadModules() {
   const base = option("--base");
   if (base) return importFrom(base.endsWith("/") ? base : base + "/");
 
   const here = dirname(fileURLToPath(import.meta.url));
-  if (existsSync(join(here, "checker.js")) && existsSync(join(here, "fixer.js"))) {
-    return {
-      where: join(here, "/"),
-      checker: await import(pathToFileURL(join(here, "checker.js")).href),
-      fixer: await import(pathToFileURL(join(here, "fixer.js")).href),
-    };
+  for (const dir of [here, process.cwd(), join(process.cwd(), "guide")]) {
+    if (existsSync(join(dir, "checker.js")) && existsSync(join(dir, "fixer.js"))) {
+      return {
+        where: join(dir, "/"),
+        checker: await import(pathToFileURL(join(dir, "checker.js")).href),
+        fixer: await import(pathToFileURL(join(dir, "fixer.js")).href),
+      };
+    }
   }
-  return importFrom(PUBLISHED);
+
+  /* Each published name in turn. `importFrom` exits on a failure it cannot
+     recover from, so the last one is the one allowed to do that. */
+  for (const [index, published] of PUBLISHED.entries()) {
+    const last = index === PUBLISHED.length - 1;
+    const loaded = await importFrom(published, { fatal: last });
+    if (loaded) return loaded;
+  }
+  return undefined;
 }
 
 /**
@@ -73,7 +104,7 @@ async function loadModules() {
  * are fetched and written into a temp directory before importing — the same
  * bytes either way, and `fixer.js` finds `checker.js` beside it.
  */
-async function importFrom(base) {
+async function importFrom(base, { fatal = true } = {}) {
   try {
     const checker = await import(base + "checker.js");
     const fixer = await import(base + "fixer.js");
@@ -83,9 +114,37 @@ async function importFrom(base) {
   }
   const dir = mkdtempSync(join(tmpdir(), "eml-"));
   for (const name of ["checker.js", "fixer.js"]) {
-    const response = await fetch(base + name);
-    if (!response.ok) {
-      console.error(`could not fetch ${base}${name}: ${response.status} ${response.statusText}`);
+    /*
+     * A blocked network fails in two shapes and they must be handled alike.
+     *
+     * A refused connection or a DNS failure *throws*; an egress proxy or a
+     * corporate gateway *answers*, with 403, 407 or 502. The second is the one
+     * that reads like the site being broken, and it is the commoner of the two
+     * inside an agent sandbox — so both end in the same place: try the next
+     * base, and when there is none left, say what to do instead of only what
+     * went wrong.
+     */
+    let failure;
+    let response;
+    try {
+      response = await fetch(base + name);
+      if (!response.ok) failure = `${response.status} ${response.statusText}`;
+    } catch (error) {
+      failure = String(error?.message || error);
+    }
+    if (failure) {
+      if (!fatal) return undefined;
+      console.error(
+        `could not load ${base}${name}: ${failure}\n\n` +
+          "The published modules could not be reached — usually no egress from this\n" +
+          "environment rather than anything wrong with the site. It does NOT mean the\n" +
+          "model is valid, and it is not a reason to stop:\n\n" +
+          "  1. put checker.js and fixer.js next to the model, or in this directory,\n" +
+          "     and run this script again — it prefers local copies and needs no network;\n" +
+          "  2. or pass --base <directory> naming where those two files are;\n" +
+          "  3. or, if neither is possible, deliver the model and state plainly that it\n" +
+          "     is unvalidated and why. Never report checker counts you did not obtain."
+      );
       process.exit(2);
     }
     writeFileSync(join(dir, name), await response.text());
