@@ -1013,7 +1013,25 @@ async function run(fresh) {
     );
 
     const frame = $("frame");
-    const url = `${BASE}index.html${fresh ? "?ephemeral" : ""}`;
+    /*
+     * `?theme=dark` on the frame's URL, and the reason is the reason
+     * `viewers/index.html` carries `data-awv-theme="dark"`.
+     *
+     * This site serves one theme to everybody: `dark-theme.css` is loaded last on
+     * every page and the stage around this frame is near-black. The generated
+     * application defaults to following the reader's machine, so on a light
+     * machine a light application rendered inside a dark page — the only part of
+     * the chapter that did not match it.
+     *
+     * A parent page cannot reach into the frame to set a theme, so the generated
+     * application reads `?theme=` as its *default*: a reader who picks a theme in
+     * the application's own control keeps it, and this only decides what they meet
+     * first. Upstream honours it in the pre-paint script, so there is no flash.
+     */
+    // `ephemeral=` rather than a bare `?ephemeral`: `boot.js` reads it with
+    // `URLSearchParams.has`, which is true for either spelling.
+    const query = fresh ? "?theme=dark&ephemeral=" : "?theme=dark";
+    const url = `${BASE}index.html${query}`;
     frame.src = "about:blank";
     // A frame so the blank navigation commits first; assigning twice in one
     // task leaves the iframe on the old document with the new URL in its bar.
