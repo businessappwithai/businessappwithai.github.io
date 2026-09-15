@@ -384,5 +384,74 @@ console.log("\nThe reporting application in the deployable archive");
 }
 
 // ---------------------------------------------------------------------------
+// 7. The four prompts on try-it-yourself.html.
+//
+// The page makes a claim about each pair — that the second prompt is the first
+// one word for word below its opening line, and that only the document and the
+// section number change. It is the kind of claim that is true when it is
+// written and false after the next edit to either block, because the two are
+// four hundred lines apart in the source and nothing reads both. A prompt pair
+// that has drifted sends one reader through the wrong protocol.
+console.log("\n7. The prompts on try-it-yourself.html");
+{
+  const page = readFileSync(path.join(ROOT, "try-it-yourself.html"), "utf8");
+
+  const promptBody = (id) => {
+    const m = page.match(new RegExp(`<pre id="${id}"[^>]*>([\\s\\S]*?)</pre>`));
+    if (!m) return null;
+    /* `[data-url]` spans carry the URL as their text; main.js rewrites them at
+       run time, so the text is what a reader copies. Unwrap, then unescape. */
+    return m[1]
+      .replace(/<span[^>]*>([\s\S]*?)<\/span>/g, "$1")
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
+  };
+
+  const pairs = [
+    ["authoring", "research-prompt", "enterprise-research-prompt", "llms-full.txt", "llmdetailed.txt"],
+    ["enhancement", "enhance-prompt", "enterprise-enhance-research-prompt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"],
+  ];
+
+  for (const [label, batchId, gatedId, batchDoc, gatedDoc] of pairs) {
+    const a = promptBody(batchId);
+    const b = promptBody(gatedId);
+    if (!a || !b) { fail(`the ${label} pair is on the page`, `missing #${a ? gatedId : batchId}`); continue; }
+
+    const aLines = a.split("\n");
+    const bLines = b.split("\n");
+    aLines.slice(1).join("\n") === bLines.slice(1).join("\n")
+      ? ok(`the ${label} prompts are identical below their first line`)
+      : fail(`the ${label} prompts are identical below their first line`,
+             "they have drifted — edit one and you must edit the other");
+    aLines[0] !== bLines[0]
+      ? ok(`the ${label} pair's first lines differ, which is where all four differences live`)
+      : fail(`the ${label} pair's first lines differ`, "both name the same document and section");
+    aLines[0].includes(batchDoc) && bLines[0].includes(gatedDoc)
+      ? ok(`the ${label} pair names ${batchDoc} and ${gatedDoc}`)
+      : fail(`the ${label} pair names its two documents`, `got: ${aLines[0].slice(0, 80)}`);
+  }
+
+  /* Every document the four prompts name has to be served from this origin —
+     a prompt is a URL a reader pastes, and a 404 is silent to them until the
+     model says it cannot read it. */
+  for (const doc of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"])
+    existsSync(path.join(ROOT, doc))
+      ? ok(`${doc} is published here`)
+      : fail(`${doc} is published here`, "a prompt names a document this site does not serve");
+
+  /* The enhancement pair exists because the authoring pair, pointed at an
+     existing model, rewrites it. Both enhancement prompts must therefore hand
+     the user's file over and refuse a reconstruction. */
+  for (const id of ["enhance-prompt", "enterprise-enhance-research-prompt"]) {
+    const body = promptBody(id) ?? "";
+    /My model is attached/.test(body) && /do not rebuild it/i.test(body)
+      ? ok(`#${id} tells the model to read the attached file and not rebuild it`)
+      : fail(`#${id} tells the model to read the attached file`, "the prompt does not require the user's own model");
+    /Not a patch, not a diff/.test(body)
+      ? ok(`#${id} asks for the whole model back rather than a patch`)
+      : fail(`#${id} asks for the whole model back`, "the prompt permits a diff");
+  }
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);

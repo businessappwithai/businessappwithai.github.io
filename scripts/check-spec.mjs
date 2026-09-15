@@ -395,6 +395,14 @@ expect(spawnSync(process.execPath, [runner], { encoding: "utf8" }).status === 2,
  */
 
 const detailed = readFileSync(root + "llmdetailed.txt", "utf8");
+/* The enhancement editions. Each is its base with the authoring protocol
+ * swapped for the enhancement protocol, derived by
+ * scripts/build-llmtext-enhancement.mjs — so everything asserted below about a
+ * base document has to hold for its enhancement edition too. */
+const enhancements = {
+  "llmtextenhancement.txt": readFileSync(root + "llmtextenhancement.txt", "utf8"),
+  "llmdetailedenhancement.txt": readFileSync(root + "llmdetailedenhancement.txt", "utf8"),
+};
 /* The file is hard-wrapped, so any assertion about a *sentence* has to run
  * against a whitespace-collapsed copy — otherwise it silently passes or fails
  * on where the line happened to break. */
@@ -490,7 +498,7 @@ held(/Perform the validation; do not offer it/i.test(detailedProse),
  * "validated but not compiled" while the same file's own table said compiled.
  * The authority (language/appwithai-language.json) lives upstream, so what is
  * held here is each document against its own status table. */
-for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spec.join("\n")]]) {
+for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spec.join("\n")], ...Object.entries(enhancements)]) {
   const compiled = [...body.matchAll(/^\| `%%(\w+)` \|[^\n]*\bcompiled\b[^\n]*$/gm)].map((m) => m[1]);
   held(compiled.length >= 8, `${file}: its directive table marks the compiled directives (${compiled.length})`);
   const flat = body.replace(/\s+/g, " ");
@@ -506,4 +514,124 @@ for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spe
 held(/every step that touches the `\.mmd`/i.test(detailedProse),
   "section 10 binds the fixer-then-checker loop to every step, not only to phase 6");
 
-process.exit(exampleFailures + fail + runnerFail + detailedFail === 0 ? 0 : 1);
+
+/* ------------------------------- 7. the enhancement editions ---------------
+ *
+ * `llmtextenhancement.txt` and `llmdetailedenhancement.txt` take an existing
+ * `.mmd` and change it, where their base documents write one from a brief.
+ * They are *derived* from those bases — the whole language reference is copied,
+ * only the protocol section differs — so the first thing held here is that the
+ * derivation is current. The rest holds the four claims that make an
+ * enhancement protocol different from an authoring one, each of which was a
+ * real failure before it was a rule: starting without the user's file,
+ * rebuilding the model from memory, answering with a patch, and handing back a
+ * model that checks clean and is quietly smaller than the one that came in.
+ */
+
+let enhancementFail = 0;
+const enh = (cond, label) => {
+  if (cond) console.log(`ok   ${label}`);
+  else { enhancementFail++; console.log(`FAIL ${label}`); }
+};
+
+/* The derivation itself. A base edited without rebuilding its enhancement
+ * edition is the only way these four documents can disagree about the
+ * language, and it is exactly the failure the deriver exists to prevent. */
+const built = spawnSync(process.execPath, [root + "scripts/build-llmtext-enhancement.mjs", "--check"], { encoding: "utf8" });
+enh(built.status === 0,
+  `both enhancement editions are current against their bases${built.status === 0 ? "" : "\n" + built.stdout}`);
+
+/* The language half is the base's, byte for byte. Asserted directly as well as
+ * through the deriver, because this is the property that matters and it should
+ * fail by name rather than as "the build is stale". */
+const tailFrom = (body, heading) => body.slice(body.search(heading));
+enh(tailFrom(enhancements["llmtextenhancement.txt"], /^## 2\. /m) === tailFrom(spec.join("\n"), /^## 2\. /m),
+  "llmtextenhancement.txt carries llms-full.txt's language reference unchanged");
+enh(tailFrom(enhancements["llmdetailedenhancement.txt"], /^## 11\. /m) === tailFrom(detailed, /^## 11\. /m),
+  "llmdetailedenhancement.txt carries llmdetailed.txt's closing section unchanged");
+
+for (const [name, body] of Object.entries(enhancements)) {
+  const prose = body.replace(/\s+/g, " ");
+
+  /* A code invented for a table reads exactly like a real one to a model. */
+  const cited = [...new Set(body.match(/EML\d{3}/g) ?? [])].sort();
+  const missing = cited.filter((code) => !checkerSource.includes(code));
+  enh(cited.length >= 20 && missing.length === 0,
+    `${name}: every diagnostic it cites exists in the checker (${cited.length} codes${missing.length ? ", missing: " + missing.join(", ") : ""})`);
+
+  /* Cross-references must resolve, or a ladder sends the reader nowhere. */
+  const heads = new Set([...body.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
+  const dangling = [...new Set([...body.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))].filter((r) => !heads.has(r));
+  enh(dangling.length === 0,
+    `${name}: every §N.N cross-reference resolves${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
+
+  /* 1 — it has an input, and it asks for it. A protocol that does not say this
+   * gets a model invented from the conversation, which is the authoring
+   * protocol run under the wrong name. */
+  enh(/load (?:their|your) `?\.mmd`?|Send me the `\.mmd`/i.test(prose),
+    `${name}: asks the user to load their .mmd before anything else`);
+  enh(/Never reconstruct the model/i.test(prose),
+    `${name}: forbids reconstructing the model from memory or the conversation`);
+
+  /* 2 — the deliverable is the whole file. The observed failure is a reply of
+   * "add these lines", which makes the user perform the merge. */
+  enh(/Not a patch\. Not a diff\.|Not a diff, not a patch/i.test(prose),
+    `${name}: says the deliverable is the whole model, not a patch or a diff`);
+  enh(/\.mmd/.test(body) && /one file/i.test(prose),
+    `${name}: still delivers exactly one .mmd`);
+
+  /* 3 — baseline before editing, so a diagnostic can be attributed. */
+  enh(/baseline/i.test(prose) && /inventor/i.test(prose),
+    `${name}: baselines and inventories the model before it is edited`);
+
+  /* 4 — the regression comparison. This is the half no tool performs, and the
+   * reason both documents exist rather than a sentence in the base ones. */
+  enh(/%%report/.test(body) && /(nothing was lost|nothing lost|regression)/i.test(prose),
+    `${name}: compares the result against the baseline to prove nothing was lost`);
+  enh(/help text/i.test(prose) && /%%rbac/.test(body),
+    `${name}: names help text and %%rbac among what an enhancement silently drops`);
+
+  /* The four protocols have to be findable from any one of them, or a reader
+   * lands on the enhancement form for a model that does not exist yet. */
+  for (const sibling of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"])
+    if (sibling !== name)
+      enh(body.includes(sibling), `${name}: names its companion ${sibling}`);
+}
+
+/* The interactive edition is held to every tooling claim llmdetailed.txt is
+ * held to above — it carries the same §10.6, spliced by the deriver, so these
+ * pass for free and fail loudly if that splice is ever replaced by prose. */
+const interactive = enhancements["llmdetailedenhancement.txt"];
+const interactiveProse = interactive.replace(/\s+/g, " ");
+enh(/curl -sO https:\/\/(?:www\.)?appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
+  "llmdetailedenhancement.txt carries the one-line way to run the checker");
+for (const flagName of ["--write", "--base"])
+  enh(interactive.includes(flagName) && runnerSource.includes(flagName),
+    `llmdetailedenhancement.txt's \`${flagName}\` is a flag check-model.mjs actually has`);
+enh(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(interactive),
+  "llmdetailedenhancement.txt documents all three of the runner's exit codes");
+enh(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(interactive)),
+  `llmdetailedenhancement.txt tabulates every auto-fixable code (${AUTO_FIXABLE.join(", ")})`);
+enh(/https:\/\/(?:www\.)?appwithai\.org\/viewers\//.test(interactive),
+  "llmdetailedenhancement.txt names the model viewers by their published URL");
+for (const named of ["Workflows", "Business rules", "Access"])
+  enh(viewerTabs.includes(named) && interactiveProse.includes(`**${named}**`),
+    `llmdetailedenhancement.txt: the "${named}" tab it names exists on the viewer page`);
+enh(/File System Access API/.test(interactiveProse) && /Watch a file/.test(interactiveProse),
+  "llmdetailedenhancement.txt says which browsers can watch a file");
+enh(/every step that touches the `\.mmd`/i.test(interactiveProse),
+  "llmdetailedenhancement.txt binds the fixer-then-checker loop to every step");
+enh(/Perform the validation; do not offer it/i.test(interactiveProse),
+  "llmdetailedenhancement.txt requires the run rather than offering it");
+
+/* The gates are the substance of the interactive form. A phase list with no
+ * gate in it is the batch protocol wearing the other file's name. */
+for (const gate of ["Gate A", "Gate B", "Gate C", "Gate D", "Gate E"])
+  enh(interactive.includes(gate), `llmdetailedenhancement.txt keeps ${gate}`);
+enh(/00-original\.mmd/.test(interactive),
+  "llmdetailedenhancement.txt keeps the original untouched as the thing to compare against");
+
+console.log(`\n${enhancementFail === 0 ? "enhancement editions hold." : enhancementFail + " enhancement claim(s) contradicted."}`);
+
+
+process.exit(exampleFailures + fail + runnerFail + detailedFail + enhancementFail === 0 ? 0 : 1);

@@ -68,10 +68,19 @@ businessappwithai.github.io/
 ├── llmdetailed.txt           # The whole system, and §10's *interactive* authoring
 │                             # protocol — the enterprise path. Vendored from
 │                             # `llmtext/llmdetailed.txt`, unlike llms-full.txt
+├── llmtextenhancement.txt    # llms-full.txt with §1 replaced: enhance an existing
+│                             # .mmd rather than write a new one. DERIVED
+├── llmdetailedenhancement.txt# llmdetailed.txt with §10 replaced: the same, with
+│                             # approval gates. DERIVED
 ├── scripts/
 │   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js,
-│   │                         # plus llmdetailed.txt §10's tooling claims
-│   └── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
+│   │                         # plus llmdetailed.txt §10's tooling claims, plus
+│   │                         # both enhancement editions and their derivation
+│   ├── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
+│   ├── build-llmtext-enhancement.mjs   # Derives the two enhancement editions
+│   │                         # from their bases. `--check` fails when stale
+│   └── llmtext/              # The sources it composes: one protocol and one
+│                             # header per edition. The ONLY hand-edited part
 ├── favicon.svg               # The tab icon: `.logo-mark` restated in SVG. The A is a
 │                             #   path, not <text> — a favicon cannot assume a font
 ├── favicon.ico               # The same mark at 16/32/48 for the browser's default
@@ -148,6 +157,8 @@ Deployment is fully automatic:
 | `viewers/index.html` | The model viewer: an `.eml.mmd` drawn in full — entities, state machines, sagas, business rules and access — by the generator's own parser and compilers. Linked from the home page, `try-it-yourself.html#enterprise-prompt`, chapter 11 and every footer |
 | `llms-full.txt` | The EML language specification language models are pointed at — the language only, deliberately not the generator or the framework |
 | `llmdetailed.txt` | The same language, plus the generator, the templates and the generated application — and an *interactive* authoring protocol in §10. The professional/enterprise path, linked from `try-it-yourself.html#enterprise-prompt` and the home page |
+| `llmtextenhancement.txt` | `llms-full.txt` with its §1 replaced by the **enhancement** protocol: load the user's existing `.mmd`, change what they asked for, keep everything else, and prove it. Derived, not authored — see **The enhancement editions** below. Linked from `try-it-yourself.html#enhance` and the home page |
+| `llmdetailedenhancement.txt` | `llmdetailed.txt` with its §10 replaced by the **interactive** enhancement protocol — the same seven-phase, gated walkthrough, applied to a model that already exists. Derived. Linked from `try-it-yourself.html#enterprise-enhance-prompt` |
 
 ## Design System (Lunaris)
 
@@ -364,6 +375,15 @@ them the path spans five files. If you change one, check the others. There are n
    seven phases separated by them. If you edit one prompt below its first line, edit
    the other, or the claim on the page stops being true. The home page carries a
    one-line pointer to it and nothing more.
+7. **The enhancement pair — `try-it-yourself.html#enhance`.** Two more prompt
+   cards and a four-way table, in a section of their own after the two above.
+   They point at `llmtextenhancement.txt` and `llmdetailedenhancement.txt`, and
+   they exist because the two prompts above **rewrite** any model you point them
+   at — they are written to produce a model from a description, so given one they
+   produce a second one. The enhancement prompts attach the user's `.mmd`
+   instead, and ask for the whole file back with before-and-after counts. The
+   same word-for-word rule binds this pair as binds the first, and
+   `website-e2e.mjs` enforces both. The home page carries a one-line pointer.
 
 ## Key Conventions for AI Assistants
 
@@ -722,6 +742,7 @@ Where each one comes from:
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
 | `llmdetailed.txt` | `website/llmtext/llmdetailed.txt` | — |
+| `llmtextenhancement.txt`, `llmdetailedenhancement.txt` | **Neither.** Derived here from the two files above by `scripts/build-llmtext-enhancement.mjs`; the product repositories derive their own copies from their own bases | `node scripts/build-llmtext-enhancement.mjs` |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
 The five generator artifacts move together. Re-vendoring `checker.js` without
@@ -818,6 +839,84 @@ mean no request: a page load still asks `us-assets.i.posthog.com` for the
 project config and `api_host` for flags, before any event. The README beside the
 bundle tabulates all three, and `privacy.html` is written to match. Neither
 claim is guesswork — both were read off the network in a browser.
+
+## The enhancement editions — derived, never hand-written
+
+There are **four** published protocol documents, not two, and they divide on two
+questions: does the reader start from a description or from a `.mmd` they
+already have, and do they want one answer or a conversation.
+
+| | Start from a brief | Start from an existing `.mmd` |
+|---|---|---|
+| **One pass** | `llms-full.txt` §1 | `llmtextenhancement.txt` §1 |
+| **Phased, with approval gates** | `llmdetailed.txt` §10 | `llmdetailedenhancement.txt` §10 |
+
+**The enhancement pair is derived from the pair above it.** Each is its base
+with one section swapped — the authoring protocol becomes the enhancement
+protocol — and *everything else carried across byte for byte*. Rebuild them with:
+
+```bash
+node scripts/build-llmtext-enhancement.mjs          # rebuild both
+node scripts/build-llmtext-enhancement.mjs --check  # what CI runs
+```
+
+**Do not edit `llmtextenhancement.txt` or `llmdetailedenhancement.txt` by
+hand.** They are build outputs. The four files under `scripts/llmtext/` are the
+sources — one protocol and one header per edition — and a hand edit to the
+output is lost the next time anyone runs the builder, silently, because the
+output is checked in and looks like an ordinary document.
+
+**Why derive rather than write two more specifications.** Four documents
+describing one language, each maintained separately, is four answers to "what
+does `%%rbac` do", and three of them go stale in the direction nobody notices.
+Here the language half cannot drift: it is copied, and `check-spec.mjs` asserts
+byte-for-byte that it still matches the base. That is the same reasoning behind
+`check:models` upstream, applied to prose.
+
+Two properties of the deriver are load-bearing:
+
+- **A section ends at the next *numbered* `## ` heading**, never at a bare one.
+  Both base documents quote a markdown dossier inside a fenced block whose own
+  headings are `## Fields` and `## Enums`, so a bare match stops inside the
+  fence and strands the tail of the old protocol after the new one. That is not
+  a crash: the result checks clean and reads as a document with an extra entity
+  dossier bolted to the end. `llmtext-claims.ts` upstream is what caught it.
+- **The interactive edition splices the base's own `#### The tools` block**
+  rather than restating it. Every claim about the checker — its flags, its three
+  exit codes, the offline ladder, the rule that an unreachable GitHub is not an
+  unreachable checker — is therefore the real one, and stays true for free.
+
+**The section numbers move with the shape.** The protocol sources use a `{{N}}`
+token rather than a literal number, because the same protocol sits at §1 in this
+site's language-only edition and at §10 in the product repositories' system
+edition. For the same reason a source must never quote another document's
+section number: `llms-full.txt` §1 here is `llms-full.txt` §10 there. Refer to
+"its authoring protocol", not to a digit.
+
+**What makes an enhancement protocol different, and what the checks hold it to.**
+Authoring has one way to fail — model the business badly. Enhancement has three,
+and only the first has a diagnostic:
+
+1. answering with prose about the model instead of the model (`EML004`);
+2. answering with only the part that changed, so the user performs the merge by
+   hand into a document they did not write;
+3. handing back a model that checks clean and is **quietly smaller** than the one
+   that came in — four `%%report` directives gone, an entity's help text gone,
+   two `%%rbac` lines gone. A smaller model is a valid model, so nothing
+   complains.
+
+Both editions therefore ask for the user's file before anything else, refuse to
+reconstruct a model from a summary or the conversation, inventory the model
+*before* editing it, and close by comparing the result against that inventory.
+`check-spec.mjs` §7 and `website-e2e.mjs` §7 assert each of those, and
+`llmtext-claims.ts` upstream asserts them where the files are derived.
+
+**Four prompts, and two pairs that must stay word-for-word.** `try-it-yourself.html`
+carries all four. Within each pair everything below the first line is identical,
+and the first line carries every difference — the document, the section number,
+and (for the gated forms) the sentence about not crossing a gate. `website-e2e.mjs`
+holds both pairs to that, so editing one prompt without the other fails CI rather
+than quietly sending a reader through the wrong protocol.
 
 ## `llms-full.txt` is authored here, not vendored
 
@@ -1004,7 +1103,7 @@ the three scripts it runs have no dependencies.
 
 | Step | What it holds |
 |---|---|
-| `node scripts/check-spec.mjs` | `llms-full.txt`'s fenced examples and its claims, against the published checker |
+| `node scripts/check-spec.mjs` | `llms-full.txt`'s fenced examples and its claims, against the published checker — plus `llmdetailed.txt` §10's tooling claims, both enhancement editions, and that neither is stale against its base |
 | `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
 | `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below |
 
@@ -1048,6 +1147,13 @@ groups:
    is one the generated migration creates. It is the slow group, and it says so
    and skips itself when `stack-templates.json` is absent rather than passing
    without running.
+7. **the four prompts on `try-it-yourself.html`.** Each pair is identical below
+   its first line, each first line names the document and section it should, and
+   every document the four name is one this site actually serves. Both
+   enhancement prompts are held to attaching the user's model and asking for the
+   whole file back. The claim was written on the page and read by nothing: the
+   two halves of a pair are four hundred lines apart in the source.
+
 
 **"Roles" means the roles the model declares.** `readModel().stats.roles` is two
 higher — it adds the generated `administrator` and `user` that no model writes —

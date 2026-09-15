@@ -130,7 +130,7 @@
     <div class="container">
       <div class="section-header">
         <h2>The prompt — copy it as it is</h2>
-        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you. For a professional or enterprise application, use <a href="#enterprise-prompt" style="color: inherit;">the same prompt against the detailed specification</a> instead — same words, a longer conversation, a model nobody had to guess.</p>
+        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you. For a professional or enterprise application, use <a href="#enterprise-prompt" style="color: inherit;">the same prompt against the detailed specification</a> instead — same words, a longer conversation, a model nobody had to guess. <strong>Already have a <code>.mmd</code>?</strong> Both of these write a model from nothing; <a href="#enhance" style="color: inherit;">the enhancement prompts</a> start from the file you already have and give it back whole.</p>
       </div>
 
       <div class="card">
@@ -202,6 +202,130 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Already have a model? -->
+  <section class="section section-white" id="enhance">
+    <div class="container">
+      <div class="section-header">
+        <h2>Already have a model? Enhance it instead</h2>
+        <p class="section-subtitle">The two prompts above start from nothing. These two start from the <code>.mmd</code> you already have — you load your file, say what you want changed, and get the whole model back with the change in it and everything else still there. Same language, same checker, a different protocol.</p>
+      </div>
+
+      <div class="card">
+        <span class="hero-badge">For a model you already have</span>
+        <h3 style="margin-top: var(--spacing-md);">Load your file, describe the change, get the whole model back</h3>
+        <p class="text-muted">There is a second pair of specifications for this, because enhancing is not authoring and the ways it goes wrong are its own. <a href="llmtextenhancement.txt"><code>llmtextenhancement.txt</code></a> is the one-pass form: the model reads your file, shows you what is in it, applies your change, and hands the file back whole. Its section 1 is the enhancement protocol.</p>
+
+        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
+          <div>
+            <h4>What it does that the authoring prompt cannot</h4>
+            <p class="text-sm text-muted">An authoring prompt pointed at an existing model rewrites it. A rewrite is a new model wearing the old one&rsquo;s name — and what it loses, no checker reports.</p>
+            <ul class="footer-links" style="line-height: 1.9;">
+              <li><strong>It asks for your file first</strong> — and refuses to work from a summary or a description</li>
+              <li><strong>It reads and counts your model before editing</strong> — entities, roles, reports, help text</li>
+              <li><strong>It follows the change through the file</strong> — a new entity also needs access rules, help and enum bindings</li>
+              <li><strong>It hands back the whole file</strong> — not a patch you have to merge yourself</li>
+              <li><strong>It proves nothing was lost</strong> — the before-and-after counts, side by side</li>
+            </ul>
+            <p class="text-muted text-sm">That last one is the point of the whole thing. A model that quietly came back with two fewer <code>%%rbac</code> lines and no help text on three entities passes the checker exactly like one that did not — so the count is the only thing that catches it.</p>
+          </div>
+          <div>
+            <pre id="enhance-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmtextenhancement.txt">https://www.appwithai.org/llmtextenhancement.txt</span> in full, and follow section 1 — the enhancement protocol — exactly.
+
+My model is attached. Do not start until you have read it, and do not rebuild it from anything else — not from a summary, not from this conversation, not from an earlier draft.
+
+What I want changed:
+[Describe it here. What to add, what to change, what to remove. Who does the new work. What states the new records move through. What has to be approved, and by whom.]
+
+First tell me what is in my model today — entities, roles, reports, help text, and the checker&#39;s verdict on it as it stands — so I can see you have the real file. Then apply only the change I asked for.
+
+Deliver exactly one file I can download: the whole enhanced model, under the name it arrived with. Not a patch, not a diff, not only the new parts, and nothing abbreviated — every line of the file, so I can upload it without merging anything by hand. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive.
+
+Keep everything I did not ask you to change: every entity, every column, every %%rbac line, every %%report and all the help text. Then show me the before-and-after counts side by side, and tell me plainly if any of them went down.
+
+Then, in your reply text: what changed, the checker result with its counts for my original and for the file you are delivering, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
+            <button type="button" class="btn btn-primary" data-copy="enhance-prompt">Copy the enhancement prompt</button>
+            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Attach your <code>.mmd</code> to the same message. If your model lives in a chat rather than a file, paste it in a single fenced block — the protocol accepts either, and takes the block&rsquo;s contents as the file.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+              <a href="llmtextenhancement.txt" class="btn btn-ghost">Read the enhancement specification &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-5" id="enterprise-enhance-prompt">
+        <span class="hero-badge">For a serious change to a model in use</span>
+        <h3 style="margin-top: var(--spacing-md);">Changing something people already depend on? Walk it, one change at a time</h3>
+        <p class="text-muted">The prompt above is right for a change you can state in a sentence. It is the wrong trade when the model is large, or old, or generating an application somebody is using — because then the risk is not that the change is wrong, it is that something else moved with it. For that there is <a href="llmdetailedenhancement.txt"><code>llmdetailedenhancement.txt</code></a>: the same language, the same diagnostics, the same checker, and an interactive enhancement protocol in its section 10.</p>
+
+        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
+          <div>
+            <h4>What section 10 does differently</h4>
+            <p class="text-sm text-muted">Section 1 of <code>llmtextenhancement.txt</code> is the <strong>batch</strong> enhancement: read the file, apply the change, validate, hand it back. Section 10 of <code>llmdetailedenhancement.txt</code> is the <strong>interactive</strong> one — seven phases separated by approval gates, with your original kept untouched beside the working copy the whole way.</p>
+            <ul class="footer-links" style="line-height: 1.9;">
+              <li><strong>Phase 1</strong> — load your model and inventory it, and show you what it contains</li>
+              <li><strong>Phase 2</strong> — agree the change roster before a byte is edited</li>
+              <li><strong>Phase 3</strong> — baseline a working copy; your original is never written to</li>
+              <li><strong>Phase 4</strong> — walk the changes one at a time, checking and counting after each</li>
+              <li><strong>Phase 5</strong> — the cross-cutting pass: what should have moved with the change and did not</li>
+              <li><strong>Phase 6</strong> — validate to clean, and prove nothing was lost</li>
+              <li><strong>Phase 7</strong> — deliver</li>
+            </ul>
+            <p class="text-muted text-sm">It costs a conversation instead of a reply. What you get for it is that no change to your model happened without your seeing it first, and that the thing you already had is still there afterwards — checked at every step, not hoped for at the end.</p>
+          </div>
+          <div>
+            <pre id="enterprise-enhance-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailedenhancement.txt">https://www.appwithai.org/llmdetailedenhancement.txt</span> in full, and follow section 10 — the interactive enhancement protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
+
+My model is attached. Do not start until you have read it, and do not rebuild it from anything else — not from a summary, not from this conversation, not from an earlier draft.
+
+What I want changed:
+[Describe it here. What to add, what to change, what to remove. Who does the new work. What states the new records move through. What has to be approved, and by whom.]
+
+First tell me what is in my model today — entities, roles, reports, help text, and the checker&#39;s verdict on it as it stands — so I can see you have the real file. Then apply only the change I asked for.
+
+Deliver exactly one file I can download: the whole enhanced model, under the name it arrived with. Not a patch, not a diff, not only the new parts, and nothing abbreviated — every line of the file, so I can upload it without merging anything by hand. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive.
+
+Keep everything I did not ask you to change: every entity, every column, every %%rbac line, every %%report and all the help text. Then show me the before-and-after counts side by side, and tell me plainly if any of them went down.
+
+Then, in your reply text: what changed, the checker result with its counts for my original and for the file you are delivering, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
+            <button type="button" class="btn btn-primary" data-copy="enterprise-enhance-research-prompt">Copy the detailed enhancement prompt</button>
+            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
+            <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps your original and the working copy side by side on disk rather than holding either in the conversation.</p>
+            <p class="text-muted text-sm"><strong>Watch it being changed.</strong> Open the <a href="viewers/index.html">model viewer</a> and point it at the working file, and the diagram updates as each change lands — the entities and their links, each lifecycle&rsquo;s legal moves, each rule&rsquo;s branches, and who ends up able to see what. Approving a change is worth more when you have seen what it did to the rest of the model.</p>
+            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+              <a href="llmdetailedenhancement.txt" class="btn btn-outline">Read the detailed enhancement specification &rarr;</a>
+              <a href="viewers/index.html" class="btn btn-outline">Open the model viewer &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-5">
+        <h4>Which of the four do I want?</h4>
+        <p class="text-muted text-sm">They divide on two questions: are you starting from a description or from a file, and do you want one answer or a conversation.</p>
+        <div style="overflow-x: auto;">
+          <table class="comparison-table">
+            <thead>
+              <tr><th></th><th>Start from a description</th><th>Start from a <code>.mmd</code> you have</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>One pass</strong></td>
+                <td><a href="#the-prompt"><code>llms-full.txt</code></a> &sect;1</td>
+                <td><a href="#enhance"><code>llmtextenhancement.txt</code></a> &sect;1</td>
+              </tr>
+              <tr>
+                <td><strong>Phased, with approval gates</strong></td>
+                <td><a href="#enterprise-prompt"><code>llmdetailed.txt</code></a> &sect;10</td>
+                <td><a href="#enterprise-enhance-prompt"><code>llmdetailedenhancement.txt</code></a> &sect;10</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">All four describe the same language and are held to the same published checker. The enhancement pair carries the identical language reference to the pair above it — only the protocol section differs, which is why a model that has read one of them already knows EML.</p>
       </div>
     </div>
   </section>
