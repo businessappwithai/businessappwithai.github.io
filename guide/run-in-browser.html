@@ -301,9 +301,12 @@
         <b>Two different applications, from the one model.</b> <i>Download as files</i> writes out the
         browser application above &mdash; the one running in the frame, no install and no build.
         <i>Download the deployable app</i> assembles the other one: the real NestJS and TanStack Start
-        source the command-line generator writes, about four hundred files, with a
+        source the command-line generator writes, about four hundred and fifty files, with a
         <code>docker-compose.yml</code> beside them. Unzip it and
-        <code>docker compose up --build</code> brings up PostgreSQL, the API and the web front end.
+        <code>docker compose up --build</code> brings up PostgreSQL, the API, the web front end
+        &mdash; <b>and the Enterprise Reporting platform beside them</b>, on its own port, holding
+        this model&rsquo;s reports, charts and dashboard and one reporting role per role the model
+        declares. <code>reporting/README.md</code> in the archive names both sets of accounts.
         It is assembled here in your browser when you press the button, which takes a few seconds and
         fetches the stack templates from this site.
       </p>
@@ -368,6 +371,38 @@
   generator seeds faker from the application's name — a screenshot of row four stays a screenshot of
   row four.
 </p>
+<h2 id="reporting">The second application, and the second sign-in</h2>
+<p>
+  The dashboard carries an <b>Enterprise Reporting</b> section, and clicking through it does not open a
+  screen of the application you are signed into &mdash; it asks you to sign in again. That is the whole
+  point of it. One model generates two applications, and this is the other one: the reporting platform,
+  holding the reports, charts and dashboard derived from the same document, over the same data the
+  application above has been writing.
+</p>
+<p>
+  <b>Two logins, and they are not merged.</b> A role in the application decides what you may <i>do</i>
+  to a record. A role here decides which of the application's tables your queries may <i>read</i> — and
+  those are different questions, answered by different tables in different sign-in screens. The names
+  line up, deliberately: the CRM model declares seven functional roles and the reporting side has one
+  account per role, at <code>support.agent@crm.reports.example.com</code> against the application's
+  <code>support.agent@crm.example.com</code>. The addresses differ on purpose, because identical ones
+  would invite you to try one password on both, and neither password works on the other side.
+</p>
+<p>
+  Signing in as <code>support.agent@…</code> is the thing to try. It reads five of the model's
+  seventeen tables, so it is offered 36 of the 116 reports and its dashboard says
+  <i>7 tiles hidden — Support Agent may not read the tables behind them</i>. Ask it for a report over
+  an entity it does not own and it refuses by name. The administrator reads all seventeen. None of that
+  is configured here: it is the same <code>%%rbac … .read</code> lines the application's navigation is
+  scoped from, read a second way.
+</p>
+<p>
+  Deployed, this is a separate service with a database of its own &mdash; which is what the
+  <i>Download the deployable app</i> archive sets up, with the platform on its own port beside the
+  application. A browser tab cannot run a second server, so here the reports and the roles are served
+  from this one; everything a reader meets is still separate, and that is the part that has to be.
+</p>
+
 <p>
   The dashboard of the running application opens on a <b>Manual</b> button, and what it points at was
   written by the same generation run. <code>manual.html</code> is one self-contained page &mdash; a
