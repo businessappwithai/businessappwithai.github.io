@@ -918,6 +918,39 @@ and (for the gated forms) the sentence about not crossing a gate. `website-e2e.m
 holds both pairs to that, so editing one prompt without the other fails CI rather
 than quietly sending a reader through the wrong protocol.
 
+## What the published checker hands back
+
+`guide/checker.js` and `guide/fixer.js` now return, and print, the context needed
+to act on a diagnostic: the code, the line, **the text of that line**, and the
+repair — followed by steps derived from the run itself.
+
+```
+error:18 [EML144] %%field "Order.status" references undeclared enum "MissingEnum".
+  18 │ %%field Order.status enum: MissingEnum
+     └ fix: Add  %%enum MissingEnum: value1, value2  before the erDiagram block.
+```
+
+A line number alone makes the reader count lines, and the reader here is usually
+a language model holding the document in a context window rather than open in an
+editor. It miscounts, edits the wrong line, and reports a fix that was never
+applied.
+
+**None of this is authored here.** It is `language/browser/checker.entry.ts` and
+`fixer.entry.ts` in `app-with-ai-tanstack`, rebuilt with `bun run
+build:language-tools` and `bun run build:viewers`. Three files move together when
+it changes — `guide/checker.js`, `guide/fixer.js` and `viewers/eml-model.js`,
+which bundles the same checker entry — and chapter 11, chapter 09 and the viewers
+will otherwise disagree about the same model.
+
+Two properties worth not breaking when re-vendoring:
+
+- **The verdict is still the final line.** The steps sit between the diagnostics
+  and the verdict. `check-spec.mjs` reads the runner's last line, and §8.2 tells
+  readers to do the same.
+- **`formatReport` output is multi-line per diagnostic now.** `validator.js`
+  renders it inside a `<pre>`, so it needs nothing; anything that assumed one
+  line per issue does.
+
 ## The published host is written in full — `https://www.appwithai.org`
 
 Every mention of the host in all four protocol documents is the absolute URL,
