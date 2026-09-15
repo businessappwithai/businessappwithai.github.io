@@ -918,6 +918,56 @@ and (for the gated forms) the sentence about not crossing a gate. `website-e2e.m
 holds both pairs to that, so editing one prompt without the other fails CI rather
 than quietly sending a reader through the wrong protocol.
 
+## The published host is written in full — `https://www.appwithai.org`
+
+Every mention of the host in all four protocol documents is the absolute URL,
+scheme and `www.` included. This is not a style preference. A model following
+the specification reported a failed validator fetch as
+
+```
+Validator retrieval failed for [www.appwithai.org](https://www.appwithai.org)
+and appwithai.org: container requests returned DNS-resolution failures
+```
+
+— a Markdown link whose *text* is a bare host, beside a second bare host. The
+documents taught it that: they named the host without a scheme in prose, and the
+copies in the product repositories used the apex for most URLs while the
+published ones used `www`. Three things follow, and each has been seen:
+
+- **A bare host is not a URL.** A runtime handed `appwithai.org/guide/checker.js`
+  either refuses it or guesses a scheme.
+- **A Markdown link around a bare host is worse, because it looks right.** These
+  files are read by language models, not rendered — the link text is what gets
+  parsed out and resolved.
+- **The apex is not canonical.** It serves the same files and redirects, but an
+  environment that resolves one and not the other is common.
+
+The rule lives in each document's validation section and says all of this, plus
+how to report a failure: name the exact request and the exact error, not a
+prettified version of the host.
+
+**`check-spec.mjs` §8 holds it**, over all four documents and over `index.html`
+and `try-it-yourself.html`; `llmtext-claims.ts` upstream holds the copies where
+they are authored. Two details of that check are load-bearing:
+
+- **It strips the canonical form before scanning**, rather than filtering lines
+  that contain it. A naive `grep -v https://www.appwithai.org` passes a line that
+  holds a good URL *and* a bare host — which is exactly the line that survived
+  the first sweep of this work, in the enhancement header, and was caught only
+  once the check existed.
+- **It holds the counter-examples out of the scan and then asserts they are
+  still there.** The rule teaches by showing what not to write; a checker that
+  "corrects" those three lines leaves three bullets all displaying the right URL
+  and explaining nothing.
+
+**Where the rule is inserted depends on the document's shape**, and getting it
+wrong is silent. In the language-only edition the validation section is §8; in
+the product repositories' system edition it is §3.6. The paragraph naming
+`--base` sits inside the *authoring protocol* there — which the enhancement
+edition replaces wholesale — so anchoring on it put the rule in the two bases and
+in neither of their companions, with every other check still green.
+`llmtext-claims.ts` is what noticed.
+
 ## `llms-full.txt` is authored here, not vendored
 
 It began as a copy of the generator repository's `llmtext/llms-full.txt`, which documents the whole

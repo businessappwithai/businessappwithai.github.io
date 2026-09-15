@@ -34,8 +34,10 @@
   language and are held to the same checker.
 - **Validators**, published by this document's validation section:
   `https://www.appwithai.org/guide/checker.js` and
-  `https://www.appwithai.org/guide/fixer.js`. The apex, `appwithai.org`, serves
-  the same files; `www` is canonical. **If neither host is reachable from your
+  `https://www.appwithai.org/guide/fixer.js`. **Write that exact form every
+  time** — scheme, `www.`, and never a bare host. The apex
+  `https://appwithai.org` serves the same files, but the `www` form is
+  canonical and is the one to write. **If neither host is reachable from your
   environment, that is a fact about your network and not a reason to skip
   validation or to stop** — that section's last two rows are the offline
   procedure, and they are real runs with real counts.
