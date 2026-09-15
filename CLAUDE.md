@@ -33,7 +33,7 @@ businessappwithai.github.io/
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
-│       └── stack-templates.json  # 353 stack templates for chapters 09 and 10
+│       └── stack-templates.json  # 360 stack templates for chapters 09 and 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
 │   ├── index.html            # 00 · Overview
@@ -442,11 +442,44 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 
 The generated application seeds one account per functional role the model
 declares, and its sign-in screen lists every one with the number of entities
-that role can see. That is the point of the CRM example declaring eight
+that role can see. That is the point of the CRM example declaring **seven**
 functional roles: signing in as `support.agent@…` gives you five entities of
 seventeen, `marketing.manager@…` six, and the administrator all of them. None of
 that logic is on this site — `guide/models/crm.eml.mmd` declares the roles with
 `%%rbac … .read` lines and the vendored generator does the rest.
+
+Seven, not eight, and this paragraph said eight for as long as it existed. The
+model's reader reports **nine** roles and two of those are generated —
+`Administrator` and `User`, which no model writes — so any count taken off
+`readModel().stats.roles` is two high, and one taken by counting names in
+`%%rbac` lines is wrong the other way, because some models name `administrator`
+there and some do not. `scripts/website-e2e.mjs` counts the roles the reader
+marks `Declared by %%rbac`, which is the only number that means the same thing
+for every model; it is what found the cards overstating by one, and this line
+was the same mistake sitting outside its reach.
+
+**The second sign-in — what the reader is meant to try**
+
+The dashboard carries an **Enterprise Reporting** section, and clicking it does
+not open a screen of the application: it asks for a different password. One
+model generates two applications and that is the other one — the reporting
+platform's reports, charts and dashboard, over the same data, behind its own
+accounts.
+
+A role in the application decides what you may *do* to a record; a reporting
+role decides which of the application's tables your queries may *read*. The
+names line up (one reporting account per `%%rbac` role) and the addresses do
+not: `support.agent@crm.reports.example.com` against the application's
+`support.agent@crm.example.com`, deliberately, because identical ones invite a
+reader to try one password on both. Neither works on the other side.
+
+**None of it is on this site.** `buildReportingPack` in the generator
+(`packages/generator/src/reporting/pack.ts`) derives the whole thing from the
+parsed model, `appwithai-wasm.js` writes it into `model.json`, and the runtime
+serves it behind `/api/report-auth` and `/api/reporting`. The figures chapter 09
+states about it — five of seventeen tables, 36 of 116 reports — are asserted by
+`scripts/website-e2e.mjs` against the pack the *vendored* bundle derives, so
+they cannot go stale the way the role count in this file did.
 
 **Delete all records** — the dashboard of the running application carries an
 administrator-only control that empties every business table and leaves the
@@ -484,9 +517,22 @@ exactly that reason.
 The same model produces two applications, and the page now hands over both. The
 browser application is the one running in the frame; *Download the deployable
 app (.zip)* assembles the **other** one — the real NestJS and TanStack Start
-source, 445 files, with a `docker-compose.yml` so `docker compose up --build`
+source, 454 files, with a `docker-compose.yml` so `docker compose up --build`
 brings up PostgreSQL, the API and the web front end.
 
+- **It carries the reporting platform too, and that is new.** The archive has a
+  `reporting/` directory — the pack derived from the model (saved queries,
+  report and chart definitions, a dashboard, and one reporting role per
+  `%%rbac` role), a Dockerfile that fetches and builds the Enterprise Reporting
+  platform, the PostgreSQL init that gives it a database of its own, and a
+  README naming *both* sets of accounts. `docker-compose.yml` gains a `report`
+  service and a one-shot `report-seeder`, so `docker compose up --build` brings
+  up two applications on two ports with two sign-ins. **The platform is not
+  vendored into the archive** — it is around ninety megabytes of somebody
+  else's source, so the Dockerfile clones it at `REPORT_REF` (default `main`)
+  and the pack is the only reporting artefact the archive actually contains.
+  That means the *build* needs network access; the note in that Dockerfile says
+  what to do without it.
 - **It is chapter 10's machinery, used differently.** `appwithai-fullstack.js`
   and `assets/vendor/stack-templates.json` are what `run-real-stack.html`
   already loads; here the file map is zipped instead of mounted in a
@@ -563,7 +609,7 @@ fire on it and the roles that may read it.
 
 ## Chapter 10 — the real stack in a WebContainer
 
-`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — 451 files — and
+`guide/run-real-stack.html` assembles the full NestJS and TanStack Start application — around 460 files — and
 runs it in a WebContainer. It needs two things chapter 09 does not.
 
 - **Cross-origin isolation.** A WebContainer needs `SharedArrayBuffer`, which requires
@@ -993,7 +1039,15 @@ groups:
    `parent:` directive, and every page still renders correctly;
 5. the vendored bundles still behave: an entity whose name begins with an
    acronym resolves to `bus_kyc_record`, and `checker.js` and `eml-model.js`
-   report one language version.
+   report one language version;
+6. **the reporting application the deployable archive carries.** It generates
+   the whole thing from `appwithai-fullstack.js` — the byte this site serves,
+   not the generator upstream — and holds chapter 09's reporting figures to the
+   pack that comes out: the tables a role reads, the reports it is offered, one
+   reporting role per declared role, and that every table the pack's SQL names
+   is one the generated migration creates. It is the slow group, and it says so
+   and skips itself when `stack-templates.json` is absent rather than passing
+   without running.
 
 **"Roles" means the roles the model declares.** `readModel().stats.roles` is two
 higher — it adds the generated `administrator` and `user` that no model writes —

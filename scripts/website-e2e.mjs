@@ -257,5 +257,132 @@ for (const name of readdirSync(p("guide", "models")).filter((f) => f.endsWith(".
 }
 
 // ---------------------------------------------------------------------------
+// The reporting application the deployable archive now carries.
+//
+// Chapter 09 states concrete figures about it — a role reads five of seventeen
+// tables and is offered 36 of 116 reports — and those are not figures anyone
+// can check by reading the model: they come out of the pack the generator
+// derives. So they are measured here, from the *vendored* bundle, which makes
+// this the same kind of check as the acronym one above: a page claim held to
+// the byte the site actually serves rather than to the generator upstream.
+//
+// It generates a whole application, so it is the slow group. Skipped with a
+// said-out-loud note when the templates are absent, because
+// `stack-templates.json` is a build artefact and a fresh clone may not have it
+// — a check that quietly passes without running is worse than one that says it
+// did not.
+console.log("\nThe reporting application in the deployable archive");
+{
+  const templatesPath = p("assets", "vendor", "stack-templates.json");
+  const bundlePath = p("assets", "js", "appwithai-fullstack.js");
+
+  if (!existsSync(templatesPath) || !existsSync(bundlePath)) {
+    console.log("  note stack-templates.json or appwithai-fullstack.js absent — group skipped");
+  } else {
+    const templates = JSON.parse(readFileSync(templatesPath, "utf8"));
+    const { generateFullStack } = await import(`file://${bundlePath}`);
+
+    // The generator narrates to stdout, and this file's output is its report.
+    const realLog = console.log;
+    console.log = () => {};
+    let files;
+    try {
+      const result = await generateFullStack({
+        source: STATS["crm.eml.mmd"].src,
+        name: "crm",
+        templates,
+        // The archive is unzipped and run under Docker against a real
+        // PostgreSQL, so no WASM overlay — the same flag the download uses.
+        overlay: false,
+      });
+      files = result.files ?? result;
+    } finally {
+      console.log = realLog;
+    }
+
+    const has = (path) => Object.hasOwn(files, path);
+    has("reporting/reporting-pack.json")
+      ? ok("the archive carries reporting/reporting-pack.json")
+      : fail("the archive carries the reporting pack", "reporting/reporting-pack.json was not written");
+    has("reporting/Dockerfile")
+      ? ok("and the Dockerfile that builds the platform")
+      : fail("the archive carries reporting/Dockerfile", "not written");
+    has("reporting/README.md")
+      ? ok("and the README naming both sets of accounts")
+      : fail("the archive carries reporting/README.md", "not written");
+
+    const compose = files["docker-compose.yml"] ?? "";
+    /^ {2}report:/m.test(compose)
+      ? ok("docker-compose.yml names the report service")
+      : fail("compose names the report service", "no `report:` service found");
+    /^ {2}report-seeder:/m.test(compose)
+      ? ok("docker-compose.yml names the one-shot seeder")
+      : fail("compose names the seeder", "no `report-seeder:` service found");
+
+    if (has("reporting/reporting-pack.json")) {
+      const pack = JSON.parse(files["reporting/reporting-pack.json"]);
+      const roles = pack.access.roles;
+
+      // One reporting role per role the model declares, plus the two the
+      // generator adds — the same arithmetic `measure()` documents above, from
+      // the other end.
+      is(roles.length, STATS["crm.eml.mmd"].roles + 2,
+        "one reporting role per declared role, plus administrator and user");
+
+      // Every figure chapter 09 states about the reporting side.
+      const chapter = readFileSync(p("guide", "run-in-browser.html"), "utf8");
+      const agent = roles.find((r) => /support\.agent@/.test(r.email));
+      if (!agent) {
+        fail("the CRM pack seeds a support.agent reporting account", "no such role in the pack");
+      } else {
+        const stated = chapter.match(/It reads (\w+) of the model's\s*\n?\s*(\w+) tables/);
+        stated
+          ? (is(num(stated[1]), agent.tables.length, "chapter 09: the tables support.agent reads"),
+             is(num(stated[2]), pack.access.entityTotal, "chapter 09: the tables the model has"))
+          : fail("chapter 09 states what support.agent reads",
+                 "the sentence naming its table counts is gone — update this check with it");
+
+        // Reports visible to that role: a report is visible when every table
+        // its query reads is one the role may. Computed the way the runtime
+        // computes it, off the pack's own `tables`, so the two cannot disagree.
+        const allowed = new Set(agent.tables);
+        const byKey = new Map(pack.queries.map((q) => [q.key, q]));
+        const visible = pack.reports.filter((r) =>
+          (byKey.get(r.queryKey)?.tables ?? []).every((t) => allowed.has(t))
+        ).length;
+        const offered = chapter.match(/offered (\d+) of the (\d+) reports/);
+        offered
+          ? (is(Number(offered[1]), visible, "chapter 09: the reports that role is offered"),
+             is(Number(offered[2]), pack.reports.length, "chapter 09: the reports the pack holds"))
+          : fail("chapter 09 states how many reports the role is offered",
+                 "the sentence is gone — update this check with it");
+      }
+
+      // Every query names the tables it reads, or a role cannot be scoped at
+      // all and every report is offered to everybody.
+      const unscoped = pack.queries.filter((q) => !q.tables?.length);
+      unscoped.length === 0
+        ? ok("every saved query records the tables it reads")
+        : fail("every saved query records its tables",
+               `${unscoped.length} with none, e.g. ${unscoped[0].key}`);
+
+      // The acronym check, one layer deeper than the one above: the pack's SQL
+      // has to name tables the generated migration creates.
+      const migration = Object.entries(files).find(([k]) => /create_bus_tables/.test(k))?.[1] ?? "";
+      const created = new Set(
+        [...migration.matchAll(/CREATE TABLE IF NOT EXISTS (bus_[a-z0-9_]+)/g)].map((m) => m[1])
+      );
+      const phantom = pack.queries.flatMap((q) =>
+        (q.tables ?? []).filter((t) => !created.has(t)).map((t) => `${q.key} -> ${t}`)
+      );
+      created.size > 0 && phantom.length === 0
+        ? ok(`every table the pack queries is one the migration creates (${created.size})`)
+        : fail("the pack queries only tables the migration creates",
+               created.size === 0 ? "no CREATE TABLE found in the migration" : phantom.slice(0, 3).join(", "));
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);

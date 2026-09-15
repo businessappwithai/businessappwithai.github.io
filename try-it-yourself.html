@@ -59,7 +59,7 @@
            together, or this box offers something the page cannot select. -->
       <div style="margin-top: var(--spacing-2xl); border: 1px solid rgba(255,255,255,0.35); border-radius: var(--radius-lg); padding: var(--spacing-xl); background: rgba(255,255,255,0.07); text-align: left; max-width: 62rem; margin-left: auto; margin-right: auto;">
         <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the six worked examples</p>
-        <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser runtime with the model already loaded, and nothing is installed or uploaded.</p>
+        <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser runtime with the model already loaded, and nothing is installed or uploaded. Each one builds <strong>two</strong> applications: the one you click through, and the Enterprise Reporting platform beside it, with a sign-in of its own and one reporting role per role the model declares.</p>
         <div class="grid grid-3" style="gap: var(--spacing-md);">
           <a href="guide/run-in-browser.html#crm" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Sales CRM</strong>
@@ -136,7 +136,7 @@
       <div class="card">
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://www.appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
 
 My business:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
@@ -145,7 +145,7 @@ Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>
@@ -182,7 +182,7 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
             <p class="text-muted text-sm">It costs a conversation instead of a reply. What you get for it is that nothing about your business was inferred without your seeing it, and the <code>help:</code> text — the only help your users will ever get, and the whole of the manual the generator writes — is still written by entity fifteen.</p>
           </div>
           <div>
-            <pre id="enterprise-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailed.txt">https://appwithai.org/llmdetailed.txt</span> in full, and follow section 10 — the interactive authoring protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
+            <pre id="enterprise-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailed.txt">https://www.appwithai.org/llmdetailed.txt</span> in full, and follow section 10 — the interactive authoring protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
 
 My business:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
@@ -191,7 +191,7 @@ Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed.</pre>
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
             <button type="button" class="btn btn-primary" data-copy="enterprise-research-prompt">Copy the detailed prompt</button>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
             <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps the <code>.mmd</code> on disk as it goes rather than holding it in the conversation. It ends where the prompt above ends — one file, checked clean, that you upload and run here.</p>
@@ -290,7 +290,7 @@ erDiagram
         <div class="card">
           <div class="card-icon">&#9000;</div>
           <h3>In a terminal — two lines</h3>
-          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/check-model.mjs">https://appwithai.org/guide/check-model.mjs</span>
+          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/check-model.mjs">https://www.appwithai.org/guide/check-model.mjs</span>
 node check-model.mjs my-business.mmd</pre>
           <p class="text-muted text-sm">It runs the three passes the protocol asks for, prints the checker's own report, and exits <code>0</code> when the file is clean, <code>1</code> when the generator would refuse it.</p>
         </div>
