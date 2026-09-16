@@ -21,7 +21,7 @@
  *   --base <url>   where to load checker.js and fixer.js from — a directory
  *                  works too, which is how to run this with no network at all
  *                  (default: this file's own directory, the working directory,
- *                  ./guide/, then https://appwithai.org/guide/ and the apex)
+ *                  ./guide/, then https://appwithai.org/guide/)
  *   --write        save the repaired document back over the input file when
  *                  `checkAndFix` repaired something
  *   --quiet        print only the verdict line
@@ -35,20 +35,28 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 /**
- * Where the published modules live, most canonical first.
+ * Where the published modules live.
  *
- * Two spellings because both answer — `appwithai.org` is the site's
- * canonical name and the apex, `appwithai.org`, serves the same deployment —
- * and because trying only one turns a DNS or proxy failure against that one
- * name into "the validator is unavailable".
+ * One host, and deliberately one: `appwithai.org`. This list used to carry two
+ * entries described as "two spellings because both answer", the second being
+ * the same name under a `www.` label — and that one never answered. Pages issues a
+ * certificate for the domain configured in repository settings, so the `www.`
+ * label was reached over TLS it did not cover and every client refused it with
+ * ERR_CERT_COMMON_NAME_INVALID. A fallback that cannot succeed is not
+ * redundancy; it is one wasted round trip before the real error.
  *
- * Both are the published site and nothing else. This script deliberately
- * reaches no code-hosting origin: §10.6 of `llmdetailed.txt` tells the reader
- * so, and `scripts/check-spec.mjs` asserts it by reading this file. Both are tried before this script gives
- * up, and giving up is still not the same as the model being unchecked: see
- * `--base`, and `loadModules` below, which prefer anything local.
+ * The redundancy that does work is local-first, below: `--base`, this file's
+ * own directory, the working directory, then `./guide/`. `checker.js` and
+ * `fixer.js` are two dependency-free ES modules, so anything that puts them on
+ * disk — a checkout, a copy, a file the user pastes in — is a complete
+ * validation path with no network at all.
+ *
+ * This is the published site and nothing else. The script deliberately reaches
+ * no code-hosting origin: §10.6 of `llmdetailed.txt` tells the reader so, and
+ * `scripts/check-spec.mjs` asserts it by reading this file. Failing to reach
+ * this host is still not the same as the model being unchecked.
  */
-const PUBLISHED = ["https://appwithai.org/guide/", "https://appwithai.org/guide/"];
+const PUBLISHED = ["https://appwithai.org/guide/"];
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const option = (name) => {

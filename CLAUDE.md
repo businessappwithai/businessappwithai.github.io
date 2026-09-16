@@ -1075,6 +1075,34 @@ in the source is only what a reader sees before that runs — and what a languag
 raw file takes at face value, which is why the literal has to be right too. Keep that mechanism if
 you edit those URLs.
 
+**The substitution that fixed the URLs broke two things it did not touch.** Rewriting
+`www.appwithai.org` to the apex across 103 references left the *prose around* those URLs
+saying what it said before, and two places then read as their own opposite:
+
+- `llms-full.txt` §0 and both enhancement editions said "The apex, `appwithai.org`, serves
+  the same files; **`www` is canonical**" — a sentence that, after the rewrite, tells a model
+  the broken host is the preferred one while every link beside it names the working one.
+- `guide/check-model.mjs` held `PUBLISHED = [apex, apex]` — the two entries had been two
+  spellings of one site, so collapsing them produced **the same URL twice**. The documented
+  "tries both" fallback was one host retried, and §10.6's account of it was wrong.
+
+Both are fixed, and the second is now honest about what redundancy this runner has: **one
+published host, and local-first resolution as the real fallback** (`--base`, its own
+directory, the working directory, `./guide/`). A second hostname was never redundancy —
+`checker.js` and `fixer.js` being two dependency-free ES modules is. Adding
+`businessappwithai.github.io` as a second entry looks attractive and is wrong: §10.6 states
+the runner reaches no code-hosting origin and `check-spec.mjs` asserts it by reading the
+file, so that entry would make a published claim false to buy a fallback the offline path
+already provides.
+
+**`check-spec.mjs` now fails on the spelling rather than trusting review.** A guard walks
+every `.txt`/`.md`/`.html`/`.mjs`/`.js`/`.json` file in the tree and fails on any
+`www.appwithai.org`, exempting only this file and the guard itself, which have to name it to
+explain it. Its regexes are pinned to the apex too — they used to accept `(?:www\.)?`, which
+is how a URL nothing could fetch passed a check written to catch exactly that. The guard was
+verified by planting a reference and watching it fail. If `www.` is ever given a certificate
+of its own, delete the guard deliberately; do not widen it.
+
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what
 `guide/check-model.mjs` is for — it looks for `checker.js` and `fixer.js` *beside itself* before it

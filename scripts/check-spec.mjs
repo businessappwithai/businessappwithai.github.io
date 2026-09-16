@@ -14,7 +14,7 @@
  *
  *   node scripts/check-spec.mjs
  */
-import { readFileSync, writeFileSync, mkdtempSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, existsSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -429,10 +429,12 @@ held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length =
   `section 10.6 counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
 
 // The runner it tells a model to use, and the flags it promises that runner has.
-// `www` is canonical and the apex serves the same files, so either spelling
-// satisfies this — what is being held is that the line is there and runnable,
-// not which of the two hostnames it names.
-held(/curl -sO https:\/\/(?:www\.)?appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
+// The host is pinned to the apex, not left as "either spelling". Pages issues a
+// certificate for the domain in repository settings, so a `www.` label is
+// refused over TLS — a published URL naming it sends a model to a failure it
+// reads as "the checker is unavailable". That is the defect the guard below
+// exists to prevent recurring.
+held(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
   "section 10.6 carries the one-line way to run the checker without a checkout");
 for (const flag of ["--write", "--base"])
   held(detailed.includes(flag) && runnerSource.includes(flag),
@@ -458,9 +460,9 @@ for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js
  * following a stale instruction sends its user to a 404 in the middle of a
  * walkthrough. The upstream repository holds the document to the same claims
  * where it is authored; this holds the copy to what *this host* serves. */
-// Either hostname: `www` is canonical and the apex serves the same files. What
-// is held is that the viewers are named by their published URL at all.
-held(/https:\/\/(?:www\.)?appwithai\.org\/viewers\//.test(detailed),
+// The apex, for the same reason as above: a `www.` URL here would send a reader
+// mid-walkthrough to a certificate error rather than to the viewers.
+held(/https:\/\/appwithai\.org\/viewers\//.test(detailed),
   "section 10 names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
   held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
@@ -603,7 +605,7 @@ for (const [name, body] of Object.entries(enhancements)) {
  * pass for free and fail loudly if that splice is ever replaced by prose. */
 const interactive = enhancements["llmdetailedenhancement.txt"];
 const interactiveProse = interactive.replace(/\s+/g, " ");
-enh(/curl -sO https:\/\/(?:www\.)?appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
+enh(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
   "llmdetailedenhancement.txt carries the one-line way to run the checker");
 for (const flagName of ["--write", "--base"])
   enh(interactive.includes(flagName) && runnerSource.includes(flagName),
@@ -612,7 +614,7 @@ enh(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(interactive),
   "llmdetailedenhancement.txt documents all three of the runner's exit codes");
 enh(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(interactive)),
   `llmdetailedenhancement.txt tabulates every auto-fixable code (${AUTO_FIXABLE.join(", ")})`);
-enh(/https:\/\/(?:www\.)?appwithai\.org\/viewers\//.test(interactive),
+enh(/https:\/\/appwithai\.org\/viewers\//.test(interactive),
   "llmdetailedenhancement.txt names the model viewers by their published URL");
 for (const named of ["Workflows", "Business rules", "Access"])
   enh(viewerTabs.includes(named) && interactiveProse.includes(`**${named}**`),
@@ -634,4 +636,45 @@ enh(/00-original\.mmd/.test(interactive),
 console.log(`\n${enhancementFail === 0 ? "enhancement editions hold." : enhancementFail + " enhancement claim(s) contradicted."}`);
 
 
-process.exit(exampleFailures + fail + runnerFail + detailedFail + enhancementFail === 0 ? 0 : 1);
+/* ---------------------------------------------------------------------------
+ * The published host. Nothing here may name `www.appwithai.org`.
+ *
+ * GitHub Pages issues a certificate for the domain configured in repository
+ * settings — the apex, pinned in the tree by `CNAME`. The `www.` label
+ * resolves (it is a DNS record onto the same edge) but is served a certificate
+ * that does not name it, so every client refuses it with
+ * ERR_CERT_COMMON_NAME_INVALID. A language model told to import or curl such a
+ * URL gets a TLS failure, concludes the published checker is unavailable, and
+ * reports its validation state as "not determinable" — which is exactly what
+ * happened, across 103 references in 17 files, for as long as nothing checked.
+ *
+ * Reviewing prose is what missed it, so this is mechanical. If `www.` is ever
+ * given a certificate of its own, delete this guard deliberately rather than
+ * working around it.
+ * ------------------------------------------------------------------------- */
+let hostFail = 0;
+const PUBLISHED_HOST_EXEMPT = new Set(["CLAUDE.md", "scripts/check-spec.mjs"]);
+const textLike = /\.(txt|md|html|mjs|js|json)$/;
+const walk = (dir) => {
+  const out = [];
+  for (const entry of readdirSync(root + dir, { withFileTypes: true })) {
+    const rel = dir + entry.name;
+    if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "vendor") continue;
+    if (entry.isDirectory()) out.push(...walk(rel + "/"));
+    else if (textLike.test(entry.name)) out.push(rel);
+  }
+  return out;
+};
+const offenders = walk("").filter(
+  (rel) => !PUBLISHED_HOST_EXEMPT.has(rel) && readFileSync(root + rel, "utf8").includes("www.appwithai.org")
+);
+if (offenders.length === 0) {
+  console.log("ok   no published file names www.appwithai.org — the host with no certificate");
+} else {
+  hostFail = offenders.length;
+  for (const rel of offenders)
+    console.log(`FAIL ${rel} names www.appwithai.org, which serves no valid certificate — use the apex`);
+}
+
+
+process.exit(exampleFailures + fail + runnerFail + detailedFail + enhancementFail + hostFail === 0 ? 0 : 1);
