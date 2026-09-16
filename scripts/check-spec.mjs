@@ -14,7 +14,7 @@
  *
  *   node scripts/check-spec.mjs
  */
-import { readFileSync, writeFileSync, mkdtempSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdtempSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -363,7 +363,7 @@ console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - fa
 
 const runner = root + "guide/check-model.mjs";
 const specText = spec.join("\n");
-const command = "curl -sO https://appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
+const command = "curl -sO https://www.appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
 
 const scratch = mkdtempSync(join(tmpdir(), "eml-spec-"));
 const clean = join(scratch, "clean.mmd");
@@ -434,7 +434,7 @@ held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length =
 // refused over TLS — a published URL naming it sends a model to a failure it
 // reads as "the checker is unavailable". That is the defect the guard below
 // exists to prevent recurring.
-held(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
+held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
   "section 10.6 carries the one-line way to run the checker without a checkout");
 for (const flag of ["--write", "--base"])
   held(detailed.includes(flag) && runnerSource.includes(flag),
@@ -462,7 +462,7 @@ for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js
  * where it is authored; this holds the copy to what *this host* serves. */
 // The apex, for the same reason as above: a `www.` URL here would send a reader
 // mid-walkthrough to a certificate error rather than to the viewers.
-held(/https:\/\/appwithai\.org\/viewers\//.test(detailed),
+held(/https:\/\/www\.appwithai\.org\/viewers\//.test(detailed),
   "section 10 names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
   held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
@@ -605,7 +605,7 @@ for (const [name, body] of Object.entries(enhancements)) {
  * pass for free and fail loudly if that splice is ever replaced by prose. */
 const interactive = enhancements["llmdetailedenhancement.txt"];
 const interactiveProse = interactive.replace(/\s+/g, " ");
-enh(/curl -sO https:\/\/appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
+enh(/curl -sO https:\/\/www\.appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
   "llmdetailedenhancement.txt carries the one-line way to run the checker");
 for (const flagName of ["--write", "--base"])
   enh(interactive.includes(flagName) && runnerSource.includes(flagName),
@@ -614,7 +614,7 @@ enh(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(interactive),
   "llmdetailedenhancement.txt documents all three of the runner's exit codes");
 enh(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(interactive)),
   `llmdetailedenhancement.txt tabulates every auto-fixable code (${AUTO_FIXABLE.join(", ")})`);
-enh(/https:\/\/appwithai\.org\/viewers\//.test(interactive),
+enh(/https:\/\/www\.appwithai\.org\/viewers\//.test(interactive),
   "llmdetailedenhancement.txt names the model viewers by their published URL");
 for (const named of ["Workflows", "Business rules", "Access"])
   enh(viewerTabs.includes(named) && interactiveProse.includes(`**${named}**`),
@@ -637,56 +637,39 @@ console.log(`\n${enhancementFail === 0 ? "enhancement editions hold." : enhancem
 
 
 /* ---------------------------------------------------------------------------
- * The published host. Nothing here may name `www.appwithai.org`.
+ * The published host, and why the guard that used to sit here is gone.
  *
- * GitHub Pages issues a certificate for the domain configured in repository
- * settings — the apex, pinned in the tree by `CNAME`. The `www.` label
- * resolves (it is a DNS record onto the same edge) but is served a certificate
- * that does not name it, so every client refuses it with
- * ERR_CERT_COMMON_NAME_INVALID. A language model told to import or curl such a
- * URL gets a TLS failure, concludes the published checker is unavailable, and
- * reports its validation state as "not determinable" — which is exactly what
- * happened, across 103 references in 17 files, for as long as nothing checked.
+ * It forbade `www.appwithai.org` anywhere in the tree. GitHub Pages issues a
+ * certificate for the domain configured in repository settings, and `www` was
+ * a DNS record onto the apex rather than a delegation to the Pages host — so
+ * it resolved, reached the edge, and was refused with
+ * ERR_CERT_COMMON_NAME_INVALID. A model told to curl such a URL reported the
+ * checker as unavailable and its validation state as "not determinable".
  *
- * Reviewing prose is what missed it, so this is mechanical. If `www.` is ever
- * given a certificate of its own, delete this guard deliberately rather than
- * working around it.
+ * `www` is now a CNAME onto `businessappwithai.github.io`, Pages has issued a
+ * certificate for it, and it serves directly — verified in a browser. The
+ * guard named that exact condition for its own deletion ("if `www.` is ever
+ * given a certificate of its own, delete this guard deliberately"), so it is
+ * deleted rather than widened, and `www` is the canonical published form.
+ *
+ * What replaces it is section 8 below, which is the check that still has
+ * something to catch: the canonical form in every document, and the three
+ * spellings that fail — a bare host, a Markdown link around one, and a host
+ * without a scheme.
  * ------------------------------------------------------------------------- */
 let hostFail = 0;
-const PUBLISHED_HOST_EXEMPT = new Set(["CLAUDE.md", "scripts/check-spec.mjs"]);
-const textLike = /\.(txt|md|html|mjs|js|json)$/;
-const walk = (dir) => {
-  const out = [];
-  for (const entry of readdirSync(root + dir, { withFileTypes: true })) {
-    const rel = dir + entry.name;
-    if (entry.name === ".git" || entry.name === "node_modules" || entry.name === "vendor") continue;
-    if (entry.isDirectory()) out.push(...walk(rel + "/"));
-    else if (textLike.test(entry.name)) out.push(rel);
-  }
-  return out;
-};
-const offenders = walk("").filter(
-  (rel) => !PUBLISHED_HOST_EXEMPT.has(rel) && readFileSync(root + rel, "utf8").includes("www.appwithai.org")
-);
-if (offenders.length === 0) {
-  console.log("ok   no published file names www.appwithai.org — the host with no certificate");
-} else {
-  hostFail = offenders.length;
-  for (const rel of offenders)
-    console.log(`FAIL ${rel} names www.appwithai.org, which serves no valid certificate — use the apex`);
-}
 
 
 /* ------------------------------- 8. the published host, written in full ----
  *
  * A model following these documents reported a failed validator fetch as
- * `[appwithai.org](https://appwithai.org)` — a Markdown link whose text
+ * `[appwithai.org](https://www.appwithai.org)` — a Markdown link whose text
  * is a bare host. That is what the documents taught it: they named the host
  * without a scheme in prose, and half their URLs used a label with no certificate.
  * Both are fixed,
  * and this is what stops either coming back.
  *
- * Every mention of the host must be `https://appwithai.org`. The three
+ * Every mention of the host must be `https://www.appwithai.org`. The three
  * passages that deliberately show another form are teaching material — the rule
  * itself, and the two sentences contrasting the apex with `www` — so they are
  * removed before the scan rather than special-cased inside it.
@@ -701,10 +684,12 @@ const host = (cond, label) => {
    write, so each must survive canonicalisation — and be excluded from it. */
 const TEACHING = [
   "`appwithai.org/guide/checker.js` is a string a",
-  "`[appwithai.org](https://appwithai.org)` reads to a person as a working",
-  "- **There is no `www.` alias.** `https://appwithai.org/…` is not a second",
-  "  spelling of this host. GitHub Pages issues a certificate for the domain in",
+  "`[appwithai.org](https://www.appwithai.org)` reads to a person as a working",
+  "- **The apex is not the canonical form.** `https://appwithai.org/…` serves the same files and",
+  "  is the domain the repository's `CNAME` pins, but `https://www.appwithai.org/…`",
+  "  `https://appwithai.org` serves the same files, but the `www.` form is the canonical one.",
   '*"Validator retrieval failed for appwithai.org"* says neither',
+  "is the canonical host and the apex `https://appwithai.org` serves the same",
 ];
 
 for (const [name, body] of [
@@ -715,10 +700,10 @@ for (const [name, body] of [
   const teachable = body.split("\n").filter((line) => !TEACHING.some((t) => line.includes(t)));
   const stray = teachable
     .map((line, index) => ({ line, index }))
-    .filter(({ line }) => /appwithai\.org/.test(line.replace(/https:\/\/appwithai\.org/g, "")));
+    .filter(({ line }) => /appwithai\.org/.test(line.replace(/https:\/\/www\.appwithai\.org/g, "")));
 
   host(stray.length === 0,
-    `${name}: every mention of the host is https://appwithai.org${
+    `${name}: every mention of the host is https://www.appwithai.org${
       stray.length ? ` (${stray.length} stray, first: "${stray[0].line.trim().slice(0, 72)}")` : ""
     }`);
 
@@ -730,7 +715,7 @@ for (const [name, body] of [
     `${name}: tells the reader to report the URL actually requested`);
 
   /* And the counter-examples have to survive, or the rule teaches nothing. */
-  host(body.includes("[appwithai.org](https://appwithai.org)"),
+  host(body.includes("[appwithai.org](https://www.appwithai.org)"),
     `${name}: keeps the Markdown-link counter-example the rule is about`);
 }
 
@@ -739,7 +724,7 @@ for (const page of ["index.html", "try-it-yourself.html"]) {
   const markup = readFileSync(root + page, "utf8");
   const bare = [...markup.matchAll(/[^/w.]((?:www\.)?appwithai\.org)/g)].map((m) => m[1]);
   host(bare.length === 0,
-    `${page}: names the host only as https://appwithai.org${bare.length ? ` (${bare.length} bare)` : ""}`);
+    `${page}: names the host only as https://www.appwithai.org${bare.length ? ` (${bare.length} bare)` : ""}`);
 }
 
 console.log(`\n${hostFail === 0 ? "the published host is written in full everywhere." : hostFail + " host spelling(s) wrong."}`);

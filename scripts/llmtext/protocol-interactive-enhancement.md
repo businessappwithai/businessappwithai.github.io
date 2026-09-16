@@ -135,7 +135,7 @@ else — the rules, the workflows, the enums and the access control are `%%`
 directives it treats as comments — so a stakeholder pointed at a Mermaid preview
 is being shown the smallest part of what they are approving.
 
-**The viewers are at `https://appwithai.org/viewers/`**, and they draw all of
+**The viewers are at `https://www.appwithai.org/viewers/`**, and they draw all of
 it — entities with their columns, badges and help text, relationships in crow's
 foot notation, state machines with the moves the generated API will allow, sagas
 as an ordered ladder, decision tables as tables, and the roles with the entity
@@ -620,7 +620,7 @@ Alongside the file — in the reply, never inside it — give the change roster 
 built, the regression table from §{{N}}.6, the checker's counts for the original
 and for the delivered file, anything still unresolved, and where the session
 directory is on disk. Then tell them what to do next: upload the file at
-`https://appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
+`https://www.appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
 running application in the browser tab.
 
 Say plainly that the original is still at `00-original.mmd`. A user who can see

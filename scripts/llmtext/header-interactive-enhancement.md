@@ -4,7 +4,7 @@
 > language it reads, the pipeline that compiles it, the templates it renders,
 > and the shape of the application that comes out. Written for language models.
 >
-> Companion human guide: https://appwithai.org/guide/index.html
+> Companion human guide: https://www.appwithai.org/guide/index.html
 > (nine chapters, every screenshot from the CRM described in §9. The material
 > is inlined here in §9 so you do not need to fetch it.)
 >

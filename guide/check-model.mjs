@@ -2,10 +2,10 @@
 /**
  * check-model.mjs — run the published EML checker over a model file.
  *
- *   curl -sO https://appwithai.org/guide/check-model.mjs
+ *   curl -sO https://www.appwithai.org/guide/check-model.mjs
  *   node check-model.mjs my-business.mmd
  *
- * §1.3 of https://appwithai.org/llms-full.txt asks a language model to validate
+ * §1.3 of https://www.appwithai.org/llms-full.txt asks a language model to validate
  * the `.mmd` it wrote before handing it over, by importing `checker.js` and
  * `fixer.js`. That is one line in Bun or Deno, which import straight from a URL,
  * and it is several in Node, which removed network imports — so a model with a
@@ -21,7 +21,7 @@
  *   --base <url>   where to load checker.js and fixer.js from — a directory
  *                  works too, which is how to run this with no network at all
  *                  (default: this file's own directory, the working directory,
- *                  ./guide/, then https://appwithai.org/guide/)
+ *                  ./guide/, then https://www.appwithai.org/guide/)
  *   --write        save the repaired document back over the input file when
  *                  `checkAndFix` repaired something
  *   --quiet        print only the verdict line
@@ -56,7 +56,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
  * `scripts/check-spec.mjs` asserts it by reading this file. Failing to reach
  * this host is still not the same as the model being unchecked.
  */
-const PUBLISHED = ["https://appwithai.org/guide/"];
+const PUBLISHED = ["https://www.appwithai.org/guide/"];
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const option = (name) => {
