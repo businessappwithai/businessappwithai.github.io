@@ -363,7 +363,7 @@ console.log(`${pass - claimsBefore} dictionary derivations verified, ${fail - fa
 
 const runner = root + "guide/check-model.mjs";
 const specText = spec.join("\n");
-const command = "curl -sO https://www.appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
+const command = "curl -sO https://appwithai.org/guide/check-model.mjs\nnode check-model.mjs my-business.mmd";
 
 const scratch = mkdtempSync(join(tmpdir(), "eml-spec-"));
 const clean = join(scratch, "clean.mmd");

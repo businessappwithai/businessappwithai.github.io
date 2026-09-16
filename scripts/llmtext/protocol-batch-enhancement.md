@@ -270,7 +270,7 @@ tool.
 a shell, this is the whole of it:
 
 ```sh
-curl -sO https://www.appwithai.org/guide/check-model.mjs
+curl -sO https://appwithai.org/guide/check-model.mjs
 node check-model.mjs my-business.mmd
 ```
 
@@ -310,7 +310,7 @@ Only when every rung has genuinely failed: walk the delivery checklist by hand,
 then hand over the file with one plain sentence — the checker could not be run
 here, this is what was verified by hand, and the user can validate it in their
 own browser in a few seconds at
-`https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same
+`https://appwithai.org/guide/11-check-a-model.html`, which runs these same
 two modules with nothing to install. Never report the output of a check of your
 own devising in the vocabulary of the real one: a substitute described as
 "passes" or "0 warnings" is worse than no check at all, because the user cannot
@@ -377,7 +377,7 @@ Alongside the file — in the reply, never inside it — give:
 - **anything still unresolved**, and any pre-existing diagnostic you deliberately
   left alone;
 - **what to do next**: upload the file at
-  `https://www.appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
+  `https://appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
   running application in the browser tab, with nothing installed and nothing
   uploaded to a server.
 

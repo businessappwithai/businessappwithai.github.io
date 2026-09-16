@@ -2,10 +2,10 @@
 /**
  * check-model.mjs — run the published EML checker over a model file.
  *
- *   curl -sO https://www.appwithai.org/guide/check-model.mjs
+ *   curl -sO https://appwithai.org/guide/check-model.mjs
  *   node check-model.mjs my-business.mmd
  *
- * §1.3 of https://www.appwithai.org/llms-full.txt asks a language model to validate
+ * §1.3 of https://appwithai.org/llms-full.txt asks a language model to validate
  * the `.mmd` it wrote before handing it over, by importing `checker.js` and
  * `fixer.js`. That is one line in Bun or Deno, which import straight from a URL,
  * and it is several in Node, which removed network imports — so a model with a
@@ -21,7 +21,7 @@
  *   --base <url>   where to load checker.js and fixer.js from — a directory
  *                  works too, which is how to run this with no network at all
  *                  (default: this file's own directory, the working directory,
- *                  ./guide/, then https://www.appwithai.org/guide/ and the apex)
+ *                  ./guide/, then https://appwithai.org/guide/ and the apex)
  *   --write        save the repaired document back over the input file when
  *                  `checkAndFix` repaired something
  *   --quiet        print only the verdict line
@@ -37,7 +37,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 /**
  * Where the published modules live, most canonical first.
  *
- * Two spellings because both answer — `www.appwithai.org` is the site's
+ * Two spellings because both answer — `appwithai.org` is the site's
  * canonical name and the apex, `appwithai.org`, serves the same deployment —
  * and because trying only one turns a DNS or proxy failure against that one
  * name into "the validator is unavailable".
@@ -48,7 +48,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
  * up, and giving up is still not the same as the model being unchecked: see
  * `--base`, and `loadModules` below, which prefer anything local.
  */
-const PUBLISHED = ["https://www.appwithai.org/guide/", "https://appwithai.org/guide/"];
+const PUBLISHED = ["https://appwithai.org/guide/", "https://appwithai.org/guide/"];
 const args = process.argv.slice(2);
 const flag = (name) => args.includes(name);
 const option = (name) => {
