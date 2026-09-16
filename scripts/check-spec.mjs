@@ -677,4 +677,72 @@ if (offenders.length === 0) {
 }
 
 
+/* ------------------------------- 8. the published host, written in full ----
+ *
+ * A model following these documents reported a failed validator fetch as
+ * `[appwithai.org](https://appwithai.org)` — a Markdown link whose text
+ * is a bare host. That is what the documents taught it: they named the host
+ * without a scheme in prose, and half their URLs used a label with no certificate.
+ * Both are fixed,
+ * and this is what stops either coming back.
+ *
+ * Every mention of the host must be `https://appwithai.org`. The three
+ * passages that deliberately show another form are teaching material — the rule
+ * itself, and the two sentences contrasting the apex with `www` — so they are
+ * removed before the scan rather than special-cased inside it.
+ */
+
+const host = (cond, label) => {
+  if (cond) console.log(`ok   ${label}`);
+  else { hostFail++; console.log(`FAIL ${label}`); }
+};
+
+/* The counter-examples, verbatim. Each one exists to show a reader what NOT to
+   write, so each must survive canonicalisation — and be excluded from it. */
+const TEACHING = [
+  "`appwithai.org/guide/checker.js` is a string a",
+  "`[appwithai.org](https://appwithai.org)` reads to a person as a working",
+  "- **There is no `www.` alias.** `https://appwithai.org/…` is not a second",
+  "  spelling of this host. GitHub Pages issues a certificate for the domain in",
+  '*"Validator retrieval failed for appwithai.org"* says neither',
+];
+
+for (const [name, body] of [
+  ["llms-full.txt", spec.join("\n")],
+  ["llmdetailed.txt", detailed],
+  ...Object.entries(enhancements),
+]) {
+  const teachable = body.split("\n").filter((line) => !TEACHING.some((t) => line.includes(t)));
+  const stray = teachable
+    .map((line, index) => ({ line, index }))
+    .filter(({ line }) => /appwithai\.org/.test(line.replace(/https:\/\/appwithai\.org/g, "")));
+
+  host(stray.length === 0,
+    `${name}: every mention of the host is https://appwithai.org${
+      stray.length ? ` (${stray.length} stray, first: "${stray[0].line.trim().slice(0, 72)}")` : ""
+    }`);
+
+  /* The rule has to actually be in the document, or the scan above is passing
+     over a file that never tells the reader which form to write. */
+  host(body.includes("Write the URL in full, every time"),
+    `${name}: carries the rule that the URL is written in full`);
+  host(/Report the URL you actually requested/.test(body.replace(/\s+/g, " ")),
+    `${name}: tells the reader to report the URL actually requested`);
+
+  /* And the counter-examples have to survive, or the rule teaches nothing. */
+  host(body.includes("[appwithai.org](https://appwithai.org)"),
+    `${name}: keeps the Markdown-link counter-example the rule is about`);
+}
+
+/* The pages are held to the same form: a prompt is a URL a reader pastes. */
+for (const page of ["index.html", "try-it-yourself.html"]) {
+  const markup = readFileSync(root + page, "utf8");
+  const bare = [...markup.matchAll(/[^/w.]((?:www\.)?appwithai\.org)/g)].map((m) => m[1]);
+  host(bare.length === 0,
+    `${page}: names the host only as https://appwithai.org${bare.length ? ` (${bare.length} bare)` : ""}`);
+}
+
+console.log(`\n${hostFail === 0 ? "the published host is written in full everywhere." : hostFail + " host spelling(s) wrong."}`);
+
+
 process.exit(exampleFailures + fail + runnerFail + detailedFail + enhancementFail + hostFail === 0 ? 0 : 1);
