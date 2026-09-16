@@ -33,16 +33,15 @@
   This file is the one-pass enhancement form. All four describe the same
   language and are held to the same checker.
 - **Validators**, published by this document's validation section:
-  `https://appwithai.org/guide/checker.js` and
-  `https://appwithai.org/guide/fixer.js`. **Write that exact form every
-  time** — scheme included, and never a bare host. That host is the only one
-  that serves them: there is no `www.` alias, and a request to one is refused
-  over TLS before it is answered. **If the host is not reachable from your
+  `https://www.appwithai.org/guide/checker.js` and
+  `https://www.appwithai.org/guide/fixer.js`. **Write that exact form every
+  time** — scheme included, `www.` included, and never a bare host. The apex
+  `https://appwithai.org` serves the same files, but the `www.` form is the canonical one. **If the host is not reachable from your
   environment, that is a fact about your network and not a reason to skip
   validation or to stop** — that section's last two rows are the offline
   procedure, and they are real runs with real counts.
 - **To check a model from a shell** (§{{N}}.5) — nothing to install:
-  `curl -sO https://appwithai.org/guide/check-model.mjs` then
+  `curl -sO https://www.appwithai.org/guide/check-model.mjs` then
   `node check-model.mjs my-business.mmd`. Exit `0` means the generator accepts
   it; exit `1` means it does not, and the report says why.
 - **Every example in this document is a complete model that the checker accepts

@@ -1105,134 +1105,64 @@ thing a language model has to produce is a model file.
   three checker passes over its own bytes, plus help coverage and line-item placement.
   `guide/models/crm.eml.mmd` passes it 22/22.
 
-**On the published domain — and the `www.` that had no certificate.**
+**On the published domain — `www.appwithai.org` is canonical, and it took a DNS change to get there.**
 
-The specification quotes the validators as `https://appwithai.org/guide/checker.js`, and chapter 11
-prints them that way. It did **not** until now: every one of those URLs, in `llms-full.txt`,
-`llmdetailed.txt`, both enhancement editions, `check-model.mjs`, chapter 11 and both prompt blocks,
-named `https://www.appwithai.org/…` — 103 references across 17 files here and 49 more upstream.
+The specification quotes the validators as `https://www.appwithai.org/guide/checker.js`, and
+`guide/check-model.mjs` carries `PUBLISHED = ["https://www.appwithai.org/guide/"]`. The apex serves
+the same files and is what the root `CNAME` pins; `www` is the form to write.
 
-`www.appwithai.org` resolves. That is the trap. It has an A record onto GitHub's Pages edge
-(`185.199.108-111.153`), so DNS answers and the host is reachable — but the certificate Pages issues
-covers the **apex** domain configured in repository settings, not the `www.` label, so a browser
-gets `net::ERR_CERT_COMMON_NAME_INVALID` and refuses the connection. A language model told to
-`import` or `curl` that URL gets a TLS failure, concludes the checker is unavailable, and reports
-its validation state as "not determinable" — which is exactly what happened, and the reason every
-published URL is the apex now.
+**It was not always safe to write it, and that is the whole history of this section.** For a long
+while every published URL named `www.appwithai.org` while `www` was a DNS record onto the *apex*
+rather than a delegation to the Pages host. It resolved, it reached GitHub's edge, and Pages served
+it a certificate naming only the apex — so every client refused with
+`net::ERR_CERT_COMMON_NAME_INVALID`. A language model told to `import` or `curl` that URL got a TLS
+failure, concluded the published checker was unavailable, and reported its validation state as "not
+determinable". That happened repeatedly, and it is why the URLs were moved to the apex mid-session
+and a tree-wide guard was added forbidding the `www.` spelling.
 
-Two things to take from it:
-
-- **DNS resolving is not the site answering.** Diagnosing this from a sandbox with no egress, DNS
-  resolution looked like proof that both hosts were fine; it was proof of nothing. The certificate
-  is the part that has to match, and only a real client sees it.
-- **`www.` needs a certificate or a redirect before it is published anywhere.** If it should work,
-  it belongs in repository settings (or as a `CNAME` record onto `businessappwithai.github.io`, not
-  an A record onto the apex IPs) so Pages provisions a certificate for it. Until then, do not write
-  it: `grep -rI 'www\.appwithai\.org'` should stay at zero.
-
-**There is a `CNAME` file now**, holding `appwithai.org`. The Pages source is GitHub Actions, which
-keeps a custom domain in repository settings — but `actions/upload-pages-artifact` includes a root
-`CNAME` in the artifact and Pages honours it, so the domain is pinned in the tree instead of only in
-a settings page, and it is the domain the certificate covers. This file used to say there was no
-`CNAME`, which was true and was part of how the `www.` spelling went unnoticed for so long: nothing
-in the repository stated which host it is published at.
-
-**Making `www.appwithai.org` work is a DNS change, not a repository change.** It is currently a
-`CNAME` onto the **apex** — `www.appwithai.org` → `appwithai.org` → `185.199.108-111.153` — which
-reaches GitHub's edge with a request for a host GitHub has issued no certificate for, hence
-`ERR_CERT_COMMON_NAME_INVALID`. Pages needs the subdomain pointed at the *user* domain:
+**The DNS record is now `www CNAME businessappwithai.github.io.`**, Pages has issued a certificate
+covering `www`, and it serves directly without redirecting — confirmed in a browser. So the guard's
+premise is false, and the guard named that exact condition for its own deletion. It is gone rather
+than widened, and `www` is canonical again.
 
 ```
-www   CNAME   businessappwithai.github.io.     # not appwithai.org
-@     A       185.199.108.153 .109 .110 .111   # unchanged
+www   CNAME   businessappwithai.github.io.     # NOT a record onto the apex
+@     A       185.199.108.153 .109 .110 .111
 ```
 
-With that record in place Pages provisions a certificate for `www.` as well and redirects it to the
-apex, so `https://www.appwithai.org/guide/checker.js` resolves, validates and serves. Until then the
-apex is the only host that works, which is why every published URL names it.
+Three things worth keeping from the episode, because each cost real time:
 
-So the page never trusts the literal either: every URL it
-shows carries a `data-url` attribute, and `main.js` (or `validator.js` under `guide/`) resolves it
-against `window.location`, so the text always names the host that is actually answering. The literal
-in the source is only what a reader sees before that runs — and what a language model reading the
-raw file takes at face value, which is why the literal has to be right too. Keep that mechanism if
-you edit those URLs.
+- **DNS resolving is not the site answering.** Diagnosed from a sandbox with no egress, resolution
+  looked like proof both hosts were fine; it was proof of nothing. Only a real client sees a
+  certificate, which is why the browser check was the gate for switching back.
+- **A `www` record must point at the Pages host, not at the apex.** Pointing it at the apex reaches
+  the edge with a hostname Pages has issued nothing for. That is the mistake, and it is invisible to
+  `dig`.
+- **`check-spec.mjs` section 8 is what survives.** The tree-wide spelling guard is gone; section 8
+  still holds every document to the canonical form and to the three spellings that fail — a bare
+  host, a Markdown link whose text is a bare host, and a host without a scheme. Those fail
+  regardless of which hostname is canonical, which is why that check outlived the other one.
 
-**The substitution that fixed the URLs broke two things it did not touch.** Rewriting
-`www.appwithai.org` to the apex across 103 references left the *prose around* those URLs
-saying what it said before, and two places then read as their own opposite:
+So the page never trusts the literal either: every URL it shows carries a `data-url` attribute, and
+`main.js` (or `validator.js` under `guide/`) resolves it against `window.location`, so the text
+always names the host that is actually answering. The literal in the source is only what a reader
+sees before that runs — and what a language model reading the raw file takes at face value, which is
+why the literal has to be right too. Keep that mechanism if you edit those URLs.
 
-- `llms-full.txt` §0 and both enhancement editions said "The apex, `appwithai.org`, serves
-  the same files; **`www` is canonical**" — a sentence that, after the rewrite, tells a model
-  the broken host is the preferred one while every link beside it names the working one.
-- `guide/check-model.mjs` held `PUBLISHED = [apex, apex]` — the two entries had been two
-  spellings of one site, so collapsing them produced **the same URL twice**. The documented
-  "tries both" fallback was one host retried, and §10.6's account of it was wrong.
+**Two substitution traps, both hit here, both worth knowing before any host-wide rewrite.** A sweep
+of `https://<old>` → `https://<new>` changes the links and leaves the *prose around* them saying what
+it said before:
 
-Both are fixed, and the second is now honest about what redundancy this runner has: **one
-published host, and local-first resolution as the real fallback** (`--base`, its own
-directory, the working directory, `./guide/`). A second hostname was never redundancy —
-`checker.js` and `fixer.js` being two dependency-free ES modules is. Adding
-`businessappwithai.github.io` as a second entry looks attractive and is wrong: §10.6 states
-the runner reaches no code-hosting origin and `check-spec.mjs` asserts it by reading the
-file, so that entry would make a published claim false to buy a fallback the offline path
-already provides.
+- A bullet contrasting two hosts becomes the same URL twice — *"`https://X/…` serves the same files,
+  but `https://X/…` is canonical"* — which reads as nonsense and says nothing. Rewrite contrast
+  passages by hand, and keep the URL that must *not* move behind a sentinel the sweep cannot see.
+- A headline can end up contradicting its own example: *"scheme included, `www.` included"* above a
+  URL with no `www.`. Both of these shipped briefly, in both directions.
 
-**`check-spec.mjs` now fails on the spelling rather than trusting review.** A guard walks
-every `.txt`/`.md`/`.html`/`.mjs`/`.js`/`.json` file in the tree and fails on any
-`www.appwithai.org`, exempting only this file and the guard itself, which have to name it to
-explain it. Its regexes are pinned to the apex too — they used to accept `(?:www\.)?`, which
-is how a URL nothing could fetch passed a check written to catch exactly that. The guard was
-verified by planting a reference and watching it fail. If `www.` is ever given a certificate
-of its own, delete the guard deliberately; do not widen it.
-
-**The URL is written in full, and `check-spec.mjs` §8 holds every document to it.**
-Salvaged from a branch that had the diagnosis right and the hostname wrong. Three forms
-fail and all three were observed: a **bare host** (`appwithai.org/guide/checker.js`) is a
-string a runtime refuses or has to guess a scheme for; a **Markdown link whose text is a
-bare host** is worse because it looks right — these files are parsed by language models,
-not rendered, so the link *text* is what gets resolved; and the **`www.` label**, which
-has no certificate. The same rule governs reporting a failure: name the exact request and
-the exact error. *"Validator retrieval failed for appwithai.org"* says neither what was
-asked for nor what happened; `GET https://appwithai.org/guide/checker.js failed:
-EAI_AGAIN (DNS)` says both.
-
-**The counter-examples in those passages deliberately show a bad form**, so §8 drops them
-by name before scanning rather than pattern-matching around them — a counter-example that
-gets "corrected" leaves a rule displaying the right URL three times and teaching nothing.
-Two traps when editing that list: the strip removes the *canonical* form before looking
-for strays, so changing which host is canonical without changing the strip makes the check
-flag the canonical form; and rewriting `https://www.appwithai.org` → the apex *before* the
-targeted replacements leaves half-converted strings like
-`[www.appwithai.org](https://appwithai.org)` that then match nothing. Both were hit here.
-
-**`guide/check-model-standalone.mjs` — the whole checker as one file.** Built by
-`scripts/build-standalone-checker.mjs`, which brotli-compresses `checker.js`,
-`fixer.js` and `check-model.mjs` and embeds them base64. On run it inflates them
-into a temp directory and **executes the published runner** against them with
-`--base <tmpdir>`, forwarding argv and the exit code. It reimplements nothing:
-the three passes, the diagnostics and the 0/1/2 exit codes are the published
-ones because they are the published code.
-
-It exists for one case, and it is worth stating so nobody reaches for it
-otherwise: **a shell that resolves no host, whose only channel in is text
-somebody pastes.** 427KB across three files does not go through that; 135KB in
-one file does. Three separate files are *smaller apart than this is together*,
-so every ladder rung that names it says to prefer them whenever anything can
-fetch.
-
-Two checks hold it, both in `tests.yml`, and they answer different questions:
-
-- **`--check`** fails when the embedded payloads no longer match the files
-  beside them. Re-vendoring `checker.js` without rebuilding this would publish
-  one file disagreeing with the three next to it, and nothing about the page
-  would look wrong. Verified non-vacuous by appending a line to `checker.js` and
-  watching it fail.
-- **A standalone run**, in a directory holding nothing else, whose `--quiet`
-  output must equal the three-file runner's on the same model, and which must
-  exit non-zero on a document that is prose rather than a model. "Up to date" is
-  not "works": the first check would pass just as happily on a payload that
-  inflates to nothing.
+And the same ordering trap twice: targeted replacements must run **before** the generic sweep, or the
+sweep rewrites the text they were about to match; and escaped-regex forms
+(`https:\/\/appwithai\.org` inside a `.mjs`) contain no plain literal, so a sweep silently misses
+them and a check ends up stripping the wrong host.
 
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what

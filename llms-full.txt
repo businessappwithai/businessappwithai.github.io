@@ -16,16 +16,15 @@
 - **EML version**: 1.2.0 · **Based on**: Mermaid · **Updated**: 2026-08-29
 - **Authority**: `language/appwithai-language.json`. Where this document and that
   file disagree, that file wins.
-- **Validators** (§8): `https://appwithai.org/guide/checker.js` and
-  `https://appwithai.org/guide/fixer.js`. **Write that exact form every
-  time** — scheme included, and never a bare host. That host is the only one
-  that serves them: there is no `www.` alias, and a request to one is refused
-  over TLS before it is answered. **If the host is not reachable from your
+- **Validators** (§8): `https://www.appwithai.org/guide/checker.js` and
+  `https://www.appwithai.org/guide/fixer.js`. **Write that exact form every
+  time** — scheme included, `www.` included, and never a bare host. The apex
+  `https://appwithai.org` serves the same files, but the `www.` form is the canonical one. **If the host is not reachable from your
   environment, that is a fact about your network and not a reason to skip
   validation or to stop** — §8.4's last two rows are the offline procedure, and
   they are real runs with real counts.
 - **To check a model from a shell** (§1.3, §8.4) — nothing to install:
-  `curl -sO https://appwithai.org/guide/check-model.mjs` then
+  `curl -sO https://www.appwithai.org/guide/check-model.mjs` then
   `node check-model.mjs my-business.mmd`. Exit `0` means the generator accepts
   it; exit `1` means it does not, and the report says why.
 - **Every example in this document is a complete model that the checker accepts
@@ -293,7 +292,7 @@ accepts it. The two modules and their API are in §8.
 Node 18+, Bun or Deno, nothing to install:
 
 ```sh
-curl -sO https://appwithai.org/guide/check-model.mjs
+curl -sO https://www.appwithai.org/guide/check-model.mjs
 node check-model.mjs my-business.mmd
 ```
 
@@ -306,8 +305,8 @@ the rest, and the recipes for runtimes with no shell.)
 Written out, that is:
 
 ```js
-import { check, formatReport } from "https://appwithai.org/guide/checker.js";
-import { checkAndFix }          from "https://appwithai.org/guide/fixer.js";
+import { check, formatReport } from "https://www.appwithai.org/guide/checker.js";
+import { checkAndFix }          from "https://www.appwithai.org/guide/fixer.js";
 
 let model = /* the exact bytes of the .mmd you just wrote */;
 
@@ -380,7 +379,7 @@ the directory you are working in turns "cannot validate" into an ordinary run.
 Only when that is also impossible: walk §10 by hand instead, item by item, then hand over the file with one
 plain sentence: the checker could not be run here, this is what was verified by
 hand, and the user can validate it in their own browser in a few seconds at
-`https://appwithai.org/guide/11-check-a-model.html`, which runs these same two
+`https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same two
 modules with nothing to install. An unvalidated `.mmd` is still the deliverable.
 A specification handed over in place of one never is.
 
@@ -453,7 +452,7 @@ Alongside the file — in the reply, never inside it — give:
   hand;
 - anything you assumed, and anything still unresolved;
 - what to do next: upload the file at
-  `https://appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
+  `https://www.appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
   running application in the browser tab, with nothing installed and nothing
   uploaded to a server.
 
@@ -1709,16 +1708,16 @@ a document the generator will accept.
 
 | Module | URL | What it gives you |
 |---|---|---|
-| `checker.js` | `https://appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
-| `fixer.js` | `https://appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
+| `checker.js` | `https://www.appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
+| `fixer.js` | `https://www.appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
 
 ### 8.1 The API
 
 ```js
 import { check, formatIssue, formatReport, AUTO_FIXABLE, LANGUAGE_VERSION }
-  from "https://appwithai.org/guide/checker.js";
+  from "https://www.appwithai.org/guide/checker.js";
 import { fix, checkAndFix, applyFixes }
-  from "https://appwithai.org/guide/fixer.js";
+  from "https://www.appwithai.org/guide/fixer.js";
 ```
 
 `check(source)` returns:
@@ -1831,12 +1830,12 @@ usually gets skipped. Find your row and run it.
 
 | What you have | What to do |
 |---|---|
-| A shell with Node 18+, Bun or Deno | `curl -sO https://appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
-| Bun or Deno, writing the code yourself | `import { check } from "https://appwithai.org/guide/checker.js"` — a URL import works as it stands |
+| A shell with Node 18+, Bun or Deno | `curl -sO https://www.appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
+| Bun or Deno, writing the code yourself | `import { check } from "https://www.appwithai.org/guide/checker.js"` — a URL import works as it stands |
 | Node, writing the code yourself | Node has no network imports: fetch both files, write them into one directory, `import()` them from there (below) |
-| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
-| A browse or fetch tool **beside** a shell with no network | The split most assistants have, and a bridge rather than a blocker. Read `https://appwithai.org/guide/checker.js` and `https://appwithai.org/guide/fixer.js` with the layer that can reach them, write both into the shell's working directory — a heredoc will do, and a file too large for one write goes in pieces — then run the first row with `--base .`. The shell needs no network, only a file write |
-| A shell that runs Node but **reaches no host at all**, and a text-only way in | **One file.** `https://appwithai.org/guide/check-model-standalone.mjs` is about 130KB and carries `checker.js`, `fixer.js` and the runner compressed inside it. Get that one file there by any means — paste it, print it from a layer that can read it, copy it off another machine — then `node check-model-standalone.mjs <business-name>.mmd`. It inflates them into a temp directory and runs the published runner against them: same three passes, same diagnostics, same `0`/`1`/`2`. **A real run, counts reportable.** Three separate files are smaller apart than this is together, so prefer them whenever anything can fetch |
+| A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
+| A browse or fetch tool **beside** a shell with no network | The split most assistants have, and a bridge rather than a blocker. Read `https://www.appwithai.org/guide/checker.js` and `https://www.appwithai.org/guide/fixer.js` with the layer that can reach them, write both into the shell's working directory — a heredoc will do, and a file too large for one write goes in pieces — then run the first row with `--base .`. The shell needs no network, only a file write |
+| A shell that runs Node but **reaches no host at all**, and a text-only way in | **One file.** `https://www.appwithai.org/guide/check-model-standalone.mjs` is about 130KB and carries `checker.js`, `fixer.js` and the runner compressed inside it. Get that one file there by any means — paste it, print it from a layer that can read it, copy it off another machine — then `node check-model-standalone.mjs <business-name>.mmd`. It inflates them into a temp directory and runs the published runner against them: same three passes, same diagnostics, same `0`/`1`/`2`. **A real run, counts reportable.** Three separate files are smaller apart than this is together, so prefer them whenever anything can fetch |
 | A shell, but **no egress** — a sandbox, a proxy, an air-gapped runner | The modules are two dependency-free files and `check-model.mjs` prefers a local copy of them to the network. Put `checker.js` and `fixer.js` in the directory you are working in, or beside the script, or name their directory with `--base <dir>`, and run it exactly as above. **This is a real run**: same engines, same report, same exit codes, counts reportable |
 | No JavaScript runtime at all | Walk §10 by hand, and say in your delivery that the model was checked against the checklist and not against the checker |
 
@@ -1866,13 +1865,13 @@ not.
 
 **Nothing here needs a checkout, and nothing here needs GitHub.** There is no
 repository to clone, no credentials to hold and no `bun` to install: the two
-modules and the runner are served from `https://appwithai.org`. `check-model.mjs`
+modules and the runner are served from `https://www.appwithai.org`. `check-model.mjs`
 resolves them from `--base`, then from its own directory, then from the
 published site — GitHub is in none of those paths. "I could not obtain the
 repository, therefore I could not validate" is a wrong inference, not an honest
 limitation, and it has been observed in the wild.
 
-**Write the URL in full, every time: `https://appwithai.org/…`.** Scheme
+**Write the URL in full, every time: `https://www.appwithai.org/…`.** Scheme
 included, `www.` included, never a bare host. Three things go wrong otherwise and
 all three have been observed:
 
@@ -1880,18 +1879,19 @@ all three have been observed:
   runtime either refuses or has to guess a scheme for, and a sandboxed agent's
   HTTP client usually refuses.
 - **A Markdown link around a bare host is worse**, because it looks right.
-  `[appwithai.org](https://appwithai.org)` reads to a person as a working
+  `[appwithai.org](https://www.appwithai.org)` reads to a person as a working
   link and to anything parsing your output as the bare host. Write the plain
   absolute URL: this is a specification, not a web page, and nothing here is
   rendered.
-- **The apex is not the canonical form.** `https://appwithai.org/…` serves the
-  same files, but `https://appwithai.org/…` is canonical, and an environment
-  that resolves one and not the other is common enough never to rely on.
+- **The apex is not the canonical form.** `https://appwithai.org/…` serves the same files and
+  is the domain the repository's `CNAME` pins, but `https://www.appwithai.org/…`
+  is the canonical form to write. Both carry a certificate now; write the
+  canonical one so every reference agrees.
 
 **The same rule governs how you report a failure.** Name the exact request and
 the exact error. *"Validator retrieval failed for appwithai.org"* says neither
 what was requested nor what happened; *"GET
-https://appwithai.org/guide/checker.js failed: EAI_AGAIN (DNS)"* says both,
+https://www.appwithai.org/guide/checker.js failed: EAI_AGAIN (DNS)"* says both,
 and is the difference between a reader who can reproduce your problem and one who
 cannot. Report the URL you actually requested — not a shortened, prettified or
 linked version of it.
@@ -1947,13 +1947,13 @@ taking it has skipped it — and the offer reads as diligence, which is what mak
 it hard to catch.
 
 ```sh
-curl -sO https://appwithai.org/guide/check-model.mjs
+curl -sO https://www.appwithai.org/guide/check-model.mjs
 node check-model.mjs my-business.mmd
 ```
 
 **`check-model.mjs`** is the one-command form of §1.3, published beside the
 modules it runs. It finds `checker.js` and `fixer.js` — beside itself if they
-were downloaded together, otherwise from `https://appwithai.org/guide/` — runs
+were downloaded together, otherwise from `https://www.appwithai.org/guide/` — runs
 `checkAndFix` and then two `check` passes over the repaired bytes, prints the
 report, and exits `0` when the model is clean, `1` when the generator would
 refuse it, `2` when it could not run at all. `--write` saves the repaired
@@ -1971,7 +1971,7 @@ import { pathToFileURL } from "node:url";
 
 const dir = mkdtempSync(join(tmpdir(), "eml-"));
 for (const name of ["checker.js", "fixer.js"]) {
-  const response = await fetch(`https://appwithai.org/guide/${name}`);
+  const response = await fetch(`https://www.appwithai.org/guide/${name}`);
   writeFileSync(join(dir, name), await response.text());
 }
 const { check, formatReport } = await import(pathToFileURL(join(dir, "checker.js")).href);
