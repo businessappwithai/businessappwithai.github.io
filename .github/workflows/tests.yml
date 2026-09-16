@@ -32,6 +32,27 @@ jobs:
             node guide/check-model.mjs "$f"
           done
 
+      # The one-file checker carries checker.js, fixer.js and the runner
+      # compressed inside it. Re-vendoring the validators without rebuilding it
+      # would publish a single file that disagrees with the three beside it —
+      # and nothing about the page would look wrong.
+      - name: One-file checker is current
+        run: node scripts/build-standalone-checker.mjs --check
+
+      # It has to actually run, not merely be up to date: in a directory of its
+      # own, with no other file to fall back to, and agreeing with the runner.
+      - name: One-file checker runs standalone
+        run: |
+          work=$(mktemp -d)
+          cp guide/check-model-standalone.mjs "$work"/
+          cp guide/models/crm.eml.mmd "$work"/model.mmd
+          ( cd "$work" && node check-model-standalone.mjs model.mmd --quiet ) > one-file.txt
+          node guide/check-model.mjs guide/models/crm.eml.mmd --quiet > three-file.txt
+          diff one-file.txt three-file.txt
+          printf 'prose about a model, not a model\n' > "$work"/prose.mmd
+          ( cd "$work" && node check-model-standalone.mjs prose.mmd >/dev/null 2>&1 ) && \
+            { echo "expected exit 1 on an invalid model"; exit 1; } || true
+
       # Every figure the pages state about a model, against the model; every
       # example offered, against what chapter 09 can select; and the vendored
       # generator bundles, against the behaviour they are supposed to carry.
