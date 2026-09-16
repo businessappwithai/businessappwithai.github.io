@@ -1206,6 +1206,34 @@ flag the canonical form; and rewriting `https://www.appwithai.org` → the apex 
 targeted replacements leaves half-converted strings like
 `[www.appwithai.org](https://appwithai.org)` that then match nothing. Both were hit here.
 
+**`guide/check-model-standalone.mjs` — the whole checker as one file.** Built by
+`scripts/build-standalone-checker.mjs`, which brotli-compresses `checker.js`,
+`fixer.js` and `check-model.mjs` and embeds them base64. On run it inflates them
+into a temp directory and **executes the published runner** against them with
+`--base <tmpdir>`, forwarding argv and the exit code. It reimplements nothing:
+the three passes, the diagnostics and the 0/1/2 exit codes are the published
+ones because they are the published code.
+
+It exists for one case, and it is worth stating so nobody reaches for it
+otherwise: **a shell that resolves no host, whose only channel in is text
+somebody pastes.** 427KB across three files does not go through that; 135KB in
+one file does. Three separate files are *smaller apart than this is together*,
+so every ladder rung that names it says to prefer them whenever anything can
+fetch.
+
+Two checks hold it, both in `tests.yml`, and they answer different questions:
+
+- **`--check`** fails when the embedded payloads no longer match the files
+  beside them. Re-vendoring `checker.js` without rebuilding this would publish
+  one file disagreeing with the three next to it, and nothing about the page
+  would look wrong. Verified non-vacuous by appending a line to `checker.js` and
+  watching it fail.
+- **A standalone run**, in a directory holding nothing else, whose `--quiet`
+  output must equal the three-file runner's on the same model, and which must
+  exit non-zero on a document that is prose rather than a model. "Up to date" is
+  not "works": the first check would pass just as happily on a payload that
+  inflates to nothing.
+
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what
 `guide/check-model.mjs` is for — it looks for `checker.js` and `fixer.js` *beside itself* before it
