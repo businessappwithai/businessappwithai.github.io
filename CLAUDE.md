@@ -919,6 +919,89 @@ and (for the gated forms) the sentence about not crossing a gate. `website-e2e.m
 holds both pairs to that, so editing one prompt without the other fails CI rather
 than quietly sending a reader through the wrong protocol.
 
+## What the published checker hands back
+
+`guide/checker.js` and `guide/fixer.js` now return, and print, the context needed
+to act on a diagnostic: the code, the line, **the text of that line**, and the
+repair — followed by steps derived from the run itself.
+
+```
+error:18 [EML144] %%field "Order.status" references undeclared enum "MissingEnum".
+  18 │ %%field Order.status enum: MissingEnum
+     └ fix: Add  %%enum MissingEnum: value1, value2  before the erDiagram block.
+```
+
+A line number alone makes the reader count lines, and the reader here is usually
+a language model holding the document in a context window rather than open in an
+editor. It miscounts, edits the wrong line, and reports a fix that was never
+applied.
+
+**None of this is authored here.** It is `language/browser/checker.entry.ts` and
+`fixer.entry.ts` in `app-with-ai-tanstack`, rebuilt with `bun run
+build:language-tools` and `bun run build:viewers`. Three files move together when
+it changes — `guide/checker.js`, `guide/fixer.js` and `viewers/eml-model.js`,
+which bundles the same checker entry — and chapter 11, chapter 09 and the viewers
+will otherwise disagree about the same model.
+
+Two properties worth not breaking when re-vendoring:
+
+- **The verdict is still the final line.** The steps sit between the diagnostics
+  and the verdict. `check-spec.mjs` reads the runner's last line, and §8.2 tells
+  readers to do the same.
+- **`formatReport` output is multi-line per diagnostic now.** `validator.js`
+  renders it inside a `<pre>`, so it needs nothing; anything that assumed one
+  line per issue does.
+
+## The published host is written in full — `https://www.appwithai.org`
+
+Every mention of the host in all four protocol documents is the absolute URL,
+scheme and `www.` included. This is not a style preference. A model following
+the specification reported a failed validator fetch as
+
+```
+Validator retrieval failed for [www.appwithai.org](https://www.appwithai.org)
+and appwithai.org: container requests returned DNS-resolution failures
+```
+
+— a Markdown link whose *text* is a bare host, beside a second bare host. The
+documents taught it that: they named the host without a scheme in prose, and the
+copies in the product repositories used the apex for most URLs while the
+published ones used `www`. Three things follow, and each has been seen:
+
+- **A bare host is not a URL.** A runtime handed `appwithai.org/guide/checker.js`
+  either refuses it or guesses a scheme.
+- **A Markdown link around a bare host is worse, because it looks right.** These
+  files are read by language models, not rendered — the link text is what gets
+  parsed out and resolved.
+- **The apex is not canonical.** It serves the same files and redirects, but an
+  environment that resolves one and not the other is common.
+
+The rule lives in each document's validation section and says all of this, plus
+how to report a failure: name the exact request and the exact error, not a
+prettified version of the host.
+
+**`check-spec.mjs` §8 holds it**, over all four documents and over `index.html`
+and `try-it-yourself.html`; `llmtext-claims.ts` upstream holds the copies where
+they are authored. Two details of that check are load-bearing:
+
+- **It strips the canonical form before scanning**, rather than filtering lines
+  that contain it. A naive `grep -v https://www.appwithai.org` passes a line that
+  holds a good URL *and* a bare host — which is exactly the line that survived
+  the first sweep of this work, in the enhancement header, and was caught only
+  once the check existed.
+- **It holds the counter-examples out of the scan and then asserts they are
+  still there.** The rule teaches by showing what not to write; a checker that
+  "corrects" those three lines leaves three bullets all displaying the right URL
+  and explaining nothing.
+
+**Where the rule is inserted depends on the document's shape**, and getting it
+wrong is silent. In the language-only edition the validation section is §8; in
+the product repositories' system edition it is §3.6. The paragraph naming
+`--base` sits inside the *authoring protocol* there — which the enhancement
+edition replaces wholesale — so anchoring on it put the rule in the two bases and
+in neither of their companions, with every other check still green.
+`llmtext-claims.ts` is what noticed.
+
 ## `llms-full.txt` is authored here, not vendored
 
 It began as a copy of the generator repository's `llmtext/llms-full.txt`, which documents the whole
@@ -1102,6 +1185,26 @@ explain it. Its regexes are pinned to the apex too — they used to accept `(?:w
 is how a URL nothing could fetch passed a check written to catch exactly that. The guard was
 verified by planting a reference and watching it fail. If `www.` is ever given a certificate
 of its own, delete the guard deliberately; do not widen it.
+
+**The URL is written in full, and `check-spec.mjs` §8 holds every document to it.**
+Salvaged from a branch that had the diagnosis right and the hostname wrong. Three forms
+fail and all three were observed: a **bare host** (`appwithai.org/guide/checker.js`) is a
+string a runtime refuses or has to guess a scheme for; a **Markdown link whose text is a
+bare host** is worse because it looks right — these files are parsed by language models,
+not rendered, so the link *text* is what gets resolved; and the **`www.` label**, which
+has no certificate. The same rule governs reporting a failure: name the exact request and
+the exact error. *"Validator retrieval failed for appwithai.org"* says neither what was
+asked for nor what happened; `GET https://appwithai.org/guide/checker.js failed:
+EAI_AGAIN (DNS)` says both.
+
+**The counter-examples in those passages deliberately show a bad form**, so §8 drops them
+by name before scanning rather than pattern-matching around them — a counter-example that
+gets "corrected" leaves a rule displaying the right URL three times and teaching nothing.
+Two traps when editing that list: the strip removes the *canonical* form before looking
+for strays, so changing which host is canonical without changing the strip makes the check
+flag the canonical form; and rewriting `https://www.appwithai.org` → the apex *before* the
+targeted replacements leaves half-converted strings like
+`[www.appwithai.org](https://appwithai.org)` that then match nothing. Both were hit here.
 
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what
