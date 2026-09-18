@@ -32,26 +32,57 @@ jobs:
             node guide/check-model.mjs "$f"
           done
 
-      # The one-file checker carries checker.js, fixer.js and the runner
+      # And through the *other* published runner — the checklist audit. A model
+      # can pass the step above with 0 errors and 0 warnings and still be
+      # missing half the language: no state machine, no access rules, a
+      # reference column that forgot its FK modifier, help that restates the
+      # column's own name. Every published model is meant to be a worked
+      # example, so every one of them scores 22/22 or this fails.
+      - name: Models are finished, not merely valid
+        run: |
+          for f in guide/models/*.eml.mmd; do
+            echo "── $f"
+            node guide/audit-model.mjs "$f" --base guide/
+          done
+
+      # The audit has to still bite. A scorer that passes everything is
+      # indistinguishable from one that ran nothing, and this one is published,
+      # so a vendored checker that stopped emitting EML151-EML153 would leave it
+      # silently toothless. A bare ERD the checker accepts must fail it.
+      - name: The audit fails an unfinished model
+        run: |
+          work=$(mktemp -d)
+          printf '%%%%meta name: Bare Erd\n%%%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string name\n        string status\n    }\n' > "$work/bare-erd.mmd"
+          node guide/check-model.mjs "$work/bare-erd.mmd" --quiet
+          node guide/audit-model.mjs "$work/bare-erd.mmd" --base guide/ --quiet && \
+            { echo "expected the audit to fail a model with no rbac, no workflow and no help"; exit 1; } || true
+
+      # The one-file checker carries checker.js, fixer.js and both runners
       # compressed inside it. Re-vendoring the validators without rebuilding it
-      # would publish a single file that disagrees with the three beside it —
+      # would publish a single file that disagrees with the four beside it —
       # and nothing about the page would look wrong.
       - name: One-file checker is current
         run: node scripts/build-standalone-checker.mjs --check
 
       # It has to actually run, not merely be up to date: in a directory of its
-      # own, with no other file to fall back to, and agreeing with the runner.
+      # own, with no other file to fall back to, and agreeing with the runners
+      # it carries — both of them, since it carries the audit as well.
       - name: One-file checker runs standalone
         run: |
           work=$(mktemp -d)
           cp guide/check-model-standalone.mjs "$work"/
           cp guide/models/crm.eml.mmd "$work"/model.mmd
-          ( cd "$work" && node check-model-standalone.mjs model.mmd --quiet ) > one-file.txt
-          node guide/check-model.mjs guide/models/crm.eml.mmd --quiet > three-file.txt
-          diff one-file.txt three-file.txt
+          ( cd "$work" && node check-model-standalone.mjs model.mmd --quiet ) > "$work/one-file.txt"
+          node guide/check-model.mjs guide/models/crm.eml.mmd --quiet > "$work/three-file.txt"
+          diff "$work/one-file.txt" "$work/three-file.txt"
+          ( cd "$work" && node check-model-standalone.mjs model.mmd --audit --quiet ) > "$work/one-file-audit.txt"
+          node guide/audit-model.mjs guide/models/crm.eml.mmd --base guide/ --quiet > "$work/three-file-audit.txt"
+          diff "$work/one-file-audit.txt" "$work/three-file-audit.txt"
           printf 'prose about a model, not a model\n' > "$work"/prose.mmd
           ( cd "$work" && node check-model-standalone.mjs prose.mmd >/dev/null 2>&1 ) && \
             { echo "expected exit 1 on an invalid model"; exit 1; } || true
+          ( cd "$work" && node check-model-standalone.mjs prose.mmd --audit >/dev/null 2>&1 ) && \
+            { echo "expected exit 1 from --audit on an invalid model"; exit 1; } || true
 
       # Every figure the pages state about a model, against the model; every
       # example offered, against what chapter 09 can select; and the vendored

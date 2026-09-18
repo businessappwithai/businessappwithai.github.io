@@ -381,6 +381,34 @@ node check-model.mjs my-business.mmd</code></pre>
   of its own.
 </p>
 
+<h2 id="audit">Valid is not the same as finished</h2>
+<p>
+  Everything above answers one question: would the generator refuse this model. It does not answer the
+  other one. Nothing in the checker requires a model to <em>have</em> anything — a single entity with a
+  primary key and a name is a valid EML document with no lifecycle, no rules, no access control and not
+  one word of help text. Zero errors, zero warnings, and the verdict line says
+  <i>the generator accepts this model</i>, which is true and is not the same as saying it is done.
+</p>
+<pre><code>curl -sO <span data-url="audit-model.mjs">https://www.appwithai.org/guide/audit-model.mjs</span>
+node audit-model.mjs my-business.mmd</code></pre>
+<p>
+  That is the second runner, published beside the first and resolved the same way. It scores the model
+  against the delivery checklist — twenty-two checks: the file's shape, a primary key per entity, the
+  <code>FK</code> modifier on every reference column, an enum binding on every status, a state machine
+  with a beginning and an end, <code>%%action</code>, <code>%%hook</code>, <code>kind: saga</code> and
+  <code>%%rbac</code> all present, help on every entity and every column that says something rather
+  than restating its own name, every line item declared out of its category, and the three checker
+  passes over the file's own bytes. Its last line is the score, <code>22 passed, 0 failed</code>, and it
+  exits <code>0</code> only when nothing failed.
+</p>
+<p>
+  <b>It is a scorer, not a third checker.</b> Every diagnostic it reads comes from the same
+  <code>checker.js</code> this page runs; it adds no codes of its own, and it cannot tell you the model
+  says what the business meant. The bare entity above passes <code>check-model.mjs</code> with exit
+  <code>0</code> and fails this nine ways — which is the whole reason it is published rather than kept
+  as a maintainer's script. Run both before you hand a model over, and report both.
+</p>
+
 <h2 id="spec">The specification, for machines</h2>
 <p>
   The full machine-readable specification of the modelling language — every directive, type, modifier,

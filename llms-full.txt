@@ -27,6 +27,15 @@
   `curl -sO https://www.appwithai.org/guide/check-model.mjs` then
   `node check-model.mjs my-business.mmd`. Exit `0` means the generator accepts
   it; exit `1` means it does not, and the report says why.
+- **To check whether it is *finished*** (§8.5, §10) — a different question, and
+  the one a clean report does not answer:
+  `curl -sO https://www.appwithai.org/guide/audit-model.mjs` then
+  `node audit-model.mjs my-business.mmd`. It scores the model against §10's
+  checklist — every reference column's `FK` modifier, every enum binding, help
+  text on every entity and every column, a state machine per lifecycle, `%%rbac`
+  on every entity — and exits `0` only when all of it is there. **A bare ERD
+  passes the checker with zero errors and fails this nine ways.** Run both
+  before you deliver.
 - **Every example in this document is a complete model that the checker accepts
   with zero errors and zero warnings.** Paste any of them into `check()` and see.
   Imitate their shape.
@@ -1835,8 +1844,8 @@ usually gets skipped. Find your row and run it.
 | Node, writing the code yourself | Node has no network imports: fetch both files, write them into one directory, `import()` them from there (below) |
 | A browser, a canvas, an HTML preview | `<script type="module">` with the same URL import — or paste the document into `https://www.appwithai.org/guide/11-check-a-model.html`, which runs these same modules in the tab. Either is a real run and its counts are reportable |
 | A browse or fetch tool **beside** a shell with no network | The split most assistants have, and a bridge rather than a blocker. Read `https://www.appwithai.org/guide/checker.js` and `https://www.appwithai.org/guide/fixer.js` with the layer that can reach them, write both into the shell's working directory — a heredoc will do, and a file too large for one write goes in pieces — then run the first row with `--base .`. The shell needs no network, only a file write |
-| A shell that runs Node but **reaches no host at all**, and a text-only way in | **One file.** `https://www.appwithai.org/guide/check-model-standalone.mjs` is about 130KB and carries `checker.js`, `fixer.js` and the runner compressed inside it. Get that one file there by any means — paste it, print it from a layer that can read it, copy it off another machine — then `node check-model-standalone.mjs <business-name>.mmd`. It inflates them into a temp directory and runs the published runner against them: same three passes, same diagnostics, same `0`/`1`/`2`. **A real run, counts reportable.** Three separate files are smaller apart than this is together, so prefer them whenever anything can fetch |
-| A shell, but **no egress** — a sandbox, a proxy, an air-gapped runner | The modules are two dependency-free files and `check-model.mjs` prefers a local copy of them to the network. Put `checker.js` and `fixer.js` in the directory you are working in, or beside the script, or name their directory with `--base <dir>`, and run it exactly as above. **This is a real run**: same engines, same report, same exit codes, counts reportable |
+| A shell that runs Node but **reaches no host at all**, and a text-only way in | **One file.** `https://www.appwithai.org/guide/check-model-standalone.mjs` is about 140KB and carries `checker.js`, `fixer.js` and **both** runners compressed inside it. Get that one file there by any means — paste it, print it from a layer that can read it, copy it off another machine — then `node check-model-standalone.mjs <business-name>.mmd`, and `node check-model-standalone.mjs <business-name>.mmd --audit` for §8.5's checklist score. It inflates them into a temp directory and runs the published runners against them: same three passes, same diagnostics, same `0`/`1`/`2`. **A real run, counts reportable.** The published files are smaller apart than this is together, so prefer them whenever anything can fetch |
+| A shell, but **no egress** — a sandbox, a proxy, an air-gapped runner | The modules are two dependency-free files, and both `check-model.mjs` and `audit-model.mjs` prefer a local copy of them to the network. Put `checker.js` and `fixer.js` in the directory you are working in, or beside the script, or name their directory with `--base <dir>` — a relative directory such as `--base ./` is fine — and run them exactly as above. **This is a real run**: same engines, same report, same exit codes, counts reportable |
 | No JavaScript runtime at all | Walk §10 by hand, and say in your delivery that the model was checked against the checklist and not against the checker |
 
 **A blocked network is not a failed validation, and it is not a stopping
@@ -1983,6 +1992,68 @@ console.log(formatReport(check(report.source)));
 
 Both files must land in the same directory: `fixer.js` imports `checker.js` from
 beside itself.
+
+### 8.5 Is the model *finished*? — the checklist audit
+
+A clean report and a finished model are different things, and the gap between
+them is where delivered models actually fail.
+
+Nothing in the checker requires a model to *have* anything. A single entity with
+a primary key and a name is a valid EML document: no state machine, no saga, no
+hook, no `%%action`, no `%%rbac` line, not one word of help text — zero errors,
+zero warnings, and the generator will build it. What comes out is a grid of text
+boxes that every user can see all of, with no lifecycle, no rules and no
+security, and the report said it was fine. The three warnings that do fire
+(`EML146`, `EML152`, `EML153`) are advisory: `formatReport` ends such a run with
+*"the generator accepts this model"*, which is true and is not the same as
+*"this model is done"*.
+
+So there is a second published runner, beside the first and resolved the same
+way:
+
+```sh
+curl -sO https://www.appwithai.org/guide/audit-model.mjs
+node audit-model.mjs my-business.mmd
+```
+
+It scores the mechanical half of §1.2's file contract and §10's checklist —
+twenty-two checks — and its last line is the score:
+
+```
+22 passed, 0 failed
+```
+
+Exit `0` when every check passed, `1` when one or more failed, `2` when it could
+not run. `--quiet` prints the score line alone; `--base <dir-or-url>` is the same
+flag `check-model.mjs` has, and the offline rows of §8.4 apply unchanged.
+
+What it holds a model to, and what a clean checker run would not have told you:
+
+| It checks | Because a clean report does not mean |
+|---|---|
+| The file's name, its first line, no Markdown anywhere in it | The bytes are a `.mmd` a Mermaid viewer renders (§1.2) |
+| Every entity has a primary key; every `FK` ends `_id`; **every `_id`/`_by` column carries the `FK` modifier** | The reference is a `Table Direct` lookup rather than a silently downgraded text box (§3.7) |
+| Every `status`/`state`/`stage` column is bound by `%%field … enum:` | The control is a List rather than free text the state machine cannot act on (§3.7) |
+| At least one `kind: state` workflow, each with an initial transition and a terminal state | The records have a lifecycle at all (§5.2) |
+| `%%action`, `kind: saga`, `%%hook` and `%%rbac` are all present | The model decides, runs and restricts something — rather than being an ERD with diagrams beside it |
+| Help on every entity and every column, **none of it restating its own name** | The application and its generated manual say something. `Status for Client.` is complete coverage and worthless (`EML151`, `EML152`, `EML153`) |
+| Every declared line item is out of every `%%category`, and every candidate is reported | The dashboard does not carry a card listing every invoice line ever written (§3.5.1, `EML149`, `EML150`) |
+| `checkAndFix` then two `check` passes over the repaired bytes, all clean | The bytes you are delivering are the bytes that passed (§1.3) |
+
+Three of those — the `FK` modifier, the enum binding, and help that says
+something — are the ones worth re-reading, because each is a warning the
+generator proceeds past after quietly getting the application wrong.
+
+**It is a scorer, not a second checker.** Every diagnostic it reads comes from
+`checker.js`; it adds no codes of its own. And it cannot tell you the model says
+what the business meant — only that nothing in it is mechanically unfinished.
+`EML149` candidates are *printed* rather than counted against the score, because
+whether something is a line item is a question about the business and a candidate
+you have considered and rejected is a legitimate answer.
+
+**Run it before you deliver, and report its score beside the checker's counts.**
+A delivery that says *"0 errors, 0 warnings"* and nothing else is not wrong, and
+it is not the whole truth about the file either.
 
 ---
 
@@ -2154,6 +2225,19 @@ flowchart TD
 
 ## 10. Before you deliver — the checklist
 
+**Most of this list is machine-checkable, so do not walk it by hand.** Items 1-4
+and 6-16 are what `audit-model.mjs` scores — twenty-two checks, one command, the
+same engines the checker runs (§8.5):
+
+```sh
+curl -sO https://www.appwithai.org/guide/audit-model.mjs
+node audit-model.mjs my-business.mmd
+```
+
+`22 passed, 0 failed` and exit `0` is the state to deliver in. Read the list
+anyway for the three items no script can answer — 5, 7 and 17 are about whether
+the model matches the business — and for the reasoning behind the ones it can.
+
 **The file itself**
 
 1. There *is* a file, and it is Mermaid — not a document describing one (§1.0).
@@ -2224,6 +2308,11 @@ flowchart TD
     plainly that the checker could not be run and walked this list by hand
     instead (§1.3).
 20. Warnings are cleared, or each remaining one is explained to the user.
-21. The file the user receives is the file you validated, delivered as a
-    download, with the enhanced specification and the checker counts beside it in
-    the reply — not inside the file (§1.4).
+21. **`node audit-model.mjs <file>.mmd` exits `0`** — every mechanical item
+    above, scored rather than remembered (§8.5). A clean checker run does not
+    imply this one: a model with no `%%rbac`, no state machine and no help text
+    is 0 errors and 0 warnings, and it is not finished. If a check fails and you
+    are leaving it that way, say which and why.
+22. The file the user receives is the file you validated, delivered as a
+    download, with the enhanced specification, the checker counts **and the
+    audit score** beside it in the reply — not inside the file (§1.4).

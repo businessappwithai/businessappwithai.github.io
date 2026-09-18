@@ -384,6 +384,79 @@ expect(/OK — 0 errors/.test(cleanRun.stdout), "check-model.mjs prints the chec
 expect(brokenRun.status === 1, "check-model.mjs exits 1 when the generator would refuse the model");
 expect(spawnSync(process.execPath, [runner], { encoding: "utf8" }).status === 2, "check-model.mjs exits 2 when it cannot run");
 
+/* ------------------------------- 5b. the checklist audit §8.5 publishes -----
+ *
+ * The audit answers the question a clean report does not: is the model
+ * finished. It was a repository script for most of its life — twenty-two checks
+ * importing `../guide/checker.js` by relative path — so the only people who
+ * could run it were the ones with a clone, and the failure it catches is
+ * delivered by a language model in an environment that has neither. It is
+ * published beside the checker now, and these hold it there.
+ *
+ * The positive case has to be a real finished model, not the two-column fixture
+ * above: that one is exactly what the audit exists to fail.
+ */
+const auditor = root + "guide/audit-model.mjs";
+const runAudit = (file, ...extra) =>
+  spawnSync(process.execPath, [auditor, file, "--base", root + "guide/", "--quiet", ...extra], { encoding: "utf8" });
+
+/* A bare ERD: a primary key, a name, a free-text status. The checker accepts it
+   with 0 errors — no %%rbac, no workflow, no help, no enum binding — and that
+   is the whole reason this runner exists. */
+const bare = join(scratch, "bare-erd.mmd");
+writeFileSync(bare, "%%meta name: Bare Erd\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string name\n        string status\n    }\n");
+
+const finishedRun = runAudit(root + "guide/models/crm.eml.mmd");
+const unfinishedRun = runAudit(bare);
+const unfinishedCheck = run(bare);
+
+expect(existsSync(auditor), "guide/audit-model.mjs exists at the path the spec publishes");
+expect(finishedRun.status === 0, "audit-model.mjs exits 0 on a finished model");
+expect(unfinishedRun.status === 1, "audit-model.mjs exits 1 on a model that is valid but unfinished");
+expect(unfinishedCheck.status === 0,
+  "…and that same model passes check-model.mjs — which is why the audit is published, not optional");
+expect(spawnSync(process.execPath, [auditor], { encoding: "utf8" }).status === 2, "audit-model.mjs exits 2 when it cannot run");
+
+/* The score is a published figure: §8.5 states it and shows the line. A check
+   added or dropped without editing the document leaves the spec quoting a
+   number no run produces. */
+const scored = /^(\d+) passed, (\d+) failed$/m.exec(finishedRun.stdout.trim());
+expect(scored !== null, "audit-model.mjs's last line is its score");
+const total = scored ? Number(scored[1]) + Number(scored[2]) : 0;
+expect(specText.includes(`${total} passed, 0 failed`),
+  `section 8.5 quotes the score the runner actually prints (${total} checks)`);
+expect(new RegExp(`\\b${total === 22 ? "twenty-two" : String(total)}\\b`).test(specText),
+  "section 8.5 states how many checks there are, in words, and it is that many");
+
+/* §8.4's no-egress row tells the reader to pass a directory, and `--base ./` is
+   the form it shows. A relative path is not a URL: `fetch` and a bare
+   `import()` both reject `guide/checker.js` outright, so this used to fail with
+   "Failed to parse URL" — which reads as the site being unreachable while the
+   files sit in the next directory. Both runners resolve it as a path now. */
+const relative = (script) =>
+  spawnSync(process.execPath, [script, "guide/models/crm.eml.mmd", "--base", "guide/", "--quiet"],
+    { encoding: "utf8", cwd: root });
+for (const [label, script] of [["check-model.mjs", runner], ["audit-model.mjs", auditor]])
+  expect(relative(script).status === 0, `${label} accepts a relative --base, as §8.4 tells the reader to pass`);
+
+/* Both runners are local-first and neither reaches a code-hosting origin — the
+   same claim §8.4 makes, now made about two files. */
+const auditorSource = readFileSync(auditor, "utf8");
+expect(!/github/i.test(auditorSource), "audit-model.mjs reaches no GitHub host either");
+expect(auditorSource.includes("scorer, not a second checker"),
+  "audit-model.mjs says in its own header that it originates no diagnostic");
+
+/* The one-file build carries it too, or the shell that can reach nothing can
+   ask only half the question. */
+const standalone = readFileSync(root + "scripts/build-standalone-checker.mjs", "utf8");
+expect(/SOURCES = \[[^\]]*"audit-model\.mjs"/.test(standalone),
+  "the one-file checker embeds the audit as well as the checker");
+
+/* Named where a reader will meet it: the header bullet, §8.5 and §10. */
+expect((specText.match(/audit-model\.mjs/g) ?? []).length >= 4,
+  "the audit is reachable from the header, §8.4, §8.5 and §10");
+expect(/^### 8\.5 /m.test(specText), "§8.5 exists — the header and §10 both cite it");
+
 /* ------------------------------- 6. llmdetailed.txt — the interactive §10 ---
  *
  * llms-full.txt is authored here; llmdetailed.txt is vendored from
@@ -450,8 +523,27 @@ held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can
   || /reach GitHub says nothing about whether the checker can run/i.test(detailedProse),
   "section 10.6 states that an unreachable GitHub is not an unreachable checker");
 
+/* The audit, in the vendored document too. This file is a straight copy from
+ * app-with-ai-tanstack, so a re-vendor from a tree that predates the audit
+ * would silently drop it while every other check here stayed green — and the
+ * paragraph it replaced named a script in *this* repository that no reader of
+ * that document has. */
+held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/audit-model\.mjs/.test(detailed),
+  "llmdetailed.txt offers the checklist audit by URL, not a repository script");
+/* The document keeps one mention of the old path, in a sentence saying it used
+ * to be the instruction and why that was unfollowable. That is a
+ * counter-example, so it is dropped by name before the scan — the same
+ * treatment section 8 gives the bad-URL forms, and for the same reason: a
+ * check that "corrects" it leaves a paragraph explaining nothing. */
+const withoutHistory = detailed
+  .split("\n")
+  .filter((line) => !/paragraph used to name/.test(line) && !/in the website$/.test(line))
+  .join("\n");
+held(!/scripts\/check-model\.mjs/.test(withoutHistory),
+  "…and no longer points a reader without a clone at scripts/check-model.mjs");
+
 // Every rung of the ladder has to name something this site actually serves.
-for (const rung of ["guide/check-model.mjs", "guide/checker.js", "guide/fixer.js", "guide/11-check-a-model.html"])
+for (const rung of ["guide/check-model.mjs", "guide/audit-model.mjs", "guide/checker.js", "guide/fixer.js", "guide/11-check-a-model.html"])
   held(existsSync(root + rung) && detailed.includes(rung.replace("guide/", "")),
     `the ladder's ${rung} is published here and named in the document`);
 

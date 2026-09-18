@@ -2,20 +2,26 @@
 /**
  * Builds `guide/check-model-standalone.mjs` — the whole checker as ONE file.
  *
- * Why this exists. The published validators are two ES modules plus a runner:
- * three files, 418KB. A shell with network fetches them in one line and this
- * file is pointless. The case it is for is the one that kept recurring: an
+ * Why this exists. The published validators are two ES modules plus two
+ * runners: four files, 433KB. A shell with network fetches them in one line and
+ * this file is pointless. The case it is for is the one that kept recurring: an
  * assistant whose shell cannot resolve any host, whose only channel into that
  * shell is text it can paste, and whose model file is already sitting there.
- * Three files of 418KB do not go through that channel; one file of ~125KB does.
+ * Four files of 433KB do not go through that channel; one file of ~140KB does.
  *
- * What it is. `checker.js`, `fixer.js` and `check-model.mjs` are embedded
- * brotli-compressed and base64-encoded — byte-identical to what the site
- * serves. On run it inflates them into a temp directory and executes the
- * *published runner* against them with `--base <tmpdir>`, forwarding argv and
- * the exit code. It reimplements nothing: the three passes, the report and the
- * 0/1/2 exit codes are the published ones, because they are literally the
- * published code.
+ * What it is. `checker.js`, `fixer.js`, `check-model.mjs` and
+ * `audit-model.mjs` are embedded brotli-compressed and base64-encoded —
+ * byte-identical to what the site serves. On run it inflates them into a temp
+ * directory and executes the *published runner* against them with
+ * `--base <tmpdir>`, forwarding argv and the exit code. It reimplements
+ * nothing: the three passes, the checklist audit, the report and the 0/1/2 exit
+ * codes are the published ones, because they are literally the published code.
+ *
+ * `--audit` picks the second runner. Both belong in here for the same reason
+ * the file exists at all: the environment this is for cannot fetch the other
+ * one afterwards, and "would the generator refuse this" and "is this model
+ * finished" are different questions. Carrying only the first would leave the
+ * shell that needs this most able to ask only half of it.
  *
  * That is also why it cannot drift in behaviour. `--check` fails when the
  * embedded payloads no longer match the files beside them, so re-vendoring the
@@ -27,7 +33,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const SOURCES = ["checker.js", "fixer.js", "check-model.mjs"];
+const SOURCES = ["checker.js", "fixer.js", "check-model.mjs", "audit-model.mjs"];
 const OUT = join(root, "guide", "check-model-standalone.mjs");
 
 const pack = (name) => {
@@ -46,17 +52,25 @@ const body = `#!/usr/bin/env node
  *   rebuild: node scripts/build-standalone-checker.mjs
  *
  * usage: node check-model-standalone.mjs <model.mmd> [--write] [--quiet]
- * exit:  0 clean · 1 the checker found errors · 2 could not run
+ *        node check-model-standalone.mjs <model.mmd> --audit [--quiet]
+ * exit:  0 clean · 1 the checker found errors, or the audit failed a check
+ *        2 could not run
  *
- * This needs NO network and NO install. It carries \`checker.js\`, \`fixer.js\`
- * and \`check-model.mjs\` — the published validators, byte for byte — inflates
- * them into a temp directory and runs the published runner against them. The
- * three passes, the diagnostics and the exit codes are therefore the real ones:
- * a run from this file is a real run and its counts are reportable.
+ * This needs NO network and NO install. It carries \`checker.js\`, \`fixer.js\`,
+ * \`check-model.mjs\` and \`audit-model.mjs\` — the published validators, byte
+ * for byte — inflates them into a temp directory and runs the published runner
+ * against them. The three passes, the diagnostics and the exit codes are
+ * therefore the real ones: a run from this file is a real run and its counts
+ * are reportable.
+ *
+ * Without \`--audit\` it answers "would the generator refuse this model".
+ * With \`--audit\` it answers the other question — "is this model finished" —
+ * by scoring it against the authoring checklist, which a model can fail with
+ * zero errors and zero warnings.
  *
  * It exists for a shell that cannot resolve a host and whose only input channel
- * is text. If your shell has network, fetch the three files instead — they are
- * smaller apart than this is together.
+ * is text. If your shell has network, fetch the published files instead — each
+ * one you need is smaller on its own than this is altogether.
  */
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { brotliDecompressSync } from "node:zlib";
@@ -77,9 +91,14 @@ try {
   /* Run the published runner, not a copy of its logic. It resolves the two
    * modules from --base before it considers the network, so this never leaves
    * the machine. process.exitCode is what it sets; import() runs it to
-   * completion first. */
-  process.argv = [process.argv[0], join(dir, "check-model.mjs"), ...process.argv.slice(2), "--base", dir];
-  await import(pathToFileURL(join(dir, "check-model.mjs")).href);
+   * completion first.
+   *
+   * --audit is consumed here rather than passed on: the audit runner has no
+   * such flag, and an unrecognised argument would be taken for the model file. */
+  const forwarded = process.argv.slice(2).filter((arg) => arg !== "--audit");
+  const runner = process.argv.includes("--audit") ? "audit-model.mjs" : "check-model.mjs";
+  process.argv = [process.argv[0], join(dir, runner), ...forwarded, "--base", dir];
+  await import(pathToFileURL(join(dir, runner)).href);
   code = process.exitCode ?? 0;
 } catch (error) {
   console.error("could not run the embedded checker: " + (error?.message ?? error));
@@ -106,4 +125,4 @@ writeFileSync(OUT, body);
 const raw = payloads.reduce((n, p) => n + p.raw, 0);
 console.log(`wrote guide/check-model-standalone.mjs (${body.length} bytes)`);
 for (const p of payloads) console.log(`  ${p.name.padEnd(22)} ${p.raw} → ${p.packed}`);
-console.log(`  three files, ${raw} bytes → one file, ${body.length} bytes`);
+console.log(`  ${payloads.length} files, ${raw} bytes → one file, ${body.length} bytes`);
