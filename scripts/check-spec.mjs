@@ -809,6 +809,19 @@ for (const [name, body] of [
   /* And the counter-examples have to survive, or the rule teaches nothing. */
   host(body.includes("[appwithai.org](https://www.appwithai.org)"),
     `${name}: keeps the Markdown-link counter-example the rule is about`);
+
+  /* Naming the exact error is only half of it: the reader also has to be able
+   * to tell which *kind* of failure it was. A shell reporting `curl: (6)` has
+   * no resolver, so every host fails identically and the result says nothing
+   * about this one — but the observed behaviour was to report it as the site
+   * being unavailable. The table names the four codes that never reached the
+   * site and the one that did, so a model can classify its own failure instead
+   * of generalising from it. */
+  for (const code of ["curl: (6)", "curl: (7)", "curl: (56)"])
+    host(body.includes(code),
+      `${name}: names \`${code}\` among the failures that never reached the site`);
+  host(/never reached the site, so none of them is evidence it is down/.test(body.replace(/\s+/g, " ")),
+    `${name}: says those failures are not evidence the site is down`);
 }
 
 /* The pages are held to the same form: a prompt is a URL a reader pastes. */
