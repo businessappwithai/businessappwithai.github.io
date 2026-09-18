@@ -822,7 +822,21 @@ for (const [name, body] of [
       `${name}: names \`${code}\` among the failures that never reached the site`);
   host(/never reached the site, so none of them is evidence it is down/.test(body.replace(/\s+/g, " ")),
     `${name}: says those failures are not evidence the site is down`);
+
+  /* The page-only rung. A fetch layer that reads text/html and refuses
+   * application/javascript reports the module as inaccessible while the same
+   * host serves it pages — so the modules are published inside pages, and every
+   * edition has to name that directory or the rung is unreachable. */
+  host(body.includes("https://www.appwithai.org/guide/source/"),
+    `${name}: names the page-carried copies, for a fetcher that refuses JavaScript`);
 }
+
+/* The source pages the ladder now names have to be published here, one per
+ * file, or four documents send a reader to a 404. Their contents are held by
+ * scripts/check-validator-source-pages.mjs, which decodes them. */
+for (const name of ["index.html", "checker.js.html", "fixer.js.html", "check-model.mjs.html", "audit-model.mjs.html"])
+  host(existsSync(root + "guide/source/" + name),
+    `guide/source/${name} is published here — the ladder names that directory`);
 
 /* The pages are held to the same form: a prompt is a URL a reader pastes. */
 for (const page of ["index.html", "try-it-yourself.html"]) {

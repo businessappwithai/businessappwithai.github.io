@@ -84,6 +84,21 @@ jobs:
           ( cd "$work" && node check-model-standalone.mjs prose.mmd --audit >/dev/null 2>&1 ) && \
             { echo "expected exit 1 from --audit on an invalid model"; exit 1; } || true
 
+      # The validators are also published inside pages, for a fetch layer that
+      # reads text/html and refuses application/javascript. Each page carries
+      # one file base64-encoded plus its SHA-256, so a stale page would hand
+      # somebody a checker that is subtly not the published one.
+      - name: Validator source pages are current
+        run: node scripts/build-validator-source-page.mjs --check
+
+      # "Current" is not "recoverable": the check above would pass just as
+      # happily on a page whose base64 decodes to nothing. This decodes each
+      # page the way a reader would, compares against the published file, checks
+      # the SHA-256 the page prints, and runs the reconstructed checker and
+      # audit in a directory holding nothing else.
+      - name: Validator source pages round-trip to the real bytes
+        run: node scripts/check-validator-source-pages.mjs
+
       # Every figure the pages state about a model, against the model; every
       # example offered, against what chapter 09 can select; and the vendored
       # generator bundles, against the behaviour they are supposed to carry.

@@ -48,6 +48,9 @@ businessappwithai.github.io/
 │   │                         #   not "would the generator refuse this" but
 │   │                         #   "is this model finished". Published, not local
 │   ├── coi-sw.js             # Service Worker that isolates chapter 10
+│   ├── source/               # The validators carried INSIDE pages, base64 + sha256,
+│   │                         #   for a fetch layer that reads text/html and refuses
+│   │                         #   application/javascript. Generated — see below
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load (crm,
 │   │                         # drug-discovery, hospital-management-system,
@@ -81,6 +84,8 @@ businessappwithai.github.io/
 │   │                         # both enhancement editions and their derivation
 │   ├── check-model.mjs       # A forwarder to guide/audit-model.mjs — the audit
 │   │                         #   itself is published; this is the local way in
+│   ├── build-validator-source-page.mjs # Generates guide/source/. `--check` fails stale
+│   ├── check-validator-source-pages.mjs# Decodes them back and runs the result
 │   ├── build-llmtext-enhancement.mjs   # Derives the two enhancement editions
 │   │                         # from their bases. `--check` fails when stale
 │   └── llmtext/              # The sources it composes: one protocol and one
@@ -1246,6 +1251,47 @@ Three checks hold it, all in `tests.yml`, and they answer different questions:
   never executed is exactly the defect the check above exists to catch, one file
   along.
 
+**`guide/source/` — the validators carried inside pages.** A fetch layer that
+reads `text/html` and refuses `application/javascript` reports the module as
+*inaccessible* while the same host serves it pages without complaint, which
+reads as the site being broken. Observed from one runtime on all three files at
+once. So each module is published inside a page as well:
+`guide/source/checker.js.html` and its three siblings, plus an index.
+
+**The payload is base64, and that is the whole design.** Escaped source in a
+`<pre>` looks simpler and is the wrong choice: a markdown-converting fetcher can
+drop a blank line or collapse an indent, the result still *looks* like
+JavaScript, and the checker it produces is subtly not the published one. Base64
+carries no HTML-special character, ignores whitespace — so a reflow, a wrap or a
+Markdown conversion cannot corrupt it — and either decodes to the exact bytes or
+fails loudly. Each page also prints the **SHA-256 of the real file**, so whoever
+reassembles it can prove they have the published bytes rather than assume it.
+
+Two checks hold it, both in `tests.yml`, and as with the one-file build they
+answer different questions:
+
+- **`build-validator-source-page.mjs --check`** fails when a page no longer
+  matches the file it carries. Re-vendoring `checker.js` without rebuilding
+  these would publish a page handing somebody a stale checker.
+- **`check-validator-source-pages.mjs`** decodes each page the way a reader
+  would, compares against the published file, checks the SHA the page prints,
+  and then **runs the reconstructed checker and audit** in a directory holding
+  nothing else. "Current" is not "recoverable": the first check would pass on a
+  page whose base64 decodes to nothing.
+
+Both were verified non-vacuous. Appending one byte to `checker.js` fails the
+first and the byte comparison in the second; dropping four characters from one
+base64 block fails the hash **and** breaks the run — `fixer.js` cannot import a
+truncated `checker.js`, so the runner falls through to the network path. That
+cascade is the point: a silently corrupted copy would otherwise produce
+confident, wrong counts.
+
+**It is a transport of last resort and every page says so**, naming the direct
+URL first. `check-model-standalone.mjs` remains the better answer when nothing
+can fetch at all; this is for the case where pages can be read and files cannot.
+The one-file build is deliberately *not* carried here — a base64 of a base64
+payload is 190KB of nothing.
+
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what
 `guide/check-model.mjs` is for — it looks for `checker.js` and `fixer.js` *beside itself* before it
@@ -1332,6 +1378,8 @@ the scripts it runs have no dependencies.
 | `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
 | `node guide/audit-model.mjs` on each model | the same six, through the **checklist audit** — every one scores 22/22, because every published model is meant to be a worked example |
 | the audit on a bare ERD | it has to still bite. A single entity with a free-text status passes `check-model.mjs` with exit 0 and must fail the audit, or a vendored checker that stopped emitting `EML151`-`EML153` would leave the scorer silently toothless |
+| `node scripts/build-validator-source-page.mjs --check` | the page-carried copies of the validators still match the files they carry |
+| `node scripts/check-validator-source-pages.mjs` | …and still decode back to those bytes, hash correctly, and *run* |
 | `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below |
 
 **`scripts/website-e2e.mjs` exists because three defects reached the live site,
