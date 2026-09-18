@@ -76,12 +76,28 @@ const say = (cond, label) => { if (cond) pass++; else { fail++; console.log("FAI
 const erd = (body, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n${extra}erDiagram\n${body}\n`;
 
 // --- 1. version and auto-fixable list (header + §8.3) -----------------------
-const expectedFixable = ["EML001", "EML103", "EML112", "EML114", "EML117", "EML421", "EML422"];
+const expectedFixable = [
+  "EML001", "EML103", "EML112", "EML114", "EML117", "EML287", "EML421", "EML422",
+];
 say(LANGUAGE_VERSION === "1.2.0", `header states EML version 1.2.0 (checker says ${LANGUAGE_VERSION})`);
-say(AUTO_FIXABLE.join(",") === expectedFixable.join(","), `section 8.3 lists the seven auto-repairs (checker says ${AUTO_FIXABLE.join(", ")})`);
-/* The heading counts them in words, so it goes stale silently otherwise. */
+say(
+  AUTO_FIXABLE.join(",") === expectedFixable.join(","),
+  `section 8.3 lists every auto-repair (checker says ${AUTO_FIXABLE.join(", ")})`
+);
+/* The heading counts them in words, so it goes stale silently otherwise. The
+   word is derived from the checker's own set rather than written here: pinned
+   to "seven", this assertion failed on a document that had already been
+   corrected to "eight", and would have passed one claiming "nine". */
+const NUMBER_WORDS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+  "nine", "ten", "eleven", "twelve",
+];
+const countWord = NUMBER_WORDS[AUTO_FIXABLE.length] ?? String(AUTO_FIXABLE.length);
 const specBody = spec.join("\n");
-say(spec.includes("### 8.3 The seven auto-repairs"), "section 8.3's heading names the right number");
+say(
+  spec.includes(`### 8.3 The ${countWord} auto-repairs`),
+  `section 8.3's heading names the right number (expected "${countWord}")`
+);
 for (const code of expectedFixable)
   say(new RegExp(`^\\| \`${code}\` \\|.*\\|$`, "m").test(specBody), `section 8.3's table carries a row for ${code}`);
 
