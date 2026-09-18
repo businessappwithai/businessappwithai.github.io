@@ -1721,7 +1721,7 @@ a document the generator will accept.
 | Module | URL | What it gives you |
 |---|---|---|
 | `checker.js` | `https://www.appwithai.org/guide/checker.js` | Every diagnostic `language/checker.ts` prints, as `check(source)` |
-| `fixer.js` | `https://www.appwithai.org/guide/fixer.js` | The seven auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
+| `fixer.js` | `https://www.appwithai.org/guide/fixer.js` | The eight auto-repairs, plus `checkAndFix(source)` — repair and re-check in one call |
 
 ### 8.1 The API
 
@@ -1798,7 +1798,7 @@ entirely wrong answer produces. A long document of headings and bullet lists tha
 describes twelve entities perfectly contains zero entities as far as the parser is
 concerned. The fix is never to edit the prose — it is to write the `.mmd`.
 
-### 8.3 The seven auto-repairs
+### 8.3 The eight auto-repairs
 
 These, and only these, `checkAndFix` will repair without being told what was
 meant. Everything else needs a decision, which is why it is handed back untouched.
@@ -1810,8 +1810,18 @@ meant. Everything else needs a decision, which is why it is handed back untouche
 | `EML112` | The same column declared twice | Deletes the later line, keeping the stronger constraints |
 | `EML114` | Foreign key not ending `_id` | Appends the suffix |
 | `EML117` | Entity with no primary key | Prepends `string id PK` |
+| `EML287` | A `%%action when:` written in camelCase | Rewrites it as the snake_case column |
 | `EML421` | State machine with no initial transition | Adds `[*] --> <first>` |
 | `EML422` | State machine with no terminal state | Adds `<last> --> [*]` |
+
+`EML287` is repaired for a related reason. A rule reads the record being
+written, whose keys are the ERD's column names, and every column an EML ERD
+declares is snake_case — so `when: encounterId == null` compares `undefined`
+to `null`, which is true, and the rule refuses **every** write to that entity.
+The mirror case, `when: isCritical == true`, compares `undefined` to `true` and
+the rule never fires at all: seeded, listed in the admin screen, drawn by the
+viewer, and inert. Neither reports anything, and the repair — the snake_case
+spelling of the same name — needs no decision.
 
 `EML103` and `EML112` are repaired rather than reported-and-left because both
 produced the same fatal outcome: a `CREATE TABLE` naming one column twice, which
