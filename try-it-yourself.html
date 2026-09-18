@@ -407,7 +407,7 @@ erDiagram
     <div class="container">
       <div class="section-header">
         <h2>Check the file before you trust it</h2>
-        <p class="section-subtitle">The same checker the generator runs is published as a module and as a one-command runner. A model that passes here is a model the generator will accept.</p>
+        <p class="section-subtitle">The same checker the generator runs is published as a module and as a one-command runner. A model that passes here is a model the generator will accept — and a second runner scores whether it is finished, which a clean report does not tell you.</p>
       </div>
 
       <div class="grid grid-2" style="align-items: start;">
@@ -425,6 +425,15 @@ node check-model.mjs my-business.mmd</pre>
           <p class="text-muted text-sm">It is the way in if your model arrived as a fenced block inside a chat report rather than as a file.</p>
           <a href="guide/11-check-a-model.html" class="btn btn-outline mt-3">Open the checker &rarr;</a>
         </div>
+      </div>
+
+      <div class="card mt-5">
+        <div class="card-icon">&#9745;</div>
+        <h3>And one more line, for whether it is <em>finished</em></h3>
+        <p>A clean report says the generator would accept the file. It does not say the model is done — nothing in the checker requires a model to <em>have</em> a lifecycle, a rule, an access rule or a word of help text. One entity with a primary key and a name is a valid model with none of them, and it checks clean.</p>
+        <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/audit-model.mjs">https://www.appwithai.org/guide/audit-model.mjs</span>
+node audit-model.mjs my-business.mmd</pre>
+        <p class="text-muted text-sm">Twenty-two checks against the delivery checklist — the <code>FK</code> modifier on every reference, an enum behind every status, a state machine with a beginning and an end, help that says something rather than restating a column's own name. Its last line is the score, <code>22 passed, 0 failed</code>. That bare entity above passes the checker and fails this nine ways, which is why both are published. <a href="guide/11-check-a-model.html#audit">What it scores &rarr;</a></p>
       </div>
     </div>
   </section>

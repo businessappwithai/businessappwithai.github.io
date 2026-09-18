@@ -82,9 +82,24 @@ if (!file) {
  * fact about the network, not a reason to hand over an unvalidated model or to
  * invent counts for it.
  */
+/**
+ * `--base` takes either a URL or a directory, and a directory is the form that
+ * matters: it is what the no-egress rungs of the ladder tell a reader to pass.
+ * A *relative* directory has to be turned into a `file:` URL first — `fetch`
+ * and a bare `import()` both reject `guide/checker.js` with "Failed to parse
+ * URL", which reads as the site being unreachable when the files are sitting
+ * right there. So anything without a scheme is resolved against the working
+ * directory and handed on as `file:///…/`, and `--base ./` works as documented.
+ */
+function asBase(value) {
+  const withSlash = value.endsWith("/") ? value : value + "/";
+  if (/^[a-z][a-z0-9+.-]*:/i.test(withSlash)) return withSlash;
+  return pathToFileURL(resolve(withSlash) + "/").href;
+}
+
 async function loadModules() {
   const base = option("--base");
-  if (base) return importFrom(base.endsWith("/") ? base : base + "/");
+  if (base) return importFrom(asBase(base));
 
   const here = dirname(fileURLToPath(import.meta.url));
   for (const dir of [here, process.cwd(), join(process.cwd(), "guide")]) {

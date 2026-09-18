@@ -44,6 +44,9 @@ businessappwithai.github.io/
 │   ├── checker.js            # Published EML checker (ES module)
 │   ├── fixer.js              # Published EML fixer (ES module)
 │   ├── check-model.mjs       # Site-authored CLI runner for both of the above
+│   ├── audit-model.mjs       # The 22-point checklist audit — the other question:
+│   │                         #   not "would the generator refuse this" but
+│   │                         #   "is this model finished". Published, not local
 │   ├── coi-sw.js             # Service Worker that isolates chapter 10
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load (crm,
@@ -76,7 +79,8 @@ businessappwithai.github.io/
 │   ├── check-spec.mjs        # Verifies llms-full.txt against guide/checker.js,
 │   │                         # plus llmdetailed.txt §10's tooling claims, plus
 │   │                         # both enhancement editions and their derivation
-│   ├── check-model.mjs       # Audits any .mmd against §1.2 and §10 of the spec
+│   ├── check-model.mjs       # A forwarder to guide/audit-model.mjs — the audit
+│   │                         #   itself is published; this is the local way in
 │   ├── build-llmtext-enhancement.mjs   # Derives the two enhancement editions
 │   │                         # from their bases. `--check` fails when stale
 │   └── llmtext/              # The sources it composes: one protocol and one
@@ -665,6 +669,39 @@ imports, so a language model with a shell needs four lines where Bun and Deno ne
 step. `scripts/check-spec.mjs` asserts its exit codes, and §8.4 of `llms-full.txt` documents it. Keep it
 a runner: no diagnostic may originate in it.
 
+`guide/audit-model.mjs` is the **second** published runner, and it answers the
+other question. The checker says whether the generator would refuse a model; it
+says nothing about whether the model is finished, because **nothing in the
+checker requires a model to *have* anything**. One entity with a primary key and
+a name is valid EML with no lifecycle, no rule, no `%%rbac` line and no help
+text: zero errors, and `formatReport` closes with *"the generator accepts this
+model"*. The audit is twenty-two checks over §1.2's file contract and §10's
+checklist, its last line is the score (`22 passed, 0 failed`), and it exits 0/1/2
+the same way. That bare entity passes `check-model.mjs` with exit 0 and **fails
+the audit nine ways** — `tests.yml` asserts exactly that, because a scorer that
+passes everything is indistinguishable from one that ran nothing.
+
+**It was a repository script until now, and that was the defect.** The
+twenty-two checks lived in `scripts/check-model.mjs`, importing
+`../guide/checker.js` by relative path, so the only way to run them was to have a
+clone of this repository — while `llmdetailed.txt` told its reader, a language
+model with a shell and no clone, to "run the scorer as well as the checker" and
+named that path. The instruction was unfollowable by its own audience, and the
+fault it catches is the one that audience delivers. `scripts/check-model.mjs` is
+a **forwarder** now (`--base guide/`), so the local command still works and there
+is one implementation. Keep it a forwarder: a check added there would be one the
+published runner does not have, and the audit would mean two different things
+depending on who ran it.
+
+Both runners resolve their modules the same way — `--base`, then the script's own
+directory, then the working directory, then `./guide/`, then the published site —
+and **`--base` accepts a relative directory**, which it did not until this work:
+`fetch` and a bare `import()` both reject `guide/checker.js` with *"Failed to
+parse URL"*, so `--base ./` — the form §8.4's no-egress row tells a reader to
+pass — failed with a message that reads as the site being unreachable while the
+files sat in the next directory. Anything without a scheme is resolved to a
+`file:` URL now, in both runners, and `check-spec.mjs` asserts it for each.
+
 Two behaviours in the page's front end are deliberate, and both are presentation of what the published
 modules already returned — not decisions of their own:
 
@@ -1064,7 +1101,7 @@ thing a language model has to produce is a model file.
   first family, a `%%guard role:… on …` line — the
   retired spelling of `%%rbac` — which parses and restricts nothing. `scripts/check-spec.mjs` asserts the
   derivation table against `appwithai-wasm.js` and asserts that the three codes fire;
-  `scripts/check-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
+  `guide/audit-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
   where an older checker is vendored.
 - **§3.7 also carries the display value** — what a reference shows in place of its uuid. The dictionary
   derives it from `sys_column.is_identifier`: a `name`-ish column, else `first_name` + `last_name`, else
@@ -1100,10 +1137,15 @@ thing a language model has to produce is a model file.
   the §5.3 step table and the §5.2 enum codes were found to be wrong. No dependencies; Node only.
 - **`node guide/check-model.mjs <file.mmd>`** is the published runner: §1.3's three passes and the
   checker's own report, exit 0/1/2. It is what §8.4 tells a language model to `curl`.
-- **`node scripts/check-model.mjs <file.mmd>`** audits a delivered model against the mechanical half of
-  §1.2's file contract and §10's checklist — shape, keys, enum bindings, state machines, rbac, and the
-  three checker passes over its own bytes, plus help coverage and line-item placement.
-  `guide/models/crm.eml.mmd` passes it 22/22.
+- **`node guide/audit-model.mjs <file.mmd>`** is the published audit: the mechanical half of §1.2's
+  file contract and §10's checklist — shape, keys, the `FK` modifier, enum bindings, state machines,
+  `%%action`/`%%hook`/saga/`%%rbac` presence, help that says something, line-item placement, and the
+  three checker passes over its own bytes. Twenty-two checks; §8.5 documents it, and `check-spec.mjs`
+  pins the figure §8.5 quotes to a real run — so adding or dropping a check fails CI rather than
+  leaving the spec quoting a number nothing produces. All six published models score 22/22, and
+  `tests.yml` asserts that on every one.
+- **`node scripts/check-model.mjs <file.mmd>`** is the same audit, forwarded, for a run inside a
+  checkout.
 
 **On the published domain — `www.appwithai.org` is canonical, and it took a DNS change to get there.**
 
@@ -1164,6 +1206,46 @@ sweep rewrites the text they were about to match; and escaped-regex forms
 (`https:\/\/appwithai\.org` inside a `.mjs`) contain no plain literal, so a sweep silently misses
 them and a check ends up stripping the wrong host.
 
+**`guide/check-model-standalone.mjs` — the whole checker as one file.** Built by
+`scripts/build-standalone-checker.mjs`, which brotli-compresses `checker.js`,
+`fixer.js`, `check-model.mjs` and `audit-model.mjs` and embeds them base64. On
+run it inflates them into a temp directory and **executes the published runner**
+against them with `--base <tmpdir>`, forwarding argv and the exit code; `--audit`
+picks the second runner. It reimplements nothing: the three passes, the
+twenty-two checks, the diagnostics and the 0/1/2 exit codes are the published
+ones because they are the published code.
+
+**This section was lost once and is restored here.** It shipped with the
+one-file build in #90; #91 branched before that and its rewrite of this part of
+the file wrote back a copy without it, so a squash merge dropped a section
+nothing about the hostname work had any reason to touch. Worth knowing as a
+shape rather than as an incident: a long-lived branch that rewrites a *region*
+of a document silently reverts whatever else landed in that region.
+
+It exists for one case, and it is worth stating so nobody reaches for it
+otherwise: **a shell that resolves no host, whose only channel in is text
+somebody pastes.** 433KB across four files does not go through that; 143KB in
+one file does. The published files are *smaller apart than this is together*,
+so every ladder rung that names it says to prefer them whenever anything can
+fetch.
+
+Three checks hold it, all in `tests.yml`, and they answer different questions:
+
+- **`--check`** fails when the embedded payloads no longer match the files
+  beside them. Re-vendoring `checker.js` without rebuilding this would publish
+  one file disagreeing with the four next to it, and nothing about the page
+  would look wrong. Verified non-vacuous by appending a line to `checker.js` and
+  watching it fail.
+- **A standalone run**, in a directory holding nothing else, whose `--quiet`
+  output must equal the three-file runner's on the same model, and which must
+  exit non-zero on a document that is prose rather than a model. "Up to date" is
+  not "works": the first check would pass just as happily on a payload that
+  inflates to nothing.
+- **The same run under `--audit`**, diffed against `audit-model.mjs` on the same
+  model, and non-zero on the prose document. Embedding a second runner that is
+  never executed is exactly the defect the check above exists to catch, one file
+  along.
+
 **A fetch of those URLs failing is still not always the site's fault.** A sandbox with no egress
 looks identical from the inside: DNS resolves and every CONNECT is refused. That case is what
 `guide/check-model.mjs` is for — it looks for `checker.js` and `fixer.js` *beside itself* before it
@@ -1207,7 +1289,7 @@ and the two documents stop agreeing about a language they both define.
   every entity and every column, one `%%rbac … .read` per entity, every state backed by a
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
   entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
-  restrictions; 0 errors, 0 warnings, 0 notes, and 22/22 under `scripts/check-model.mjs`.
+  restrictions; 0 errors, 0 warnings, 0 notes, and 22/22 under `guide/audit-model.mjs`.
   The hospital model scores 22/22 as well, and is the larger worked example: **30
   entities, 323 columns, 39 enums, 10 state machines, 10 sagas, 18 rules, 27 hooks and
   132 access rules**, 0 errors and 0 warnings. It was rebuilt end to end through §10's
@@ -1242,12 +1324,14 @@ Two workflows. `tests.yml` gates a pull request; `static.yml` deploys `main`.
 ### `.github/workflows/tests.yml` — the checks
 
 Node only, no install step, because this repository has no `package.json` and
-the three scripts it runs have no dependencies.
+the scripts it runs have no dependencies.
 
 | Step | What it holds |
 |---|---|
 | `node scripts/check-spec.mjs` | `llms-full.txt`'s fenced examples and its claims, against the published checker — plus `llmdetailed.txt` §10's tooling claims, both enhancement editions, and that neither is stale against its base |
 | `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
+| `node guide/audit-model.mjs` on each model | the same six, through the **checklist audit** — every one scores 22/22, because every published model is meant to be a worked example |
+| the audit on a bare ERD | it has to still bite. A single entity with a free-text status passes `check-model.mjs` with exit 0 and must fail the audit, or a vendored checker that stopped emitting `EML151`-`EML153` would leave the scorer silently toothless |
 | `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below |
 
 **`scripts/website-e2e.mjs` exists because three defects reached the live site,
