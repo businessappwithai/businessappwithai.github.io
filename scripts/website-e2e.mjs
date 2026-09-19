@@ -514,6 +514,27 @@ console.log("\n8. The model assistant");
     ? ok("the key warning is above the key field")
     : fail("the key warning is above the key field", "a reader pastes before reading it");
 
+  /* The download is offered only at zero errors — and that promise was broken
+     by CSS rather than by logic. `.btn` sets `display: inline-flex`, a class
+     beats the user agent's `[hidden] { display: none }`, and so Download as
+     .mmd, Repair and Stop all rendered at rest on a merged main; clicking
+     Download handed over an empty `model.eml.mmd`. Node has no cascade to ask,
+     so assert the rule that settles it — every button the controller toggles
+     with `hidden` carries a class that would otherwise win. */
+  const assistantCss = readFileSync(p("assets", "css", "assistant.css"), "utf8");
+  /\.aia-root\s+\[hidden\]\s*\{[^}]*display:\s*none\s*!important/.test(assistantCss)
+    ? ok("[hidden] beats .btn's display on the assistant")
+    : fail(
+        "[hidden] beats .btn's display on the assistant",
+        "assistant.css has no `.aia-root [hidden] { display: none !important }` — " +
+          "the download button renders before anything has been checked"
+      );
+
+  for (const id of ["aia-download", "aia-repair", "aia-stop"])
+    new RegExp(`id="${id}"[^>]*\\bhidden\\b`).test(assistant)
+      ? ok(`${id} starts hidden`)
+      : fail(`${id} starts hidden`, `it is offered before a run has produced one`);
+
   /* privacy.html promises its event list is complete, so every event this
      page can emit has to be in it. */
   const privacy = readFileSync(p("privacy.html"), "utf8");

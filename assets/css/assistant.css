@@ -23,6 +23,16 @@
   --aia-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* `.btn` sets `display: inline-flex`, and a class beats the user agent's
+   `[hidden] { display: none }` — so `#aia-download`, `#aia-repair` and
+   `#aia-stop` rendered at full size on a page where nothing had run yet, and
+   the download handed over an empty `model.eml.mmd`. That is the exact failure
+   this page exists to prevent, arrived at through CSS rather than logic.
+   `guide-demo.css` carries the same rule for the same reason. */
+.aia-root [hidden] {
+  display: none !important;
+}
+
 .aia-grid {
   display: grid;
   grid-template-columns: 1fr;
