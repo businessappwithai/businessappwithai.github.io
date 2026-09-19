@@ -212,9 +212,17 @@ carries(
   "childTabs",
   "the entity hook resolves a parent's child tabs"
 );
+/*
+ * The needle moved, the rule did not. `lineItemTables` was a computed list the
+ * dashboard query filtered against; `e1c1292b` replaced it with a NOT EXISTS
+ * read straight off `sys_tab`, so this screen and the detail screen resolve a
+ * line item from one place rather than two that can disagree. Same property —
+ * a child with `%%entity <Child> parent: <Parent>` gets no dashboard card —
+ * asserted against the clause that now carries it.
+ */
 carries(
   "backend/src/modules/sys/services/sys-category.service.ts.hbs",
-  "lineItemTables",
+  "tb.tab_level > 0",
   "the category service keeps line items off the dashboard"
 );
 
