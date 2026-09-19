@@ -792,12 +792,13 @@ const host = (cond, label) => {
    write, so each must survive canonicalisation — and be excluded from it. */
 const TEACHING = [
   "`appwithai.org/guide/checker.js` is a string a",
-  "`[appwithai.org](https://www.appwithai.org)` reads to a person as a working",
-  "- **The apex is not the canonical form.** `https://appwithai.org/…` serves the same files and",
-  "  is the domain the repository's `CNAME` pins, but `https://www.appwithai.org/…`",
+  "`[www.appwithai.org](https://www.appwithai.org)` reads to a person as a working",
+  "- **The apex is not the canonical form.** `https://appwithai.org/…` serves the",
   "  `https://appwithai.org` serves the same files, but the `www.` form is the canonical one.",
+  "  `https://appwithai.org` serves the same files, but the `www` form is",
   '*"Validator retrieval failed for appwithai.org"* says neither',
   "is the canonical host and the apex `https://appwithai.org` serves the same",
+  "the canonical form and the one to write; the apex `https://appwithai.org`",
 ];
 
 for (const [name, body] of [
@@ -823,7 +824,7 @@ for (const [name, body] of [
     `${name}: tells the reader to report the URL actually requested`);
 
   /* And the counter-examples have to survive, or the rule teaches nothing. */
-  host(body.includes("[appwithai.org](https://www.appwithai.org)"),
+  host(body.includes("[www.appwithai.org](https://www.appwithai.org)"),
     `${name}: keeps the Markdown-link counter-example the rule is about`);
 
   /* Naming the exact error is only half of it: the reader also has to be able
