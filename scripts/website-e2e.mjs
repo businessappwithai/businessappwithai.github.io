@@ -459,5 +459,82 @@ console.log("\n7. The prompts on try-it-yourself.html");
 }
 
 // ---------------------------------------------------------------------------
+console.log("\n8. The model assistant");
+/*
+ * `assistant.html` is the only page here that sends a reader's model to
+ * another company, and the only one that asks for a credential. Three things
+ * about it are promises rather than implementation details, and each is the
+ * kind that rots quietly:
+ *
+ *   - it runs the ENHANCEMENT protocol. Pointed at the authoring edition it
+ *     would rewrite the model it was given, which is the exact failure that
+ *     edition exists to prevent — and the page would still look right.
+ *   - the key never reaches this origin. The moment anything on this page
+ *     posts it somewhere of ours, the warning it prints becomes a lie.
+ *   - the warning is above the key field. Below it, a reader has already
+ *     pasted by the time they read it.
+ */
+{
+  const assistant = readFileSync(p("assistant.html"), "utf8");
+  const controller = readFileSync(p("assets", "js", "assistant.js"), "utf8");
+
+  /* The enhancement edition, not the authoring one. */
+  /PROTOCOL_URL\s*=\s*"llmtextenhancement\.txt"/.test(controller)
+    ? ok("the assistant runs the enhancement protocol, not the authoring one")
+    : fail(
+        "the assistant runs the enhancement protocol",
+        "PROTOCOL_URL is not llmtextenhancement.txt — the authoring edition rewrites the model it is given"
+      );
+
+  /* Every host the controller can reach. A key goes on these requests, so the
+     list has to stay exactly the two providers and nothing else — this is the
+     assertion that catches a proxy being added later. */
+  const hosts = [...controller.matchAll(/https:\/\/([a-z0-9.-]+)\//g)].map((m) => m[1]);
+  const unexpected = [...new Set(hosts)].filter(
+    (h) => !["api.anthropic.com", "api.openai.com", "console.anthropic.com", "platform.openai.com"].includes(h)
+  );
+  unexpected.length === 0
+    ? ok("the assistant reaches the two providers and nothing else")
+    : fail(
+        "the assistant reaches the two providers and nothing else",
+        `it also names ${unexpected.join(", ")} — a key rides these requests`
+      );
+
+  /* The key must not leave on anything of ours. `awTrack` sends to analytics,
+     so the key must never appear in one of those calls. */
+  const tracked = [...controller.matchAll(/awTrack\?\.\([^)]*\)/gs)].map((m) => m[0]).join("\n");
+  !/\bkey\b/.test(tracked)
+    ? ok("no analytics event carries the key")
+    : fail("no analytics event carries the key", "an awTrack call names `key`");
+
+  /* The warning is above the key field, not below it. */
+  const warnAt = assistant.indexOf("aia-warning");
+  const keyAt = assistant.indexOf('id="aia-key"');
+  warnAt !== -1 && keyAt !== -1 && warnAt < keyAt
+    ? ok("the key warning is above the key field")
+    : fail("the key warning is above the key field", "a reader pastes before reading it");
+
+  /* privacy.html promises its event list is complete, so every event this
+     page can emit has to be in it. */
+  const privacy = readFileSync(p("privacy.html"), "utf8");
+  for (const event of [...new Set([...controller.matchAll(/awTrack\?\.\("([a-z_]+)"/g)].map((m) => m[1]))])
+    privacy.includes(event)
+      ? ok(`privacy.html lists ${event}`)
+      : fail(`privacy.html lists ${event}`, "the page promises the list is every event, by name");
+
+  /* The nav is at its seven-item ceiling; an eighth overflows the header at
+     every desktop width. The assistant is linked from the footer and from
+     #enhance instead. */
+  const navItems = (assistant.match(/class="nav-link/g) ?? []).length;
+  navItems === 7
+    ? ok("the assistant page keeps the nav at seven items")
+    : fail("the assistant page keeps the nav at seven items", `it has ${navItems}`);
+
+  readFileSync(p("try-it-yourself.html"), "utf8").includes("assistant.html")
+    ? ok("try-it-yourself.html links the assistant")
+    : fail("try-it-yourself.html links the assistant", "the page it belongs beside does not point at it");
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);

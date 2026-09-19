@@ -214,6 +214,13 @@ Then, in your reply text: the enhanced specification you inferred, the checker r
         <p class="section-subtitle">The two prompts above start from nothing. These two start from the <code>.mmd</code> you already have — you load your file, say what you want changed, and get the whole model back with the change in it and everything else still there. Same language, same checker, a different protocol.</p>
       </div>
 
+      <div class="card mb-5" style="border-left: 4px solid var(--primary-500);">
+        <h3 style="margin-top: 0;">Or run it here, with your own key</h3>
+        <p class="text-muted">The <a href="assistant.html">Model Assistant</a> runs the same protocol in the browser: you bring an OpenAI or Claude key, load your model, say what you want changed, and the result is put through the real checker before you are offered a download — which is the step a chat window cannot do for you.</p>
+        <p class="text-sm text-muted">Your key stays in your browser and goes straight to the provider; this site is static and has no server to receive it. That also means it is exposed to anything that can run script on the page, so the page says so above its own key field. If you would rather not, the two prompts below do the same job with no key anywhere.</p>
+        <a href="assistant.html" class="btn btn-primary btn-sm mt-3">Open the Model Assistant &rarr;</a>
+      </div>
+
       <div class="card">
         <span class="hero-badge">For a model you already have</span>
         <h3 style="margin-top: var(--spacing-md);">Load your file, describe the change, get the whole model back</h3>

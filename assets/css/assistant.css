@@ -1,0 +1,319 @@
+/**
+ * The model assistant — scoped to `.aia-root`, prefixed `aia-`.
+ *
+ * Same arrangement `guide-demo.css` uses for chapter 09 and `viewers.css` for
+ * the viewers, and for the same reason: this page has its own `.btn`, `.card`
+ * and `.status` ideas and none of them may collide with the Lunaris classes
+ * the rest of the site is built from.
+ *
+ * The palette is a bridge onto the design system's tokens rather than a second
+ * set of colours — change the bridge, not the rules that use it, and the page
+ * follows the theme with nothing to do in `dark-theme.css`.
+ */
+
+.aia-root {
+  --aia-surface: var(--gray-50);
+  --aia-border: var(--gray-200);
+  --aia-ink: var(--gray-900);
+  --aia-muted: var(--gray-600);
+  --aia-accent: var(--primary-600);
+  --aia-ok: var(--success-500);
+  --aia-bad: var(--error-500);
+  --aia-warn: var(--warning-500);
+  --aia-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.aia-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xl);
+}
+
+@media (min-width: 900px) {
+  .aia-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* A grid item defaults to min-width:auto, which floors its track at its
+   min-content width — and these hold <pre> blocks with long unbroken model
+   lines. Without this the column is wider than the screen and every line in
+   the card renders outside the card's own box. */
+.aia-grid > * {
+  min-width: 0;
+}
+
+.aia-panel {
+  border: 1px solid var(--aia-border);
+  border-radius: var(--radius-lg);
+  background: var(--aia-surface);
+  padding: var(--spacing-lg);
+}
+
+.aia-panel h3 {
+  margin-top: 0;
+}
+
+.aia-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--aia-ink);
+}
+
+.aia-input,
+.aia-textarea {
+  width: 100%;
+  border: 1px solid var(--aia-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.9375rem;
+  background: white;
+  color: var(--aia-ink);
+}
+
+.aia-input:focus,
+.aia-textarea:focus {
+  outline: 2px solid var(--aia-accent);
+  outline-offset: 1px;
+}
+
+.aia-textarea {
+  font-family: var(--aia-mono);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.aia-textarea-model {
+  min-height: 14rem;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.aia-textarea-instruction {
+  min-height: 6rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+/* Provider toggle */
+.aia-providers {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.aia-provider {
+  flex: 1;
+  border: 1px solid var(--aia-border);
+  border-radius: var(--radius-md);
+  background: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  color: var(--aia-muted);
+}
+
+.aia-provider-active {
+  border-color: var(--aia-accent);
+  color: var(--aia-accent);
+  box-shadow: inset 0 0 0 1px var(--aia-accent);
+}
+
+/* The key row — deliberately plain. Nothing here should look like a
+   credential form the site itself wants. */
+.aia-key-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.aia-key-row .aia-input {
+  flex: 1;
+  min-width: 14rem;
+  font-family: var(--aia-mono);
+  font-size: 0.8125rem;
+}
+
+.aia-key-note {
+  font-size: 0.8125rem;
+  color: var(--aia-muted);
+  margin-top: var(--spacing-xs);
+}
+
+.aia-check {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.8125rem;
+  color: var(--aia-muted);
+  margin-top: var(--spacing-sm);
+}
+
+/* The warning panel. Amber, above the key field, never below it — the same
+   placement rule the home page's experimental-software notice follows. */
+.aia-warning {
+  border: 1px solid var(--warning-500);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--warning-500) 8%, transparent);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.aia-warning p {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 0.9375rem;
+}
+
+.aia-warning p:last-child {
+  margin-bottom: 0;
+}
+
+/* Status and messages */
+.aia-status {
+  font-size: 0.875rem;
+  color: var(--aia-muted);
+  min-height: 1.25rem;
+}
+
+.aia-status-busy::before {
+  content: "";
+  display: inline-block;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin-right: var(--spacing-xs);
+  border-radius: 50%;
+  border: 2px solid var(--aia-accent);
+  border-top-color: transparent;
+  animation: aia-spin 0.7s linear infinite;
+  vertical-align: -1px;
+}
+
+@keyframes aia-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aia-status-busy::before {
+    animation: none;
+  }
+}
+
+.aia-message {
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  font-size: 0.9375rem;
+  margin-top: var(--spacing-md);
+}
+
+.aia-message-error {
+  border: 1px solid var(--aia-bad);
+  background: color-mix(in srgb, var(--error-500) 8%, transparent);
+}
+
+.aia-message-note {
+  border: 1px solid var(--aia-border);
+  background: white;
+  color: var(--aia-muted);
+}
+
+/* Output and verdict */
+.aia-output {
+  font-family: var(--aia-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  background: var(--gray-900);
+  color: var(--gray-50);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  max-height: 26rem;
+  overflow: auto;
+  white-space: pre;
+}
+
+.aia-verdict {
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.aia-verdict-ok {
+  color: var(--aia-ok);
+}
+
+.aia-verdict-bad {
+  color: var(--aia-bad);
+}
+
+/* formatReport is multi-line per diagnostic — the code excerpt and the fix sit
+   under the message — so this must not assume one line per issue. */
+.aia-report {
+  font-family: var(--aia-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  background: white;
+  border: 1px solid var(--aia-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  max-height: 20rem;
+  overflow: auto;
+  white-space: pre;
+}
+
+.aia-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-md);
+}
+
+.aia-examples {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-sm);
+}
+
+.aia-example {
+  border: 1px solid var(--aia-border);
+  border-radius: var(--radius-sm);
+  background: white;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--aia-muted);
+}
+
+.aia-example:hover {
+  border-color: var(--aia-accent);
+  color: var(--aia-accent);
+}
+
+/* Dark theme. `dark-theme.css` loads last and re-points the Lunaris tokens;
+   the bridge above picks most of that up on its own. Only the rules naming a
+   literal colour need an entry here. */
+:root:not([data-theme="light"]) .aia-root .aia-input,
+:root:not([data-theme="light"]) .aia-root .aia-textarea,
+:root:not([data-theme="light"]) .aia-root .aia-provider,
+:root:not([data-theme="light"]) .aia-root .aia-example,
+:root:not([data-theme="light"]) .aia-root .aia-report,
+:root:not([data-theme="light"]) .aia-root .aia-message-note {
+  background: var(--gray-100);
+  color: var(--aia-ink);
+}
+
+@media (max-width: 767px) {
+  .aia-providers {
+    flex-direction: column;
+  }
+
+  .aia-actions .btn {
+    width: 100%;
+  }
+}

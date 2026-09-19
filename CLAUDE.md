@@ -13,6 +13,7 @@ businessappwithai.github.io/
 │       └── static.yml        # GitHub Actions: auto-deploy to GitHub Pages on push to main
 ├── assets/
 │   ├── css/
+│   │   ├── assistant.css     # Scoped styles for assistant.html (`.aia-` prefix)
 │   │   ├── style.css         # Main stylesheet (Lunaris Design System)
 │   │   ├── guide.css         # Documentation layer for the "Build a CRM" guide
 │   │   ├── guide-demo.css    # Scoped styles for the three interactive chapters
@@ -25,6 +26,8 @@ businessappwithai.github.io/
 │   │   ├── run-in-browser.js     # Controller for chapter 09
 │   │   ├── run-real-stack.js     # Controller for chapter 10
 │   │   ├── validator.js          # Controller for chapter 11
+│   │   ├── assistant.js          # Controller for assistant.html — the ONLY file here
+│   │   │                         #   that sends a reader's model off this origin
 │   │   ├── zip.js                # Dependency-free ZIP writer (the deployable download)
 │   │   ├── appwithai-wasm.js     # Vendored: browser generator (parser + compilers)
 │   │   └── appwithai-fullstack.js# Vendored: full NestJS/TanStack generator
@@ -94,6 +97,7 @@ businessappwithai.github.io/
 │                             #   path, not <text> — a favicon cannot assume a font
 ├── favicon.ico               # The same mark at 16/32/48 for the browser's default
 │                             #   /favicon.ico probe, which no <link> prevents
+├── assistant.html            # Change a model with your own OpenAI/Claude key
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
@@ -158,7 +162,8 @@ Deployment is fully automatic:
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
 | `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: completely agentic workflows on the DeepSeek Harness. The five before 1.0.0 are one line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. The after-1.0.0 item is the one exception to that brevity: it carries a six-card brief on *how* it would be built, because the harness is new and the item is meaningless without it. Each card maps a step of the AppWithAI pipeline onto a mechanism the harness actually documents — Cordis plugins and bundles, `ctx.tools`, `ask_user_question`, the `ctx.subagents` seam and `ralph`, the sandboxed filesystem/subprocess providers, and the `web`/`headless`/`sdk` profiles with their durable session log. Those come from the harness's own `docs/` (architecture, agent-lifecycle, capability-seams, tool-catalog), which the page cites — **check them before editing a claim there**, since the harness is in developer preview and expects breaking changes. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
-| `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs. Linked from every footer (the "Privacy Policy" link, which used to be `#`) and from chapter 09's note |
+| `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs; and the Model Assistant's own section on the key. Linked from every footer, from chapter 09's note and from `assistant.html` |
+| `assistant.html` | **The Model Assistant.** Bring an OpenAI or Claude key, load a model, say what to change, and the browser calls the provider directly. The result goes through `guide/checker.js` before a download is offered. Linked from `try-it-yourself.html#enhance` and every footer's Product column — **not** in the nav, which is at its seven-item ceiling |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
 | `guide/run-real-stack.html` | Chapter 10: assembles the real NestJS/TanStack app and runs it in a WebContainer |
@@ -406,6 +411,9 @@ them the path spans five files. If you change one, check the others. There are n
    the WebContainer API and posthog-js are all there on those terms.
 5. **Preserve the design system** — CSS variable names and spacing scale are intentional; do not rename or restructure them.
 6. **Static only** — there is no backend, no API, no database. Forms do not submit to a server by default.
+   This is what shapes `assistant.html`: CopilotKit's runtime and Mastra are both servers and neither
+   can run here, so that page calls the provider from the browser with the reader's own key. Do not
+   add a server-side dependency to this repository without moving it off Pages first.
 7. **Deployment is automatic** — merging to `main` deploys to production. Test locally before merging.
 8. **Mobile-first content** — ensure any new sections are responsive and tested at 767px width.
 9. **Animations via CSS + IntersectionObserver** — follow the existing pattern in `main.js` for scroll-triggered effects; do not use JS animation libraries.
@@ -466,6 +474,12 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
    from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
 3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
    the visitor's IndexedDB. **The chapter makes no request to any other host.**
+
+That last sentence is scoped to this chapter and is still true of it. `assistant.html`
+is the one page that does reach another host, because sending the model to a provider
+is the whole of what it is for; it is a separate page and nothing here reaches it. The
+note in the chapter and `privacy.html` both say so rather than leaving the blanket
+claim to be read as covering the site.
 
 **Roles — what the reader is meant to notice**
 
@@ -720,6 +734,53 @@ modules already returned — not decisions of their own:
   generator would refuse is the failure this page exists to catch; and the reader whose model arrived
   as a fenced block in a chat report gets a real `.mmd` out of the paste box, which is the path the
   home page now points them at.
+
+## The Model Assistant — `assistant.html`
+
+The one page here that sends a reader's model to another company, and the one
+that asks for a credential. Both are deliberate and both are stated on the page
+above the field rather than in a footnote.
+
+**Why it is shaped this way, and what it is not.** The obvious build — CopilotKit
+plus Mastra, which is what `app-with-ai-tanstack` already runs — is not available
+here: `/api/copilotkit` is a TanStack **server** handler that calls `requireUser`,
+Mastra is a server on `:4111`, and this site is GitHub Pages with no backend at
+all (convention 6). The only shape a static site can offer is the one this page
+takes: the visitor's key, held in their browser, on a request that goes straight
+to the provider. **Do not "upgrade" this to a runtime without moving the site off
+Pages first** — there is nowhere for one to run.
+
+- **It runs the ENHANCEMENT protocol**, `llmtextenhancement.txt`, as the system
+  prompt. Not `llms-full.txt`. The authoring edition pointed at a model that
+  already exists rewrites it — a second model wearing the first one's name — and
+  that is the exact failure the enhancement edition was derived to prevent. The
+  page would look perfectly right while doing it, so `website-e2e.mjs` §8 pins
+  `PROTOCOL_URL`.
+- **The key never reaches this origin**, because there is no origin to reach:
+  nothing here proxies, logs or stores it server-side. It is `localStorage`, opt
+  in, with a *Forget it* button. That also means the usual protection is off — a
+  key in a web page is exposed to anything that can run script on it — which is
+  why the amber panel sits **above** the key field and points at the chat-window
+  route for anyone who would rather not. §8 asserts that ordering, because below
+  the field a reader has already pasted.
+- **The step that justifies the page is the check.** Any chat window returns a
+  model; what this site has is the real validator, so the reply is stripped to
+  its Mermaid, run through `guide/checker.js`, and a download is offered **only**
+  at zero errors — chapter 11's rule, applied here.
+- **`check` returns `{ ok, counts: { errors, warnings, infos }, issues }`.** The
+  counts are nested and `ok` is the verdict. Reading `verdict.errors` gets
+  `undefined`, `undefined === 0` is false, and the download button silently never
+  appears. That was a real bug in the first draft of this file.
+- **Four events, and `privacy.html` lists all four** — it promises its table is
+  every event by name, so §8 fails on an event that page does not carry. None of
+  them carries the key, the model or the instruction.
+- **The provider list is the whole egress surface.** §8 greps every `https://`
+  host out of the controller and fails on anything that is not the two API hosts
+  and their two consoles. That is the assertion that catches a proxy or a
+  telemetry endpoint being added later, under a key.
+- `assistant.css` is scoped to `.aia-root` and prefixed `aia-`, the same
+  arrangement `guide-demo.css` and `viewers.css` use, and its palette is a bridge
+  onto the Lunaris tokens — change the bridge, not the rules.
 
 ## The model viewers — `/viewers/`
 
@@ -1380,7 +1441,7 @@ the scripts it runs have no dependencies.
 | the audit on a bare ERD | it has to still bite. A single entity with a free-text status passes `check-model.mjs` with exit 0 and must fail the audit, or a vendored checker that stopped emitting `EML151`-`EML153` would leave the scorer silently toothless |
 | `node scripts/build-validator-source-page.mjs --check` | the page-carried copies of the validators still match the files they carry |
 | `node scripts/check-validator-source-pages.mjs` | …and still decode back to those bytes, hash correctly, and *run* |
-| `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below |
+| `node scripts/website-e2e.mjs` | **the website end-to-end tests** — see below, now including §8, the Model Assistant's promises about the key and the protocol |
 
 **`scripts/website-e2e.mjs` exists because three defects reached the live site,
 all of the same shape.** A page described a model it no longer matched
