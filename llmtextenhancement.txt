@@ -1588,6 +1588,15 @@ a *part* of the model. Name those roles in §1.1, then give every entity a
 **`read` is the operation that decides ownership, and it is the only one that
 changes what a role sees.** An entity a role may not read does not appear in
 that role's navigation at all — no menu entry, no dashboard card, no lookup.
+The dashboard follows from the same rule: a category block appears only when the
+reader may read at least one entity in it, line items excluded because a child
+is reached through its parent, so a category whose every entity belongs to
+someone else does not appear. The Application Dictionary block beside the
+categories is the admin windows this reader is granted through `sys_access`, so
+an administrator and an ordinary user see different cards there too. Every
+card's icon comes from the dictionary: `sys_category.icon` for a heading,
+`sys_table.icon` for an entity, `sys_window.icon` for an admin card — and a
+window is never withheld for want of one.
 Every other operation only refuses the write: restricting `Order.delete` to
 administrators protects deletion and leaves the Order screen where it was, which
 is what its author meant. Do not reach for `.\*` to express ownership; it
