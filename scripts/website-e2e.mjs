@@ -212,9 +212,15 @@ carries(
   "childTabs",
   "the entity hook resolves a parent's child tabs"
 );
+/* This rule used to be a `lineItemTables` list the service computed for itself.
+   The dashboard is one query now, and the rule is the NOT EXISTS below: a table
+   with a tab at `tab_level` > 0 is reached by opening its parent, so it is not
+   a place to navigate to. Read off `sys_tab` rather than recomputed, so this
+   screen and the detail screen cannot disagree — which is the property worth
+   asserting, and the reason this pins the predicate rather than a symbol. */
 carries(
   "backend/src/modules/sys/services/sys-category.service.ts.hbs",
-  "lineItemTables",
+  "tb.tab_level > 0",
   "the category service keeps line items off the dashboard"
 );
 

@@ -933,6 +933,18 @@ errors — §10's checklist asks for all three codes.
   skips the line without it — the grouping is lost and every entity in it falls
   into the default `General` category. Reported as `EML154`.
 
+**An `icon:` names a lucide icon, and a wrong name is silent.** `%%category
+icon:` reaches `sys_category.icon` and is drawn beside the category's heading on
+the dashboard; `%%entity icon:` reaches `sys_table.icon` and is drawn on the
+entity's own card. Three spellings all resolve — `LayoutGrid`, `layout_grid` and
+`layout-grid` are the same icon — so write whichever reads best. What does *not*
+resolve is a name lucide does not have: it is **not** a diagnostic, because the
+checker does not carry lucide's catalogue, and the application draws a
+placeholder in its place. `icon: flask` is the trap — lucide has no `flask`, it
+has `flask-conical` — and it sat uncaught in this project's own hospital example
+for months, drawing a placeholder where the Diagnostics heading's icon should
+have been. Check a name at https://lucide.dev/icons before writing it.
+
 ### 3.7 What the Application Dictionary makes of your ERD
 
 The generated application does not hard-code its forms. Every table, column,
@@ -1076,9 +1088,27 @@ The rest of the dictionary follows the same way: each entity becomes a
 `sys_table` with a window and a tab, its attributes become fields **in the order
 you declared them**, `%%index` becomes real indexes, and `%%category` (§3.6)
 becomes the dashboard grouping — a model that declares none gets a single
-"General" group holding everything. The other `%%entity` keys — `label`, `icon`,
-`prefix`, `softDelete`, `audited` — are validated but not yet compiled (§7), so
-do not promise a user an icon that directive alone will not produce.
+"General" group holding everything.
+
+`%%entity … icon:` is compiled too, under the same naming rules as §3.6's. It
+reaches `sys_table.icon`, which is what the entity's dashboard card, its window
+heading and the navigation all draw — so a model can give every entity its own
+icon, and an entity that names none gets a default rather than nothing. The same
+column is what Application Dictionary → Table and Column writes, where an
+administrator can override the model's choice or upload an image instead, so the
+two never disagree about where an icon lives. In the browser (`--standalone`)
+stack the value is carried into `model.json` and served by `/model`, but that
+interface draws a text glyph and does not render it. The remaining `%%entity`
+keys — `label`, `prefix`, `softDelete`, `audited` — are validated but not yet
+compiled (§7), so do not promise a user what one of those alone will produce.
+
+**Every card on the dashboard is scoped to whoever is reading it.** The entity
+blocks hold what `%%rbac … .read` lets this role see, with line items excluded
+because a child is reached through its parent, so a category whose every entity
+belongs to someone else does not appear at all. The Application Dictionary block
+beside them is the admin windows this role is granted through `sys_access`,
+which differs by role in the same way — and a window the dictionary defines is
+never withheld for want of an icon.
 
 So there is no second artifact to write. A dictionary that comes out right is
 six habits in the ERD: **mark every reference column `FK`**, **bind every
@@ -1630,7 +1660,7 @@ the checker reads it.
 | `%%rbac` | `%%rbac <roleExpr> on <E>.<op>` | compiled |
 | `%%guard` | `%%guard <field> <operator> <jsonValue>` | compiled *(see below)* |
 | `%%loop` | `%%loop <id> while: <f> <op> <v> max: <n>` | compiled |
-| `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`, `parent:`; the rest **validated**)* |
+| `%%entity` | `%%entity <E> <k>: <v>` | compiled *(`help:` / `description:`, `icon:`, `parent:`; the rest **validated**)* |
 | `%%rule` | `%%rule <name> on <E> event: <hook> priority: <n>` | **validated** |
 | `%%trigger` | `%%trigger <source> -> <handler> on <E>` | **validated** |
 | `%%report` | `%%report <name> title: <T> [entity: <E>] [chart: bar\|line\|pie\|area x: <col> y: <col>] [help: <why>] sql: <query>` | compiled *(and again, separately, by the reporting platform)* |

@@ -793,11 +793,25 @@ const host = (cond, label) => {
 const TEACHING = [
   "`appwithai.org/guide/checker.js` is a string a",
   "`[appwithai.org](https://www.appwithai.org)` reads to a person as a working",
+  "`[www.appwithai.org](https://www.appwithai.org)` reads to a person as a working",
   "- **The apex is not the canonical form.** `https://appwithai.org/…` serves the same files and",
+  "- **The apex is not the canonical form.** `https://appwithai.org/…` serves the",
   "  is the domain the repository's `CNAME` pins, but `https://www.appwithai.org/…`",
   "  `https://appwithai.org` serves the same files, but the `www.` form is the canonical one.",
   '*"Validator retrieval failed for appwithai.org"* says neither',
   "is the canonical host and the apex `https://appwithai.org` serves the same",
+  "the canonical form and the one to write; the apex `https://appwithai.org`",
+];
+
+/* Both spellings of the Markdown-link counter-example are the same lesson: a
+   link whose *text* is a bare host, which is what anything parsing this file
+   resolves. `llms-full.txt` is authored here and writes the apex; the vendored
+   `llmdetailed.txt` writes `www.`, because that is the form the failure that
+   prompted the rule actually came back as. Pinning one spelling made
+   re-vendoring the other document fail a check about a rule it obeys. */
+const MARKDOWN_COUNTER_EXAMPLES = [
+  "[appwithai.org](https://www.appwithai.org)",
+  "[www.appwithai.org](https://www.appwithai.org)",
 ];
 
 for (const [name, body] of [
@@ -823,7 +837,7 @@ for (const [name, body] of [
     `${name}: tells the reader to report the URL actually requested`);
 
   /* And the counter-examples have to survive, or the rule teaches nothing. */
-  host(body.includes("[appwithai.org](https://www.appwithai.org)"),
+  host(MARKDOWN_COUNTER_EXAMPLES.some((e) => body.includes(e)),
     `${name}: keeps the Markdown-link counter-example the rule is about`);
 
   /* Naming the exact error is only half of it: the reader also has to be able
