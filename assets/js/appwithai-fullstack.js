@@ -6265,7 +6265,7 @@ var appwithai_language_default = {
       "%%category becomes the dashboard grouping; a model declaring none gets a single General category holding every entity.",
       "%%field <Entity>.<column> help: and %%entity <Name> help: become sys_column.description and sys_table.description - the help a reader sees under the field and beside the table. %%entity description: is the same key under its other name.",
       "%%entity <Child> parent: <Parent> makes the child a line item: no window and no dashboard card, a tab inside the parent's window instead. See masterDetail.",
-      "The remaining %%entity keys (label, icon, prefix, softDelete, audited) are validated but not yet compiled."
+      "The remaining %%entity keys (label, icon, prefix, softDelete, audited) are validated but not yet compiled. `icon` in particular: an entity's icon is not taken from the model, it is set in the running application through Application Dictionary -> Table and Column, where it may be a lucide name or an uploaded image. Only %%category carries an icon the model decides."
     ],
     helpText: {
       description: "The only explanation a generated application has. `%%entity <Name> help:` becomes sys_table.description and opens that entity's section of manual.html; `%%field <Entity>.<column> help:` becomes sys_column.description, the hint under the control, and the column's row in the manual. There is no second source — no hand-written tooltip, no README beside the form, no designer to ask — so a model that skips it produces an application whose manual is a table of dashes.",
@@ -7008,16 +7008,18 @@ var appwithai_language_default = {
         form: "%%entity <Name> <key>: <value>",
         status: "compiled",
         consumedBy: [
-          "packages/generator/src/parsers/mermaid.parser.ts (the help: / description: key only; the rest are validated)",
+          "packages/generator/src/parsers/mermaid.parser.ts (help:/description:, icon: and parent: are compiled; prefix:, softDelete:, label: and audited: are validated only)",
           "language/checker.ts (EML160, EML161, EML162)"
         ],
-        purpose: "Attach entity-level metadata not expressible in the ERD block: the sentence that explains the entity to whoever opens its screen, plus table prefix (bus/sys), soft delete, label, icon, audited.",
+        purpose: "Attach entity-level metadata not expressible in the ERD block: the sentence that explains the entity to whoever opens its screen, the icon that represents it, the parent it is a line item of, plus table prefix (bus/sys), soft delete, label, audited.",
         examples: [
           "%%entity Account help: A company you sell to. One account holds many contacts and every deal you run with them.",
+          "%%entity Patient icon: stethoscope",
           "%%entity Order audited: true",
           "%%entity Account prefix: bus",
           "%%entity Session softDelete: false"
-        ]
+        ],
+        iconNaming: "`icon:` is a lucide icon name (https://lucide.dev/icons). PascalCase, kebab-case and snake_case all resolve to the same icon - LayoutGrid, layout-grid and layout_grid are one. A name lucide does not have is NOT a diagnostic (the checker does not carry lucide's catalogue) and renders a placeholder instead: `icon: flask` is the common trap, because lucide has `flask-conical` and no `flask`. Compiled to sys_table.icon, which is what the entity's dashboard card, its window heading and the navigation all draw. An administrator can override it afterwards in Table and Column, including by uploading an image - the same column holds both. In the browser (--standalone) stack the value is carried into model.json and served by /model, but that interface draws a text glyph and does not render it."
       },
       {
         keyword: "%%field",
@@ -7045,6 +7047,8 @@ var appwithai_language_default = {
       {
         keyword: "%%category",
         form: "%%category name: <Name>; code: <id>; description: <text>; icon: <LucideIcon>; color: <#hex>; seq: <n>; default: true; entities: <A>, <B>",
+        dashboardScope: "A category block appears on the dashboard only when the reader may read at least one entity in it: the entity list is filtered by `%%rbac ... .read` and line items are excluded, because a child is reached through its parent. The Application Dictionary block beside the categories is the admin windows the reader is granted through sys_access, so it differs by role too.",
+        iconNaming: "A lucide icon name (https://lucide.dev/icons). PascalCase, kebab-case and snake_case all resolve to the same icon - LayoutGrid, layout-grid and layout_grid are one. A name lucide does not have is NOT a diagnostic (the checker does not carry lucide's catalogue) and renders a placeholder instead: `icon: flask` is the common trap, because lucide has `flask-conical` and no `flask`. Compiled to sys_category.icon and drawn beside the category heading on the dashboard.",
         status: "compiled",
         consumedBy: ["packages/generator/src/parsers/category.parser.ts"],
         purpose: 'Group business entities into a named Application Dictionary category. The dashboard renders one block per category, ordered by name; the admin dictionary maintains them. Only `name` is required; the rest are `;`-separated and may appear in any order. `code` is a stable short identifier, slugified from `name` when omitted — it is the dictionary row\'s key, so setting it explicitly keeps that key stable across a rename. A directive may span several lines by ending each continued line with `\\`. A model that declares none gets a single "General" default holding every entity.',
@@ -12728,7 +12732,8 @@ var EntitySchema = exports_external.object({
   description: exports_external.string().optional(),
   attributes: exports_external.array(EntityAttributeSchema),
   primaryKey: exports_external.string(),
-  timestamps: exports_external.boolean()
+  timestamps: exports_external.boolean(),
+  icon: exports_external.string().optional()
 });
 // packages/generator/src/hooks/index.ts
 var HOOK_TYPES = [
@@ -15185,6 +15190,13 @@ function cleanJsonContent(jsonStr) {
     return jsonStr.replace(/,(\s*[}\]])/g, "$1").replace(/(\[\s*),/g, "$1");
   }
 }
+var COMMON_TEMPLATES = [
+  "src/common/filters/http-exception.filter.ts",
+  "src/common/guards/user-throttler.guard.ts",
+  "src/common/interceptors/transform.interceptor.ts",
+  "src/common/logging/logger.service.ts",
+  "src/common/pipes/zod-validation.pipe.ts"
+];
 
 class NestJsBackendGenerator extends BaseGenerator {
   options;
@@ -15246,7 +15258,6 @@ class NestJsBackendGenerator extends BaseGenerator {
   }
   async createAdditionalDirectories(outputDir) {
     const dirs2 = [
-      "src/common/decorators",
       "src/common/filters",
       "src/common/guards",
       "src/common/interceptors",
@@ -15479,21 +15490,10 @@ class NestJsBackendGenerator extends BaseGenerator {
         console.warn(`Static app file not found: ${file}`);
       }
     }
-    const commonFiles = [
-      "src/common/decorators/etag.decorator.ts",
-      "src/common/filters/http-exception.filter.ts",
-      "src/common/guards/etag.guard.ts",
-      "src/common/interceptors/logging.interceptor.ts",
-      "src/common/interceptors/transform.interceptor.ts",
-      "src/common/logging/logger.service.ts",
-      "src/common/pipes/zod-validation.pipe.ts"
-    ];
-    for (const file of commonFiles) {
-      try {
-        const content = await this.renderTemplate(`${file}.hbs`, context);
-        await mkdir(dirname(join(outputDir, file)), { recursive: true });
-        await writeFile(join(outputDir, file), content);
-      } catch (_e) {}
+    for (const file of COMMON_TEMPLATES) {
+      const content = await this.renderTemplate(`${file}.hbs`, context);
+      await mkdir(dirname(join(outputDir, file)), { recursive: true });
+      await writeFile(join(outputDir, file), content);
     }
     await mkdir(join(outputDir, "src/common/logging"), { recursive: true });
     await writeFile(join(outputDir, "src/common/logging/log-spec.json"), generatedLogSpec());
@@ -16148,6 +16148,10 @@ export async function executeCustomValidateHooks(
       {
         slug: "add_reports",
         template: "src/migrations/018_add_reports.ts.hbs"
+      },
+      {
+        slug: "add_dictionary_icons",
+        template: "src/migrations/019_add_dictionary_icons.ts.hbs"
       }
     ];
     const scaffoldSlugs = new Set(scaffold.map((m) => m.slug));
@@ -16857,13 +16861,6 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
   prepareContext(entities, relationships) {
     const declared = declaredEntityNames(entities);
     const busEntities = entities.map((entity2) => entityToBusEntity(entity2, declared));
-    const lineItems = new Set(entities.filter((entity2) => entity2.parentEntity).map((entity2) => entity2.name));
-    const mainEntities = busEntities.filter((e) => !lineItems.has(e.name)).filter((e) => !e.tableName.includes("_") || e.tableName.match(/^bus_[a-z]+$/)).slice(0, 10).map((entity2) => ({
-      ...entity2,
-      title: entity2.displayName || entity2.name,
-      description: `Manage ${entity2.displayName || entity2.name}`,
-      icon: this.getIconForEntity(entity2.tableName)
-    }));
     const access2 = deriveAccess(this.options.compiledRbac ?? { operations: [], transitions: [] }, {
       projectId: this.options.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       entities: busEntities.map((entity2) => entity2.name)
@@ -16893,35 +16890,9 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       projectSnake: this.options.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
       projectKebab: this.options.projectName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       entities: busEntities,
-      mainEntities,
       relationships,
       now: new Date().toISOString()
     };
-  }
-  getIconForEntity(tableName) {
-    const iconMap = {
-      bus_patient: "UserCircle",
-      bus_patient_insurance: "FileCheck",
-      bus_patient_document: "FileText",
-      bus_patient_allergy: "Activity",
-      bus_insurance_provider: "Building2",
-      bus_insurance_claim: "FileCheck",
-      bus_appointment: "Calendar",
-      bus_admission: "ClipboardList",
-      bus_prescription: "Pill",
-      bus_medication: "Pill",
-      bus_lab_order: "TestTube",
-      bus_lab_result: "FileCheck",
-      bus_radiology_order: "Activity",
-      bus_radiology_report: "FileText",
-      bus_department: "Building2",
-      bus_staff: "Users",
-      bus_customer: "Building2",
-      bus_product: "Package",
-      bus_order: "ShoppingCart",
-      bus_sales_order: "Receipt"
-    };
-    return iconMap[tableName] || "FileText";
   }
   async generateCoreFiles(outputDir, context) {
     const templateDir = this.resolvedTemplateDir;
@@ -16971,6 +16942,12 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       await writeFile(join(outputDir, "src/routes/auth/login.tsx"), loginPageContent);
     } catch (_e) {
       console.warn("Login page template not found");
+    }
+    try {
+      const loginRedirect = await this.component("src/routes/login.tsx");
+      await writeFile(join(outputDir, "src/routes/login.tsx"), loginRedirect);
+    } catch (_e) {
+      console.warn("Login redirect template not found");
     }
     try {
       await copyFile(join(templateDir, "src/lib/auth.ts"), join(outputDir, "src/lib/auth.ts"));
@@ -17231,6 +17208,14 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       {
         src: "src/components/admin/ad-detail-shell.tsx",
         dest: "src/components/admin/ad-detail-shell.tsx"
+      },
+      {
+        src: "src/components/admin/entity-icon-field.tsx",
+        dest: "src/components/admin/entity-icon-field.tsx"
+      },
+      {
+        src: "src/components/admin/model-assistant.tsx",
+        dest: "src/components/admin/model-assistant.tsx"
       },
       {
         src: "src/components/reports/ReportPrintModal.tsx",
@@ -17541,9 +17526,15 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
     const envLocalContent = `VITE_API_URL=
 VITE_BACKEND_URL=${context.config.baseUrl}
 VITE_MASTRA_URL=http://localhost:4111
-# Set VITE_ELECTRIC_URL to enable ElectricSQL real-time sync (requires ELECTRIC_URL on backend)
-# Leave empty to use HTTP API fallback
-VITE_ELECTRIC_URL=
+# Dictionary sync over ElectricSQL. The client reads VITE_ELECTRIC_SYNC, not
+# VITE_ELECTRIC_URL — the shape request goes to this application's own
+# /api/v1/shape proxy, and it is the backend's ELECTRIC_URL that names the
+# Electric server behind it.
+#
+# Left on: with no ELECTRIC_URL on the backend the proxy answers 503 once, the
+# client records that this deployment has no Electric server, and every screen
+# reads the dictionary over HTTP. Set it to false to skip that one discovery.
+VITE_ELECTRIC_SYNC=true
 # Where a built server forwards /api/*. Only read outside \`vinxi dev\`, which
 # proxies through Vite instead.
 BACKEND_URL=${context.config.baseUrl}
@@ -19453,6 +19444,7 @@ class MermaidParser {
     const enumBindings = [];
     const fieldHelpText = [];
     const entityHelpText = new Map;
+    const entityIcons = new Map;
     const entityParents = new Map;
     for (let i = 0;i < lines.length; i++) {
       const line = lines[i] ?? "";
@@ -19477,6 +19469,9 @@ class MermaidParser {
         const entityHelp = this.parseEntityHelpDirective(trimmed);
         if (entityHelp)
           entityHelpText.set(entityHelp.entity, entityHelp.help);
+        const entityIcon = this.parseEntityIconDirective(trimmed);
+        if (entityIcon)
+          entityIcons.set(entityIcon.entity, entityIcon.icon);
         const entityParent = this.parseEntityParentDirective(trimmed);
         if (entityParent)
           entityParents.set(entityParent.entity, entityParent.parent);
@@ -19520,6 +19515,7 @@ class MermaidParser {
     }
     this.attachIndexes(entities, declaredIndexes);
     this.attachHelp(entities, fieldHelpText, entityHelpText);
+    this.attachIcons(entities, entityIcons);
     this.attachParents(entities, entityParents);
     const enums = this.attachEnums(entities, declaredEnums, enumBindings);
     return { entities, relationships, enums };
@@ -19534,6 +19530,13 @@ class MermaidParser {
       const attribute = entities.find((candidate) => candidate.name === name)?.attributes.find((candidate) => candidate.name === column);
       if (attribute)
         attribute.description = help;
+    }
+  }
+  attachIcons(entities, icons) {
+    for (const [name, icon] of icons) {
+      const entity2 = entities.find((candidate) => candidate.name === name);
+      if (entity2)
+        entity2.icon = icon;
     }
   }
   attachParents(entities, parents) {
@@ -19597,6 +19600,13 @@ class MermaidParser {
       return null;
     const help = match[2].trim();
     return help ? { entity: match[1], help } : null;
+  }
+  parseEntityIconDirective(line) {
+    const match = line.match(/^%%entity\s+([A-Za-z_]\w*)\s+icon\s*:\s*(.+)$/);
+    if (!match?.[1] || !match[2])
+      return null;
+    const icon = match[2].trim();
+    return icon ? { entity: match[1], icon } : null;
   }
   parseEntityParentDirective(line) {
     const match = line.match(/^%%entity\s+([A-Za-z_]\w*)\s+parent\s*:\s*([A-Za-z_]\w*)\s*$/);
