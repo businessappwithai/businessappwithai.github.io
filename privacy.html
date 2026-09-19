@@ -60,7 +60,7 @@
         <div class="card">
           <h3>What never leaves your browser</h3>
           <ul>
-            <li>The <code>.mmd</code> model you upload or paste &mdash; its contents are read in the tab and are never uploaded.</li>
+            <li>The <code>.mmd</code> model you upload or paste &mdash; its contents are read in the tab and are never uploaded. <strong>The one exception is the <a href="assistant.html">Model Assistant</a></strong>, whose whole purpose is to send your model to a provider you choose; that page is covered on its own below.</li>
             <li>The application generated from it: every one of its files is assembled in the tab.</li>
             <li>The database that application fills. It is PostgreSQL compiled to WebAssembly, living in your browser&rsquo;s IndexedDB.</li>
             <li>Anything you type into the running application &mdash; records, passwords, the lot.</li>
@@ -114,6 +114,10 @@
           <tr><td><code>model_viewed</code></td><td>A model is drawn by the <a href="viewers/index.html">model viewer</a></td><td>How many entities, relationships, rules, state machines and sagas it declares, and the checker&rsquo;s error and warning counts &mdash; never a name, a column or a line of it</td></tr>
           <tr><td><code>app_downloaded</code>, <code>stack_downloaded</code>, <code>model_downloaded</code></td><td>A download is started</td><td>File count and archive size</td></tr>
           <tr><td><code>github_clicked</code>, <code>guide_clicked</code></td><td>A link to the source or to the guide is followed</td><td>The link&rsquo;s address and its text</td></tr>
+          <tr><td><code>assistant_started</code></td><td>&ldquo;Make the change&rdquo; is pressed on the <a href="assistant.html">Model Assistant</a></td><td>Which provider was chosen, and how many bytes the model is &mdash; never the key, the model or the instruction</td></tr>
+          <tr><td><code>assistant_completed</code></td><td>The provider answers and the checker has run on the result</td><td>Which provider, milliseconds taken, and how many errors and warnings the checker found</td></tr>
+          <tr><td><code>assistant_failed</code></td><td>The call does not complete</td><td>Which provider &mdash; not the error text, which can quote your own model back</td></tr>
+          <tr><td><code>assistant_downloaded</code></td><td>The changed model is downloaded</td><td>Which provider</td></tr>
           <tr><td><code>contact_submitted</code></td><td>The contact form is submitted</td><td>&mdash; (the form&rsquo;s own contents go to email, not to analytics)</td></tr>
         </tbody>
       </table>
@@ -175,6 +179,45 @@
 
   <section class="section section-white">
     <div class="container container-narrow">
+      <h2 id="assistant">The Model Assistant, and your API key</h2>
+      <p>
+        <a href="assistant.html">assistant.html</a> is the only page on this site that sends
+        anything you wrote to another company, and it does it because that is what you asked it
+        to do. It is worth being exact about what happens.
+      </p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>What we never receive</h3>
+          <ul>
+            <li><strong>Your API key.</strong> It is held in your browser and attached to a request
+                that goes straight to <code>api.anthropic.com</code> or <code>api.openai.com</code>.
+                This site is static &mdash; there is no server here to receive it, so it does not
+                pass through anything of ours, is not logged, and is not recoverable by us.</li>
+            <li><strong>Your model, or your instruction.</strong> Both go to the provider and nowhere
+                else. No event carries a line of a model, an entity name, or a word of what you typed.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What leaves, and to whom</h3>
+          <ul>
+            <li>Your model, your instruction and the published enhancement protocol go
+                <strong>to the provider you picked</strong>, under your key and their terms and
+                retention policy &mdash; not ours.</li>
+            <li>Four analytics events, listed above, carrying only which provider was chosen, how
+                many bytes the model was, how long the call took, and how many errors the checker
+                then found.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-muted text-sm mt-3">
+        <strong>Storing the key is your choice and it is off unless you tick it.</strong> Ticked, it
+        goes in this browser&rsquo;s <code>localStorage</code> under one origin, and
+        <em>Forget it</em> deletes it. A key in a web page is exposed to anything able to run script
+        on that page, which is why the page says so above the field rather than in a footnote, and
+        why it points at the chat-window route for anyone who would rather not. Use a key you can
+        revoke and give it a spending limit.
+      </p>
+
       <h2>The rest of it</h2>
       <h3>Cookies</h3>
       <p>

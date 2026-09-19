@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Change an existing EML model with your own OpenAI or Claude key. The published enhancement protocol is the system prompt, your key stays in your browser, and the result is checked by the real validator before you can download it.">
+  <meta name="keywords" content="AppWithAI, EML, Mermaid model, model assistant, enhance a model, bring your own key, Claude, OpenAI, model checker">
+  <title>Model Assistant — Change a Model With Your Own Key</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/assistant.css">
+  <link rel="stylesheet" href="assets/css/dark-theme.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="index.html" class="logo" aria-label="AppWithAI — home" title="AppWithAI — home">
+        <span class="logo-mark" aria-hidden="true">A</span>
+        <span class="logo-word">App<span class="logo-word-dim">With</span><span class="logo-word-ai">AI</span></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
+          <li><a href="features.html" class="nav-link">Features</a></li>
+          <li><a href="how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="technology.html" class="nav-link">Technology</a></li>
+          <li><a href="guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="section" style="background: linear-gradient(135deg, var(--primary-700) 0%, var(--secondary-700) 100%); color: white; padding: var(--spacing-2xl) 0;">
+    <div class="container text-center">
+      <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">Your Key &middot; Your Model &middot; Checked Before You Download</span>
+      <h1 style="margin-top: var(--spacing-lg); color: white;">Change a Model, <span style="color: var(--accent-300);">Without Leaving the Page</span></h1>
+      <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">The enhancement protocol this site publishes, run here instead of pasted into a chat window. You bring the key; the browser talks to the provider directly. What comes back is put through the real checker before you are offered it.</p>
+    </div>
+  </section>
+
+  <section class="section section-white">
+    <div class="container aia-root">
+
+      <!-- The warning, above the key field and above every claim about what
+           the page does. Same placement rule as the home page's
+           experimental-software notice: the caveat comes before the pitch. -->
+      <div class="aia-warning">
+        <p><strong>Read this before you paste a key.</strong> This site is static — there is no server here, so your key is not sent to us and could not be even if we wanted it. It is held in your browser and attached to a request that goes <strong>straight to the provider</strong>.</p>
+        <p>That also means the usual protection is off: a key in a web page is exposed to anything that can run script on that page. Use a key you can revoke, give it a spending limit, and revoke it when you are done. If that is not a trade you want to make, the <a href="try-it-yourself.html#enhance">prompt on Try It Yourself</a> does the same job in a chat window you already trust, with no key anywhere.</p>
+        <p class="text-sm">Nothing about your key, your model or your instruction is recorded. <a href="privacy.html#assistant">Privacy policy &rarr;</a></p>
+      </div>
+
+      <div class="aia-grid">
+
+        <!-- Left: what you bring -->
+        <div>
+          <div class="aia-panel">
+            <h3>1 &middot; Your key</h3>
+
+            <div class="aia-providers" role="group" aria-label="Choose a provider">
+              <button type="button" class="aia-provider" data-provider="claude" aria-pressed="true">Claude</button>
+              <button type="button" class="aia-provider" data-provider="openai" aria-pressed="false">OpenAI</button>
+            </div>
+
+            <label class="aia-label" for="aia-key">API key</label>
+            <div class="aia-key-row">
+              <input class="aia-input" id="aia-key" type="password" autocomplete="off" spellcheck="false" placeholder="starts sk-ant-">
+              <button type="button" class="btn btn-outline btn-sm" id="aia-key-forget">Forget it</button>
+            </div>
+            <p class="aia-key-note">
+              <a id="aia-key-console" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer">Get a Claude key</a>
+              &middot; runs <span id="aia-model-name">Claude Opus 5</span>
+            </p>
+            <label class="aia-check">
+              <input type="checkbox" id="aia-key-remember">
+              Remember it in this browser
+            </label>
+            <p class="aia-key-note" id="aia-key-saved" hidden>Stored in this browser only. <em>Forget it</em> removes it.</p>
+          </div>
+
+          <div class="aia-panel" style="margin-top: var(--spacing-lg);">
+            <h3>2 &middot; Your model</h3>
+            <label class="aia-label" for="aia-source">Paste an <code>.eml.mmd</code>, or open one</label>
+            <textarea class="aia-textarea aia-textarea-model" id="aia-source" spellcheck="false" placeholder="%%meta name: My Model&#10;erDiagram&#10;    ..."></textarea>
+            <div class="aia-actions">
+              <label class="btn btn-outline btn-sm" style="cursor: pointer;">
+                Open a file
+                <input type="file" id="aia-file" accept=".mmd,.md,text/plain" hidden>
+              </label>
+            </div>
+            <p class="aia-key-note" id="aia-source-label">nothing loaded</p>
+            <p class="aia-key-note">Or start from one this site publishes:</p>
+            <div class="aia-examples">
+              <button type="button" class="aia-example" data-example="crm">crm</button>
+              <button type="button" class="aia-example" data-example="dance-studio">dance-studio</button>
+              <button type="button" class="aia-example" data-example="drug-discovery">drug-discovery</button>
+              <button type="button" class="aia-example" data-example="hospital-management-system">hospital</button>
+              <button type="button" class="aia-example" data-example="education-management-system">education</button>
+              <button type="button" class="aia-example" data-example="investment-planning-wealth-management-system">wealth</button>
+            </div>
+          </div>
+
+          <div class="aia-panel" style="margin-top: var(--spacing-lg);">
+            <h3>3 &middot; The change</h3>
+            <label class="aia-label" for="aia-instruction">What should be different?</label>
+            <textarea class="aia-textarea aia-textarea-instruction" id="aia-instruction" placeholder="Add a Supplier entity with the usual contact fields, give it a one-to-many to Product, and put it in a new Purchasing category."></textarea>
+            <div class="aia-actions">
+              <button type="button" class="btn btn-primary" id="aia-run">Make the change</button>
+              <button type="button" class="btn btn-outline" id="aia-stop" hidden>Stop</button>
+            </div>
+            <p class="aia-status" id="aia-status"></p>
+            <div class="aia-message" id="aia-message" hidden></div>
+          </div>
+        </div>
+
+        <!-- Right: what comes back -->
+        <div>
+          <div class="aia-panel">
+            <h3>The result</h3>
+            <p class="text-sm text-muted">The whole file comes back, not a patch — that is what the protocol asks for, so there is nothing for you to merge by hand.</p>
+
+            <div id="aia-verdict-box" hidden></div>
+
+            <div class="aia-actions">
+              <button type="button" class="btn btn-primary" id="aia-download" hidden>Download as .mmd</button>
+              <button type="button" class="btn btn-outline" id="aia-repair" hidden>Repair what can be repaired</button>
+            </div>
+
+            <div id="aia-output-wrap" hidden style="margin-top: var(--spacing-md);">
+              <pre class="aia-output"><code id="aia-output"></code></pre>
+            </div>
+          </div>
+
+          <div class="aia-panel" style="margin-top: var(--spacing-lg);">
+            <h3>What this actually does</h3>
+            <p class="text-sm">It is the four steps of <a href="llmtextenhancement.txt">the enhancement protocol</a>, run in this tab:</p>
+            <ol class="text-sm">
+              <li>That protocol — the whole language reference, byte for byte the same as the one you would paste into a chat window — becomes the system prompt.</li>
+              <li>Your model and your instruction become the message.</li>
+              <li>The reply is stripped to its Mermaid and put through <a href="guide/11-check-a-model.html">the published checker</a>.</li>
+              <li>A download appears <strong>only</strong> if that check finds no errors.</li>
+            </ol>
+            <p class="text-sm">Step four is the reason this page exists rather than a chat window. Any assistant will hand you back a model; what this site has that they do not is the validator the generator itself runs, so a file that would be refused is caught here instead of three steps later.</p>
+            <p class="text-sm text-muted">The protocol is about 34,000 tokens and is sent on every request, so a large model costs a few tens of cents a change. On Claude it is cached after the first call, which makes the ones after it markedly cheaper.</p>
+          </div>
+
+          <div class="aia-panel" style="margin-top: var(--spacing-lg);">
+            <h3>If you would rather not paste a key</h3>
+            <p class="text-sm">Nothing here is exclusive to this page. <a href="try-it-yourself.html#enhance">Try It Yourself</a> carries the same protocol as a prompt for a chat window you already pay for, and <a href="guide/11-check-a-model.html">chapter 11</a> runs the same checker on whatever comes back. This page only saves the copying.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3>AppWithAI</h3>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
+        </div>
+        <div>
+          <h3>Product</h3>
+          <ul class="footer-links">
+            <li><a href="justification.html">Why AppWithAI</a></li>
+            <li><a href="try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="assistant.html">Model Assistant</a></li>
+            <li><a href="viewers/index.html">Model Viewer</a></li>
+            <li><a href="features.html">Features</a></li>
+            <li><a href="how-it-works.html">How It Works</a></li>
+            <li><a href="technology.html">Technology</a></li>
+            <li><a href="guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="todo.html">Todo</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Company</h3>
+          <ul class="footer-links">
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Blog</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Security</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/assistant.js"></script>
+</body>
+</html>
