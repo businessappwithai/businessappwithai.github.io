@@ -46,6 +46,9 @@ import { checkAndFix } from "../../guide/fixer.js";
 const PROVIDERS = {
   claude: {
     label: "Claude",
+    /* "Get a OpenAI key" read as a typo in the one place the page asks
+       somebody to go and fetch a credential. */
+    article: "a",
     keyPrefix: "sk-ant-",
     keyHint: "starts sk-ant-",
     endpoint: "https://api.anthropic.com/v1/messages",
@@ -92,6 +95,7 @@ const PROVIDERS = {
 
   openai: {
     label: "OpenAI",
+    article: "an",
     keyPrefix: "sk-",
     keyHint: "starts sk-",
     endpoint: "https://api.openai.com/v1/chat/completions",
@@ -490,7 +494,7 @@ function selectProvider(name) {
 
   $("aia-key").placeholder = provider.keyHint;
   $("aia-key-console").href = provider.console;
-  $("aia-key-console").textContent = `Get a ${provider.label} key`;
+  $("aia-key-console").textContent = `Get ${provider.article} ${provider.label} key`;
   $("aia-model-name").textContent = provider.modelLabel;
 }
 
@@ -507,6 +511,7 @@ export function init() {
   const saved = store.get(KEY_STORAGE);
   if (saved) {
     $("aia-key").value = saved;
+    $("aia-key-remember").checked = true;
     $("aia-key-saved").hidden = false;
   }
 
@@ -514,18 +519,32 @@ export function init() {
     button.addEventListener("click", () => selectProvider(button.dataset.provider));
   }
 
+  /* Remembering has to follow the field, not only the moment the box is ticked.
+     Ticking first and pasting after is the obvious order, and it used to store
+     the empty string the field held at that instant — then say "Stored in this
+     browser only" and hand back nothing on the next visit. A page that makes a
+     false claim about a credential is worse than one that never offered to
+     keep it. */
+  const rememberKey = () => {
+    if (!$("aia-key-remember").checked) return;
+    const ok = store.set(KEY_STORAGE, $("aia-key").value.trim());
+    $("aia-key-saved").hidden = !ok;
+    if (!ok) {
+      $("aia-key-remember").checked = false;
+      report(
+        "This browser will not let the page store anything — a private window, " +
+          "or site data blocked. The key still works for this visit; it just will " +
+          "not be here next time.",
+        "note"
+      );
+    }
+  };
+
+  $("aia-key").addEventListener("input", rememberKey);
+
   $("aia-key-remember").addEventListener("change", (event) => {
     if (event.target.checked) {
-      const ok = store.set(KEY_STORAGE, $("aia-key").value.trim());
-      $("aia-key-saved").hidden = !ok;
-      if (!ok) {
-        report(
-          "This browser will not let the page store anything — a private window, " +
-            "or site data blocked. The key still works for this visit; it just will " +
-            "not be here next time.",
-          "note"
-        );
-      }
+      rememberKey();
     } else {
       store.remove(KEY_STORAGE);
       $("aia-key-saved").hidden = true;
