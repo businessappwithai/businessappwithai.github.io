@@ -1063,19 +1063,42 @@ show beside it. Both come from directives, and from nowhere else:
 
 Write the sentence a new joiner needs, not a restatement of the column name:
 "The company this person works for" earns its place; "The account id" does not.
-Cover every entity and every column: the bar is *say something the name does
-not*, and a column you cannot say anything about is usually a column that should
-not be there.
+
+**Cover every entity and every column, without exception** — including the
+self-evident ones, and including the ones you would be tempted to skip because
+the name already reads well. The primary key is the single thing that needs
+none: it is a uuid the generator issues, read-only on every form. The bar is
+*say something the name does not*, and a column you cannot say anything about is
+usually a column that should not be there.
+
+This is not a style preference, and it is not a pass somebody makes later.
+`sys_column.description` has exactly one source — the `%%field … help:` line you
+write — so a column you leave undescribed is a control with nothing under it in
+the application and a dash in the manual, permanently. `EML152` reports an
+entity with no help, `EML153` names the columns of an entity that have none, and
+`EML151` reports help that restates its own subject, which is the failure mode
+of writing help to satisfy a coverage check rather than to inform a reader.
 
 **The generated manual is the second reader of that text, and it is why
 "every column" is not too many.** The last thing generation does is write
 `manual.html` beside the application — one self-contained HTML page with a
 contents menu, a section per entity, and inside each a table of every field with
 its control type, its constraints, its enumerated values and its help text,
-followed by the entity's relationships, its state machine, the rules that fire
-on it and the roles that may see it. The application's dashboard carries a
-**Manual** button pointing at it. Both generators write it, so it also travels
-in the downloadable `.zip`.
+followed by **where that entity appears** — the window it opens in, the tab it
+sits on, and every field on that tab with its form and grid placement and the
+order the screen draws them in — then the entity's relationships, its state
+machine, the rules that fire on it and the roles that may see it. The
+application's dashboard carries a **Manual** button pointing at it. Both
+generators write it, so it also travels in the downloadable `.zip`.
+
+That window/tab/field block is the dictionary's own layer, and it is derived
+rather than written: **there is no directive that places a field on a screen.**
+Each entity becomes one window with one tab, and each of its columns becomes a
+field on that tab, in the order you declared the columns. So the two things you
+control are the order — declare the columns in the order a person should read
+them — and the labels and help, which are the only part of that block a model
+supplies. An administrator can rearrange it afterwards in Application Dictionary
+→ Fields without regenerating, which is the point of the dictionary being data.
 
 The manual is derived from the model, so it cannot describe an entity that does
 not exist or miss one that does — but it can only report the help you wrote.
@@ -1113,9 +1136,28 @@ never withheld for want of an icon.
 So there is no second artifact to write. A dictionary that comes out right is
 six habits in the ERD: **mark every reference column `FK`**, **bind every
 enumerated column with `%%field … enum:`**, **give every referenced entity a
-name column**, **write `help:` on every entity and every column that needs
-explaining**, prefer the specific type alias over the canonical name, and group
-the entities with `%%category`.
+name column**, **write `help:` on every entity and every column**, prefer the
+specific type alias over the canonical name, and group the entities with
+`%%category` — every one of which carries a `name:` key.
+
+**Five of those six are mandatory, and they are checked.** The dictionary is the
+whole of what the application draws, so a gap in it is a gap in every screen —
+and because the generator accepts the model anyway, nothing else will tell you.
+These are the codes that report one, and none of them is advisory:
+
+| Code | What the dictionary records instead |
+|---|---|
+| `EML119` | a reference column as `String` — a uuid in a text box, not a lookup |
+| `EML146` | a closed vocabulary as `String` — a free text box, not a dropdown |
+| `EML151` | help that restates its own name — coverage without meaning |
+| `EML152` | `sys_table.description` empty — the entity's manual section opens with nothing |
+| `EML153` | `sys_column.description` empty — the field prints a dash in the form *and* in the manual |
+| `EML154` | a `%%category` the parser drops, so its entities fall into "General" |
+
+They are warnings rather than errors because the generator does not refuse them;
+they are still required. `node audit-model.mjs <file>.mmd` fails while any of
+them stands (§8.5), and §10 item 21 makes exiting `0` there part of delivering.
+The sixth habit — the type alias — is a preference, not a check.
 
 ---
 

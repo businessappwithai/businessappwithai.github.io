@@ -1169,6 +1169,22 @@ thing a language model has to produce is a model file.
   derivation table against `appwithai-wasm.js` and asserts that the three codes fire;
   `guide/audit-model.mjs` keeps its own checks for the two downgrades, so a delivery is audited even
   where an older checker is vendored.
+- **Six of those codes are mandatory, and §3.7 now says so in a table.** `EML119`, `EML146`,
+  `EML151`, `EML152`, `EML153` and `EML154` are the ones that leave the dictionary recording less
+  than the model knows, and `audit-model.mjs` fails while any stands. They are *warnings* only
+  because the generator does not refuse them — which is the whole difficulty, because the published
+  checker used to close a run with "clearing the N warnings is optional" and a verdict reading
+  "notes and warnings are advisory". A language model reads the report last and acts on that
+  sentence, so the document said mandatory and the tooling said optional about the same six codes.
+  `checker.entry.ts` upstream names them in both lines now; §3.7 carries the same table, and the
+  six-habits summary no longer says "every column **that needs explaining**", which was the same
+  softening inside the document that §10 item 10 already contradicted.
+- **§3.7 describes the window/tab/field layer, and says it is derived.** There is no directive that
+  places a field on a screen: each entity becomes one window with one tab, and each column a field
+  on it in declared order. So the only things a model controls there are the column order and the
+  labels and help — worth stating, because the alternative is a reader looking for the directive
+  that does not exist. The generated manual prints that layer per entity now (upstream
+  `manual/index.ts`), which is what the paragraph about the manual promises.
 - **§3.7 also carries the display value** — what a reference shows in place of its uuid. The dictionary
   derives it from `sys_column.is_identifier`: a `name`-ish column, else `first_name` + `last_name`, else
   a `code`, else — for a **join entity**, two or more `FK` columns and no name of its own — its first two
