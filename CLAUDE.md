@@ -1244,10 +1244,35 @@ failure, concluded the published checker was unavailable, and reported its valid
 determinable". That happened repeatedly, and it is why the URLs were moved to the apex mid-session
 and a tree-wide guard was added forbidding the `www.` spelling.
 
-**The DNS record is now `www CNAME businessappwithai.github.io.`**, Pages has issued a certificate
-covering `www`, and it serves directly without redirecting — confirmed in a browser. So the guard's
-premise is false, and the guard named that exact condition for its own deletion. It is gone rather
-than widened, and `www` is canonical again.
+**The DNS record is now `www CNAME businessappwithai.github.io.`** and Pages has issued a
+certificate covering `www` — `CN=*.appwithai.org`, with `www.appwithai.org` in the SAN. So the
+guard's premise is false, and the guard named that exact condition for its own deletion. It is gone
+rather than widened, and `www` is the spelling every published URL uses.
+
+**What `www` does *not* do is serve directly.** This paragraph said it did, "confirmed in a
+browser", and that is no longer true — Pages answers it with a 301 to the apex:
+
+```
+$ curl -sI https://www.appwithai.org/guide/checker.js
+HTTP/2 301
+location: https://appwithai.org/guide/checker.js
+
+$ curl -sI https://appwithai.org/guide/checker.js
+HTTP/2 200
+content-type: application/javascript; charset=utf-8
+```
+
+**That is a working configuration, not a regression, and the distinction is the whole point of the
+episode above.** The failure that cost real time was a *certificate* failure: `www` had no
+certificate, so the connection was refused before any HTTP response existed and there was nothing to
+follow. A 301 is the opposite case — the handshake succeeds, the response arrives, and `fetch`,
+`import()` and `curl -L` all follow it to the same bytes. Verified: the published `checker.js`
+fetches to 200 through `www`.
+
+So the canonical form stays `https://www.appwithai.org`, and §8 of `check-spec.mjs` still holds
+every document to it. **Do not "fix" this by sweeping the documents to the apex** — the URLs work,
+and that sweep is the one this file documents two substitution traps for. Keep the claim accurate
+instead: `www` is canonical, carries a certificate, and redirects to the apex.
 
 ```
 www   CNAME   businessappwithai.github.io.     # NOT a record onto the apex
