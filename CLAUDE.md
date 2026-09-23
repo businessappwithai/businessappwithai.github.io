@@ -516,6 +516,17 @@ not: `support.agent@crm.reports.example.com` against the application's
 `support.agent@crm.example.com`, deliberately, because identical ones invite a
 reader to try one password on both. Neither works on the other side.
 
+**In the browser it is a preview, drawn in the platform's own layout, and the
+page says so.** The deployed platform (`enterprise_reporting_tanstack`) is a
+server, so the frame shows the same reports, roles and accounts in its sidebar,
+header, cards and colours, with a strip on every screen saying it is a preview.
+Its **Administration** section works — Users, Roles, Permissions (per-role table
+grants, enforced on the next query), Data Sources and System Logs — and what
+needs the platform's servers (SQL editor, NL query, jobs, the report generator,
+trigger board, settings) opens a page naming where the real one is. The
+deployable archive builds the platform itself, unmodified. Chapter 09 and
+`try-it-yourself.html` say both; keep them saying it.
+
 **None of it is on this site.** `buildReportingPack` in the generator
 (`packages/generator/src/reporting/pack.ts`) derives the whole thing from the
 parsed model, `appwithai-wasm.js` writes it into `model.json`, and the runtime
