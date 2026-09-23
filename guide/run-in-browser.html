@@ -403,10 +403,23 @@
   scoped from, read a second way.
 </p>
 <p>
-  Deployed, this is a separate service with a database of its own &mdash; which is what the
-  <i>Download the deployable app</i> archive sets up, with the platform on its own port beside the
-  application. A browser tab cannot run a second server, so here the reports and the roles are served
-  from this one; everything a reader meets is still separate, and that is the part that has to be.
+  Sign in as the administrator and the sidebar grows an <b>Administration</b> section, and it works:
+  <b>Users</b> adds, edits and deactivates reporting accounts, <b>Roles</b> creates them, and
+  <b>Permissions</b> decides which of the application's tables each role may read &mdash; take one away
+  from the Support Agent and its next report over that table is refused, not its next session.
+  <b>Data Sources</b> shows the application's database with live row counts, and <b>System Logs</b>
+  records every sign-in, every run and every refusal, and every change made under Administration.
+</p>
+<p>
+  <b>This is a preview of the platform, and it says so on every screen.</b> Deployed, Enterprise
+  Reporting is a separate product &mdash; <code>enterprise_reporting_tanstack</code>, a server over
+  PostgreSQL &mdash; and the <i>Download the deployable app</i> archive builds it from its own source,
+  unmodified, on its own port beside the application. A browser tab cannot run that server, so here
+  the same reports, roles and accounts are served from this tab and drawn in the platform's own
+  layout: its sidebar, its header, its cards and tables, its colours. What needs the platform's
+  servers &mdash; the SQL editor, natural-language queries, jobs, monitoring, the report generator,
+  the trigger board and settings &mdash; stays in the sidebar where the platform puts it, and opens a
+  page naming where the real one is.
 </p>
 
 <p>
