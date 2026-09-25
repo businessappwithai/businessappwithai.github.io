@@ -403,6 +403,36 @@ Take the roster in order. For each change, write a dossier to
 `changes/<NN>-<slug>.md` **already filled in**, apply it to the working copy, run
 the loop, compare the inventory, and open Gate C.
 
+**Plan the Application Dictionary for the change before you edit — this is
+mandatory, and it is where the thinking goes.** For every entity and column the
+enhancement adds or touches, decide in writing, before the first edit: its help
+text (domain knowledge, not its name in a sentence); for a reference, the entity
+it points at and its `FK` modifier; for a status, state or stage, the `%%enum` and
+the `%%field … enum:` binding; its `%%category` and that category's `name:`; and,
+for a step that writes to another entity, which of its rows it aims at
+(`targetSource` or `targetField`; `EML265` otherwise). Then read the model you
+were given for the same six gaps listed below: **a dictionary value the original
+is missing is filled as part of this enhancement**, and each one is named in the
+delivery. It is the one addition you make without being asked, because nothing
+else in the pipeline will ever make it.
+
+**Every Application Dictionary value is mandatory, and all of them are filled in
+the `.mmd`.** Six checker codes mean a dictionary value is missing, and the audit
+fails a model that carries any of them. None is advisory, whatever the severity
+of the warning says:
+
+| Code | The value that is missing |
+|---|---|
+| `EML119` | the `FK` modifier on a reference column (`_id` / `_by` resolving to an entity) — without it the lookup is lost |
+| `EML146` | the `%%field … enum:` binding on a status, state or stage column — without it the dropdown is lost |
+| `EML151` | help that describes its subject rather than restating its name |
+| `EML152` | `%%entity <Name> help:` on an entity |
+| `EML153` | `%%field <Entity>.<column> help:` on every column but the primary key |
+| `EML154` | `name:` on a `%%category` — without it the grouping is dropped |
+
+The delivered file carries none of these six. Not "a few", not "only on the
+obvious columns": none.
+
 A dossier is short and it is specific. It says what is being changed, what the
 model says about that area today, what it will say afterward, and what else moves
 as a consequence:
@@ -618,7 +648,7 @@ hand into a document they did not write, which is where losses come from.
 
 Alongside the file — in the reply, never inside it — give the change roster as
 built, the regression table from §{{N}}.6, the checker's counts for the original
-and for the delivered file, anything still unresolved, and where the session
+and for the delivered file, every dictionary value filled (the original's gaps included) with the count of the six dictionary codes — zero — and the audit's last line, anything still unresolved, and where the session
 directory is on disk. Then tell them what to do next: upload the file at
 `https://www.appwithai.org/guide/run-in-browser.html#upload`, where it becomes a
 running application in the browser tab.
