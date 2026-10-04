@@ -65,11 +65,15 @@ a:hover { color: #a5b4fc; }
 .nav-link.active { color: #f1f5f9; }
 .menu-toggle span { background: #94a3b8; }
 
-/* Mobile nav drawer */
-.nav { background: #0a0a0a; }
+/* Mobile nav drawer. Scoped to the drawer: on desktop the nav sits inside the
+   header and takes its background, and a fill here drew a darker box behind
+   the links once the header turned translucent on scroll. `.nav.mobile-open`
+   is named because style.css paints the open drawer white at that specificity. */
 @media (max-width: 1023px) {
-  .nav {
+  .nav,
+  .nav.mobile-open {
     background: #111827;
+    border-top-color: #1f2937;
     border-bottom: 1px solid #1f2937;
   }
 }
@@ -193,13 +197,16 @@ a:hover { color: #a5b4fc; }
   background: #111827 !important;
   border-color: #1f2937 !important;
 }
-.card[style*="--success-50"] {
+.card[style*="--success-50"],
+div[style*="background: var(--success-50)"] {
   background: rgba(16, 185, 129, 0.08) !important;
   border-color: rgba(16, 185, 129, 0.25) !important;
 }
-.card[style*="--success-50"] strong { color: #6ee7b7 !important; }
+.card[style*="--success-50"] strong,
+div[style*="background: var(--success-50)"] strong { color: #6ee7b7 !important; }
 .card[style*="--success-50"] p,
-.card[style*="--success-50"] li { color: #a7f3d0 !important; }
+.card[style*="--success-50"] li,
+div[style*="background: var(--success-50)"] p { color: #a7f3d0 !important; }
 .card[style*="--error-50"] {
   background: rgba(239, 68, 68, 0.08) !important;
   border-color: rgba(239, 68, 68, 0.3) !important;
