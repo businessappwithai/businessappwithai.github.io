@@ -119,12 +119,13 @@ document.addEventListener('DOMContentLoaded', function() {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const target = entry.target;
-          const text = target.textContent;
-          const number = parseInt(text.replace(/[^0-9]/g, ''));
-          const suffix = text.replace(/[0-9]/g, '');
+          // Only a leading integer with a non-numeric suffix ("90%", "403") can be
+          // counted up. Anything else ("Apache 2.0", "$426,000") is left as written:
+          // stripping its non-digits rendered "20Apache ." and "426000$,".
+          const match = target.textContent.trim().match(/^(\d+)(\D*)$/);
 
-          if (!isNaN(number)) {
-            animateValue(target, 0, number, 2000, suffix);
+          if (match) {
+            animateValue(target, 0, parseInt(match[1], 10), 2000, match[2]);
           }
           statsObserver.unobserve(target);
         }
