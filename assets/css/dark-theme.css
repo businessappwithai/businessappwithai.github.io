@@ -193,13 +193,16 @@ a:hover { color: #a5b4fc; }
   background: #111827 !important;
   border-color: #1f2937 !important;
 }
-.card[style*="--success-50"] {
+.card[style*="--success-50"],
+div[style*="background: var(--success-50)"] {
   background: rgba(16, 185, 129, 0.08) !important;
   border-color: rgba(16, 185, 129, 0.25) !important;
 }
-.card[style*="--success-50"] strong { color: #6ee7b7 !important; }
+.card[style*="--success-50"] strong,
+div[style*="background: var(--success-50)"] strong { color: #6ee7b7 !important; }
 .card[style*="--success-50"] p,
-.card[style*="--success-50"] li { color: #a7f3d0 !important; }
+.card[style*="--success-50"] li,
+div[style*="background: var(--success-50)"] p { color: #a7f3d0 !important; }
 .card[style*="--error-50"] {
   background: rgba(239, 68, 68, 0.08) !important;
   border-color: rgba(239, 68, 68, 0.3) !important;
