@@ -859,6 +859,18 @@ Where each one comes from:
 | `llmtextenhancement.txt`, `llmdetailedenhancement.txt` | **Neither.** Derived here from the two files above by `scripts/build-llmtext-enhancement.mjs`; the product repositories derive their own copies from their own bases | `node scripts/build-llmtext-enhancement.mjs` |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
+**`website/viewers/README.md` upstream is not vendored.** It documents the
+viewers for that repository's readers; the nine files listed in the
+`viewers/index.html` row below are the ones this site serves.
+
+**Whether a run page needs re-vendoring is a date question, not a diff
+question.** `assets/js/run-in-browser.js` and `run-real-stack.js` differ from
+upstream by several hundred lines at any time, because the deltas below are
+large (the storage dialog alone is one). Compare the date upstream last changed
+`html/assets/run-*.js` with the date this site last re-vendored them: re-vendor,
+and re-apply the deltas, only when upstream's is later. The five generator
+artifacts and `viewers/eml-model.js` carry no deltas and are copied whenever upstream moves.
+
 The five generator artifacts move together. Re-vendoring `checker.js` without
 `appwithai-wasm.js` leaves chapter 11 disagreeing with chapter 09 about the same
 model — they carry two copies of the same engine. The local deltas,
@@ -1007,6 +1019,25 @@ site's language-only edition and at §10 in the product repositories' system
 edition. For the same reason a source must never quote another document's
 section number: `llms-full.txt` §1 here is `llms-full.txt` §10 there. Refer to
 "its authoring protocol", not to a digit.
+
+**Every protocol carries the Application Dictionary blocks — keep them in
+step across all four.** The authoring protocols (`llms-full.txt` §1,
+`llmdetailed.txt` §10) and both enhancement sources carry the same three:
+plan every dictionary value in writing before the first line of Mermaid (an
+enhancement also fills the gaps the original carries, and names each one); the
+six dictionary-completeness codes (`EML119`, `EML146`, `EML151`–`EML154`) as a
+table of gaps the delivered file carries none of; and a review that re-runs the
+checker and the audit from zero until a full pass finds nothing to change. Two
+placement details matter:
+
+- In the interactive base, the review block and the `EML265` checklist row sit
+  inside `#### The tools`, so `protocol-interactive-enhancement.md` does **not**
+  repeat them — the splice brings them, and a copy in the source would print
+  them twice.
+- `app-with-ai-tanstack` carries its own four copies (`website/llmtext/`), and
+  derived against *those* bases these sources reproduce its two enhancement
+  editions byte for byte. Change a block in one repository and make the same
+  change in the other, then check both derivations.
 
 **What makes an enhancement protocol different, and what the checks hold it to.**
 Authoring has one way to fail — model the business badly. Enhancement has three,
