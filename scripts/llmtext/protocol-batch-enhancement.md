@@ -278,6 +278,21 @@ lines it drags with it are spread through the document:
 | Rename anything | Every reference to the old name, everywhere: foreign-key prefixes, relationship lines, `%%rbac`, `%%rule`, `%%workflow`, `%%hook`, `%%step`, `%%field`, `%%index`, and the SQL inside every `%%report` |
 | Remove anything | Everything that names it, by the same list |
 
+**Follow it into the reporting application as well.** The same file generates a
+second application — Enterprise Reporting — whose reports, charts, dashboard and
+reporting roles are derived from the model (this document's section on the
+reporting application says how). An edit changes it whether or not anybody
+mentioned reports:
+
+| When you… | The reporting application |
+|---|---|
+| Add an entity | Gains a register and a volume-per-month line, a breakdown per `%%enum`-bound column, and a lifecycle if a state machine covers its `status` — each named from the entity's help text |
+| Bind a column to an `%%enum` | Gains a breakdown chart for that column |
+| Add, widen or narrow a `%%rbac … .read` | Changes which tables that role's reporting account may read |
+| Add a role | Gains a reporting account, `<role>@<app>.reports.example.com`, beside the application's own |
+| Rename, retype or drop a column | Breaks every `%%report` whose SQL names it — the checker does not read inside SQL, so search the `sql:` of every report yourself |
+| Drop `%%entity … help:` or `%%field … help:` | Renames that entity's reports after its table |
+
 **The file contract is unchanged, and it still applies to every byte you hand
 back**: one file, UTF-8, first non-blank line a `%%` line, `%%meta name:` before
 the first Mermaid keyword, every other line a Mermaid statement or an EML `%%`
@@ -424,6 +439,8 @@ Alongside the file — in the reply, never inside it — give:
 - **the dictionary values filled**, including every one the original was
   missing, and the count of the six dictionary codes — zero — with the audit's
   last line;
+- **what the reporting application gains or loses** — the reports, charts and
+  reporting roles the change adds, narrows or breaks, by the table in §{{N}}.4;
 - **anything still unresolved**, and any pre-existing diagnostic you deliberately
   left alone;
 - **what to do next**: upload the file at

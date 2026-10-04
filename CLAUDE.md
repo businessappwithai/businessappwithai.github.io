@@ -1246,6 +1246,14 @@ thing a language model has to produce is a model file.
   `app-and-report-with-ai-tanstack` is what turns one into a saved query, a report
   and a chart. What the checker cannot do is tell you a column name is wrong, and
   that is what `check-reporting-pack.ts` does against a real PostgreSQL.
+- **§7.1 is the reporting application** — what Enterprise Reporting makes of the same
+  model: the three surfaces (orchestrator, deployable zip, browser preview), the table of
+  what each declaration yields in the pack, what a gap in the model costs there, and the
+  two sign-ins. Its figures are `buildReportingPack`'s on the CRM model (133 queries,
+  116 reports, 84 charts, nine roles); the system editions carry the same section as
+  §5.8. Both enhancement protocols follow an edit into it and report what it gains or
+  loses — that table lives in `scripts/llmtext/protocol-*.md`, so it reaches every
+  repository's enhancement editions.
 - **§8 is the checker contract**, and the URLs in it are the ones `guide/checker.js` and
   `guide/fixer.js` are actually published at. **`formatReport` prints the diagnostics first and the
   verdict last** — `OK — 0 errors, 0 warnings, 2 notes (EML 1.2.0)` — so the final line of a run is
