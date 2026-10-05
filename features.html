@@ -330,6 +330,10 @@
             <strong>Row-Level Security</strong>
             <p class="text-muted">Users see only records belonging to their department, region, or organizational unit — enforced via sys_access_record policies</p>
           </div>
+          <div style="padding: var(--spacing-md); border-bottom: 1px solid var(--gray-200);">
+            <strong>Concurrent Edits — Optimistic Locking</strong>
+            <p class="text-muted">Every record carries a version. A save made after someone else has saved the same record is refused instead of overwriting their change, and the form offers to reload their version, overwrite with yours, or keep editing</p>
+          </div>
           <div style="padding: var(--spacing-md);">
             <strong>Document Status Security</strong>
             <p class="text-muted">Approved or completed documents are locked from editing, preserving the integrity of the audit trail</p>
