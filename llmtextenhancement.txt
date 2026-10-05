@@ -1192,6 +1192,22 @@ interface draws a text glyph and does not render it. The remaining `%%entity`
 keys — `label`, `prefix`, `softDelete`, `audited` — are validated but not yet
 compiled (§7), so do not promise a user what one of those alone will produce.
 
+**The `version` column is what makes two people's edits safe, and you write
+nothing for it.** It is one of the columns the generator adds (§3.1), starting
+at 1 and raised by every save. The record form remembers the version it opened
+and sends it back; a save made after somebody else has saved the same record is
+refused rather than applied — the second person no longer overwrites the first
+without seeing it. The form then lists the fields the other save changed, theirs
+beside yours, and offers **Reload their version**, **Overwrite with mine** (itself
+checked again) or **Keep editing**. Over the API it is plain HTTP: a read answers
+with `ETag: "<version>"`, a `PUT`/`PATCH` sends `If-Match: "<version>"`, and a
+stale one gets **409** with `details.code: "VERSION_CONFLICT"`. Every target
+behaves this way — the deployable application, the one that runs in a browser,
+and both of the `eml` CLI's own targets — and the generated manual explains it
+under *When two people change the same record*. So never declare a column
+called `version` (it is `EML103`), and never model a "locked by" or "last
+editor" column to stop two people saving at once: the application already does.
+
 **Every card on the dashboard is scoped to whoever is reading it.** The entity
 blocks hold what `%%rbac … .read` lets this role see, with line items excluded
 because a child is reached through its parent, so a category whose every entity

@@ -377,6 +377,22 @@
   generator seeds faker from the application's name — a screenshot of row four stays a screenshot of
   row four.
 </p>
+<h2 id="concurrent-edits">When two people save the same record</h2>
+<p>
+  Every record carries a <code>version</code> that each save raises by one, and the form you edit a
+  record in remembers the version it opened. A save made after somebody else has already saved that
+  record is refused rather than applied, so the second person cannot overwrite the first without
+  seeing it. The form shows a panel listing the fields the other save changed &mdash; their value beside
+  yours, the fields you both changed marked &mdash; and offers <b>Reload their version</b>,
+  <b>Overwrite with mine</b> or <b>Keep editing</b>. It is a panel here rather than a dialog because the
+  application runs inside a frame on this page, where a dialog is not guaranteed to appear.
+</p>
+<p>
+  The deployable application in the <code>.zip</code> behaves the same way, with a dialog, and so does
+  its API to anything that is not a browser: a read answers with <code>ETag: "&lt;version&gt;"</code>, a
+  save sends <code>If-Match</code>, and a stale one gets <code>409</code> with
+  <code>VERSION_CONFLICT</code>. The generated manual explains it to the people using the application.
+</p>
 <h2 id="reporting">The second application, and the second sign-in</h2>
 <p>
   The dashboard carries an <b>Enterprise Reporting</b> section, and clicking through it does not open a

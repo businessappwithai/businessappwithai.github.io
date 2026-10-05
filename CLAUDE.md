@@ -535,6 +535,18 @@ states about it — five of seventeen tables, 36 of 116 reports — are asserted
 `scripts/website-e2e.mjs` against the pack the *vendored* bundle derives, so
 they cannot go stale the way the role count in this file did.
 
+**Concurrent edits — `#concurrent-edits`.** The chapter says what the
+generated form does when someone else saved the record first: a panel (not a
+dialog — the app is in a frame) listing their changes beside yours, with
+Reload their version / Overwrite with mine / Keep editing; the zip does the same
+with a dialog, and the API speaks `ETag` / `If-Match` / 409 `VERSION_CONFLICT`.
+**None of it is implemented here** — it is the vendored runtime's
+(`bus.routes.js`, `entity-form.js`) and the full-stack templates'. It
+deliberately does not tell the reader to open two tabs: each tab boots its own
+PGlite, and the chapter must not promise a demonstration the page cannot give.
+`llms-full.txt` §3.7, `features.html` and `technology.html` carry the same
+claim; keep them in step with `applicationDictionary.optimisticLocking` upstream.
+
 **Delete all records** — the dashboard of the running application carries an
 administrator-only control that empties every business table and leaves the
 application itself in place. It is there because the chapter seeds 170 rows so
