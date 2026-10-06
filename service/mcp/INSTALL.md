@@ -1,5 +1,7 @@
 # Add AppWithAI to your own ChatGPT — until it is in the app directory
 
+> The same steps, formatted for readers, are published at https://www.appwithai.org/chatgpt-app.html.
+
 AppWithAI checks, repairs and audits an EML `.mmd` model inside ChatGPT. Until
 the app is listed in OpenAI's directory, you can connect it to your own account
 as a custom app in **developer mode**. It takes about two minutes and is private
