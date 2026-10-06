@@ -55,6 +55,7 @@ const KEY_OF = {
   "education-management-system.eml.mmd": "education",
   "hospital-management-system.eml.mmd": "hospital",
   "investment-planning-wealth-management-system.eml.mmd": "investment",
+  "investment-planning-wealth-management-v101.eml.mmd": "wealth",
 };
 
 const NUMBER = "(?:a |one )?[\\w-]+(?:\\s+hundred\\s+and\\s+[\\w-]+)?";

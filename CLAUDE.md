@@ -58,7 +58,8 @@ businessappwithai.github.io/
 │   ├── models/               # Example EML models the chapters load (crm,
 │   │                         # drug-discovery, hospital-management-system,
 │   │                         # dance-studio, investment-planning-…,
-│   │                         # education-management-system)
+│   │                         # education-management-system, and
+│   │                         # investment-planning-wealth-management-v101)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── viewers/                  # The model viewers — appwithai.org/viewers. Vendored
 │   │                         # from `website/viewers/` upstream; only index.html
@@ -654,6 +655,14 @@ fire on it and the roles that may read it.
 - **`guide/models/crm.eml.mmd` must stay byte-identical to `language/examples/crm.eml.mmd` upstream.**
   They drifted once — the site's copy gained the per-entity `%%rbac … .read` rules and the generator
   repository's `html/models/` copy did not — and a unit test upstream now asserts it.
+
+**The seventh model — `#wealth`.** `guide/models/investment-planning-wealth-management-v101.eml.mmd`
+is a second, revised (`%%meta version: 1.0.1`) take on the wealth-management business, added beside the
+first rather than replacing it: same 91 entities, 39 enums against 17, nine rules, ten state machines, 102
+access restrictions, and **no `%%report` directives** (the first carries 19), so its reporting pack is
+derived from shape alone. It has its own `BUILT_IN` key, choice buttons in chapters 09, 10 and 11, a card
+on `try-it-yourself.html` and a `KEY_OF` entry in `website-e2e.mjs`. The file name has no dots on purpose —
+the audit's *name is lower-case and hyphenated* check reads it.
 
 **Constraints to respect**
 
