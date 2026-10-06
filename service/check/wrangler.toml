@@ -1,6 +1,0 @@
-# Cloudflare Workers config. Deploy from this directory with:  npx wrangler deploy
-# Wrangler bundles ../../guide/checker.js and fixer.js into the worker, so a
-# re-vendored checker reaches the service on the next deploy.
-name = "appwithai-check"
-main = "worker.js"
-compatibility_date = "2026-10-01"
