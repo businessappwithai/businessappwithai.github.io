@@ -34,6 +34,16 @@ const WEBCONTAINER_API = new URL("../vendor/webcontainer/index.js", import.meta.
 /** The 310 stack templates, beside the other vendored payloads. */
 const TEMPLATES_URL = new URL("../vendor/stack-templates.json", import.meta.url).href;
 
+/* Local delta: fetch the template bundle with revalidation and hand loadTemplates a
+   blob: URL. A stale cached stack-templates.json beside a newer appwithai-fullstack.js
+   fails with "ENOENT … /packages/generator/templates/…" for any template added since. */
+async function freshTemplatesUrl(url) {
+  const response = await fetch(url, { cache: "no-cache" });
+  if (!response.ok) throw new Error(`stack templates: HTTP ${response.status}`);
+  return URL.createObjectURL(await response.blob());
+}
+
+
 /** The nine binary templates the JSON bundle cannot carry. Fetched as bytes and
  *  put back into the tree before it is mounted, so the application that boots
  *  has the typefaces the CLI would have written. */
@@ -351,7 +361,7 @@ $("generate").addEventListener("click", async () => {
   try {
     if (!state.templates) {
       build.start("templates", "Fetching the stack templates");
-      state.templates = await loadTemplates(TEMPLATES_URL);
+      state.templates = await loadTemplates(await freshTemplatesUrl(TEMPLATES_URL));
       build.done("templates", `${Object.keys(state.templates).length} templates`);
     }
 
