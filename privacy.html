@@ -218,6 +218,50 @@
         revoke and give it a spending limit.
       </p>
 
+      <h2 id="chatgpt-app">AppWithAI in ChatGPT, and the model checker page</h2>
+      <p>
+        The AppWithAI app for ChatGPT and the checker page at
+        <a href="plugin/">/plugin/</a> are the same panel. It checks, repairs and audits a model
+        <strong>on your device</strong>, with the published checker, fixer and audit. Code comes
+        from this site to you; your model never goes the other way.
+      </p>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>What we never receive</h3>
+          <ul>
+            <li><strong>Your model.</strong> No part of it &mdash; not its text, an entity or field
+                name, a diagnostic, nor the repaired copy. The panel reads it in your browser, or
+                from ChatGPT, and saves it back to your device or to your ChatGPT chat.</li>
+            <li><strong>Anything about it.</strong> The panel carries no analytics. The page at
+                <a href="plugin/">/plugin/</a> runs under a content security policy that forbids it
+                to open any network connection at all.</li>
+            <li><strong>Your file&rsquo;s name.</strong> The app&rsquo;s server has two tools and
+                neither takes any input, so nothing you type or attach is sent to it. An optional
+                &ldquo;Open with AppWithAI&rdquo; for <code>.mmd</code> files would make ChatGPT tell
+                the server a file&rsquo;s name (never its contents); it is switched off.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What does reach us, and from whom</h3>
+          <ul>
+            <li>When ChatGPT opens the app, <strong>OpenAI&rsquo;s servers</strong> ask ours for the
+                app&rsquo;s description and its panel. Those requests carry no content from your
+                chat. We keep no logs of them; our host, Cloudflare, processes the request
+                metadata (such as the calling IP address) under its own policy.</li>
+            <li>Your browser downloads the panel&rsquo;s code from this site, as it would any page.</li>
+            <li>Your model stays wherever you keep it. In ChatGPT that is your chat, under
+                <strong>OpenAI&rsquo;s</strong> terms and retention &mdash; not ours.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-muted text-sm mt-3">
+        Each result names the engine that produced it: the EML version and the SHA-256 of every
+        file the panel ran, so a check can be reproduced exactly. These promises are enforced by a
+        test the site runs on every change, which fails if the panel gains any way to send data, if
+        the page&rsquo;s security policy is loosened, or if the app&rsquo;s server gains a tool that
+        accepts input.
+      </p>
+
       <h2>The rest of it</h2>
       <h3>Cookies</h3>
       <p>
