@@ -627,5 +627,50 @@ console.log("\n9. The deployable archive keeps script permissions");
 }
 
 // ---------------------------------------------------------------------------
+// 10. The archive's seed survives a reference with no parent.
+//
+// The wealth-management v1.0.1 model marks `Document.document_type_id` as a
+// required FK and declares no `DocumentType`. The seed returned null for it, the
+// column's NOT NULL refused the insert, and the generated backend never started.
+// Every figure on every page was right; the application just did not run.
+console.log("\n10. The deployable archive's seed handles a reference with no parent");
+{
+  const templatesPath = p("assets", "vendor", "stack-templates.json");
+  const bundlePath = p("assets", "js", "appwithai-fullstack.js");
+  const modelPath = p("guide", "models", "investment-planning-wealth-management-v101.eml.mmd");
+  if (!existsSync(templatesPath) || !existsSync(bundlePath) || !existsSync(modelPath)) {
+    console.log("  note templates, bundle or model absent — group skipped");
+  } else {
+    const { generateFullStack } = await import(`file://${bundlePath}`);
+    const realLog = console.log;
+    console.log = () => {};
+    let files;
+    try {
+      files = (await generateFullStack({
+        source: readFileSync(modelPath, "utf8"),
+        name: "wealth",
+        templates: JSON.parse(readFileSync(templatesPath, "utf8")),
+        overlay: false,
+      })).files;
+    } finally {
+      console.log = realLog;
+    }
+    const seed = files["backend/seeds/03_business_data.ts"] ?? "";
+    seed.includes("fk('document_type_id', 0, true)")
+      ? ok("the seed tells fk() that document_type_id is required")
+      : fail("the seed tells fk() that document_type_id is required", "the call does not carry the required flag");
+    seed.includes("orphanIds")
+      ? ok("the seed has a fallback for a required reference with no parent")
+      : fail("the seed has a fallback for a required reference with no parent", "fk() still returns null for it, and NOT NULL refuses the insert");
+    /* Any call that passes `false` for a column the model requires would
+       reintroduce it, so every document_type_id call must say true. */
+    const calls = seed.match(/document_type_id: fk\([^)]*\)/g) ?? [];
+    calls.length > 0 && calls.every((c) => c.endsWith("true)"))
+      ? ok(`all ${calls.length} document_type_id values are drawn as required`)
+      : fail("every document_type_id value is drawn as required", calls.find((c) => !c.endsWith("true)")) ?? "no calls found");
+  }
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);
