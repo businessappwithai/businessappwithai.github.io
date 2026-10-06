@@ -16,7 +16,7 @@
  *     saving goes back through `openai/resources/write`.
  *  2. ChatGPT's file library: window.openai.selectFiles() → [{ fileId, fileName }],
  *     getFileDownloadUrl({ fileId }) → { downloadUrl }, uploadFile(file, { library }).
- *  3. Anywhere: Open .mmd…, drop a file, or paste.
+ *  3. The standalone page only (not inside a host): Open .mmd…, drop a file, or paste.
  */
 import { analyze, LANGUAGE_VERSION } from "./appwithai-eml.js";
 import { MANIFEST } from "./manifest.js";
@@ -149,14 +149,29 @@ function run(name, source, resource = null) {
 
 /* ── Getting a model in ───────────────────────────────────────────── */
 
+/* Inside ChatGPT (or any MCP Apps host) the model comes from the chat session —
+   a file the user attached there — never from a picker, drop zone or text box in
+   this page. Those stay only for the standalone page at /plugin/. */
+const hosted = Boolean(inFrame || oa);
+if (hosted) {
+  document.querySelectorAll(".local-input").forEach((el) => { el.hidden = true; });
+  const canPick = typeof oa?.selectFiles === "function" && typeof oa?.getFileDownloadUrl === "function";
+  $("status").textContent = "";
+  $("host-hint").hidden = false;
+  $("host-hint").textContent = canPick
+    ? "No file yet? Attach your .mmd to the chat, or paste the model into the chat and ask ChatGPT to save it as a .mmd file. Then choose it here."
+    : "Attach your .mmd to the chat, or paste the model into the chat and ask ChatGPT to save it as a .mmd file, then open AppWithAI from that file.";
+}
+
 $("file").addEventListener("change", async (ev) => {
   const f = ev.target.files?.[0];
   if (f) run(f.name, await f.text());
 });
-$("paste-run").addEventListener("click", () => run("model.mmd", $("paste").value));
+$("paste-run").addEventListener("click", () => { if (!hosted) run("model.mmd", $("paste").value); });
 document.addEventListener("dragover", (e) => e.preventDefault());
 document.addEventListener("drop", async (e) => {
   e.preventDefault();
+  if (hosted) return;
   const f = e.dataTransfer?.files?.[0];
   if (f) run(f.name, await f.text());
 });

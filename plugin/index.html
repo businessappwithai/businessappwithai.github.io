@@ -20,11 +20,12 @@
   <p class="lede">Open an <code>.mmd</code>. The published checker, fixer and checklist audit run in this page. Model contents stay in your browser or ChatGPT session and are never sent to AppWithAI.</p>
   <div class="inputs">
     <button id="host-pick" class="primary" hidden>Choose a file from this chat</button>
-    <label class="btn" for="file">Open .mmd…</label>
-    <input type="file" id="file" accept=".mmd,.txt,text/plain">
+    <label class="btn local-input" for="file">Open .mmd…</label>
+    <input class="local-input" type="file" id="file" accept=".mmd,.txt,text/plain">
     <span class="status" id="status">Or drop a file anywhere on this page.</span>
   </div>
-  <details>
+  <p class="hint" id="host-hint" hidden></p>
+  <details class="local-input">
     <summary>Paste a model instead</summary>
     <textarea id="paste" spellcheck="false" placeholder="%%meta name: …"></textarea>
     <button id="paste-run">Check</button>
