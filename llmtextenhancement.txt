@@ -2104,6 +2104,11 @@ The modules are ES modules on a public URL. Loading them is one line on some
 runtimes and four on others, and that difference is where the validation step
 usually gets skipped. Find your row and run it.
 
+**The checker lives on `https://www.appwithai.org` and nowhere else.** Do not try `github.com`, `git clone`, `bun` or
+`npm`: none of them is a route to it, and a failed attempt at any of them says nothing about the checker. If your
+shell cannot resolve `www.appwithai.org` either, stop fetching: your shell has no network, so go straight to the
+row for a shell that resolves no host (`check-model-lite.mjs`) and bring that one file in as text.
+
 | What you have | What to do |
 |---|---|
 | A shell with Node 18+, Bun or Deno | `curl -sO https://www.appwithai.org/guide/check-model.mjs` then `node check-model.mjs <business-name>.mmd` |
