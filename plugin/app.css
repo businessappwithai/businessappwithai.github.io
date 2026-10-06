@@ -1,0 +1,26 @@
+:root { --bg:#ffffff; --fg:#111827; --muted:#6b7280; --line:#e5e7eb; --card:#f9fafb; --err:#b91c1c; --warn:#b45309; --info:#1d4ed8; --ok:#047857; --accent:#2563eb; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0b0f17; --fg:#e5e7eb; --muted:#9ca3af; --line:#1f2937; --card:#111827; --err:#f87171; --warn:#fbbf24; --info:#93c5fd; --ok:#34d399; --accent:#60a5fa; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 860px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 18px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 20px 0 8px; }
+.lede, .status, .engine, .hint, .ln { color: var(--muted); }
+.lede { margin: 0 0 12px; } .engine { font-size: 12px; margin-top: 20px; overflow-wrap: anywhere; }
+.inputs { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin: 12px 0; }
+button, label.btn { font:inherit; padding:7px 12px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--fg); cursor:pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+input[type=file] { display:none; }
+textarea { width:100%; min-height:90px; font:12px/1.4 ui-monospace, Menlo, monospace; background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:8px; }
+.figures { display:grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap:8px; }
+.figures div { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px; }
+.figures span { display:block; color:var(--muted); font-size:12px; } .figures strong { font-size:18px; }
+table { border-collapse: collapse; margin-top: 8px; } th, td { padding: 4px 12px 4px 0; text-align: left; }
+td.e { color: var(--err); } td.w { color: var(--warn); } td.i { color: var(--info); }
+.verdict { font-family: ui-monospace, Menlo, monospace; padding: 8px; border-radius: 8px; background: var(--card); border:1px solid var(--line); overflow-wrap:anywhere; }
+.verdict.ok { color: var(--ok); } .verdict.bad { color: var(--err); }
+ol.problems { padding-left: 20px; } ol.problems li { margin: 0 0 8px; overflow-wrap:anywhere; }
+li.error code { color: var(--err); } li.warning code { color: var(--warn); } li.info code { color: var(--info); }
+pre { margin: 4px 0; padding: 6px; background: var(--card); border-radius: 6px; overflow-x: auto; font-size: 12px; }
+.hint { margin: 2px 0 0; font-size: 13px; }
+.privacy { border-left: 3px solid var(--ok); padding: 4px 10px; margin: 8px 0 0; color: var(--muted); }

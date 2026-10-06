@@ -99,10 +99,13 @@ jobs:
           ( cd "$work" && node check-model-lite.mjs prose.mmd >/dev/null 2>&1 ) && \
             { echo "expected exit 1 on an invalid model"; exit 1; } || true
 
-      # The checking service (service/check/) imports checker.js and fixer.js and
-      # must give the published runner's verdict and exit code on every model.
-      - name: Checking service agrees with the runner
-        run: node scripts/check-service.mjs
+      # The ChatGPT app (plugin/, service/mcp/): its engine identity is current,
+      # it gives the published runner's verdict, its panel cannot send, and its
+      # MCP server has no tool that takes a model.
+      - name: ChatGPT app manifest is current
+        run: node scripts/build-plugin-manifest.mjs --check
+      - name: ChatGPT app runs the official checker and cannot send a model
+        run: node scripts/check-plugin.mjs
 
       # The validators are also published inside pages, for a fetch layer that
       # reads text/html and refuses application/javascript. Each page carries

@@ -1,0 +1,4 @@
+# Cloudflare Workers. Deploy from this directory: npx wrangler deploy
+name = "appwithai-mcp"
+main = "server.js"
+compatibility_date = "2026-10-01"

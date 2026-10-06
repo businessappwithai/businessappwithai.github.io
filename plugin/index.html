@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The privacy guarantee, enforced by the browser rather than promised:
+       this page may load its own code and nothing else, and may open NO
+       connection — connect-src 'none' — so a model opened here cannot be sent
+       anywhere, by this code or by anything injected into it. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="description" content="Check and repair an AppWithAI EML model in your browser. The model never leaves your device.">
+  <meta name="keywords" content="AppWithAI, EML, Mermaid, checker, fixer, offline">
+  <title>AppWithAI model checker</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+<main>
+  <h1>AppWithAI model checker</h1>
+  <p class="lede">Open an <code>.mmd</code>. The published checker, fixer and checklist audit run in this page, and the page cannot connect anywhere, so your model stays on your device.</p>
+  <div class="inputs">
+    <button id="host-pick" class="primary" hidden>Choose a file from this chat</button>
+    <label class="btn" for="file">Open .mmd…</label>
+    <input type="file" id="file" accept=".mmd,.txt,text/plain">
+    <span class="status" id="status">Or drop a file anywhere on this page.</span>
+  </div>
+  <details>
+    <summary>Paste a model instead</summary>
+    <textarea id="paste" spellcheck="false" placeholder="%%meta name: …"></textarea>
+    <button id="paste-run">Check</button>
+  </details>
+
+  <section id="result" hidden>
+    <h2 id="model-name"></h2>
+    <div class="figures" id="figures"></div>
+    <table id="counts"></table>
+    <h2>Verdict</h2>
+    <div id="verdict" class="verdict"></div>
+    <div class="inputs">
+      <button id="save" class="primary">Save the .mmd</button>
+      <button id="copy">Copy the .mmd</button>
+    </div>
+    <h2>Checklist audit</h2>
+    <div id="audit-score" class="verdict"></div>
+    <ol class="problems" id="audit"></ol>
+    <div id="audit-notes"></div>
+    <h2>Problems</h2>
+    <ol class="problems" id="problems"></ol>
+    <p class="hint" id="problems-more"></p>
+  </section>
+
+  <p class="privacy">Nothing you open here is uploaded, logged or stored by AppWithAI. The only files this page downloads are its own code.</p>
+  <p class="engine" id="engine"></p>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
