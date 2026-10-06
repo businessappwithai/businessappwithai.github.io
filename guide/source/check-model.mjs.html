@@ -31,8 +31,8 @@ exists for one case: a fetch layer that reads pages but refuses
 while the site is answering normally.</p>
 
 <div class="meta">
-<div>bytes    10143</div>
-<div>sha256   634ad4e3cc41f8f2fd112a4dd264a65639a2d5c1e33cc8d5b909d81a7c230055</div>
+<div>bytes    10148</div>
+<div>sha256   9dcf89b3d7445fd871ca9efab26bcb4481f4157ed23014a797c00628acc45210</div>
 </div>
 
 <p>The block below is that file, base64-encoded. Base64 carries no HTML-special
@@ -40,7 +40,7 @@ character and ignores whitespace, so reflowing, wrapping or converting this page
 to Markdown cannot corrupt it. Reconstruct and verify:</p>
 
 <pre>base64 -d &lt; check-model.mjs.b64 &gt; check-model.mjs
-sha256sum check-model.mjs      # must print 634ad4e3cc41f8f2fd112a4dd264a65639a2d5c1e33cc8d5b909d81a7c230055</pre>
+sha256sum check-model.mjs      # must print 9dcf89b3d7445fd871ca9efab26bcb4481f4157ed23014a797c00628acc45210</pre>
 
 <p>Or in Node, with the block as a string:</p>
 
@@ -227,7 +227,8 @@ b2RlbCk7CiAgICBjb25zb2xlLmxvZyhgXG5yZXBhaXJlZCBkb2N1bWVudCB3cml0dGVuIGJhY2sg
 dG8gJHtwYXRofWApOwogIH0gZWxzZSB7CiAgICBjb25zb2xlLmxvZygiXG5UaGUgcmVwYWlycyBh
 Ym92ZSBhcmUgbm90IHNhdmVkLiBSZS1ydW4gd2l0aCAtLXdyaXRlIHRvIGtlZXAgdGhlbSwgYW5k
 IGhhbmQgb3ZlciB0aGUgcmVwYWlyZWQgZmlsZSByYXRoZXIgdGhhbiB0aGUgZHJhZnQuIik7CiAg
-fQp9Cgpwcm9jZXNzLmV4aXQoZmluYWwuY291bnRzLmVycm9ycyA9PT0gMCA/IDAgOiAxKTsK</pre>
+fQp9Cgpwcm9jZXNzLmV4aXRDb2RlID0gZmluYWwuY291bnRzLmVycm9ycyA9PT0gMCA/IDAgOiAx
+Owo=</pre>
 
 <p class="dim">Generated from the published file by
 <code>scripts/build-validator-source-page.mjs</code>. Do not edit: CI rebuilds

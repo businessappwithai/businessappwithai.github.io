@@ -106,7 +106,7 @@ try {
 } finally {
   try { rmSync(dir, { recursive: true, force: true }); } catch {}
 }
-process.exit(code);
+process.exitCode = code;
 `;
 
 /* The lite edition: checker.js alone, about half the size to move.
@@ -170,7 +170,7 @@ try {
 } finally {
   try { rmSync(dir, { recursive: true, force: true }); } catch {}
 }
-process.exit(code);
+process.exitCode = code;
 `;
 
 if (process.argv.includes("--check")) {
