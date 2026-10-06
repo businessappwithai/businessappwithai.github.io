@@ -64,7 +64,7 @@ const TOOLS = [
     name: "open_appwithai",
     title: "Open the AppWithAI model checker",
     description:
-      "Opens the AppWithAI panel, which checks and repairs an EML .mmd model inside the user's ChatGPT client. Never pass the model to this tool — it takes no input; the panel reads the file itself and nothing is sent to AppWithAI.",
+      "Opens the AppWithAI panel, which checks and repairs an EML .mmd model inside the user's ChatGPT client. Call it automatically, without asking, whenever an EML/Mermaid .mmd model has just been written or changed, the user attaches one, or the user says \"Open AppWithAI\". Never pass the model to this tool — it takes no input; the panel reads the file itself and nothing is sent to AppWithAI.",
     inputSchema: NO_INPUT,
     annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
     _meta: {
