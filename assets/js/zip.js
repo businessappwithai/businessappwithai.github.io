@@ -66,6 +66,17 @@ async function deflateRaw(bytes) {
   }
 }
 
+/**
+ * A script has to keep its execute bit through the archive. Docker runs the
+ * scripts it mounts (`reporting/pg-init/01-reporting-database.sh`) and a
+ * 0644 entry is an init script it cannot execute. Decided from the file
+ * itself — a `.sh` name or a `#!` first line — so there is no list of paths
+ * to fall behind the generator.
+ */
+function isExecutable(path, bytes) {
+  return /\.sh$/i.test(path) || (bytes.length > 1 && bytes[0] === 0x23 && bytes[1] === 0x21);
+}
+
 /** MS-DOS date and time, which is what the format's fixed fields carry. */
 function dosStamp(date) {
   const time =
@@ -112,6 +123,7 @@ export async function createZip(files, options = {}) {
     const packed = await deflateRaw(raw);
     entries.push({
       name,
+      mode: isExecutable(String(path), raw) ? 0o100755 : 0o100644,
       crc: crc32(raw),
       size: raw.length,
       body: packed ?? raw,
@@ -149,7 +161,9 @@ export async function createZip(files, options = {}) {
   const directoryAt = out.at;
   for (const entry of entries) {
     out.u32(0x02014b50);
-    out.u16(20); // version made by
+    // High byte 3 = Unix: without it unzip and Python's zipfile ignore the mode
+    // below and extract every file 0644.
+    out.u16((3 << 8) | 20); // version made by
     out.u16(20); // version needed
     out.u16(0x0800);
     out.u16(entry.method);
@@ -163,9 +177,9 @@ export async function createZip(files, options = {}) {
     out.u16(0); // comment
     out.u16(0); // disk
     out.u16(0); // internal attributes
-    // 0644, as a regular file, in the high half — what unzip reads to set the
-    // mode. Without it some extractors create files nobody can read.
-    out.u32((0o100644 << 16) >>> 0);
+    // 0644 (0755 for scripts), as a regular file, in the high half — what unzip
+    // reads to set the mode. Without it some extractors create files nobody can read.
+    out.u32((entry.mode << 16) >>> 0);
     out.u32(entry.offset);
     out.raw(entry.name);
   }

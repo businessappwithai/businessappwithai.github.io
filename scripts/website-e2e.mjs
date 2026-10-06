@@ -557,5 +557,74 @@ console.log("\n8. The model assistant");
 }
 
 // ---------------------------------------------------------------------------
+// 9. The archive keeps its scripts executable.
+//
+// `docker compose up` bind-mounts `reporting/pg-init/` into Postgres's
+// /docker-entrypoint-initdb.d, and an init script without its execute bit is
+// one Docker cannot run. `zip.js` wrote every entry 0644 — and marked the
+// archive as made on MS-DOS, which makes unzip ignore the mode anyway — so the
+// archive the download button produced could not start the reporting database.
+// Nothing about the application looked wrong: every file was there and correct.
+console.log("\n9. The deployable archive keeps script permissions");
+{
+  const { createZip } = await import(`file://${p("assets", "js", "zip.js")}`);
+  /* The unix mode of each entry, read back from the central directory the way
+     unzip does: only trusted when "version made by" says Unix (high byte 3). */
+  const modes = async (files) => {
+    const bytes = new Uint8Array(await (await createZip(files)).arrayBuffer());
+    const view = new DataView(bytes.buffer);
+    let at = view.getUint32(bytes.length - 22 + 16, true);
+    const out = {};
+    while (view.getUint32(at, true) === 0x02014b50) {
+      const madeBy = view.getUint16(at + 4, true);
+      const nameLength = view.getUint16(at + 28, true);
+      const extra = view.getUint16(at + 30, true) + view.getUint16(at + 32, true);
+      const name = new TextDecoder().decode(bytes.subarray(at + 46, at + 46 + nameLength));
+      out[name] = madeBy >> 8 === 3 ? (view.getUint32(at + 38, true) >>> 16) & 0o777 : null;
+      at += 46 + nameLength + extra;
+    }
+    return out;
+  };
+  const m = await modes({
+    "a/init.sh": "echo hi\n",
+    "a/tool": "#!/bin/sh\necho hi\n",
+    "a/notes.txt": "hello\n",
+  });
+  m["a/init.sh"] === 0o755 ? ok("a .sh file is stored 0755") : fail("a .sh file is stored 0755", `mode ${m["a/init.sh"]?.toString(8)}`);
+  m["a/tool"] === 0o755 ? ok("a #! file is stored 0755") : fail("a #! file is stored 0755", `mode ${m["a/tool"]?.toString(8)}`);
+  m["a/notes.txt"] === 0o644 ? ok("an ordinary file stays 0644") : fail("an ordinary file stays 0644", `mode ${m["a/notes.txt"]?.toString(8)}`);
+
+  const templatesPath = p("assets", "vendor", "stack-templates.json");
+  const bundlePath = p("assets", "js", "appwithai-fullstack.js");
+  if (!existsSync(templatesPath) || !existsSync(bundlePath)) {
+    console.log("  note stack-templates.json or appwithai-fullstack.js absent — real archive skipped");
+  } else {
+    const { generateFullStack } = await import(`file://${bundlePath}`);
+    const realLog = console.log;
+    console.log = () => {};
+    let files;
+    try {
+      files = (await generateFullStack({
+        source: STATS["crm.eml.mmd"].src,
+        name: "crm",
+        templates: JSON.parse(readFileSync(templatesPath, "utf8")),
+        overlay: false,
+      })).files;
+    } finally {
+      console.log = realLog;
+    }
+    const real = await modes(files);
+    for (const script of Object.keys(files).filter((f) => /\.sh$/.test(f))) {
+      real[script] === 0o755
+        ? ok(`${script} is executable in the archive`)
+        : fail(`${script} is executable in the archive`, `mode ${real[script]?.toString(8)}`);
+    }
+    "reporting/pg-init/01-reporting-database.sh" in files
+      ? ok("the archive carries the reporting init script")
+      : fail("the archive carries the reporting init script", "reporting/pg-init/01-reporting-database.sh is missing");
+  }
+}
+
+// ---------------------------------------------------------------------------
 console.log(`\n${failures.length === 0 ? "OK" : "FAILED"} — ${passed} passed, ${failures.length} failed`);
 process.exit(failures.length === 0 ? 0 : 1);

@@ -631,6 +631,11 @@ brings up PostgreSQL, the API and the web front end.
   zlib and exactly what a ZIP's method 8 wants; where it is missing an entry is
   stored uncompressed instead. No ZIP64 — four hundred small text files are
   three orders of magnitude from the ceilings.
+  Scripts keep their execute bit: an entry is written 0755 when its name ends `.sh` or
+  its first line is `#!`, and the archive is marked made-on-Unix (`version made by` high
+  byte 3) because without that unzip ignores the mode entirely. Docker mounts
+  `reporting/pg-init/` as Postgres's init directory and cannot run a 0644 script;
+  `website-e2e.mjs` §9 holds it.
 - **The nine fonts are restored the same way chapter 10 restores them**, from
   `assets/vendor/app-fonts/`, because `stack-templates.json` is JSON and they
   are binary. A font that will not fetch is not worth failing a download for.
