@@ -109,19 +109,90 @@ try {
 process.exit(code);
 `;
 
+/* The lite edition: checker.js alone, about half the size to move.
+ *
+ * The full file is for a shell whose only way in is text, and it is still
+ * ~150KB of base64 for a model to carry across. Most of that is fixer.js and the
+ * audit, which a bare "does the generator accept this" does not need. This one
+ * carries checker.js and runs `check()` on the model's own bytes -- one pass,
+ * no repairs -- so its output is the checker's verdict and nothing of its own.
+ * A clean result is a real, reportable official-checker pass; errors mean run
+ * the full file or the published runner to see what the fixer can repair. */
+const LITE_OUT = join(root, "guide", "check-model-lite.mjs");
+const checkerPayload = payloads.find((p) => p.name === "checker.js");
+const liteBody = `#!/usr/bin/env node
+/**
+ * The AppWithAI EML checker, lite: checker.js alone, in one file. Generated.
+ *   rebuild: node scripts/build-standalone-checker.mjs
+ *
+ * usage: node check-model-lite.mjs <model.mmd> [--quiet]
+ * exit:  0 no errors . 1 the checker found errors . 2 could not run
+ *
+ * No network, no install. It inflates the published checker.js -- byte for
+ * byte, ${checkerPayload.raw} bytes -- into a temp directory and calls its
+ * check() on your file. One pass, no repairs: the report is the checker's own
+ * formatReport(), so a clean result is a real run whose counts are reportable.
+ * It does not run the fixer or the checklist audit; for those use
+ * check-model-standalone.mjs, or the published runners if anything can fetch.
+ */
+import { mkdtempSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { brotliDecompressSync } from "node:zlib";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+
+const CHECKER = "${checkerPayload.base64}";
+
+const file = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
+if (!file) {
+  console.error("usage: node check-model-lite.mjs <model.mmd> [--quiet]");
+  process.exit(2);
+}
+let source;
+try {
+  source = readFileSync(resolve(file), "utf8");
+} catch (error) {
+  console.error("could not read " + resolve(file) + ": " + (error.code === "ENOENT" ? "no such file" : error.message));
+  process.exit(2);
+}
+
+const dir = mkdtempSync(join(tmpdir(), "eml-checker-lite-"));
+let code = 2;
+try {
+  writeFileSync(join(dir, "checker.js"), brotliDecompressSync(Buffer.from(CHECKER, "base64")));
+  const { check, formatReport } = await import(pathToFileURL(join(dir, "checker.js")).href);
+  const result = check(source);
+  console.log(formatReport(result));
+  code = result.counts.errors === 0 ? 0 : 1;
+} catch (error) {
+  console.error("could not run the embedded checker: " + (error?.message ?? error));
+  code = 2;
+} finally {
+  try { rmSync(dir, { recursive: true, force: true }); } catch {}
+}
+process.exit(code);
+`;
+
 if (process.argv.includes("--check")) {
-  let current = "";
-  try { current = readFileSync(OUT, "utf8"); } catch {}
-  if (current === body) {
-    console.log("ok    guide/check-model-standalone.mjs — up to date");
-    process.exit(0);
+  let stale = false;
+  for (const [out, text] of [[OUT, body], [LITE_OUT, liteBody]]) {
+    let current = "";
+    try { current = readFileSync(out, "utf8"); } catch {}
+    const name = "guide/" + out.split("/").pop();
+    if (current === text) {
+      console.log(`ok    ${name} — up to date`);
+    } else {
+      console.log(`FAIL  ${name} is stale against the published validators.`);
+      stale = true;
+    }
   }
-  console.log("FAIL  guide/check-model-standalone.mjs is stale against the published validators.");
-  console.log("      Rebuild: node scripts/build-standalone-checker.mjs");
-  process.exit(1);
+  if (stale) console.log("      Rebuild: node scripts/build-standalone-checker.mjs");
+  process.exit(stale ? 1 : 0);
 }
 
 writeFileSync(OUT, body);
+writeFileSync(LITE_OUT, liteBody);
+console.log(`wrote guide/check-model-lite.mjs (${liteBody.length} bytes)`);
 const raw = payloads.reduce((n, p) => n + p.raw, 0);
 console.log(`wrote guide/check-model-standalone.mjs (${body.length} bytes)`);
 for (const p of payloads) console.log(`  ${p.name.padEnd(22)} ${p.raw} → ${p.packed}`);
