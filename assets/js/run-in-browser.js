@@ -727,6 +727,16 @@ $("download").addEventListener("click", () => {
  * to look at the browser application should not pay for either.
  */
 const STACK_TEMPLATES_URL = new URL("../vendor/stack-templates.json", import.meta.url).href;
+
+/* Local delta: fetch the template bundle with revalidation and hand loadTemplates a
+   blob: URL. A stale cached stack-templates.json beside a newer appwithai-fullstack.js
+   fails with "ENOENT … /packages/generator/templates/…" for any template added since. */
+async function freshTemplatesUrl(url) {
+  const response = await fetch(url, { cache: "no-cache" });
+  if (!response.ok) throw new Error(`stack templates: HTTP ${response.status}`);
+  return URL.createObjectURL(await response.blob());
+}
+
 const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
 const FONTS_DIR = "frontend/public/fonts";
 const FONTS = [
@@ -789,7 +799,7 @@ $("download-stack").addEventListener("click", async () => {
     }
     if (!stackCache.templates) {
       button.innerHTML = '<span class="working"></span>Fetching the stack templates';
-      stackCache.templates = await stackCache.module.loadTemplates(STACK_TEMPLATES_URL);
+      stackCache.templates = await stackCache.module.loadTemplates(await freshTemplatesUrl(STACK_TEMPLATES_URL));
     }
 
     button.innerHTML = '<span class="working"></span>Writing the application source';
