@@ -325,7 +325,9 @@ Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.</pre>
+Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
+
+If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>
