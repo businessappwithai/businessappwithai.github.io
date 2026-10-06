@@ -4,23 +4,23 @@ export const MANIFEST = {
   "files": [
     {
       "path": "guide/checker.js",
-      "sha256": "cd39d573250f9398b1e1d6c4a1198e293fd0699d7742f3a92f81adf8bb700de7"
+      "sha256": "1658fe7636b1f139b06d5bc048f3315c2a47f2e5df9f7da86810ee5723dc97cf"
     },
     {
       "path": "guide/fixer.js",
-      "sha256": "d0163f85f309b70b3db488017d57571ee39bcfe6331484bd563e65ad6a8d3bcd"
+      "sha256": "0a20d56040949eeaddf8e64a5e7a5ccec7c522f8f66f188ac8562451ecf97db3"
     },
     {
       "path": "viewers/eml-model.js",
-      "sha256": "090f528833df743568c2bea2bec04b2c3ab20ad8a6603dfdbfd88c73db7449e1"
+      "sha256": "4faf3b50fa357478e49fecc2919d0d8f5007db434d36699f7d13d2ad85efcb8f"
     },
     {
       "path": "plugin/appwithai-eml.js",
-      "sha256": "c4621447701a019fc6ff4320bbcd55c6e714e37a052decb913b6e4e40dff1858"
+      "sha256": "fbb587af08b8384b1a415a5fac83e43c16938d01a2d7fb819636dc4c7163cb8e"
     },
     {
       "path": "plugin/app.js",
-      "sha256": "14991e532ccad80b00e98c27e3bdf0fd2842fa2c2efd2a6aaf51c86f1878675f"
+      "sha256": "3f05c207dd5172abbecfae45acd0bbf938787076921e3596f724c01f28a3fadc"
     }
   ]
 };
