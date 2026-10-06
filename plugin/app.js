@@ -3,12 +3,11 @@
  * all in this page. Used standalone at https://www.appwithai.org/plugin/ and as
  * the ChatGPT app's panel.
  *
- * THE RULE: the model never leaves the user's ChatGPT environment. This file
- * makes exactly one network request — a GET of a download URL ChatGPT itself
- * issued for a file the user picked — and talks to nothing else but its host
- * window (ChatGPT) through postMessage. Nothing here sends a model, a file name,
- * an entity name or a diagnostic to AppWithAI. scripts/check-plugin.mjs fails
- * CI if that stops being true.
+ * THE RULE: model contents remain inside the user's browser/ChatGPT environment
+ * and are never sent to AppWithAI. This file may GET a temporary file URL issued
+ * by ChatGPT for a file the user selected, and otherwise communicates only with
+ * the ChatGPT host. Nothing here sends model contents, entity names or diagnostics
+ * to AppWithAI. scripts/check-plugin.mjs fails CI if that stops being true.
  *
  * Three ways a model arrives, every one feature-detected, never assumed:
  *  1. ChatGPT opens a .mmd with this app (file entrypoint): the MCP Apps bridge
@@ -79,13 +78,21 @@ async function connectToHost() {
 }
 
 async function openHostResource(file) {
-  const result = await request("resources/read", { uri: file.resourceUri });
+  const result = await request("resources/read", {
+    uri: file.resourceUri,
+    _meta: { "openai/resource": { representation: "text" } },
+  });
   const content = result?.contents?.[0] ?? {};
   const text = typeof content.text === "string" ? content.text
     : typeof content.blob === "string" ? new TextDecoder().decode(Uint8Array.from(atob(content.blob), (c) => c.charCodeAt(0)))
     : null;
   if (text === null) throw new Error("the host returned no text");
-  current.resource = { uri: file.resourceUri, etag: content._meta?.etag ?? content._meta?.["openai/etag"] };
+  const resourceMeta = content._meta?.["openai/resource"] ?? {};
+  current.resource = {
+    uri: file.resourceUri,
+    etag: resourceMeta.etag,
+    writable: resourceMeta.writable === true,
+  };
   run(file.name ?? "model.mmd", text, current.resource);
 }
 
@@ -121,8 +128,9 @@ function render() {
     `<li class="${esc(i.severity)}"><code>${esc(i.code)}</code> <span class="ln">${i.line ? "line " + i.line : ""}</span> ${esc(i.message)}` +
     (i.lineText ? `<pre>${esc(i.lineText)}</pre>` : "") + (i.hint ? `<p class="hint">${esc(i.hint)}</p>` : "") + `</li>`).join("");
   $("problems-more").textContent = r.repaired.issues.length > shown.length ? `…and ${r.repaired.issues.length - shown.length} more.` : "";
-  $("save").textContent = current.resource ? (r.repaired.changed ? "Save the repairs to this file" : "Save to this file")
-    : r.repaired.changed ? "Save the repaired .mmd" : "Save the .mmd";
+  $("save").textContent = current.resource?.writable
+    ? (r.repaired.changed ? "Save the repairs to this file" : "Save to this file")
+    : r.repaired.changed ? "Save the repaired .mmd to this ChatGPT session" : "Save the .mmd to this ChatGPT session";
 }
 
 function run(name, source, resource = null) {
@@ -131,7 +139,7 @@ function run(name, source, resource = null) {
   setTimeout(() => {
     try {
       current.result = analyze(source, current.name);
-      status(`Checked on this device with EML ${LANGUAGE_VERSION}. Nothing was sent to AppWithAI.`);
+      status(`Checked inside this browser/ChatGPT session with EML ${LANGUAGE_VERSION}. Model contents were not sent to AppWithAI.`);
     } catch (e) {
       status(`The checker could not run: ${e?.message ?? e}`);
     }
@@ -180,8 +188,9 @@ $("save").addEventListener("click", async () => {
   if (!r) return;
   const text = r.repaired.source;
 
-  // Opened from a file in ChatGPT: write it back to that file, through ChatGPT.
-  if (current.resource) {
+  // Desktop file-entrypoint path only: write back through ChatGPT when the
+  // host explicitly advertised this resource as writable.
+  if (current.resource?.writable) {
     try {
       const params = { uri: current.resource.uri, text };
       if (current.resource.etag) params.ifMatch = current.resource.etag;
@@ -196,19 +205,13 @@ $("save").addEventListener("click", async () => {
   const name = current.name.endsWith(".mmd") ? current.name : `${current.name}.mmd`;
   const file = new File([text], name, { type: "text/plain;charset=utf-8" });
   if (typeof oa?.uploadFile === "function") {
-    try { await oa.uploadFile(file, { library: true }); status(`Saved ${name} to this chat.`); return; }
+    try { await oa.uploadFile(file); status(`Saved ${name} to this ChatGPT session.`); return; }
     catch (e) { status(`Saving to the chat failed (${e?.message ?? e}); downloading instead.`); }
   }
   const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(file), download: name });
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 });
-$("copy").addEventListener("click", async () => {
-  if (!current.result) return;
-  try { await navigator.clipboard.writeText(current.result.repaired.source); status("Copied."); }
-  catch { status("Copy was refused by the browser."); }
-});
-
 /* ── Engine identity ──────────────────────────────────────────────── */
 
 $("engine").innerHTML = `EML ${esc(MANIFEST.languageVersion)} · ` +
