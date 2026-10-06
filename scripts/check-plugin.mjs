@@ -37,8 +37,9 @@ for (const file of models) {
   expect(got.audit.score === auditLine && (got.audit.ok ? 0 : 1) === auditRun.status, `${name}: audit ${got.audit.score}`);
 }
 
-// 2a. The panel's code cannot send.
-const SENDERS = /XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|["']POST["']|navigator\.share/;
+// 2a. The panel cannot send model data to AppWithAI. Its only fetch is a
+// credential-less GET of a ChatGPT/OpenAI-authorized temporary file URL.
+const SENDERS = /XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|["']POST["']|navigator\.share|navigator\.clipboard/;
 for (const f of ["plugin/app.js", "plugin/appwithai-eml.js"]) {
   const src = readFileSync(join(root, f), "utf8");
   expect(!SENDERS.test(src), `${f}: no API that sends`);
@@ -48,6 +49,7 @@ for (const f of ["plugin/app.js", "plugin/appwithai-eml.js"]) {
 }
 const appSrc = readFileSync(join(root, "plugin/app.js"), "utf8");
 expect(/fetch\(url, \{ method: "GET", credentials: "omit" \}\)/.test(appSrc), "plugin/app.js: its one fetch is a credential-less GET of the host's file URL");
+expect(!/uploadFile\(file,\s*\{\s*library:\s*true/.test(appSrc), "plugin/app.js: repaired models are not persisted to the ChatGPT Library by default");
 const posts = appSrc.match(/\.postMessage\(/g) ?? [];
 const toParent = appSrc.match(/window\.parent\.postMessage\(/g) ?? [];
 expect(posts.length === toParent.length, `plugin/app.js: postMessage goes only to the host window (${toParent.length} call sites)`);
@@ -71,11 +73,24 @@ for (const tool of _test.TOOLS) {
     "MCP open_mmd_file: off unless FILE_ENTRYPOINT=1");
   expect(t._meta["openai/ui"].entrypoints[0].extensions.join() === ".mmd", "MCP open_mmd_file: registers .mmd");
 }
-expect(_test.RESOURCES.every((r) => (r._meta?.["openai/widgetCSP"]?.connect_domains ?? ["x"]).length === 0
-  && (r._meta?.ui?.csp?.connectDomains ?? ["x"]).length === 0), "MCP widget: may connect to no domain (both CSP forms)");
+const allowedConnect = new Set(["https://*.oaiusercontent.com", "https://chatgpt.com"]);
+expect(_test.RESOURCES.every((r) => {
+  const legacy = r._meta?.["openai/widgetCSP"]?.connect_domains ?? [];
+  const standard = r._meta?.ui?.csp?.connectDomains ?? [];
+  return legacy.length > 0 && standard.length > 0
+    && legacy.every((d) => allowedConnect.has(d))
+    && standard.every((d) => allowedConnect.has(d))
+    && ![...legacy, ...standard].some((d) => /appwithai\.org/i.test(d));
+}), "MCP widget: runtime connections are limited to ChatGPT/OpenAI file hosts, never AppWithAI");
+expect(_test.RESOURCES.every((r) => r._meta?.ui?.domain === "https://www.appwithai.org"
+  && r._meta?.["openai/widgetDomain"] === "https://www.appwithai.org"), "MCP widget: declares the required dedicated UI domain");
 const rpc = async (method, params) => (await (await handle(new Request("http://local/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }))).json());
 expect((await rpc("initialize", { protocolVersion: "2025-06-18" })).result?.serverInfo?.name === "appwithai", "MCP initialize");
-expect((await rpc("tools/list")).result?.tools?.length === 2, "MCP tools/list (file entrypoint off by default)");
+const listedTools = (await rpc("tools/list")).result?.tools ?? [];
+expect(listedTools.length === 2, "MCP tools/list (desktop file entrypoint off by default)");
+const openTool = listedTools.find((t) => t.name === "open_appwithai");
+const entryTypes = openTool?._meta?.["openai/ui"]?.entrypoints?.map((e) => e.type).sort().join(",");
+expect(entryTypes === "global,thread", "MCP open_appwithai: web/mobile-safe global and thread entrypoints");
 const widget = (await rpc("resources/read", { uri: "ui://widget/appwithai.html" })).result?.contents?.[0];
 expect(widget?.mimeType === "text/html;profile=mcp-app" && widget.text.includes("https://www.appwithai.org/plugin/app.js"), "MCP widget resource loads the published panel");
 expect((await rpc("tools/call", { name: "open_appwithai", arguments: {} })).result?.structuredContent?.languageVersion, "MCP open_appwithai");
