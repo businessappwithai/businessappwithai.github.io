@@ -17,7 +17,7 @@
 <body>
 <main>
   <h1>AppWithAI model checker</h1>
-  <p class="lede">Open an <code>.mmd</code>. The published checker and fixer run in this page, and the page cannot connect anywhere, so your model stays on your device.</p>
+  <p class="lede">Open an <code>.mmd</code>. The published checker, fixer and checklist audit run in this page, and the page cannot connect anywhere, so your model stays on your device.</p>
   <div class="inputs">
     <button id="host-pick" class="primary" hidden>Choose a file from this chat</button>
     <label class="btn" for="file">Open .mmd…</label>
@@ -40,6 +40,10 @@
       <button id="save" class="primary">Save the .mmd</button>
       <button id="copy">Copy the .mmd</button>
     </div>
+    <h2>Checklist audit</h2>
+    <div id="audit-score" class="verdict"></div>
+    <ol class="problems" id="audit"></ol>
+    <div id="audit-notes"></div>
     <h2>Problems</h2>
     <ol class="problems" id="problems"></ol>
     <p class="hint" id="problems-more"></p>

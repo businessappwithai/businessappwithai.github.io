@@ -29,8 +29,12 @@ const models = [...readdirSync(join(root, "guide/models")).filter((f) => f.endsW
 for (const file of models) {
   const run = spawnSync(process.execPath, [join(root, "guide/check-model.mjs"), file, "--quiet", "--base", join(root, "guide/")], { encoding: "utf8", maxBuffer: 64 << 20 });
   const expected = run.stdout.split("\n").find((l) => /^(OK|FAILED) —/.test(l));
-  const got = analyze(readFileSync(file, "utf8"));
-  expect(got.repaired.verdict === expected && got.exitCode === run.status, `${file.split("/").pop()}: ${got.repaired.verdict} · exit ${got.exitCode}`);
+  const name = file.split("/").pop();
+  const got = analyze(readFileSync(file, "utf8"), file);
+  expect(got.repaired.verdict === expected && got.exitCode === run.status, `${name}: ${got.repaired.verdict} · exit ${got.exitCode}`);
+  const auditRun = spawnSync(process.execPath, [join(root, "guide/audit-model.mjs"), file, "--quiet", "--base", join(root, "guide/")], { encoding: "utf8" });
+  const auditLine = auditRun.stdout.trimEnd().split("\n").pop();
+  expect(got.audit.score === auditLine && (got.audit.ok ? 0 : 1) === auditRun.status, `${name}: audit ${got.audit.score}`);
 }
 
 // 2a. The panel's code cannot send.
@@ -44,6 +48,10 @@ for (const f of ["plugin/app.js", "plugin/appwithai-eml.js"]) {
 }
 const appSrc = readFileSync(join(root, "plugin/app.js"), "utf8");
 expect(/fetch\(url, \{ method: "GET", credentials: "omit" \}\)/.test(appSrc), "plugin/app.js: its one fetch is a credential-less GET of the host's file URL");
+const posts = appSrc.match(/\.postMessage\(/g) ?? [];
+const toParent = appSrc.match(/window\.parent\.postMessage\(/g) ?? [];
+expect(posts.length === toParent.length, `plugin/app.js: postMessage goes only to the host window (${toParent.length} call sites)`);
+expect(/if \(!inFrame \|\| event\.source !== window\.parent\) return;/.test(appSrc), "plugin/app.js: only the host window may message the panel");
 const page = readFileSync(join(root, "plugin/index.html"), "utf8");
 expect(/connect-src 'none'/.test(page), "plugin/index.html: CSP forbids every connection");
 expect(!/analytics\.js|posthog/i.test(page + appSrc), "plugin/: no analytics");
@@ -53,12 +61,23 @@ for (const tool of _test.TOOLS) {
   const props = Object.keys(tool.inputSchema?.properties ?? {});
   expect(props.length === 0 && tool.inputSchema?.additionalProperties === false, `MCP tool ${tool.name}: takes no input`);
 }
-expect(_test.RESOURCES.every((r) => (r._meta?.["openai/widgetCSP"]?.connect_domains ?? ["x"]).length === 0), "MCP widget: may connect to no domain");
+{
+  const t = _test.OPEN_FILE_TOOL;
+  const fileProps = Object.keys(t.inputSchema.properties.file.properties).sort().join(",");
+  expect(Object.keys(t.inputSchema.properties).join(",") === "file" && fileProps === "name,resourceUri"
+    && t.inputSchema.additionalProperties === false && t.inputSchema.properties.file.additionalProperties === false,
+    "MCP open_mmd_file: receives only a file name and an opaque handle, never contents");
+  expect(!_test.toolsFor({}).includes(t) && _test.toolsFor({ FILE_ENTRYPOINT: "1" }).includes(t),
+    "MCP open_mmd_file: off unless FILE_ENTRYPOINT=1");
+  expect(t._meta["openai/ui"].entrypoints[0].extensions.join() === ".mmd", "MCP open_mmd_file: registers .mmd");
+}
+expect(_test.RESOURCES.every((r) => (r._meta?.["openai/widgetCSP"]?.connect_domains ?? ["x"]).length === 0
+  && (r._meta?.ui?.csp?.connectDomains ?? ["x"]).length === 0), "MCP widget: may connect to no domain (both CSP forms)");
 const rpc = async (method, params) => (await (await handle(new Request("http://local/", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }))).json());
 expect((await rpc("initialize", { protocolVersion: "2025-06-18" })).result?.serverInfo?.name === "appwithai", "MCP initialize");
-expect((await rpc("tools/list")).result?.tools?.length === 2, "MCP tools/list");
+expect((await rpc("tools/list")).result?.tools?.length === 2, "MCP tools/list (file entrypoint off by default)");
 const widget = (await rpc("resources/read", { uri: "ui://widget/appwithai.html" })).result?.contents?.[0];
-expect(widget?.mimeType === "text/html+skybridge" && widget.text.includes("https://www.appwithai.org/plugin/app.js"), "MCP widget resource loads the published panel");
+expect(widget?.mimeType === "text/html;profile=mcp-app" && widget.text.includes("https://www.appwithai.org/plugin/app.js"), "MCP widget resource loads the published panel");
 expect((await rpc("tools/call", { name: "open_appwithai", arguments: {} })).result?.structuredContent?.languageVersion, "MCP open_appwithai");
 
 console.log(failed ? `\n${failed} failed` : "\nthe app runs the official checker and cannot send a model.");

@@ -16,11 +16,11 @@ export const MANIFEST = {
     },
     {
       "path": "plugin/appwithai-eml.js",
-      "sha256": "52430926be57d02e7e6dbe4b96aa40f1c3680b4b805028e54d0b16b04f8f91b0"
+      "sha256": "c4621447701a019fc6ff4320bbcd55c6e714e37a052decb913b6e4e40dff1858"
     },
     {
       "path": "plugin/app.js",
-      "sha256": "2edda6131837f1bdc16dd83e1b6eee91d075b41ba99389a62559c692f445bba6"
+      "sha256": "14991e532ccad80b00e98c27e3bdf0fd2842fa2c2efd2a6aaf51c86f1878675f"
     }
   ]
 };
