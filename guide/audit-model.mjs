@@ -299,4 +299,4 @@ if (!quiet) {
    reads a run reads its final line, and a FAIL above the total would otherwise
    be the last thing a reader sees on a passing audit. */
 console.log(`${ok.length} passed, ${bad.length} failed`);
-process.exit(bad.length === 0 ? 0 : 1);
+process.exitCode = bad.length === 0 ? 0 : 1;

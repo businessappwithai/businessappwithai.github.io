@@ -48,4 +48,4 @@ try {
 } finally {
   try { rmSync(dir, { recursive: true, force: true }); } catch {}
 }
-process.exit(code);
+process.exitCode = code;

@@ -230,4 +230,4 @@ if (model !== original) {
   }
 }
 
-process.exit(final.counts.errors === 0 ? 0 : 1);
+process.exitCode = final.counts.errors === 0 ? 0 : 1;
