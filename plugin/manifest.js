@@ -20,7 +20,7 @@ export const MANIFEST = {
     },
     {
       "path": "plugin/app.js",
-      "sha256": "14991e532ccad80b00e98c27e3bdf0fd2842fa2c2efd2a6aaf51c86f1878675f"
+      "sha256": "077a7063ad93aef65199dcb1744571c33644a9b363ea03bea08c52243585b0cf"
     }
   ]
 };

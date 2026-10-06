@@ -70,6 +70,7 @@ const TOOLS = [
     _meta: {
       ui: { resourceUri: WIDGET_URI },
       "openai/outputTemplate": WIDGET_URI,
+      "openai/ui": { entrypoints: [{ type: "global" }, { type: "thread" }] },
       "openai/toolInvocation/invoking": "Opening the AppWithAI checker…",
       "openai/toolInvocation/invoked": "AppWithAI checker ready",
     },
@@ -89,11 +90,23 @@ const RESOURCES = [
     name: "AppWithAI model checker",
     mimeType: "text/html;profile=mcp-app",
     _meta: {
-      // MCP Apps: scripts and styles from AppWithAI; connections to nothing of ours.
-      ui: { csp: { connectDomains: [], resourceDomains: [ORIGIN] }, prefersBorder: true },
-      "openai/widgetDescription": "Checks and repairs an EML model locally; the model never leaves the user's device.",
-      // Scripts and styles may come from AppWithAI; the panel may CONNECT to nothing of ours.
-      "openai/widgetCSP": { connect_domains: [], resource_domains: [ORIGIN] },
+      // Static code comes from AppWithAI. The only allowed runtime connections are
+      // to ChatGPT/OpenAI-owned file URLs returned by the host file APIs.
+      ui: {
+        domain: ORIGIN,
+        csp: {
+          connectDomains: ["https://*.oaiusercontent.com", "https://chatgpt.com"],
+          resourceDomains: [ORIGIN],
+        },
+        prefersBorder: true,
+      },
+      "openai/ui": { availableDisplayModes: ["fullscreen", "inline"] },
+      "openai/widgetDescription": "Checks and repairs an EML model inside the ChatGPT client; model contents are never sent to AppWithAI.",
+      "openai/widgetCSP": {
+        connect_domains: ["https://*.oaiusercontent.com", "https://chatgpt.com"],
+        resource_domains: [ORIGIN],
+      },
+      "openai/widgetDomain": ORIGIN,
       "openai/widgetPrefersBorder": true,
     },
   },
@@ -106,12 +119,12 @@ const toolsFor = (env) => (env?.FILE_ENTRYPOINT === "1" ? [...TOOLS, OPEN_FILE_T
 function call(name, env) {
   if (name === "open_mmd_file" && env?.FILE_ENTRYPOINT === "1")
     return {
-      content: [{ type: "text", text: "Opened in the AppWithAI panel, which checks it on the user's device." }],
+      content: [{ type: "text", text: "Opened in the AppWithAI panel, which checks it inside the ChatGPT client." }],
       structuredContent: { languageVersion: MANIFEST.languageVersion },
     };
   if (name === "open_appwithai")
     return {
-      content: [{ type: "text", text: "The AppWithAI checker is open. It reads the .mmd from this chat and checks it on the user's device." }],
+      content: [{ type: "text", text: "The AppWithAI checker is open. It reads the .mmd inside the browser/ChatGPT session and never sends model contents to AppWithAI." }],
       structuredContent: { languageVersion: MANIFEST.languageVersion },
     };
   if (name === "get_eml_engine")

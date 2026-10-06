@@ -1,8 +1,8 @@
-# AppWithAI for ChatGPT — the model never leaves the user's device
+# AppWithAI for ChatGPT — model contents never reach AppWithAI
 
 ```
-www.appwithai.org ──(checker.js, fixer.js, the panel: code only)──► ChatGPT client
-user's .mmd ───────────────────────────────────────────────────────X  never to AppWithAI
+www.appwithai.org ──(checker.js, fixer.js, panel code only)──────► ChatGPT client
+user's .mmd ── browser / ChatGPT session only ────────────────────X  never to AppWithAI
 ```
 
 | Piece | What it does | Where it runs |
@@ -41,17 +41,20 @@ inside a live ChatGPT yet; that needs the deployment above.
 
 | Path | Protocol | Saving |
 |---|---|---|
-| **Open with AppWithAI** on an `.mmd` in the chat (opt-in) | MCP Apps bridge: `ui/initialize` → `ui/notifications/tool-input` `{ file: { name, resourceUri } }` → `resources/read`, which ChatGPT answers itself | `openai/resources/write` with `ifMatch`, back into the same file |
-| **Choose a file from this chat** | `window.openai.selectFiles()` → `[{ fileId, fileName }]`, then `getFileDownloadUrl({ fileId })` → `{ downloadUrl }`, one GET | `window.openai.uploadFile(file, { library: true })` |
-| **Open .mmd… / drop / paste** | the browser's own file APIs | a download |
+| **Open AppWithAI** from the plugin/sidebar/thread, then choose a ChatGPT file | `window.openai.selectFiles()` → `[{ fileId, fileName }]`, then `getFileDownloadUrl({ fileId })` → one credential-less GET to ChatGPT/OpenAI | `window.openai.uploadFile(file)` into the current ChatGPT session; no Library persistence requested |
+| **Open .mmd… / drop / paste** | the browser's own file APIs | session save through `uploadFile` when available, otherwise a local download |
+| **Open with AppWithAI** on an `.mmd` (optional desktop-only entrypoint) | MCP resource bridge: `ui/notifications/tool-input` → `resources/read`, intercepted by ChatGPT | `openai/resources/write` only when ChatGPT marks the resource writable |
 
 The panel loads cross-origin from `www.appwithai.org`; GitHub Pages serves
 every file with `access-control-allow-origin: *` and `.mjs` as
 `text/javascript`, which a module import needs.
 
-## "Open with AppWithAI" for `.mmd` — opt-in, and why
+## "Open with AppWithAI" for `.mmd` — optional desktop-only entrypoint
 
-OpenAI's file entrypoint (`_meta["openai/ui"].entrypoints: [{ type: "file",
+OpenAI currently supports file-extension entrypoints on desktop, not ChatGPT web,
+iOS or Android. The primary cross-platform path is therefore the global/thread
+AppWithAI entrypoint plus the ChatGPT file helpers above. The optional desktop
+file entrypoint (`_meta["openai/ui"].entrypoints: [{ type: "file",
 extensions: [".mmd"] }]`) makes ChatGPT call the app's tool with
 `{ file: { name, resourceUri } }`. The **contents** never reach this server —
 the panel reads them through ChatGPT — but the **file name** does, and the
@@ -63,4 +66,5 @@ npx wrangler deploy --var FILE_ENTRYPOINT:1     # Workers
 FILE_ENTRYPOINT=1 node service/mcp/node-server.mjs
 ```
 
-The server never reads, stores or logs that tool's arguments.
+The server never reads, stores or logs that tool's arguments. Keep this entrypoint
+disabled when the policy is that even file-name metadata must not reach AppWithAI.

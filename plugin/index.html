@@ -8,7 +8,7 @@
        connection — connect-src 'none' — so a model opened here cannot be sent
        anywhere, by this code or by anything injected into it. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
-  <meta name="description" content="Check and repair an AppWithAI EML model in your browser. The model never leaves your device.">
+  <meta name="description" content="Check and repair an AppWithAI EML model inside your browser or ChatGPT session. Model contents are never sent to AppWithAI.">
   <meta name="keywords" content="AppWithAI, EML, Mermaid, checker, fixer, offline">
   <title>AppWithAI model checker</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
@@ -17,7 +17,7 @@
 <body>
 <main>
   <h1>AppWithAI model checker</h1>
-  <p class="lede">Open an <code>.mmd</code>. The published checker, fixer and checklist audit run in this page, and the page cannot connect anywhere, so your model stays on your device.</p>
+  <p class="lede">Open an <code>.mmd</code>. The published checker, fixer and checklist audit run in this page. Model contents stay in your browser or ChatGPT session and are never sent to AppWithAI.</p>
   <div class="inputs">
     <button id="host-pick" class="primary" hidden>Choose a file from this chat</button>
     <label class="btn" for="file">Open .mmd…</label>
@@ -38,7 +38,6 @@
     <div id="verdict" class="verdict"></div>
     <div class="inputs">
       <button id="save" class="primary">Save the .mmd</button>
-      <button id="copy">Copy the .mmd</button>
     </div>
     <h2>Checklist audit</h2>
     <div id="audit-score" class="verdict"></div>
@@ -49,7 +48,7 @@
     <p class="hint" id="problems-more"></p>
   </section>
 
-  <p class="privacy">Nothing you open here is uploaded, logged or stored by AppWithAI. The only files this page downloads are its own code.</p>
+  <p class="privacy">AppWithAI never receives, logs or stores your model contents. In ChatGPT, saves stay in the current ChatGPT session unless you explicitly download the file yourself.</p>
   <p class="engine" id="engine"></p>
 </main>
 <script type="module" src="app.js"></script>

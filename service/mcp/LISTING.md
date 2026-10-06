@@ -17,7 +17,7 @@ OpenAI's form may differ; the content is what matters.
 
 ## Short description (one line)
 
-Check, repair and audit AppWithAI EML models on your own device. Your model never leaves it.
+Check, repair and audit AppWithAI EML models in ChatGPT without sending model contents to AppWithAI.
 
 ## Long description
 
@@ -32,8 +32,8 @@ AppWithAI checker, fixer and 22-point audit on your model inside ChatGPT:
   bindings, state machines, rules, hooks, access rules and help text.
 - **Save** the repaired model back into your chat.
 
-All of it happens in your ChatGPT client. The app's code comes from
-www.appwithai.org; your model is never sent to AppWithAI. Each result names
+All model processing happens in the browser/ChatGPT client. The app's code comes
+from www.appwithai.org; model contents are never sent to AppWithAI. Each result names
 the exact engine that produced it: the EML version and the SHA-256 of every
 file it ran.
 
@@ -48,12 +48,16 @@ file it ran.
 
 - **Tools.** `open_appwithai` opens the panel; `get_eml_engine` returns the EML
   version and file hashes. Both are read-only and take no input.
-- **Data.** The app has no tool that accepts a model or any user content. The
-  panel reads a file through ChatGPT's file functions (`selectFiles`,
-  `getFileDownloadUrl`) and saves through `uploadFile`. Its CSP allows
-  scripts from `https://www.appwithai.org` and connections to no AppWithAI
-  domain (`connectDomains: []`).
-- **To test.** Attach any `.mmd`, for example
+- **Data.** The app has no tool that accepts model contents. The cross-platform
+  panel reads a user-authorized file through ChatGPT's file helpers
+  (`selectFiles`, `getFileDownloadUrl`) or the browser's local file input,
+  checks it client-side, and saves through `uploadFile` without requesting
+  persistent ChatGPT Library storage. Its runtime CSP permits connections only
+  to ChatGPT/OpenAI file hosts; model contents are never sent to AppWithAI.
+- **Web/mobile.** Open AppWithAI from its global or thread entrypoint, then choose
+  an existing ChatGPT file or a local `.mmd`. File-extension "Open with"
+  integration is an optional desktop-only path.
+- **To test.** Attach or choose any `.mmd`, for example
   https://www.appwithai.org/guide/models/crm.eml.mmd, which passes with
   `OK — 0 errors, 0 warnings (EML 1.2.0)` and `22 passed, 0 failed`. Or attach a
   broken file to see the problems list and the repair.
