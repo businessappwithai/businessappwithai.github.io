@@ -57,9 +57,8 @@ businessappwithai.github.io/
 │   ├── img/                  # Screenshots used by the chapters
 │   ├── models/               # Example EML models the chapters load (crm,
 │   │                         # drug-discovery, hospital-management-system,
-│   │                         # dance-studio, investment-planning-…,
-│   │                         # education-management-system, and
-│   │                         # investment-planning-wealth-management-v101)
+│   │                         # dance-studio, investment-planning-wealth-
+│   │                         # management-system and education-management-system)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── viewers/                  # The model viewers — appwithai.org/viewers. Vendored
 │   │                         # from `website/viewers/` upstream; only index.html
@@ -661,13 +660,17 @@ fire on it and the roles that may read it.
   They drifted once — the site's copy gained the per-entity `%%rbac … .read` rules and the generator
   repository's `html/models/` copy did not — and a unit test upstream now asserts it.
 
-**The seventh model — `#wealth`.** `guide/models/investment-planning-wealth-management-v101.eml.mmd`
-is a second, revised (`%%meta version: 1.0.1`) take on the wealth-management business, added beside the
-first rather than replacing it: same 91 entities, 39 enums against 17, nine rules, ten state machines, 102
-access restrictions, and **no `%%report` directives** (the first carries 19), so its reporting pack is
-derived from shape alone. It has its own `BUILT_IN` key, choice buttons in chapters 09, 10 and 11, a card
-on `try-it-yourself.html` and a `KEY_OF` entry in `website-e2e.mjs`. The file name has no dots on purpose —
-the audit's *name is lower-case and hyphenated* check reads it.
+**The wealth-management model — `#investment`.** `guide/models/investment-planning-wealth-management-system.eml.mmd`
+is the v1.0.1 revision (`%%meta version: 1.0.1`) of that business and the only wealth model published: the
+older, smaller one was removed rather than kept beside it. Ninety-one entities, 40 enums, nine rules, ten
+state machines, three sagas, 102 access restrictions, and **49 `%%report` directives** — one set for every
+role, each query read-only, `bus_`-only (a reporting role reads nothing else) and run against the schema the
+model generates (458 pack queries, none failing). Its checker result is 0 errors, 0 warnings and five notes,
+all deliberate: three self-referencing hierarchies, the standalone audit log, and a naming hint on
+`OrganizationUnit`. It declares **no foreign key to an entity it does not define**: a closed vocabulary is an
+`%%enum` (`Document.document_type`) and a link the model cannot enforce is an explicit `…_reference` string.
+A second link to a parent the model already declares cannot be a second relationship line (EML124). The file
+name has no dots on purpose — the audit's *name is lower-case and hyphenated* check reads it.
 
 **Constraints to respect**
 
@@ -1263,7 +1266,7 @@ thing a language model has to produce is a model file.
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **`%%report` is documented here now, and the published checker validates it.**
-  The six models under `guide/models/` carry 187 of them between them, and for a
+  The six models under `guide/models/` carry 217 of them between them, and for a
   while the directive was in none of the specifications this site publishes and in
   neither of its checkers — a reader who opened a model found lines `llms-full.txt`
   never defined, and an author who added their own got a clean result from a checker

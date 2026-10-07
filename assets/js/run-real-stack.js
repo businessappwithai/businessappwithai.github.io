@@ -88,11 +88,6 @@ const BUILT_IN = {
     label: "investment-planning-wealth-management-system.eml.mmd",
     name: "Investment Planning and Wealth Management",
   },
-  wealth: {
-    path: "models/investment-planning-wealth-management-v101.eml.mmd",
-    label: "investment-planning-wealth-management-v101.eml.mmd",
-    name: "Investment Planning and Wealth Management v1.0.1",
-  },
   education: {
     path: "models/education-management-system.eml.mmd",
     label: "education-management-system.eml.mmd",
@@ -204,7 +199,6 @@ const choices = [
   [$("choice-hospital"), "hospital"],
   [$("choice-dance"), "dance"],
   [$("choice-investment"), "investment"],
-  [$("choice-wealth"), "wealth"],
   [$("choice-education"), "education"],
   [$("choice-upload"), "upload"],
 ];

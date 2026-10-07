@@ -30,10 +30,6 @@ const EXAMPLES = {
     path: "models/investment-planning-wealth-management-system.eml.mmd",
     label: "investment-planning-wealth-management-system.eml.mmd",
   },
-  wealth: {
-    path: "models/investment-planning-wealth-management-v101.eml.mmd",
-    label: "investment-planning-wealth-management-v101.eml.mmd",
-  },
 };
 
 /**
@@ -104,7 +100,7 @@ const verdictOf = (result, extra) => {
 /* --------------------------------------------------------------- the model */
 
 async function load(key) {
-  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-wealth", "choice-broken", "choice-paste"]) {
+  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", String(id === `choice-${key}`));
   }
 
@@ -325,7 +321,6 @@ $("choice-drug").addEventListener("click", () => load("drug"));
 $("choice-hospital").addEventListener("click", () => load("hospital"));
 $("choice-dance").addEventListener("click", () => load("dance"));
 $("choice-investment").addEventListener("click", () => load("investment"));
-$("choice-wealth").addEventListener("click", () => load("wealth"));
 $("choice-broken").addEventListener("click", () => load("broken"));
 $("choice-paste").addEventListener("click", () => {
   window.awTrack?.("upload_started", { method: "paste" });
@@ -342,7 +337,7 @@ $("file").addEventListener("change", async (event) => {
     model_size: file.size,
     model_source: "upload",
   });
-  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-wealth", "choice-broken", "choice-paste"]) {
+  for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", "false");
   }
   reset();
