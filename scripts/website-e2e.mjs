@@ -55,7 +55,6 @@ const KEY_OF = {
   "education-management-system.eml.mmd": "education",
   "hospital-management-system.eml.mmd": "hospital",
   "investment-planning-wealth-management-system.eml.mmd": "investment",
-  "investment-planning-wealth-management-v101.eml.mmd": "wealth",
 };
 
 const NUMBER = "(?:a |one )?[\\w-]+(?:\\s+hundred\\s+and\\s+[\\w-]+)?";
@@ -629,17 +628,35 @@ console.log("\n9. The deployable archive keeps script permissions");
 // ---------------------------------------------------------------------------
 // 10. The archive's seed survives a reference with no parent.
 //
-// The wealth-management v1.0.1 model marks `Document.document_type_id` as a
-// required FK and declares no `DocumentType`. The seed returned null for it, the
-// column's NOT NULL refused the insert, and the generated backend never started.
-// Every figure on every page was right; the application just did not run.
+// A model can mark a column as a required FK and declare no entity for it
+// (EML502, an info note). The seed returned null for it, the column's NOT NULL
+// refused the insert, and the generated backend never started. Every figure on
+// every page was right; the application just did not run.
+//
+// The published wealth-management model used to be the fixture for this, with
+// `Document.document_type_id`. It declares a closed vocabulary instead now, so
+// the group drives the same path with a model that is small enough to read.
+const ORPHAN_REFERENCE_MODEL = `%%meta name: Orphan Reference
+%%meta kind: erd
+erDiagram
+    Party {
+        string id PK
+        string name
+    }
+    Document {
+        string id PK
+        string party_id FK
+        string document_type_id FK
+        string file_name
+    }
+    Party ||--o{ Document : "holds"
+`;
 console.log("\n10. The deployable archive's seed handles a reference with no parent");
 {
   const templatesPath = p("assets", "vendor", "stack-templates.json");
   const bundlePath = p("assets", "js", "appwithai-fullstack.js");
-  const modelPath = p("guide", "models", "investment-planning-wealth-management-v101.eml.mmd");
-  if (!existsSync(templatesPath) || !existsSync(bundlePath) || !existsSync(modelPath)) {
-    console.log("  note templates, bundle or model absent — group skipped");
+  if (!existsSync(templatesPath) || !existsSync(bundlePath)) {
+    console.log("  note templates or bundle absent — group skipped");
   } else {
     const { generateFullStack } = await import(`file://${bundlePath}`);
     const realLog = console.log;
@@ -647,8 +664,8 @@ console.log("\n10. The deployable archive's seed handles a reference with no par
     let files;
     try {
       files = (await generateFullStack({
-        source: readFileSync(modelPath, "utf8"),
-        name: "wealth",
+        source: ORPHAN_REFERENCE_MODEL,
+        name: "orphan-reference",
         templates: JSON.parse(readFileSync(templatesPath, "utf8")),
         overlay: false,
       })).files;

@@ -207,7 +207,7 @@
           <span class="choice__desc">
             A booking business in nine entities: classes, sessions, bookings and a waitlist, with both
             state machines a booking business has and the saga that promotes a waitlisted member when
-            someone cancels. The smallest of the seven — nine entities against nineteen, twenty-eight
+            someone cancels. The smallest of the six — nine entities against nineteen, twenty-eight
             and ninety-one — so it is the quickest one to read all the way through.
           </span>
           <span class="choice__meta">examples/dance-studio.eml.mmd</span>
@@ -218,15 +218,11 @@
             The largest model published here: ninety-one entities covering households, advisors, the
             compliance file, financial plans, a security master, portfolios and holdings, orders and
             settlement, recommendations and proposals, rebalancing, performance and commissions.
-            Eight rules, eleven state machines, three sagas and fifty-nine access restrictions — the
-            one to open if you want to see whether this holds up at enterprise size.
+            Nine rules, ten state machines, three sagas and 102 access restrictions, forty enum-bound
+            vocabularies and forty-nine written <code>%%report</code> directives, one set for every role —
+            the one to open if you want to see whether this holds up at enterprise size.
           </span>
           <span class="choice__meta">examples/investment-planning-wealth-management-system.eml.mmd</span>
-        </button>
-        <button type="button" class="choice" id="choice-wealth" aria-pressed="false">
-          <span class="choice__name">Use the wealth-management example, v1.0.1</span>
-          <span class="choice__desc">A second, revised version (v1.0.1) of the wealth-management business: the same ninety-one entities, with thirty-nine enum-bound vocabularies where the first has seventeen. Nine rules, ten state machines, three sagas and 102 access restrictions. It carries no <code>%%report</code> directives, so the reporting pack is derived from the model's shape alone.</span>
-          <span class="choice__meta">examples/investment-planning-wealth-management-v101.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-education" aria-pressed="false">
           <span class="choice__name">Use the education example</span>
