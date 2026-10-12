@@ -16357,6 +16357,10 @@ export async function executeCustomValidateHooks(
       {
         slug: "add_dictionary_icons",
         template: "src/migrations/019_add_dictionary_icons.ts.hbs"
+      },
+      {
+        slug: "add_rule_title",
+        template: "src/migrations/020_add_rule_title.ts.hbs"
       }
     ];
     const scaffoldSlugs = new Set(scaffold.map((m) => m.slug));
@@ -16941,7 +16945,8 @@ export async function seed(db: Kysely<any>): Promise<void> {
     const wdFiles = [
       "workflow-definitions.controller.ts",
       "workflow-definitions.module.ts",
-      "workflow-definitions.service.ts"
+      "workflow-definitions.service.ts",
+      "automation-compiler.ts"
     ];
     for (const file of wdFiles) {
       try {
@@ -16956,6 +16961,53 @@ export async function seed(db: Kysely<any>): Promise<void> {
 // packages/generator/src/generators/tanstack-start-nestjs/tanstack-start-frontend.generator.ts
 init_memory_fs();
 init_node_path();
+
+// packages/generator/src/generators/tanstack-start-nestjs/vendor-editors.ts
+init_memory_fs();
+init_node_path();
+var MARKER = "lib/utils.ts";
+var SKIP = /(?:^|\/)__tests__(?:\/|$)|\.(?:test|spec)\.[cm]?[jt]sx?$|(?:^|\/)vite-env\.d\.ts$/;
+async function exists(target) {
+  try {
+    await access(target);
+    return true;
+  } catch {
+    return false;
+  }
+}
+async function copyTree(source, destination, relative2 = "") {
+  const entries = await readdir(source, { withFileTypes: true });
+  await mkdir(destination, { recursive: true });
+  let copied = 0;
+  for (const entry of entries) {
+    const inner = relative2 ? `${relative2}/${entry.name}` : entry.name;
+    if (SKIP.test(inner))
+      continue;
+    const from = join(source, entry.name);
+    const to = join(destination, entry.name);
+    if (entry.isDirectory())
+      copied += await copyTree(from, to, inner);
+    else {
+      await copyFile(from, to);
+      copied++;
+    }
+  }
+  return copied;
+}
+async function ensureEditorsVendored(frontendTemplateDir) {
+  const destination = join(frontendTemplateDir, "src/editors");
+  const source = resolve(frontendTemplateDir, "../../../../editors/src");
+  if (await exists(join(source, MARKER))) {
+    await rm(destination, { recursive: true, force: true });
+    await copyTree(source, destination);
+    return;
+  }
+  if (await exists(join(destination, MARKER)))
+    return;
+  throw new Error(`The rule and workflow editors are missing from ${destination}. In a checkout they are ` + "copied from packages/editors/src; in a published package they ship inside templates/. " + "Run `bun run vendor:editors`.");
+}
+
+// packages/generator/src/generators/tanstack-start-nestjs/tanstack-start-frontend.generator.ts
 function resolveTemplateDir2(subpath) {
   const cwd = process.cwd();
   const possiblePaths = [
@@ -17055,6 +17107,9 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
       "src/lib/workflow",
       "src/lib/automation",
       "src/components/automation",
+      "src/components/eml",
+      "src/components/rules",
+      "src/lib/eml",
       "src/components/reports",
       "src/components/notifications",
       "src/components/help",
@@ -17103,6 +17158,8 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
   }
   async generateCoreFiles(outputDir, context) {
     const templateDir = this.resolvedTemplateDir;
+    await ensureEditorsVendored(templateDir);
+    await this.copyDirRecursive(join(templateDir, "src/editors"), join(outputDir, "src/editors"));
     const clientEntryContent = await this.renderTemplate("src/client.tsx.hbs", context);
     await writeFile(join(outputDir, "src/client.tsx"), clientEntryContent);
     const ssrEntryContent = await this.renderTemplate("src/ssr.tsx.hbs", context);
@@ -17471,40 +17528,16 @@ class TanStackStartFrontendGenerator extends BaseGenerator {
         dest: "src/components/admin/bus-entity-detail-page.tsx"
       },
       {
-        src: "src/lib/workflow/bpmn-model.ts",
-        dest: "src/lib/workflow/bpmn-model.ts"
+        src: "src/worker-modules.d.ts",
+        dest: "src/worker-modules.d.ts"
       },
       {
-        src: "src/lib/automation/model.ts",
-        dest: "src/lib/automation/model.ts"
+        src: "src/components/rules/RuleGraphEditor.tsx",
+        dest: "src/components/rules/RuleGraphEditor.tsx"
       },
       {
-        src: "src/lib/automation/rule-content.ts",
-        dest: "src/lib/automation/rule-content.ts"
-      },
-      {
-        src: "src/components/automation/LadderCard.tsx",
-        dest: "src/components/automation/LadderCard.tsx"
-      },
-      {
-        src: "src/components/automation/RailList.tsx",
-        dest: "src/components/automation/RailList.tsx"
-      },
-      {
-        src: "src/components/automation/StepInspector.tsx",
-        dest: "src/components/automation/StepInspector.tsx"
-      },
-      {
-        src: "src/components/automation/AutomationBuilder.tsx",
-        dest: "src/components/automation/AutomationBuilder.tsx"
-      },
-      {
-        src: "src/components/automation/RuleTableEditor.tsx",
-        dest: "src/components/automation/RuleTableEditor.tsx"
-      },
-      {
-        src: "src/components/automation/AutomationHelp.tsx",
-        dest: "src/components/automation/AutomationHelp.tsx"
+        src: "src/lib/logic-host.ts",
+        dest: "src/lib/logic-host.ts"
       },
       {
         src: "src/components/admin/doc-status-badge.tsx",
@@ -17841,6 +17874,7 @@ var SHARED_SUITES = [
   "20-transaction-notifications.test.ts",
   "21-reports.test.ts",
   "22-optimistic-locking.test.ts",
+  "23-workflow-editors-api.test.ts",
   "10-benchmark.test.ts",
   "18-write-benchmark.test.ts",
   "11-performance-budget.test.ts"
@@ -19864,6 +19898,95 @@ ${processSection}
 `;
 }
 
+// packages/generator/src/rules/model-logic.ts
+function buildModelLogic(sources) {
+  const document = (Array.isArray(sources) ? sources : [sources]).filter(Boolean).join(`
+
+`);
+  if (!document.trim())
+    return [];
+  return extractWorkflowSections(document).map((workflow) => ({
+    name: workflow.name,
+    entity: workflow.entity,
+    kind: workflow.kind,
+    ...workflow.trigger ? { trigger: workflow.trigger } : {},
+    ...workflow.operation ? { operation: workflow.operation } : {},
+    ...workflow.title ? { title: workflow.title } : {},
+    diagram: workflow.diagram
+  }));
+}
+function renderModelLogic(workflows) {
+  return `/**
+ * The workflows this application's model declares, as the author drew them — written when
+ * the application was generated. The Rules & workflows screen lists them read-only: the
+ * next generation rewrites them, so they are changed in the model, not here.
+ */
+
+export interface ModelWorkflow {
+  name: string;
+  entity: string;
+  kind: "hook" | "state" | "saga";
+  trigger?: "automatic" | "rule";
+  operation?: "CREATE" | "UPDATE" | "DELETE" | "ALL";
+  title?: string;
+  diagram: string;
+}
+
+export const MODEL_WORKFLOWS: ModelWorkflow[] = ${JSON.stringify(workflows, null, 2)};
+`;
+}
+
+// packages/generator/src/rules/rule-model.ts
+var jsonType = (type) => type === "integer" || type === "decimal" ? "number" : type === "boolean" ? "boolean" : "string";
+function buildRuleModel(model) {
+  const declared = declaredEntityNames(model.entities);
+  return model.entities.map((entity2) => {
+    const bus = entityToBusEntity(entity2, declared);
+    const values = {};
+    for (const attribute of entity2.attributes) {
+      if (attribute.enumValues?.length)
+        values[attribute.name] = [...attribute.enumValues];
+    }
+    for (const machine of model.workflows.filter((w) => w.entity === entity2.name)) {
+      const states = machine.states.map((state) => state.name);
+      const column = Object.entries(values).find(([, list]) => states.some((s) => list.includes(s)))?.[0] ?? (entity2.attributes.some((a) => a.name === "status") ? "status" : undefined);
+      if (column)
+        values[column] = states;
+    }
+    return {
+      name: entity2.name,
+      table: bus.tableName,
+      label: formatDisplayName(entity2.name),
+      fields: entity2.attributes.map((attribute) => ({
+        name: attribute.name,
+        type: jsonType(attribute.type)
+      })),
+      values,
+      processes: model.sagas.filter((saga) => saga.entity === entity2.name).map((saga) => saga.name)
+    };
+  });
+}
+function renderRuleModel(entities) {
+  return `/**
+ * What a rule in this application may name, written when it was generated from
+ * its model: each record type's fields and their types, the values a closed
+ * field may hold (its enum, or its state machine's states) and the processes
+ * defined for it. The rule editor offers these and nothing else.
+ */
+
+export interface RuleModelEntity {
+  name: string;
+  table: string;
+  label: string;
+  fields: Array<{ name: string; type: "string" | "number" | "boolean" }>;
+  values: Record<string, string[]>;
+  processes: string[];
+}
+
+export const RULE_MODEL: RuleModelEntity[] = ${JSON.stringify(entities, null, 2)};
+`;
+}
+
 // packages/generator/src/pipeline/logger-port.ts
 var NO_LOG = {
   event() {}
@@ -20582,6 +20705,132 @@ function parseDecisionTableDirective(flowchart) {
     return null;
   }
 }
+var JDM_GRAPH_DIRECTIVE = "%%jdm-graph ";
+var GRAPH_NODE_TYPES = new Set([
+  "inputNode",
+  "outputNode",
+  "decisionTableNode",
+  "expressionNode",
+  "functionNode",
+  "switchNode"
+]);
+var FORBIDDEN_FUNCTION_SOURCE = /\b(?:import|require|fetch|eval|process|globalThis)\b/;
+function parseJdmGraphDirective(flowchart) {
+  const line = (flowchart ?? "").split(`
+`).map((l) => l.trim()).find((l) => l.startsWith(JDM_GRAPH_DIRECTIVE));
+  if (!line)
+    return null;
+  try {
+    const parsed = JSON.parse(line.slice(JDM_GRAPH_DIRECTIVE.length));
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+function validateJdmGraph(graph) {
+  const problems = [];
+  const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
+  const edges = Array.isArray(graph.edges) ? graph.edges : [];
+  const ids = new Set;
+  if (!nodes.length)
+    return ["the graph has no nodes"];
+  for (const node of nodes) {
+    const label = String(node.name ?? node.id);
+    ids.add(String(node.id));
+    if (typeof node.type !== "string" || !GRAPH_NODE_TYPES.has(node.type)) {
+      problems.push(`node "${label}" has an unsupported type "${String(node.type)}"`);
+      continue;
+    }
+    if (node.type === "inputNode" || node.type === "outputNode")
+      continue;
+    if (node.content === undefined || node.content === null) {
+      problems.push(`${node.type} "${label}" has no content, so the engine would reject it`);
+    }
+    if (node.type === "functionNode") {
+      const content = node.content;
+      const source = typeof content === "string" ? content : typeof content?.source === "string" ? content.source : "";
+      if (!/\bhandler\b/.test(source)) {
+        problems.push(`functionNode "${label}" defines no handler; write export const handler = async (input) => ({ ... })`);
+      }
+      if (FORBIDDEN_FUNCTION_SOURCE.test(source)) {
+        problems.push(`functionNode "${label}" uses import, require, fetch, eval, process or globalThis, which the sandbox does not allow`);
+      }
+    }
+  }
+  if (!nodes.some((n) => n.type === "inputNode"))
+    problems.push("the graph has no input node");
+  if (!nodes.some((n) => n.type === "outputNode"))
+    problems.push("the graph has no output node");
+  for (const edge of edges) {
+    if (!ids.has(String(edge.sourceId)) || !ids.has(String(edge.targetId))) {
+      problems.push(`edge "${String(edge.id)}" joins a node that is not in the graph`);
+    }
+  }
+  return problems;
+}
+function normalizeGraphActions(graph) {
+  const rewrite = (cell) => typeof cell === "string" ? cell.replace(/(["'])validation-error\1/g, "$1prevent$1") : cell;
+  return {
+    ...graph,
+    nodes: graph.nodes.map((node) => {
+      const content = node.content;
+      if (node.type === "functionNode" && typeof content === "string") {
+        return { ...node, content: { source: content } };
+      }
+      const table = content;
+      if (node.type !== "decisionTableNode" || !Array.isArray(table?.rules)) {
+        return node;
+      }
+      const inputIds = new Set((table.inputs ?? []).map((column) => column.id));
+      return {
+        ...node,
+        content: withTransformData({
+          ...table,
+          rules: table.rules.map((row) => Object.fromEntries(Object.entries(row).map(([key, cell]) => [
+            key,
+            inputIds.has(key) ? emptyMeansBlank(rewrite(cell)) : rewrite(cell)
+          ])))
+        })
+      };
+    })
+  };
+}
+function emptyMeansBlank(cell) {
+  if (typeof cell !== "string")
+    return cell;
+  const text = cell.trim();
+  if (text === "null")
+    return 'null, ""';
+  if (text === "!= null")
+    return '!= null and != ""';
+  return cell;
+}
+function literalText(cell) {
+  const match = String(cell ?? "").trim().match(/^(?:'(.*)'|"(.*)")$/s);
+  return match ? match[1] ?? match[2] ?? "" : null;
+}
+function withTransformData(content) {
+  const outputs = content.outputs ?? [];
+  const fieldColumn = outputs.find((column) => column.field === "field");
+  const valueColumn = outputs.find((column) => column.field === "value");
+  const actionColumn = outputs.find((column) => column.field === "action");
+  if (!fieldColumn || !valueColumn || !actionColumn || outputs.some((column) => column.field === "transformData")) {
+    return content;
+  }
+  const dataColumn = { id: "transformData-auto", name: "Transform Data", field: "transformData" };
+  return {
+    ...content,
+    outputs: [...outputs, dataColumn],
+    rules: (content.rules ?? []).map((row) => {
+      const target = literalText(row[fieldColumn.id])?.trim();
+      const isTransform = literalText(row[actionColumn.id])?.trim() === "transform";
+      if (!isTransform || !target)
+        return { ...row, [dataColumn.id]: row[dataColumn.id] ?? "" };
+      const value = literalText(row[valueColumn.id]) ?? String(row[valueColumn.id] ?? "");
+      return { ...row, [dataColumn.id]: zenLiteral(JSON.stringify({ [target]: value })) };
+    })
+  };
+}
 function isBareLiteral(value) {
   return value === "true" || value === "false" || value === "null" || value !== "" && !Number.isNaN(Number(value));
 }
@@ -20602,12 +20851,12 @@ function zenInputCell(raw) {
     return "";
   const match = value.match(/^(>=|<=|!=|=|>|<)\s*(.*)$/);
   if (!match)
-    return zenCell(value);
+    return emptyMeansBlank(zenCell(value));
   const [, operator, operand] = match;
   const cell = zenCell(operand);
   if (!cell)
     return "";
-  return operator === "=" ? cell : `${operator} ${cell}`;
+  return emptyMeansBlank(operator === "=" ? cell : `${operator} ${cell}`);
 }
 function buildEditorDecisionTable(ruleName, table) {
   const inputs = (table.inputs ?? []).filter((column) => (column.field ?? "").trim() !== "");
@@ -20628,7 +20877,7 @@ function buildEditorDecisionTable(ruleName, table) {
         id: tableId,
         name: ruleName,
         type: "decisionTableNode",
-        content: {
+        content: withTransformData({
           hitPolicy: table.hitPolicy === "collect" ? "collect" : "first",
           inputs: inputs.map((column) => ({
             id: column.id,
@@ -20641,7 +20890,7 @@ function buildEditorDecisionTable(ruleName, table) {
             field: column.field ?? ""
           })),
           rules: rows
-        }
+        })
       },
       { id: "output", name: "Output", type: "outputNode" }
     ],
@@ -20723,6 +20972,24 @@ function compileRules(sections, onWarn = () => {}) {
     }
     try {
       const editorTable = parseDecisionTableDirective(section.flowchart);
+      const editorGraph = parseJdmGraphDirective(section.flowchart);
+      if (editorGraph) {
+        const problems = validateJdmGraph(editorGraph);
+        if (problems.length) {
+          onWarn(`Rule "${section.name}" has a graph that cannot run: ${problems.join("; ")}.`);
+          continue;
+        }
+        compiled.push({
+          name: section.name,
+          entity: section.entity,
+          tableName: toTableName(section.entity),
+          event: section.event,
+          operation: eventToOperation(section.event),
+          priority: section.priority ?? 100,
+          jdmContent: JSON.stringify(normalizeGraphActions(editorGraph))
+        });
+        continue;
+      }
       const ast = parseMermaidFlowchart(section.flowchart);
       if (!editorTable && !ast.nodes.size) {
         onWarn(`Rule "${section.name}" has no nodes; skipping.`);
@@ -20927,6 +21194,8 @@ async function generateApplication(options) {
     stage = "artifacts";
     await writeModelSource(options.outputDir, options.sources, log);
     await writeManual(options.outputDir, model, options, log);
+    await writeRuleModel(options.outputDir, model, log);
+    await writeModelLogic(options.outputDir, options.sources, log);
     if (options.writeManifestFile !== false) {
       await writeManifest(options.outputDir, model, options, options.manifest ?? {}, log);
     }
@@ -20939,6 +21208,32 @@ async function generateApplication(options) {
   } catch (err) {
     log.event("pipeline.generation.failed", { project: options.projectName, stage, err });
     throw err;
+  }
+}
+async function writeRuleModel(outputDir, model, log = NO_LOG) {
+  const directory = join(outputDir, "frontend", "src", "lib");
+  try {
+    await access(directory);
+  } catch {
+    return;
+  }
+  try {
+    await writeFile(join(directory, "rule-model.ts"), renderRuleModel(buildRuleModel(model)), "utf-8");
+  } catch (err) {
+    log.event("pipeline.artifact.write_failed", { artifact: "rule-model.ts", err });
+  }
+}
+async function writeModelLogic(outputDir, sources, log = NO_LOG) {
+  const directory = join(outputDir, "frontend", "src", "lib");
+  try {
+    await access(directory);
+  } catch {
+    return;
+  }
+  try {
+    await writeFile(join(directory, "model-logic.ts"), renderModelLogic(buildModelLogic(sources)), "utf-8");
+  } catch (err) {
+    log.event("pipeline.artifact.write_failed", { artifact: "model-logic.ts", err });
   }
 }
 async function writeManual(outputDir, model, options, log = NO_LOG) {
@@ -22749,11 +23044,14 @@ class CheckEngine {
       }
     }
     const triggered = new Set(this.src.findAll(/^\s*%%action\b/).map(({ text }) => text.match(/\bworkflow:\s*(\S+)/)?.[1]).filter((name) => !!name));
+    const drawnRules = this.src.findAll(/^\s*%%(?:jdm-graph|decision-table)\s/).map(({ text }) => text);
     for (const { lineNo, text } of this.src.findAll(/^%%workflow\b/)) {
       const m = text.match(/^%%workflow\s+(\w+)[^\n]*kind:\s*saga/);
       if (!m || !/\btrigger:\s*rule\b/.test(text))
         continue;
       if (triggered.has(m[1]))
+        continue;
+      if (drawnRules.some((line) => new RegExp(`\\b${m[1]}\\b`).test(line)))
         continue;
       this.warn("EML286", `Saga "${m[1]}" is rule-triggered but no %%action names it.`, {
         line: lineNo,

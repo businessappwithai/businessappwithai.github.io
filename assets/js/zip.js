@@ -14,7 +14,7 @@
  *   stored uncompressed (method 0) instead — a bigger file that every unzipper
  *   still opens, which is a far better failure than none.
  * - **No ZIP64, deliberately.** A generated application is four hundred small
- *   text files and nine fonts; the 4GB and 65535-entry ceilings are three
+ *   text files and four fonts; the 4GB and 65535-entry ceilings are three
  *   orders of magnitude away. Writing ZIP64 for a case that cannot arise would
  *   be more code to be wrong in.
  *
