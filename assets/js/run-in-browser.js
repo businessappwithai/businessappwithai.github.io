@@ -665,9 +665,24 @@ function fail(html) {
  * whole point is that it has no dependencies. A single self-extracting shell
  * script is the honest trade: it is readable before it is run, which a zip is
  * not.
+ *
+ * It cannot carry PGlite's eighteen megabytes, so it is generated again without
+ * this page's PGlite URL — which would make this site the CDN for every copy
+ * downloaded — and starts with `npm install && npm start`: the application's own
+ * `serve.mjs` then serves the installed package. Same name, records and seed as
+ * the one on screen.
  */
 $("download").addEventListener("click", () => {
   if (!state.files) return;
+  const { files } = generateFromSource({
+    source: state.source,
+    name: $("app-name").value.trim() || "Generated App",
+    adminEmail: $("admin-email").value.trim() || "admin@admin.com",
+    adminPassword: $("admin-password").value || "admin",
+    adminName: ($("admin-email").value.split("@")[0] || "admin").trim(),
+    sampleRecords: sampleRecords(),
+    sampleSeed: $("app-name").value.trim() || "Generated App",
+  });
   window.awTrack?.("app_downloaded", {
     model_name: state.label,
     file_count: state.summary?.fileCount,
@@ -685,16 +700,16 @@ $("download").addEventListener("click", () => {
     `mkdir -p "${name}"`,
     `cd "${name}"`,
     "",
-    ...Object.entries(state.files).flatMap(([path, contents]) => [
+    ...Object.entries(files).flatMap(([path, contents]) => [
       `mkdir -p "$(dirname "${path}")"`,
       `cat > "${path}" <<'APPWITHAI_EOF'`,
       contents.replace(/\r/g, ""),
       "APPWITHAI_EOF",
       "",
     ]),
-    `echo "Wrote ${Object.keys(state.files).length} files into ${name}/"`,
-    `echo "Serve it over http (a Service Worker cannot start from file://):"`,
-    `echo "  npx serve ${name}"`,
+    `echo "Wrote ${Object.keys(files).length} files into ${name}/"`,
+    `echo "Start it (npm install fetches PostgreSQL, which ships as an npm package):"`,
+    `echo "  cd ${name} && npm install && npm start"`,
     "",
   ].join("\n");
 
@@ -740,15 +755,12 @@ async function freshTemplatesUrl(url) {
 const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
 const FONTS_DIR = "frontend/public/fonts";
 const FONTS = [
-  "inter-400-latin.woff2",
-  "inter-500-latin.woff2",
-  "inter-600-latin.woff2",
-  "inter-700-latin.woff2",
-  "jetbrains-mono-400-latin.woff2",
-  "jetbrains-mono-600-latin.woff2",
-  "newsreader-400-latin.woff2",
+  // The generated frontend's own four (upstream halved them on 2026-09-19); its
+  // CSS asks for exactly these names, so a stale list ships an app with no fonts.
+  "inter-variable-latin.woff2",
+  "jetbrains-mono-variable-latin.woff2",
+  "newsreader-variable-latin.woff2",
   "newsreader-400-italic-latin.woff2",
-  "newsreader-600-latin.woff2",
 ];
 
 /** Loaded once per page, because both are large and neither changes. */
@@ -968,6 +980,13 @@ let runningSince = 0;
 async function run(fresh) {
   if (!state.files) {
     fail("Generate the application first.");
+    return;
+  }
+  if (!state.pgliteUrl) {
+    fail(
+      "PostgreSQL (PGlite) did not load from this site, and it is never fetched from a CDN. " +
+        "Reload the page and try again."
+    );
     return;
   }
 
@@ -1280,14 +1299,13 @@ const titleCase = (value) => value.replace(/\b\w/g, (character) => character.toU
 /**
  * Find the PostgreSQL build this site ships.
  *
- * The generated application looks for PGlite in three places, in order: beside
- * itself, at whatever URL it was generated with, and finally jsDelivr. This site
- * vendors its own copy under `assets/vendor/pglite/`, so the first two are made
- * to hit that and the CDN is never reached — the chapter works on a network that
- * blocks third-party hosts, and it keeps working if jsDelivr does not.
+ * The generated application looks for PGlite beside itself, then at whatever URL
+ * it was generated with — and nowhere else: there is no CDN after those. This
+ * site vendors its own copy under `assets/vendor/pglite/`, so both are made to
+ * hit that, and the chapter works on a network that blocks third-party hosts.
  *
- * Probed rather than assumed: if the copy is ever missing the page still runs,
- * it just falls back the way upstream does.
+ * Probed rather than assumed: if the copy is ever missing, `run()` says so
+ * rather than starting an application that cannot open its database.
  */
 async function findVendoredPglite() {
   try {
@@ -1295,7 +1313,7 @@ async function findVendoredPglite() {
     const response = await fetch(url, { method: "HEAD" });
     if (response.ok) state.pgliteUrl = url;
   } catch {
-    // Left unset: the generated application falls back to the CDN on its own.
+    // Left unset; `run()` refuses and says why.
   }
 }
 

@@ -35,7 +35,7 @@ businessappwithai.github.io/
 │       ├── posthog/              # posthog-js, the no-external build (~640KB)
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
-│       ├── app-fonts/            # The nine typefaces the template bundle cannot carry
+│       ├── app-fonts/            # The four typefaces the template bundle cannot carry
 │       └── stack-templates.json  # 360 stack templates for chapters 09 and 10
 ├── guide/                    # "Build a CRM" guide (chapters 00–11); every <figure>
 │                             # puts its <figcaption> *before* the <img>
@@ -636,7 +636,7 @@ brings up PostgreSQL, the API and the web front end.
   byte 3) because without that unzip ignores the mode entirely. Docker mounts
   `reporting/pg-init/` as Postgres's init directory and cannot run a 0644 script;
   `website-e2e.mjs` §9 holds it.
-- **The nine fonts are restored the same way chapter 10 restores them**, from
+- **The four fonts are restored the same way chapter 10 restores them**, from
   `assets/vendor/app-fonts/`, because `stack-templates.json` is JSON and they
   are binary. A font that will not fetch is not worth failing a download for.
 

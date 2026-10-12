@@ -49,15 +49,12 @@ async function freshTemplatesUrl(url) {
  *  has the typefaces the CLI would have written. */
 const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
 const FONTS = [
-  "inter-400-latin.woff2",
-  "inter-500-latin.woff2",
-  "inter-600-latin.woff2",
-  "inter-700-latin.woff2",
-  "jetbrains-mono-400-latin.woff2",
-  "jetbrains-mono-600-latin.woff2",
-  "newsreader-400-latin.woff2",
+  // The generated frontend's own four (upstream halved them on 2026-09-19); its
+  // CSS asks for exactly these names, so a stale list ships an app with no fonts.
+  "inter-variable-latin.woff2",
+  "jetbrains-mono-variable-latin.woff2",
+  "newsreader-variable-latin.woff2",
   "newsreader-400-italic-latin.woff2",
-  "newsreader-600-latin.woff2",
 ];
 const FONTS_DIR = "frontend/public/fonts";
 
