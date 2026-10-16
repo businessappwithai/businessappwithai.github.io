@@ -4,15 +4,15 @@ export const MANIFEST = {
   "files": [
     {
       "path": "guide/checker.js",
-      "sha256": "ef38ebfaa476bfa547688451b456dd569c41417ce854c4796b2065e10e7657f5"
+      "sha256": "2c1a52f3d469fa2ecab646a174e4b217f735bd6589004e55786a05c1291f9214"
     },
     {
       "path": "guide/fixer.js",
-      "sha256": "0c9c710419760aff85438fc2091cb40d532e0e59a977822c32c21bc7b823ff7a"
+      "sha256": "2ca6469560c10036b00b7b33b1da4e6ccf0a3868abeea581d686ec628e11ca7f"
     },
     {
       "path": "viewers/eml-model.js",
-      "sha256": "9cf34f992015dff3ff75e8e22727901e729179d432c68f7e66980754d361bace"
+      "sha256": "7674da1deaf6c53f6dc21c61975fdc70db988cab33d99ad199c522baeb324b19"
     },
     {
       "path": "plugin/appwithai-eml.js",
