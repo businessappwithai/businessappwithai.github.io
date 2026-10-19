@@ -766,6 +766,14 @@ is one implementation. Keep it a forwarder: a check added there would be one the
 published runner does not have, and the audit would mean two different things
 depending on who ran it.
 
+**The page runs the audit too.** `audit-model.mjs` exports `audit(src, { check, checkAndFix, file })`
+as a pure function with no file system and no network, and chapter 11's **Audit** button
+(`#audit`, handled in `assets/js/validator.js`) imports that published file on the click and calls it
+with the page's own checker and fixer. A browser agent (ChatGPT Work's cloud browser, say) can therefore
+load a `.mmd`, press Check and Audit, and read both verdicts without a shell. `validator.js` holds no
+audit logic of its own and must not grow any; `check-spec.mjs` asserts the button, the import, and that
+`audit()` still scores a published model clean as a library.
+
 Both runners resolve their modules the same way — `--base`, then the script's own
 directory, then the working directory, then `./guide/`, then the published site —
 and **`--base` accepts a relative directory**, which it did not until this work:

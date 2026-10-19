@@ -213,6 +213,7 @@ console.log(formatReport(report));</code></pre>
       <div class="actions">
         <button type="button" class="btn btn--primary" id="check">Check</button>
         <button type="button" class="btn btn--go" id="fix">Check and repair</button>
+        <button type="button" class="btn" id="audit">Audit</button>
         <button type="button" class="btn" id="download-fixed" hidden>Download as .mmd</button>
       </div>
 
@@ -388,6 +389,12 @@ node check-model.mjs my-business.mmd</code></pre>
   primary key and a name is a valid EML document with no lifecycle, no rules, no access control and not
   one word of help text. Zero errors, zero warnings, and the verdict line says
   <i>the generator accepts this model</i>, which is true and is not the same as saying it is done.
+</p>
+<p>
+  The <strong>Audit</strong> button above runs the same twenty-three checks in this page, on whatever is
+  in the box — the exported <code>audit()</code> function of the published
+  <code>audit-model.mjs</code>, with this page's checker and fixer passed in. Nothing leaves your browser.
+  Its last line is the score; <code>23 passed, 0 failed</code> is a finished model.
 </p>
 <pre><code>curl -sO <span data-url="audit-model.mjs">https://www.appwithai.org/guide/audit-model.mjs</span>
 node audit-model.mjs my-business.mmd</code></pre>

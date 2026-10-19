@@ -278,6 +278,30 @@ $("fix").addEventListener("click", () => {
   $("download-fixed").hidden = !result.ok;
 });
 
+/* The audit is the published function, not a copy: `audit-model.mjs` exports
+   `audit(src, { check, checkAndFix, file })` with no file system and no network
+   precisely so this page can run what the command line runs. It is loaded on the
+   click, because a reader who only wants the checker should not fetch it. */
+$("audit").addEventListener("click", async () => {
+  const source = $("model").value;
+  if (!source.trim()) return report(`<div class="failure">There is no model to audit.</div>`);
+
+  try {
+    const { audit } = await import("../../guide/audit-model.mjs");
+    const result = audit(source, { check, checkAndFix, file: fileName(source) });
+    const items = (list, cls) =>
+      list.map((label) => `<li class="diag ${cls}"><span class="diag__msg">${escapeHtml(label)}</span></li>`).join("");
+    report(
+      `<div class="verdict ${result.ok ? "verdict--ok" : "verdict--bad"}">${escapeHtml(result.score)}</div>` +
+        (result.failed.length ? `<h4>Failed</h4><ul class="diags">${items(result.failed, "diag--error")}</ul>` : "") +
+        (result.notes.length ? `<h4>Notes</h4><ul class="diags">${items(result.notes, "diag--info")}</ul>` : "") +
+        `<h4>Passed</h4><ul class="diags">${items(result.passed, "diag--fixed")}</ul>`
+    );
+  } catch (error) {
+    report(`<div class="failure">Could not run the audit: ${escapeHtml(error.message)}</div>`);
+  }
+});
+
 /**
  * Hand the document back as a file — but only a document the generator would
  * accept. The button appears when a run comes back with no errors, whether it
