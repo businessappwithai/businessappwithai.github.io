@@ -16,7 +16,7 @@
  * that is what a WebContainer is — and the page says so.
  */
 
-// The published validator — the same file `llms.md` §1.3 and §8 point a
+// The published validator — the same file `llms.txt` §1.3 and §8 point a
 // model at. Checking here, when the model is chosen, rather than only inside
 // `generateFullStack`: the reader is looking at the model now, and a document
 // with an error is not going to become an application by pressing Assemble.

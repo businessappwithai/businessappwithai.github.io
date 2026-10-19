@@ -412,15 +412,15 @@ console.log("\n7. The prompts on try-it-yourself.html");
 
   /* One prompt, and one document. The page used to carry four prompts in two
      pairs that had to stay word for word identical below their first line; they
-     are one prompt now, pointing at llms.md, which decides new-or-change from
+     are one prompt now, pointing at llms.txt, which decides new-or-change from
      whether a .mmd is attached. What the enhancement pair existed to guarantee
      is held on the one prompt instead. */
   const body = promptBody("research-prompt");
   if (!body) fail("the prompt is on the page", "missing #research-prompt");
   else {
-    body.split("\n")[0].includes("llms.md") && /section 1/.test(body.split("\n")[0])
-      ? ok("the prompt names llms.md and its section 1")
-      : fail("the prompt names llms.md and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    body.split("\n")[0].includes("llms.txt") && /section 1/.test(body.split("\n")[0])
+      ? ok("the prompt names llms.txt and its section 1")
+      : fail("the prompt names llms.txt and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
     /If I have attached a \.mmd file, it is my existing model/.test(body) && /Never rebuild it from memory/.test(body)
       ? ok("the prompt changes an attached model and refuses to rebuild it")
       : fail("the prompt changes an attached model", "it does not tell the AI what an attached .mmd means");
@@ -442,14 +442,13 @@ console.log("\n7. The prompts on try-it-yourself.html");
 
   /* The document the prompt names is served here, and the four it replaced are
      stubs that send an AI to it. */
-  existsSync(path.join(ROOT, "llms.md"))
-    ? ok("llms.md is published here")
-    : fail("llms.md is published here", "the prompt names a document this site does not serve");
-  for (const doc of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
-    const stub = readFileSync(path.join(ROOT, doc), "utf8");
-    stub.includes("https://www.appwithai.org/llms.md")
-      ? ok(`${doc} is a stub pointing at llms.md`)
-      : fail(`${doc} is a stub pointing at llms.md`, "an old URL still serves a second account of the language");
+  existsSync(path.join(ROOT, "llms.txt"))
+    ? ok("llms.txt is published here")
+    : fail("llms.txt is published here", "the prompt names a document this site does not serve");
+  for (const doc of ["llms.md", "llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
+    !existsSync(path.join(ROOT, doc))
+      ? ok(`${doc} is gone: llms.txt is the only protocol file`)
+      : fail(`${doc} is gone`, "a second protocol file would let an AI read a staler account of the language");
   }
 }
 
@@ -474,11 +473,11 @@ console.log("\n8. The model assistant");
   const controller = readFileSync(p("assets", "js", "assistant.js"), "utf8");
 
   /* The one protocol document, run as a change in one pass. */
-  /PROTOCOL_URL\s*=\s*"llms\.md"/.test(controller) && /JUST BUILD IT/.test(controller)
-    ? ok("the assistant runs llms.md, in one pass")
+  /PROTOCOL_URL\s*=\s*"llms\.txt"/.test(controller) && /JUST BUILD IT/.test(controller)
+    ? ok("the assistant runs llms.txt, in one pass")
     : fail(
-        "the assistant runs llms.md, in one pass",
-        "PROTOCOL_URL is not llms.md, or the user turn does not ask for one pass — a single request cannot answer a question"
+        "the assistant runs llms.txt, in one pass",
+        "PROTOCOL_URL is not llms.txt, or the user turn does not ask for one pass — a single request cannot answer a question"
       );
 
   /* Every host the controller can reach. A key goes on these requests, so the

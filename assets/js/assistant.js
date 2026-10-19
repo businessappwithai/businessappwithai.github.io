@@ -13,7 +13,7 @@
  * proxies it, logs it, or sends it anywhere else — and `analytics.js` is
  * configured never to record a key, a model, or a prompt (see privacy.html).
  *
- * The loop is the same one `llms.md` describes for a change, run here rather
+ * The loop is the same one `llms.txt` describes for a change, run here rather
  * than pasted into somebody else's chat window:
  *
  *   1. the published protocol document becomes the system prompt
@@ -122,13 +122,13 @@ const PROVIDERS = {
   },
 };
 
-/* The protocol document this page runs. `llms.md` is the one document for
+/* The protocol document this page runs. `llms.txt` is the one document for
    writing a model and for changing one, and it decides which from whether a
    `.mmd` was given — here one always is, so it runs as a change: start from the
    model that exists, change what was asked, keep everything else, and prove it.
    This page is one request with nobody on the other end to answer a question,
    so the user turn asks for the one-pass pace. Same origin, so no egress. */
-const PROTOCOL_URL = "llms.md";
+const PROTOCOL_URL = "llms.txt";
 
 const KEY_STORAGE = "awai.assistant.key";
 const PROVIDER_STORAGE = "awai.assistant.provider";

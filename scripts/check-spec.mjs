@@ -1,5 +1,5 @@
 /**
- * check-spec.mjs — verify llms.md against the published checker.
+ * check-spec.mjs — verify llms.txt against the published checker.
  *
  * Two claims the specification makes about itself, both mechanical:
  *
@@ -26,7 +26,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 
 /* ---------------------------------------------- 1. the document's examples */
 
-const spec = readFileSync(root + "llms.md", "utf8").split("\n");
+const spec = readFileSync(root + "llms.txt", "utf8").split("\n");
 const blocks = [];
 let current = null, start = 0;
 spec.forEach((line, i) => {
@@ -474,15 +474,15 @@ expect((specText.match(/audit-model\.mjs/g) ?? []).length >= 4,
   "the audit is reachable from the header, §8.4, §8.5 and §10");
 expect(/^### 8\.5 /m.test(specText), "§8.5 exists — the header and §10 both cite it");
 
-/* ------------------------------- 6. llms.md — the tooling it tells a model to run ---
+/* ------------------------------- 6. llms.txt — the tooling it tells a model to run ---
  *
- * llms.md replaced four documents (llms-full.txt, llmdetailed.txt and their two
+ * llms.txt replaced four documents (llms-full.txt, llmdetailed.txt and their two
  * derived enhancement editions). Sections 1-5 audit its language; this section
  * holds the claims it makes about *the tooling it tells a model to run*, which is
  * exactly what goes stale when check-model.mjs changes underneath it.
  */
 
-const detailed = readFileSync(root + "llms.md", "utf8");
+const detailed = readFileSync(root + "llms.txt", "utf8");
 const detailedProse = detailed.replace(/\s+/g, " ");
 const checkerSource = readFileSync(root + "guide/checker.js", "utf8");
 const runnerSource = readFileSync(runner, "utf8");
@@ -497,16 +497,16 @@ const held = (cond, label) => {
 const cited = [...new Set(detailed.match(/EML\d{3}/g) ?? [])].sort();
 const unknown = cited.filter((code) => !checkerSource.includes(code));
 held(cited.length >= 20 && unknown.length === 0,
-  `every diagnostic llms.md cites exists in the checker (${cited.length} codes${unknown.length ? ", missing: " + unknown.join(", ") : ""})`);
+  `every diagnostic llms.txt cites exists in the checker (${cited.length} codes${unknown.length ? ", missing: " + unknown.join(", ") : ""})`);
 
 // The auto-fixable seven, against the engine rather than against a copy of the list.
 held(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(detailed)),
-  `llms.md tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
+  `llms.txt tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
 {
   const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
   const stated = [...detailedProse.matchAll(/\bThe ([a-z]+) auto-repairs\b/gi)].map((m) => WORDS.indexOf(m[1].toLowerCase()));
   held(stated.length > 0 && stated.every((n) => n === AUTO_FIXABLE.length),
-    `llms.md counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
+    `llms.txt counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
 }
 
 // The runner it tells a model to use, and the flags it promises that runner has.
@@ -516,20 +516,20 @@ held(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(detaile
 // reads as "the checker is unavailable". That is the defect the guard below
 // exists to prevent recurring.
 held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
-  "llms.md carries the one-line way to run the checker without a checkout");
+  "llms.txt carries the one-line way to run the checker without a checkout");
 for (const flag of ["--write", "--base"])
   held(detailed.includes(flag) && runnerSource.includes(flag),
-    `llms.md's \`${flag}\` is a flag check-model.mjs actually has`);
-held(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(detailed),
-  "llms.md documents all three of the runner's exit codes");
+    `llms.txt's \`${flag}\` is a flag check-model.mjs actually has`);
+held(/exits? `?0`?[\s\S]{0,160}`1`[\s\S]{0,160}`2`/.test(detailed) || /exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(detailed),
+  "llms.txt documents all three of the runner's exit codes");
 
 // The central claim of the rewrite: GitHub is in none of the checker's paths.
 // If the runner ever learns to fetch from GitHub, the document becomes wrong.
 held(!/github/i.test(runnerSource),
-  "check-model.mjs reaches no GitHub host, as llms.md tells the reader");
+  "check-model.mjs reaches no GitHub host, as llms.txt tells the reader");
 held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can run/i.test(detailedProse)
   || /reach GitHub says nothing about whether the checker can run/i.test(detailedProse),
-  "llms.md states that an unreachable GitHub is not an unreachable checker");
+  "llms.txt states that an unreachable GitHub is not an unreachable checker");
 
 /* The audit, in the vendored document too. This file is a straight copy from
  * app-with-ai-tanstack, so a re-vendor from a tree that predates the audit
@@ -537,7 +537,7 @@ held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can
  * paragraph it replaced named a script in *this* repository that no reader of
  * that document has. */
 held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/audit-model\.mjs/.test(detailed),
-  "llms.md offers the checklist audit by URL, not a repository script");
+  "llms.txt offers the checklist audit by URL, not a repository script");
 /* The document keeps one mention of the old path, in a sentence saying it used
  * to be the instruction and why that was unfollowable. That is a
  * counter-example, so it is dropped by name before the scan — the same
@@ -563,7 +563,7 @@ for (const rung of ["guide/check-model.mjs", "guide/audit-model.mjs", "guide/che
 // The apex, for the same reason as above: a `www.` URL here would send a reader
 // mid-walkthrough to a certificate error rather than to the viewers.
 held(/https:\/\/www\.appwithai\.org\/viewers\//.test(detailed),
-  "llms.md names the model viewers by their published URL");
+  "llms.txt names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
   held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
 
@@ -572,14 +572,14 @@ const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)]
 const referenced = [...new Set([...detailed.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))];
 const dangling = referenced.filter((ref) => !headings.has(ref));
 held(dangling.length === 0,
-  `every §N.N cross-reference in llms.md resolves to a heading${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
+  `every §N.N cross-reference in llms.txt resolves to a heading${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
 
 /* Three observed failures were one URL failing, generalised into "no validation
  * is possible" — in one case the blocked URL was llmdetailed.txt itself. */
 held(/needs no specification document at all/i.test(detailedProse),
-  "llms.md separates fetching the spec from running the checker");
+  "llms.txt separates fetching the spec from running the checker");
 held(/Perform the validation; do not offer it/i.test(detailedProse),
-  "llms.md requires the run rather than offering it");
+  "llms.txt requires the run rather than offering it");
 
 /* Directive status: a document that calls a compiled directive inert tells a
  * model its help text does nothing. %%entity help: becomes sys_table.description
@@ -587,7 +587,7 @@ held(/Perform the validation; do not offer it/i.test(detailedProse),
  * "validated but not compiled" while the same file's own table said compiled.
  * The authority (language/appwithai-language.json) lives upstream, so what is
  * held here is each document against its own status table. */
-for (const [file, body] of [["llms.md", detailed]]) {
+for (const [file, body] of [["llms.txt", detailed]]) {
   const compiled = [...body.matchAll(/^\| `%%(\w+)` \|[^\n]*\bcompiled\b[^\n]*$/gm)].map((m) => m[1]);
   held(compiled.length >= 8, `${file}: its directive table marks the compiled directives (${compiled.length})`);
   const flat = body.replace(/\s+/g, " ");
@@ -601,12 +601,12 @@ for (const [file, body] of [["llms.md", detailed]]) {
 
 // The per-step rule: in a walkthrough, the loop runs after every edit, not at the end.
 held(/run this loop after \*\*every\*\* edit to the file/i.test(detailedProse),
-  "llms.md binds the fixer-then-checker loop to every edit, not only to the end");
+  "llms.txt binds the fixer-then-checker loop to every edit, not only to the end");
 
 
 /* ------------------------------- 7. one document, two modes ---------------
  *
- * llms.md replaced four documents. Two authored a model from a brief; two —
+ * llms.txt replaced four documents. Two authored a model from a brief; two —
  * derived from those — changed a model that already existed, and each rule they
  * carried was a real failure before it was a rule: starting without the user's
  * file, rebuilding the model from memory, answering with a patch, and handing
@@ -636,7 +636,7 @@ for (const [pattern, label] of [
   [/Gate D/, "keeps Gate D"],
   [/\*\*It is mandatory\.\*\* Every entity — line items included — declares its sections/, "makes the %%section form layout mandatory"],
 ]) {
-  enh(pattern.test(detailedProse), `llms.md: ${label}`);
+  enh(pattern.test(detailedProse), `llms.txt: ${label}`);
 }
 
 /* Chapter 11's Audit button runs the published audit() function in the page. The
@@ -657,22 +657,11 @@ for (const [pattern, label] of [
   enh(r.ok && r.failed.length === 0, `audit() as a library scores the dance-studio model ${r.score}`);
 }
 
-/* llms.txt is llms.md under a name the web server types text/plain. Some
- * readers (ChatGPT's among them) refuse the text/markdown that Pages sends for
- * .md with "400 Unsupported content-type". It is a byte copy, so it can never
- * say anything the protocol document does not. */
-enh(readFileSync(root + "llms.txt", "utf8") === detailed,
-  "llms.txt is a byte-for-byte copy of llms.md (for readers that refuse text/markdown)");
-
-/* The four retired documents are stubs pointing here, so a URL a model was once
-   given still leads somewhere — and never to a second, staler account of the
-   language. */
-for (const retired of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
-  const stub = readFileSync(root + retired, "utf8");
-  enh(stub.includes("https://www.appwithai.org/llms.md") && stub.split("\n").length < 40,
-    `${retired}: is a short stub pointing at https://www.appwithai.org/llms.md`);
-  enh(stub.includes("https://www.appwithai.org/llms.txt"),
-    `${retired}: names https://www.appwithai.org/llms.txt as the plain-text fallback`);
+/* llms.txt is the only protocol file. There is no llms.txt (Pages types it
+   text/markdown, which ChatGPT's reader refuses) and the four older documents
+   are deleted, so no URL leads to a second, staler account of the language. */
+for (const gone of ["llms.md", "llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
+  enh(!existsSync(root + gone), `${gone} is gone: llms.txt is the only protocol file`);
 }
 
 console.log(`\n${enhancementFail === 0 ? "the one document holds both modes." : enhancementFail + " mode claim(s) contradicted."}`);
@@ -739,16 +728,15 @@ const TEACHING = [
 
 /* Both spellings of the Markdown-link counter-example are the same lesson: a
    link whose *text* is a bare host, which is what anything parsing this file
-   resolves. `llms-full.txt` is authored here and writes the apex; the vendored
-   `llmdetailed.txt` writes `www.`, because that is the form the failure that
-   prompted the rule actually came back as. Pinning one spelling made
-   re-vendoring the other document fail a check about a rule it obeys. */
+   resolves. The failure that prompted the rule came back as the `www.` form;
+   pinning one spelling would make re-vendoring fail a check about a rule the
+   document obeys. */
 const MARKDOWN_COUNTER_EXAMPLES = [
   "[appwithai.org](https://www.appwithai.org)",
   "[www.appwithai.org](https://www.appwithai.org)",
 ];
 
-for (const [name, body] of [["llms.md", spec.join("\n")]]) {
+for (const [name, body] of [["llms.txt", spec.join("\n")]]) {
   const teachable = body.split("\n").filter((line) => !TEACHING.some((t) => line.includes(t)));
   const stray = teachable
     .map((line, index) => ({ line, index }))

@@ -20,7 +20,7 @@
  * nobody can use.
  *
  * So this runs the mechanical half of §1.2's file contract and §10's checklist
- * in `https://www.appwithai.org/llms.md`: the file's name and shape, the
+ * in `https://www.appwithai.org/llms.txt`: the file's name and shape, the
  * keys, the enum bindings, the state machines, the rules, the sagas, the access
  * rules, help that says something rather than restating a column's own name,
  * every form laid out in `%%section` rows,
@@ -274,8 +274,8 @@ async function importFrom(base, { fatal = true } = {}) {
           "     and run this script again — it prefers local copies and needs no network;\n" +
           "  2. or pass --base <directory> naming where those two files are;\n" +
           "  3. or, if neither is possible, walk the checklist in section 10 of\n" +
-          "     https://www.appwithai.org/llms.md by hand and say in your delivery\n" +
-          "     that you did. Never report a score you did not obtain."
+          "     https://www.appwithai.org/llms.txt by hand, label the delivery\n" +
+          "     'not validated', and report no score. Never report a score you did not obtain."
       );
       process.exit(2);
     }

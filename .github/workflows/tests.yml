@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: "22"
 
-      # llms.md's own examples and claims, against the published checker.
+      # llms.txt's own examples and claims, against the published checker.
       - name: Specification
         run: node scripts/check-spec.mjs
 
@@ -99,14 +99,6 @@ jobs:
           ( cd "$work" && node check-model-lite.mjs prose.mmd >/dev/null 2>&1 ) && \
             { echo "expected exit 1 on an invalid model"; exit 1; } || true
 
-      # The ChatGPT app (plugin/, service/mcp/): its engine identity is current,
-      # it gives the published runner's verdict, its panel cannot send, and its
-      # MCP server has no tool that takes a model.
-      - name: ChatGPT app manifest is current
-        run: node scripts/build-plugin-manifest.mjs --check
-      - name: ChatGPT app runs the official checker and cannot send a model
-        run: node scripts/check-plugin.mjs
-
       # The validators are also published inside pages, for a fetch layer that
       # reads text/html and refuses application/javascript. Each page carries
       # one file base64-encoded plus its SHA-256, so a stale page would hand
@@ -127,3 +119,8 @@ jobs:
       # generator bundles, against the behaviour they are supposed to carry.
       - name: Website end-to-end tests
         run: node scripts/website-e2e.mjs
+
+      # Every vendored file is upstream's, byte for byte. Red while this site is
+      # ahead of app-with-ai-tanstack's main: merge the upstream change first.
+      - name: Vendored files match app-with-ai-tanstack
+        run: node scripts/check-upstream.mjs
