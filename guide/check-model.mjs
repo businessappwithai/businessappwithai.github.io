@@ -5,7 +5,7 @@
  *   curl -sO https://www.appwithai.org/guide/check-model.mjs
  *   node check-model.mjs my-business.mmd
  *
- * §1.3 of https://www.appwithai.org/llms-full.txt asks a language model to validate
+ * §1.3 of https://www.appwithai.org/llms.md asks a language model to validate
  * the `.mmd` it wrote before handing it over, by importing `checker.js` and
  * `fixer.js`. That is one line in Bun or Deno, which import straight from a URL,
  * and it is several in Node, which removed network imports — so a model with a
@@ -52,7 +52,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
  * validation path with no network at all.
  *
  * This is the published site and nothing else. The script deliberately reaches
- * no code-hosting origin: §10.6 of `llmdetailed.txt` tells the reader so, and
+ * no code-hosting origin: §1.3.5 of `llms.md` tells the reader so, and
  * `scripts/check-spec.mjs` asserts it by reading this file. Failing to reach
  * this host is still not the same as the model being unchecked.
  */

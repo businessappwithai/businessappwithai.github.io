@@ -99,53 +99,63 @@
     <div class="container">
       <div class="section-header">
         <h2>Three steps, in this order</h2>
-        <p class="section-subtitle">This is section 1 of the specification — the authoring protocol — in plain English. The model you prompt reads the same four steps in machine-readable form.</p>
+        <p class="section-subtitle">This is section 1 of <a href="llms.md"><code>llms.md</code></a> — the office-hours protocol — in plain English. The AI you prompt reads the same procedure in machine-readable form, and the same one prompt works whether you are starting a new application or changing one you already have.</p>
       </div>
 
       <div class="grid grid-3">
         <div class="card">
           <div class="card-icon">&#9997;&#65039;</div>
-          <h3>1. Describe your business — properly</h3>
-          <p>Not one sentence. Write what you would tell a new hire on their first day: what you sell or service, every kind of record you keep, who touches each one, the states things move through, what needs approving and by whom, and what happens when a step fails.</p>
-          <p class="text-muted text-sm">The thinner the description, the thinner the application. This is the step that decides the result.</p>
+          <h3>1. Describe your business — or attach your model</h3>
+          <p>Starting fresh? Write what you would tell a new hire on their first day: what you sell or service, every kind of record you keep, who touches each one, the states things move through, what needs approving and by whom, and what happens when a step fails.</p>
+          <p class="text-muted text-sm">Already have a <code>.mmd</code>? Attach it, and say what you want changed. Attaching the file is what tells the AI to change your model rather than write a new one.</p>
         </div>
         <div class="card">
           <div class="card-icon">&#128270;</div>
-          <h3>2. Hand it over to ChatGPT</h3>
-          <p>Give the model our machine-readable specification along with your description. It carries the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
-          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the model itself, not a document describing it — plus the specification it inferred, so you can correct what it guessed. Prefer to have it checked for you inside the chat? <a href="chatgpt-app.html">Add the AppWithAI app to your ChatGPT</a>.</p>
+          <h3>2. Hand it over to ChatGPT, Claude or Gemini</h3>
+          <p>Give the AI the prompt below. It runs office hours with you: it asks how you want to work, puts its understanding of your business in front of you as premises, proposes two versions of the model — a minimal one and a complete one — and walks through every record type with you before it writes the file and validates it against our published checker.</p>
+          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the whole model, not a document describing it. Prefer to have it checked for you inside the chat? <a href="chatgpt-app.html">Add the AppWithAI app to your ChatGPT</a>.</p>
         </div>
         <div class="card">
           <div class="card-icon">&#9654;&#65039;</div>
           <h3>3. Run it, here, in this browser</h3>
-          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, a real interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, real forms laid out the way the model says, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
           <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- The prompt -->
+  <!-- The prompt. One prompt replaces the four this page used to carry: the
+       document it names, llms.md, decides new-or-change from whether a .mmd is
+       attached. The old anchors (#enterprise-prompt, #enhance,
+       #enterprise-enhance-prompt) stay on the cards below, because other pages
+       and old links still point at them. -->
   <section class="section section-gray" id="the-prompt">
     <div class="container">
       <div class="section-header">
-        <h2>The prompt — copy it as it is</h2>
-        <p class="section-subtitle">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you. For a professional or enterprise application, use <a href="#enterprise-prompt" style="color: inherit;">the same prompt against the detailed specification</a> instead — same words, a longer conversation, a model nobody had to guess. <strong>Already have a <code>.mmd</code>?</strong> Both of these write a model from nothing; <a href="#enhance" style="color: inherit;">the enhancement prompts</a> start from the file you already have and give it back whole.</p>
+        <h2>One prompt — for a new model, or a change to the one you have</h2>
+        <p class="section-subtitle">Copy it as it is and replace only the bracketed part. It points the AI at <a href="llms.md" style="color: inherit;"><code>llms.md</code></a>, the one document that covers both jobs: <strong>attach your <code>.mmd</code></strong> and it changes that model and hands back the whole file; <strong>attach nothing</strong> and it builds a new model from your description.</p>
       </div>
 
       <div class="card">
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://www.appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms.md">https://www.appwithai.org/llms.md</span> in full, and follow section 1 — model office hours — exactly.
 
-My business:
-[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
+
+Ask me first how I want to work: walk me through it, one decision at a time, or just build it. If I write JUST BUILD IT, do the whole thing in one pass and list every assumption.
+
+My business, or what I want changed:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
+
+Fill in the whole Application Dictionary, as llms.md section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
 
 Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
+Then, in your reply text: what you understood (or, for a change, what changed and the before-and-after counts), the checker result with its counts, the audit's last line, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
 
 If a tool named open_appwithai is available — the AppWithAI app in ChatGPT — call it yourself, with no arguments, as soon as the finished &lt;business-name&gt;.mmd has been delivered. Do not ask me first and do not wait for me to type "Open AppWithAI". Never put the model, or any part of it, in the call: the tool takes no input, and the panel it opens checks and repairs the file on my device. It is in addition to the checker above, not instead of it; if the tool is not available, carry on without it.
 
@@ -153,203 +163,55 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>
-            <h3>Then bring the file back</h3>
-            <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
-            <p class="text-muted text-sm">Got a report instead of a file? Some models can only answer with a document. Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download a real <code>.mmd</code> from there.</p>
+            <h3>How to use it</h3>
+            <div class="card mt-3" id="enterprise-prompt" style="box-shadow: none; border: 1px solid var(--gray-200);">
+              <h3 style="margin-top: 0;">Starting from scratch</h3>
+              <p class="text-sm text-muted">Paste the prompt, replace the bracketed part with your description, and attach nothing. The AI will ask how you want to work, then put its understanding of your business in front of you before it writes a line.</p>
+            </div>
+            <div class="card mt-3" id="enterprise-enhance-prompt" style="box-shadow: none; border: 1px solid var(--gray-200);">
+              <h3 style="margin-top: 0;">Changing a model you already have</h3>
+              <p class="text-sm text-muted">Attach your <code>.mmd</code> to the same message, and replace the bracketed part with the change you want. The AI reads and counts your model first, applies only what you asked, and hands back the <strong>whole</strong> file — never a patch — with the before-and-after counts that prove nothing was lost. It also fills any gaps in the original&rsquo;s dictionary, and names each one.</p>
+            </div>
+            <div class="card mt-3" style="box-shadow: none; border: 1px solid var(--gray-200);">
+              <h3 style="margin-top: 0;">Choose the pace</h3>
+              <p class="text-sm text-muted"><strong>Walk me through it</strong> is the default for anything serious: one decision at a time, with real options, and a checked file at every step. <strong>Just build it</strong> — write <code>JUST BUILD IT</code> in your description — gets you the finished file in one reply, with every assumption listed for you to correct.</p>
+            </div>
+            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Then upload the <code>.mmd</code> and press Generate, then Run. Got a report instead of a file? Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download a real <code>.mmd</code> from there.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
-              <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card mt-5" id="enterprise-prompt">
-        <span class="hero-badge">For professional and enterprise software</span>
-        <h3 style="margin-top: var(--spacing-md);">Building something serious? Point the same prompt at the detailed specification</h3>
-        <p class="text-muted">The prompt above is right for a first model — one pass, one answer, a file back in a couple of minutes. It is the wrong trade once the business is large enough that guessing it in a single pass is guessing. For that there is a second specification, <a href="llmdetailed.txt"><code>llmdetailed.txt</code></a>: the same language, the same diagnostics, the same checker — plus how the generator, the templates and the generated application actually work, and a different authoring protocol in its section 10.</p>
-
-        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
-          <div>
-            <h4>What section 10 does differently</h4>
-            <p class="text-sm text-muted">Section 1 of <code>llms-full.txt</code> is the <strong>batch</strong> protocol: read the brief, infer the model, write it, validate, deliver. Section 10 of <code>llmdetailed.txt</code> is the <strong>interactive</strong> one — seven phases separated by approval gates you have to pass before the model moves on.</p>
-            <ul class="footer-links" style="line-height: 1.9;">
-              <li><strong>Phase 1</strong> — research your business, and show you what it found</li>
-              <li><strong>Phase 2</strong> — agree the entity roster before a line is written</li>
-              <li><strong>Phase 3</strong> — seed the <code>.mmd</code>, and build it on disk from here on</li>
-              <li><strong>Phase 4</strong> — walk the entities one at a time, checking after each</li>
-              <li><strong>Phase 5</strong> — the cross-cutting pass: processes, the access matrix, coverage</li>
-              <li><strong>Phase 6</strong> — validate to clean, and escalate what needs your decision</li>
-              <li><strong>Phase 7</strong> — deliver</li>
-            </ul>
-            <p class="text-muted text-sm">It costs a conversation instead of a reply. What you get for it is that nothing about your business was inferred without your seeing it, and the <code>help:</code> text — the only help your users will ever get, and the whole of the manual the generator writes — is still written by entity fifteen.</p>
-          </div>
-          <div>
-            <pre id="enterprise-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailed.txt">https://www.appwithai.org/llmdetailed.txt</span> in full, and follow section 10 — the interactive authoring protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
-
-My business:
-[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
-
-Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
-
-Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
-
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
-
-If a tool named open_appwithai is available — the AppWithAI app in ChatGPT — call it yourself, with no arguments, as soon as the finished &lt;business-name&gt;.mmd has been delivered. Do not ask me first and do not wait for me to type "Open AppWithAI". Never put the model, or any part of it, in the call: the tool takes no input, and the panel it opens checks and repairs the file on my device. It is in addition to the checker above, not instead of it; if the tool is not available, carry on without it.
-
-If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
-            <button type="button" class="btn btn-primary" data-copy="enterprise-research-prompt">Copy the detailed prompt</button>
-            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
-            <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps the <code>.mmd</code> on disk as it goes rather than holding it in the conversation. It ends where the prompt above ends — one file, checked clean, that you upload and run here.</p>
-            <p class="text-muted text-sm"><strong>Watch it being written.</strong> Open the <a href="viewers/index.html">model viewer</a> and point it at that file, and the diagram fills in as the walkthrough runs — the entities and their links, each lifecycle&rsquo;s legal moves, each rule&rsquo;s branches, and who ends up able to see what. Approving a gate is worth more when you have seen the thing you are approving, and Mermaid on its own draws none of it.</p>
-            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
-              <a href="llmdetailed.txt" class="btn btn-outline">Read the detailed specification &rarr;</a>
               <a href="viewers/index.html" class="btn btn-outline">Open the model viewer &rarr;</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Already have a model? -->
-  <section class="section section-white" id="enhance">
-    <div class="container">
-      <div class="section-header">
-        <h2>Already have a model? Enhance it instead</h2>
-        <p class="section-subtitle">The two prompts above start from nothing. These two start from the <code>.mmd</code> you already have — you load your file, say what you want changed, and get the whole model back with the change in it and everything else still there. Same language, same checker, a different protocol.</p>
-      </div>
-
-      <div class="card mb-5" style="border-left: 4px solid var(--primary-500);">
-        <h3 style="margin-top: 0;">Or run it here, with your own key</h3>
-        <p class="text-muted">The <a href="assistant.html">Model Assistant</a> runs the same protocol in the browser: you bring an OpenAI or Claude key, load your model, say what you want changed, and the result is put through the real checker before you are offered a download — which is the step a chat window cannot do for you.</p>
-        <p class="text-sm text-muted">Your key stays in your browser and goes straight to the provider; this site is static and has no server to receive it. That also means it is exposed to anything that can run script on the page, so the page says so above its own key field. If you would rather not, the two prompts below do the same job with no key anywhere.</p>
-        <a href="assistant.html" class="btn btn-primary btn-sm mt-3">Open the Model Assistant &rarr;</a>
-      </div>
-
-      <div class="card">
-        <span class="hero-badge">For a model you already have</span>
-        <h3 style="margin-top: var(--spacing-md);">Load your file, describe the change, get the whole model back</h3>
-        <p class="text-muted">There is a second pair of specifications for this, because enhancing is not authoring and the ways it goes wrong are its own. <a href="llmtextenhancement.txt"><code>llmtextenhancement.txt</code></a> is the one-pass form: the model reads your file, shows you what is in it, applies your change, and hands the file back whole. Its section 1 is the enhancement protocol.</p>
-
-        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
-          <div>
-            <h4>What it does that the authoring prompt cannot</h4>
-            <p class="text-sm text-muted">An authoring prompt pointed at an existing model rewrites it. A rewrite is a new model wearing the old one&rsquo;s name — and what it loses, no checker reports.</p>
-            <ul class="footer-links" style="line-height: 1.9;">
-              <li><strong>It asks for your file first</strong> — and refuses to work from a summary or a description</li>
-              <li><strong>It reads and counts your model before editing</strong> — entities, roles, reports, help text</li>
-              <li><strong>It follows the change through the file</strong> — a new entity also needs access rules, help and enum bindings</li>
-              <li><strong>It hands back the whole file</strong> — not a patch you have to merge yourself</li>
-              <li><strong>It proves nothing was lost</strong> — the before-and-after counts, side by side</li>
-            </ul>
-            <p class="text-muted text-sm">That last one is the point of the whole thing. A model that quietly came back with two fewer <code>%%rbac</code> lines and no help text on three entities passes the checker exactly like one that did not — so the count is the only thing that catches it.</p>
-          </div>
-          <div>
-            <pre id="enhance-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmtextenhancement.txt">https://www.appwithai.org/llmtextenhancement.txt</span> in full, and follow section 1 — the enhancement protocol — exactly.
-
-My model is attached. Do not start until you have read it, and do not rebuild it from anything else — not from a summary, not from this conversation, not from an earlier draft.
-
-What I want changed:
-[Describe it here. What to add, what to change, what to remove. Who does the new work. What states the new records move through. What has to be approved, and by whom.]
-
-First tell me what is in my model today — entities, roles, reports, help text, and the checker&#39;s verdict on it as it stands — so I can see you have the real file. Then apply only the change I asked for.
-
-Deliver exactly one file I can download: the whole enhanced model, under the name it arrived with. Not a patch, not a diff, not only the new parts, and nothing abbreviated — every line of the file, so I can upload it without merging anything by hand. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive.
-
-Keep everything I did not ask you to change: every entity, every column, every %%rbac line, every %%report and all the help text. Then show me the before-and-after counts side by side, and tell me plainly if any of them went down.
-
-Then, in your reply text: what changed, the checker result with its counts for my original and for the file you are delivering, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
-
-If a tool named open_appwithai is available — the AppWithAI app in ChatGPT — call it yourself, with no arguments, as soon as the finished &lt;business-name&gt;.mmd has been delivered. Do not ask me first and do not wait for me to type "Open AppWithAI". Never put the model, or any part of it, in the call: the tool takes no input, and the panel it opens checks and repairs the file on my device. It is in addition to the checker above, not instead of it; if the tool is not available, carry on without it.
-
-If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
-            <button type="button" class="btn btn-primary" data-copy="enhance-prompt">Copy the enhancement prompt</button>
-            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Attach your <code>.mmd</code> to the same message. If your model lives in a chat rather than a file, paste it in a single fenced block — the protocol accepts either, and takes the block&rsquo;s contents as the file.</p>
-            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
-              <a href="llmtextenhancement.txt" class="btn btn-ghost">Read the enhancement specification &rarr;</a>
+              <a href="llms.md" class="btn btn-ghost">Read llms.md yourself &rarr;</a>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="card mt-5" id="enterprise-enhance-prompt">
-        <span class="hero-badge">For a serious change to a model in use</span>
-        <h3 style="margin-top: var(--spacing-md);">Changing something people already depend on? Walk it, one change at a time</h3>
-        <p class="text-muted">The prompt above is right for a change you can state in a sentence. It is the wrong trade when the model is large, or old, or generating an application somebody is using — because then the risk is not that the change is wrong, it is that something else moved with it. For that there is <a href="llmdetailedenhancement.txt"><code>llmdetailedenhancement.txt</code></a>: the same language, the same diagnostics, the same checker, and an interactive enhancement protocol in its section 10.</p>
-
-        <div class="grid grid-2 mt-5" style="gap: var(--spacing-xl); align-items: start;">
-          <div>
-            <h4>What section 10 does differently</h4>
-            <p class="text-sm text-muted">Section 1 of <code>llmtextenhancement.txt</code> is the <strong>batch</strong> enhancement: read the file, apply the change, validate, hand it back. Section 10 of <code>llmdetailedenhancement.txt</code> is the <strong>interactive</strong> one — seven phases separated by approval gates, with your original kept untouched beside the working copy the whole way.</p>
-            <ul class="footer-links" style="line-height: 1.9;">
-              <li><strong>Phase 1</strong> — load your model and inventory it, and show you what it contains</li>
-              <li><strong>Phase 2</strong> — agree the change roster before a byte is edited</li>
-              <li><strong>Phase 3</strong> — baseline a working copy; your original is never written to</li>
-              <li><strong>Phase 4</strong> — walk the changes one at a time, checking and counting after each</li>
-              <li><strong>Phase 5</strong> — the cross-cutting pass: what should have moved with the change and did not</li>
-              <li><strong>Phase 6</strong> — validate to clean, and prove nothing was lost</li>
-              <li><strong>Phase 7</strong> — deliver</li>
-            </ul>
-            <p class="text-muted text-sm">It costs a conversation instead of a reply. What you get for it is that no change to your model happened without your seeing it first, and that the thing you already had is still there afterwards — checked at every step, not hoped for at the end.</p>
-          </div>
-          <div>
-            <pre id="enterprise-enhance-research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llmdetailedenhancement.txt">https://www.appwithai.org/llmdetailedenhancement.txt</span> in full, and follow section 10 — the interactive enhancement protocol — exactly. Do not skip a phase, and do not cross a gate I have not approved.
-
-My model is attached. Do not start until you have read it, and do not rebuild it from anything else — not from a summary, not from this conversation, not from an earlier draft.
-
-What I want changed:
-[Describe it here. What to add, what to change, what to remove. Who does the new work. What states the new records move through. What has to be approved, and by whom.]
-
-First tell me what is in my model today — entities, roles, reports, help text, and the checker&#39;s verdict on it as it stands — so I can see you have the real file. Then apply only the change I asked for.
-
-Deliver exactly one file I can download: the whole enhanced model, under the name it arrived with. Not a patch, not a diff, not only the new parts, and nothing abbreviated — every line of the file, so I can upload it without merging anything by hand. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive.
-
-Keep everything I did not ask you to change: every entity, every column, every %%rbac line, every %%report and all the help text. Then show me the before-and-after counts side by side, and tell me plainly if any of them went down.
-
-Then, in your reply text: what changed, the checker result with its counts for my original and for the file you are delivering, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
-
-If a tool named open_appwithai is available — the AppWithAI app in ChatGPT — call it yourself, with no arguments, as soon as the finished &lt;business-name&gt;.mmd has been delivered. Do not ask me first and do not wait for me to type "Open AppWithAI". Never put the model, or any part of it, in the call: the tool takes no input, and the panel it opens checks and repairs the file on my device. It is in addition to the checker above, not instead of it; if the tool is not available, carry on without it.
-
-If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
-            <button type="button" class="btn btn-primary" data-copy="enterprise-enhance-research-prompt">Copy the detailed enhancement prompt</button>
-            <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Everything below the first line is the prompt above, word for word. Only the document and the section number change — because the two specifications number their protocols differently, and quoting the wrong number gets you the wrong one.</p>
-            <p class="text-muted text-sm">Use a model with a long context and, if you can, one that can write files: section 10 keeps your original and the working copy side by side on disk rather than holding either in the conversation.</p>
-            <p class="text-muted text-sm"><strong>Watch it being changed.</strong> Open the <a href="viewers/index.html">model viewer</a> and point it at the working file, and the diagram updates as each change lands — the entities and their links, each lifecycle&rsquo;s legal moves, each rule&rsquo;s branches, and who ends up able to see what. Approving a change is worth more when you have seen what it did to the rest of the model.</p>
-            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
-              <a href="llmdetailedenhancement.txt" class="btn btn-outline">Read the detailed enhancement specification &rarr;</a>
-              <a href="viewers/index.html" class="btn btn-outline">Open the model viewer &rarr;</a>
-            </div>
-          </div>
+      <div class="grid grid-2 mt-5" id="enhance" style="align-items: start;">
+        <div class="card">
+          <span class="hero-badge">What the AI is held to</span>
+          <h3 style="margin-top: var(--spacing-md);">A complete Application Dictionary — including the layout of every form</h3>
+          <p class="text-muted">The generated application has no screen, label, lookup, dropdown or explanation that your model does not declare, so <code>llms.md</code> makes every one of them mandatory and the checker reports any that is missing:</p>
+          <ul class="footer-links" style="line-height: 1.9;">
+            <li><strong>Every reference is a lookup</strong> — a column that points at another record is marked <code>FK</code>, or your users get a raw id in a text box</li>
+            <li><strong>Every closed list is a dropdown</strong> — a status or a type is bound to an <code>%%enum</code></li>
+            <li><strong>Every entity, column and section is explained</strong> — the help text is the only help your users will get, and the whole of the generated manual</li>
+            <li><strong>Every form is laid out</strong> — headed sections of two-column rows, declared with <code>%%section</code>, with the fields people fill in together side by side</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top: 0;">What a form layout looks like in the model</h3>
+          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-md); border-radius: var(--radius-lg); font-size: var(--text-xs); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">%%section entity: SupportCase; name: Case; help: The number the customer quotes, where the case stands, and what is wrong.; rows: case_number, status | subject | description
+%%section entity: SupportCase; name: Triage; help: What kind of problem it is, how urgent, and who is working it.; rows: case_type, priority | origin, owner_id</pre>
+          <p class="text-sm text-muted">Each line is one section of one form: a heading, the sentence under it, and rows of one or two fields — <code>|</code> between rows, <code>,</code> between the two fields of a row. A row of one spans the full width. Both generated applications, the one in your browser and the deployable one, draw exactly this.</p>
+          <hr style="margin: var(--spacing-lg) 0; border: 0; border-top: 1px solid var(--gray-200);">
+          <h3>Or run it here, with your own key</h3>
+          <p class="text-sm text-muted">The <a href="assistant.html">Model Assistant</a> runs the same document in the browser: you bring an OpenAI or Claude key, load your model, say what you want changed, and the result is put through the real checker before you are offered a download. Your key stays in your browser and goes straight to the provider; the page says above its own key field what that exposes.</p>
+          <a href="assistant.html" class="btn btn-primary btn-sm mt-3">Open the Model Assistant &rarr;</a>
         </div>
       </div>
 
-      <div class="card mt-5">
-        <h4>Which of the four do I want?</h4>
-        <p class="text-muted text-sm">They divide on two questions: are you starting from a description or from a file, and do you want one answer or a conversation.</p>
-        <div style="overflow-x: auto;">
-          <table class="comparison-table">
-            <thead>
-              <tr><th></th><th>Start from a description</th><th>Start from a <code>.mmd</code> you have</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>One pass</strong></td>
-                <td><a href="#the-prompt"><code>llms-full.txt</code></a> &sect;1</td>
-                <td><a href="#enhance"><code>llmtextenhancement.txt</code></a> &sect;1</td>
-              </tr>
-              <tr>
-                <td><strong>Phased, with approval gates</strong></td>
-                <td><a href="#enterprise-prompt"><code>llmdetailed.txt</code></a> &sect;10</td>
-                <td><a href="#enterprise-enhance-prompt"><code>llmdetailedenhancement.txt</code></a> &sect;10</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">All four describe the same language and are held to the same published checker. The enhancement pair carries the identical language reference to the pair above it — only the protocol section differs, which is why a model that has read one of them already knows EML.</p>
-      </div>
+      <p class="text-muted text-sm mt-5 text-center">This page used to offer four prompts and four documents — <code>llms-full.txt</code>, <code>llmdetailed.txt</code>, <code>llmtextenhancement.txt</code> and <code>llmdetailedenhancement.txt</code>. They are one now. The old addresses still answer, and tell an AI to read <code>llms.md</code> instead.</p>
     </div>
   </section>
 
@@ -390,9 +252,24 @@ erDiagram
     Customer ||--o{ Job : "raises"
     Engineer ||--o{ Job : "works"
 
+%%entity Customer help: A household or business we service, and who pays for each visit.
+%%field Customer.name help: The name on the invoice and on every job card the engineer carries.
+%%field Customer.email help: Where booking confirmations and invoices go; one customer per address.
+%%field Customer.phone help: Rung by the engineer when running late or unable to get in.
+%%entity Engineer help: A field engineer who can be sent to a job.
+%%field Engineer.first_name help: How customers are told who is coming.
+%%field Engineer.last_name help: Used with the first name on job cards and in the dispatch board.
 %%entity Job help: A visit an engineer makes to a customer site.
+%%field Job.customer_id help: Who the visit is for, and who is invoiced for it.
+%%field Job.engineer_id help: Who is sent; empty until dispatch assigns someone.
 %%field Job.status enum: JobStatus
+%%field Job.status help: Where the visit stands; only a dispatched job can be marked on site.
+%%field Job.scheduled_for help: When the engineer is due, which is what the customer was promised.
 %%field Job.quoted_total help: What the customer was quoted, before parts used on site.
+%%section entity: Customer; name: Customer; help: Who we visit and how to reach them before we arrive.; rows: name | email, phone
+%%section entity: Engineer; name: Engineer; help: Who can be sent out to a job.; rows: first_name, last_name
+%%section entity: Job; name: Visit; help: Whose job it is, who is going, and when they are due.; rows: customer_id, engineer_id | status, scheduled_for
+%%section entity: Job; name: Price; help: What the customer has been quoted for the visit.; rows: quoted_total
 %%rbac role:dispatcher on Job.update</pre>
 
         <div class="grid grid-2 mt-5">
@@ -404,6 +281,7 @@ erDiagram
               <li><code>PK</code> <code>FK</code> <code>UK</code> <code>OPTIONAL</code> — the four modifiers that matter.</li>
               <li><code>%%enum</code> + <code>%%field … enum:</code> — a closed vocabulary, bound to a column.</li>
               <li><code>%%entity … help:</code> and <code>%%field … help:</code> — the help a user reads on screen, and the whole of the manual the generator writes.</li>
+              <li><code>%%section</code> — the form: headed sections of two-column rows, the fields people fill in together side by side.</li>
               <li><code>%%rbac</code> — who may do what.</li>
               <li><code>stateDiagram-v2</code> — the lifecycle a record moves through.</li>
               <li><code>flowchart</code> + <code>%%action</code> — a business rule that decides something.</li>
@@ -418,7 +296,7 @@ erDiagram
               <li>Types are specific: <code>email</code>, <code>phone</code>, <code>url</code>, <code>money</code>, <code>date</code> — each one picks its own input control.</li>
               <li>Entities and non-obvious columns carry <code>help:</code> — it is the only help your users will ever get.</li>
             </ul>
-            <p class="text-muted text-sm">The checker reports all four. <a href="llms-full.txt">Section 3.7</a> explains why each one matters.</p>
+            <p class="text-muted text-sm">The checker reports all four. <a href="llms.md">Section 3.7 of llms.md</a> explains why each one matters.</p>
           </div>
         </div>
       </div>
