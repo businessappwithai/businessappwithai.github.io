@@ -99,7 +99,7 @@
     <div class="container">
       <div class="section-header">
         <h2>Three steps, in this order</h2>
-        <p class="section-subtitle">This is section 1 of <a href="llms.md"><code>llms.md</code></a> — the office-hours protocol — in plain English. The AI you prompt reads the same procedure in machine-readable form, and the same one prompt works whether you are starting a new application or changing one you already have.</p>
+        <p class="section-subtitle">This is section 1 of <a href="llms.txt"><code>llms.txt</code></a> — the office-hours protocol — in plain English. The AI you prompt reads the same procedure in machine-readable form, and the same one prompt works whether you are starting a new application or changing one you already have.</p>
       </div>
 
       <div class="grid grid-3">
@@ -113,7 +113,7 @@
           <div class="card-icon">&#128270;</div>
           <h3>2. Hand it over to ChatGPT, Claude or Gemini</h3>
           <p>Give the AI the prompt below. It runs office hours with you: it asks how you want to work, puts its understanding of your business in front of you as premises, proposes two versions of the model — a minimal one and a complete one — and walks through every record type with you before it writes the file and validates it against our published checker.</p>
-          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the whole model, not a document describing it. Prefer to have it checked for you inside the chat? <a href="chatgpt-app.html">Add the AppWithAI app to your ChatGPT</a>.</p>
+          <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the whole model, not a document describing it.</p>
         </div>
         <div class="card">
           <div class="card-icon">&#9654;&#65039;</div>
@@ -126,7 +126,7 @@
   </section>
 
   <!-- The prompt. One prompt replaces the four this page used to carry: the
-       document it names, llms.md, decides new-or-change from whether a .mmd is
+       document it names, llms.txt, decides new-or-change from whether a .mmd is
        attached. The old anchors (#enterprise-prompt, #enhance,
        #enterprise-enhance-prompt) stay on the cards below, because other pages
        and old links still point at them. -->
@@ -134,13 +134,13 @@
     <div class="container">
       <div class="section-header">
         <h2>One prompt — for a new model, or a change to the one you have</h2>
-        <p class="section-subtitle">Copy it as it is and replace only the bracketed part. It points the AI at <a href="llms.md" style="color: inherit;"><code>llms.md</code></a>, the one document that covers both jobs: <strong>attach your <code>.mmd</code></strong> and it changes that model and hands back the whole file; <strong>attach nothing</strong> and it builds a new model from your description.</p>
+        <p class="section-subtitle">Copy it as it is and replace only the bracketed part. It points the AI at <a href="llms.txt" style="color: inherit;"><code>llms.txt</code></a>, the one document that covers both jobs: <strong>attach your <code>.mmd</code></strong> and it changes that model and hands back the whole file; <strong>attach nothing</strong> and it builds a new model from your description.</p>
       </div>
 
       <div class="card">
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms.md">https://www.appwithai.org/llms.md</span> in full, and follow section 1 — model office hours — exactly.
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: 0 0 var(--spacing-md) 0;">Read <span data-url="llms.txt">https://www.appwithai.org/llms.txt</span> in full, and follow section 1 — model office hours — exactly.
 
 If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
 
@@ -149,7 +149,7 @@ Ask me first how I want to work: walk me through it, one decision at a time, or 
 My business, or what I want changed:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
 
-Fill in the whole Application Dictionary, as llms.md section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
+Fill in the whole Application Dictionary, as llms.txt section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
 
 Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
 
@@ -181,7 +181,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
               <a href="viewers/index.html" class="btn btn-outline">Open the model viewer &rarr;</a>
-              <a href="llms.md" class="btn btn-ghost">Read llms.md yourself &rarr;</a>
+              <a href="llms.txt" class="btn btn-ghost">Read llms.txt yourself &rarr;</a>
             </div>
           </div>
         </div>
@@ -191,7 +191,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
         <div class="card">
           <span class="hero-badge">What the AI is held to</span>
           <h3 style="margin-top: var(--spacing-md);">A complete Application Dictionary — including the layout of every form</h3>
-          <p class="text-muted">The generated application has no screen, label, lookup, dropdown or explanation that your model does not declare, so <code>llms.md</code> makes every one of them mandatory and the checker reports any that is missing:</p>
+          <p class="text-muted">The generated application has no screen, label, lookup, dropdown or explanation that your model does not declare, so <code>llms.txt</code> makes every one of them mandatory and the checker reports any that is missing:</p>
           <ul class="footer-links" style="line-height: 1.9;">
             <li><strong>Every reference is a lookup</strong> — a column that points at another record is marked <code>FK</code>, or your users get a raw id in a text box</li>
             <li><strong>Every closed list is a dropdown</strong> — a status or a type is bound to an <code>%%enum</code></li>
@@ -211,7 +211,6 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
         </div>
       </div>
 
-      <p class="text-muted text-sm mt-5 text-center">This page used to offer four prompts and four documents — <code>llms-full.txt</code>, <code>llmdetailed.txt</code>, <code>llmtextenhancement.txt</code> and <code>llmdetailedenhancement.txt</code>. They are one now. The old addresses still answer, and tell an AI to read <code>llms.md</code> instead.</p>
     </div>
   </section>
 
@@ -296,7 +295,7 @@ erDiagram
               <li>Types are specific: <code>email</code>, <code>phone</code>, <code>url</code>, <code>money</code>, <code>date</code> — each one picks its own input control.</li>
               <li>Entities and non-obvious columns carry <code>help:</code> — it is the only help your users will ever get.</li>
             </ul>
-            <p class="text-muted text-sm">The checker reports all four. <a href="llms.md">Section 3.7 of llms.md</a> explains why each one matters.</p>
+            <p class="text-muted text-sm">The checker reports all four. <a href="llms.txt">Section 3.7 of llms.txt</a> explains why each one matters.</p>
           </div>
         </div>
       </div>
@@ -373,7 +372,6 @@ node audit-model.mjs my-business.mmd</pre>
             <li><a href="technology.html">Technology</a></li>
             <li><a href="guide/index.html">Build a CRM Guide</a></li>
             <li><a href="todo.html">Todo</a></li>
-            <li><a href="chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="pricing.html">Pricing</a></li>
           </ul>
         </div>

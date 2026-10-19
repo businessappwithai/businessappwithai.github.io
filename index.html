@@ -315,8 +315,8 @@
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
             <h4>The prompt — copy it as it is</h4>
-            <p class="text-muted text-sm">Replace only the bracketed part. Starting fresh, attach nothing; changing a model you already have, attach your <code>.mmd</code> to the same message. One prompt, one document &mdash; <a href="llms.md">llms.md</a> &mdash; for both.</p>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms.md">https://www.appwithai.org/llms.md</span> in full, and follow section 1 — model office hours — exactly.
+            <p class="text-muted text-sm">Replace only the bracketed part. Starting fresh, attach nothing; changing a model you already have, attach your <code>.mmd</code> to the same message. One prompt, one document &mdash; <a href="llms.txt">llms.txt</a> &mdash; for both.</p>
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms.txt">https://www.appwithai.org/llms.txt</span> in full, and follow section 1 — model office hours — exactly.
 
 If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
 
@@ -325,7 +325,7 @@ Ask me first how I want to work: walk me through it, one decision at a time, or 
 My business, or what I want changed:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
 
-Fill in the whole Application Dictionary, as llms.md section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
+Fill in the whole Application Dictionary, as llms.txt section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
 
 Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
 
@@ -345,7 +345,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
-              <a href="llms.md" class="btn btn-ghost">Read llms.md yourself &rarr;</a>
+              <a href="llms.txt" class="btn btn-ghost">Read llms.txt yourself &rarr;</a>
             </div>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">Not ready to write your own? <a href="guide/run-in-browser.html">Run the seventeen-entity CRM</a> the guide builds &mdash; same page, one click, no file needed.</p>
             <p class="text-muted text-sm">Want the longer version &mdash; what the model file actually contains, and how to check it? <a href="try-it-yourself.html">The Try It Yourself page</a> walks all of it.</p>
@@ -609,7 +609,6 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             <li><a href="technology.html">Technology</a></li>
             <li><a href="guide/index.html">Build a CRM Guide</a></li>
             <li><a href="todo.html">Todo</a></li>
-            <li><a href="chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="pricing.html">Pricing</a></li>
           </ul>
         </div>

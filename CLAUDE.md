@@ -107,13 +107,11 @@ businessappwithai.github.io/
 │   ├── decision-table.js     # A Decision step's table, as a table
 │   ├── model-viewer.js       # The page controller: input, tabs, inspector
 │   └── viewers.css           # Scoped to `.awv-root`; light and dark palettes
-├── llms.md                   # THE protocol document for language models: write a
+├── llms.txt                   # THE protocol document for language models: write a
 │                             # model or change one. Vendored from upstream
-├── llms-full.txt, llmdetailed.txt, llmtextenhancement.txt, llmdetailedenhancement.txt
-│                             # Retired — short stubs pointing at llms.md
 ├── scripts/
-│   ├── check-spec.mjs        # Verifies llms.md against guide/checker.js — its
-│   │                         # examples, claims, tooling, modes — and the stubs
+│   ├── check-spec.mjs        # Verifies llms.txt against guide/checker.js — its
+│   │                         # examples, claims, tooling, modes
 │   ├── check-model.mjs       # A forwarder to guide/audit-model.mjs — the audit
 │   │                         #   itself is published; this is the local way in
 │   ├── build-validator-source-page.mjs # Generates guide/source/. `--check` fails stale
@@ -189,11 +187,10 @@ Deployment is fully automatic:
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
-| `llms.md` | The one protocol document language models are pointed at — the EML language, the Application Dictionary, and one office-hours procedure for writing a model or changing one (new or change decided by whether a `.mmd` is attached). Vendored from upstream. The four documents it replaced (`llms-full.txt`, `llmdetailed.txt`, `llmtextenhancement.txt`, `llmdetailedenhancement.txt`) are stubs pointing at it |
+| `llms.txt` | The one protocol document language models are pointed at — the EML language, the Application Dictionary, and one office-hours procedure for writing a model or changing one (new or change decided by whether a `.mmd` is attached). Vendored from upstream. It is the only protocol file |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
 | `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: completely agentic workflows on the DeepSeek Harness. The five before 1.0.0 are one line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. The after-1.0.0 item is the one exception to that brevity: it carries a six-card brief on *how* it would be built, because the harness is new and the item is meaningless without it. Each card maps a step of the AppWithAI pipeline onto a mechanism the harness actually documents — Cordis plugins and bundles, `ctx.tools`, `ask_user_question`, the `ctx.subagents` seam and `ralph`, the sandboxed filesystem/subprocess providers, and the `web`/`headless`/`sdk` profiles with their durable session log. Those come from the harness's own `docs/` (architecture, agent-lifecycle, capability-seams, tool-catalog), which the page cites — **check them before editing a claim there**, since the harness is in developer preview and expects breaking changes. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs; and the Model Assistant's own section on the key. Linked from every footer, from chapter 09's note and from `assistant.html` |
-| `chatgpt-app.html` | How to add the AppWithAI app to your own ChatGPT in developer mode until it is in OpenAI's directory: requirements, the four steps, using the panel, privacy, troubleshooting. The server address is the Worker in `service/mcp`; `service/mcp/INSTALL.md` is the same text for the repository. Linked from every footer's Product column, `try-it-yourself.html` step 2 and `privacy.html#chatgpt-app` — **not** in the nav (seven-item ceiling) |
 | `assistant.html` | **The Model Assistant.** Bring an OpenAI or Claude key, load a model, say what to change, and the browser calls the provider directly. The result goes through `guide/checker.js` before a download is offered. Linked from `try-it-yourself.html#enhance` and every footer's Product column — **not** in the nav, which is at its seven-item ceiling |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
@@ -392,7 +389,7 @@ prompt**, for a new model and for a change to an existing one.
    visitor copies a link to the host they are actually on. The copy button is
    `[data-copy]` pointing at `#research-prompt`. Both are handled by `main.js`. The home
    page and `try-it-yourself.html` carry the **same** prompt text.
-2. **`llms.md`** is what that prompt tells the model to read. Its §1 is the office-hours
+2. **`llms.txt`** is what that prompt tells the model to read. Its §1 is the office-hours
    protocol; the three steps on the page are a plain-English retelling of it. If §1
    changes, the three cards should change with it — and so should the section number
    quoted in the prompt block.
@@ -558,7 +555,7 @@ with a dialog, and the API speaks `ETag` / `If-Match` / 409 `VERSION_CONFLICT`.
 (`bus.routes.js`, `entity-form.js`) and the full-stack templates'. It
 deliberately does not tell the reader to open two tabs: each tab boots its own
 PGlite, and the chapter must not promise a demonstration the page cannot give.
-`llms.md` §3.7, `features.html` and `technology.html` carry the same
+`llms.txt` §3.7, `features.html` and `technology.html` carry the same
 claim; keep them in step with `applicationDictionary.optimisticLocking` upstream.
 
 **Delete all records** — the dashboard of the running application carries an
@@ -726,9 +723,9 @@ in `assets/vendor/app-fonts/` and put back into the file tree by `withFonts()` b
 
 ## Chapter 11 — the published validators
 
-`guide/checker.js` and `guide/fixer.js` are the ES modules that §1.3 and §8 of `llms.md` tell language
+`guide/checker.js` and `guide/fixer.js` are the ES modules that §1.3 and §8 of `llms.txt` tell language
 models to import, at exactly those URLs. **Do not move or rename them** — the specification, published
-here as `llms.md`, hard-codes `https://www.appwithai.org/guide/checker.js` and `…/fixer.js`.
+here as `llms.txt`, hard-codes `https://www.appwithai.org/guide/checker.js` and `…/fixer.js`.
 
 They are built in the generator repository by `bun run build:language-tools` from
 `language/browser/*.entry.ts`, and they are the same engines the CLI runs. `assets/js/validator.js` is
@@ -739,7 +736,7 @@ generator.
 runner that locates `checker.js` and `fixer.js` (beside itself, or from the published site), performs
 §1.3's three passes, prints `formatReport`, and exits 0 / 1 / 2. It exists because Node removed network
 imports, so a language model with a shell needs four lines where Bun and Deno need one — and skips the
-step. `scripts/check-spec.mjs` asserts its exit codes, and §8.4 of `llms.md` documents it. Keep it
+step. `scripts/check-spec.mjs` asserts its exit codes, and §8.4 of `llms.txt` documents it. Keep it
 a runner: no diagnostic may originate in it.
 
 `guide/audit-model.mjs` is the **second** published runner, and it answers the
@@ -757,7 +754,7 @@ passes everything is indistinguishable from one that ran nothing.
 **It was a repository script until now, and that was the defect.** The
 twenty-two checks lived in `scripts/check-model.mjs`, importing
 `../guide/checker.js` by relative path, so the only way to run them was to have a
-clone of this repository — while `llmdetailed.txt` told its reader, a language
+clone of this repository — while the protocol told its reader, a language
 model with a shell and no clone, to "run the scorer as well as the checker" and
 named that path. The instruction was unfollowable by its own audience, and the
 fault it catches is the one that audience delivers. `scripts/check-model.mjs` is
@@ -812,8 +809,8 @@ takes: the visitor's key, held in their browser, on a request that goes straight
 to the provider. **Do not "upgrade" this to a runtime without moving the site off
 Pages first** — there is nowhere for one to run.
 
-- **It runs `llms.md` as the system prompt, in one pass.** A model is always
-  attached, so `llms.md` runs as a change — start from the model that exists, keep
+- **It runs `llms.txt` as the system prompt, in one pass.** A model is always
+  attached, so `llms.txt` runs as a change — start from the model that exists, keep
   everything else, prove it. The page is one request with nobody to answer a
   question, so the user turn says `JUST BUILD IT`. `website-e2e.mjs` §8 pins both.
 - **The key never reaches this origin**, because there is no origin to reach:
@@ -872,11 +869,11 @@ generator would not.
 - **It carries a second copy of the checker**, and reports the same verdict
   chapter 11 does. That is deliberate and it is one engine, not two: the same
   `language/checker.ts`, built by a different bundler entry. `scripts/check-spec.mjs`
-  asserts `llms.md` still names this page by its URL and that its files are served.
+  asserts `llms.txt` still names this page by its URL and that its files are served.
 - **Watching a file needs the File System Access API**, so the button is hidden
   where it is missing rather than offered and broken. Opening and pasting work
   everywhere.
-- **`llms.md` §1 sends readers here** while a model is written and at delivery, to
+- **`llms.txt` §1 sends readers here** while a model is written and at delivery, to
   see the rules, workflows, roles and forms Mermaid draws as comments. A rename or a
   move breaks a walkthrough in the middle; `check-spec.mjs` is what notices.
 - **Session replay is off here**, deliberately: `REPLAY_SURFACES` in
@@ -889,7 +886,7 @@ generator would not.
 ## Vendored files
 
 Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
-`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llms.md` comes
+`guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llms.txt` comes
 from `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand.
 Where each one comes from:
 
@@ -903,7 +900,7 @@ Where each one comes from:
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
-| `llms-full.txt`, `llmdetailed.txt`, `llmtextenhancement.txt`, `llmdetailedenhancement.txt` | `website/llmtext/*.txt` — the four stubs | — |
+| `llms.txt` | `website/llmtext/llms.txt` | — |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
 **`website/viewers/README.md` upstream is not vendored.** It documents the
@@ -1015,15 +1012,14 @@ project config and `api_host` for flags, before any event. The README beside the
 bundle tabulates all three, and `privacy.html` is written to match. Neither
 claim is guesswork — both were read off the network in a browser.
 
-## `llms.md` — one protocol document, in place of four
+## `llms.txt` — the one protocol document
 
-There used to be **four** published protocol documents — `llms-full.txt` and
-`llmdetailed.txt` (write a model, one-pass and gated) and two enhancement editions
-derived from them (change a model). They are **one** now: `llms.md`, at
-`https://www.appwithai.org/llms.md`. The four old files are short stubs that tell
-an AI to read `llms.md` instead, kept so a URL somebody was once given still
-leads somewhere. The deriver (`scripts/build-llmtext-enhancement.mjs`,
-`scripts/llmtext/`) is gone with them.
+There is **one** published protocol document, `llms.txt`, at
+`https://www.appwithai.org/llms.txt`. It is `.txt` and not `.md` on purpose: GitHub Pages types
+`.md` as `text/markdown`, which ChatGPT's web reader refuses with `400 Unsupported content-type`,
+so there is no `llms.md`. The four documents it replaced (`llms-full.txt`, `llmdetailed.txt` and the
+two enhancement editions) and the deriver that built them are deleted, and `check-spec.mjs` fails if
+any of them comes back.
 
 **New or change is decided by one fact: did the user give a `.mmd`?** §1 runs as
 office hours (after gstack's `/office-hours`): the mode, then the pace — *walk me
@@ -1035,18 +1031,10 @@ enhancement editions existed for is in it: ask for the file, never reconstruct a
 model from memory, inventory before editing, hand back the whole file, and prove
 nothing was lost with a before-and-after table.
 
-**`llms.txt` is the same file under a name Pages types `text/plain`.** Pages
-types `.md` as `text/markdown`, and some readers (ChatGPT's web reader) refuse
-it with `400 Unsupported content-type: text/markdown`. `llms.txt` is a byte copy,
-held by `check-spec.mjs`. Upstream publishes both, so vendor both; the four
-retired stubs name it as their fallback. `llms.md` stays the canonical URL.
-
-**It is vendored, byte for byte, from `website/llmtext/llms.md` in
+**It is vendored, byte for byte, from `website/llmtext/llms.txt` in
 `businessappwithai/app-with-ai-tanstack`.** Edit it there, where
-`bun run test:llmtext` holds it to the real checker, and copy it here. Its
-language reference (§2 onward) began as this site's language-only
-`llms-full.txt`, so the notes in the next section about what each part says still
-apply — only the section that owned them moved.
+`bun run test:llmtext` holds it to the real checker, and copy it here. The notes in
+the next section say what each part of it is for.
 
 **§3.7 is the Application Dictionary, and the form layout is mandatory.** Every
 entity's form is headed sections of two-column rows, declared with `%%section`
@@ -1057,9 +1045,9 @@ published model scores `23 passed, 0 failed`. A bare ERD fails it ten ways.
 **`scripts/check-spec.mjs` holds it**: sections 1–5 audit its language against
 `guide/checker.js` and its seven fenced examples (each 0 errors, 0 warnings, help
 and layout included); section 6 its tooling claims; section 7 the mode rules by
-their wording, and that the four retired files are stubs; section 8 the host.
+their wording, and that no other protocol file exists; section 8 the host.
 `website-e2e.mjs` §7 holds the one prompt on `try-it-yourself.html`, and §8 that
-`assistant.html` runs `llms.md` in one pass.
+`assistant.html` runs `llms.txt` in one pass.
 
 ## What the published checker hands back
 
@@ -1096,7 +1084,7 @@ Two properties worth not breaking when re-vendoring:
 
 ## The published host is written in full — `https://www.appwithai.org`
 
-Every mention of the host in all four protocol documents is the absolute URL,
+Every mention of the host in the protocol document is the absolute URL,
 scheme and `www.` included. This is not a style preference. A model following
 the specification reported a failed validator fetch as
 
@@ -1122,7 +1110,7 @@ The rule lives in each document's validation section and says all of this, plus
 how to report a failure: name the exact request and the exact error, not a
 prettified version of the host.
 
-**`check-spec.mjs` §8 holds it**, over all four documents and over `index.html`
+**`check-spec.mjs` §8 holds it**, over `llms.txt` and over `index.html`
 and `try-it-yourself.html`; `llmtext-claims.ts` upstream holds the copies where
 they are authored. Two details of that check are load-bearing:
 
@@ -1144,10 +1132,10 @@ edition replaces wholesale — so anchoring on it put the rule in the two bases 
 in neither of their companions, with every other check still green.
 `llmtext-claims.ts` is what noticed.
 
-## What `llms.md` says, section by section
+## What `llms.txt` says, section by section
 
-These notes were written about `llms-full.txt`, whose language reference `llms.md` carries from §2 on.
-`llms.md` is the EML language and nothing else, because the only thing a language model has to produce
+These notes describe `llms.txt`, from §2 on.
+`llms.txt` is the EML language and nothing else, because the only thing a language model has to produce
 is a model file.
 
 - **§1 is the office-hours protocol** — one procedure for "build me an app for X" and "change my model".
@@ -1231,7 +1219,7 @@ is a model file.
 - **`%%report` is documented here now, and the published checker validates it.**
   The six models under `guide/models/` carry 217 of them between them, and for a
   while the directive was in none of the specifications this site publishes and in
-  neither of its checkers — a reader who opened a model found lines `llms-full.txt`
+  neither of its checkers — a reader who opened a model found lines the protocol
   never defined, and an author who added their own got a clean result from a checker
   that was ignoring them. The directive is in `appwithai-language.json` upstream as
   `validated`, the checker emits `EML290`-`EML296` for it, and `guide/checker.js`
@@ -1447,8 +1435,8 @@ not determine" is not a verdict the tooling forces on anyone.
 
 ## The worked examples
 
-`llmdetailed.txt` §10 — the interactive authoring protocol these two models were built
-through — is now `llms.md` §1, whose *walk me through it* pace is the same gated walkthrough.
+`llms.txt` §1 — the interactive authoring protocol these two models were built
+through — is now `llms.txt` §1, whose *walk me through it* pace is the same gated walkthrough.
 
 - **`guide/models/dance-studio.eml.mmd` is §1's worked example.** The section walks a
   booking business end to end and holds the model it builds to a standard — help text on
@@ -1493,7 +1481,7 @@ the scripts it runs have no dependencies.
 
 | Step | What it holds |
 |---|---|
-| `node scripts/check-spec.mjs` | `llms.md`'s fenced examples and its claims, against the published checker — plus its tooling claims, the new-or-change rules by their wording, and that the four retired files are stubs |
+| `node scripts/check-spec.mjs` | `llms.txt`'s fenced examples and its claims, against the published checker — plus its tooling claims, the new-or-change rules by their wording, and that the four retired files are stubs |
 | `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
 | `node guide/audit-model.mjs` on each model | the same six, through the **checklist audit** — every one scores 23/23, because every published model is meant to be a worked example |
 | the audit on a bare ERD | it has to still bite. A single entity with a free-text status passes `check-model.mjs` with exit 0 and must fail the audit, or a vendored checker that stopped emitting `EML151`-`EML153` would leave the scorer silently toothless |
