@@ -653,6 +653,8 @@ for (const retired of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.t
   const stub = readFileSync(root + retired, "utf8");
   enh(stub.includes("https://www.appwithai.org/llms.md") && stub.split("\n").length < 40,
     `${retired}: is a short stub pointing at https://www.appwithai.org/llms.md`);
+  enh(stub.includes("https://www.appwithai.org/llms.txt"),
+    `${retired}: names https://www.appwithai.org/llms.txt as the plain-text fallback`);
 }
 
 console.log(`\n${enhancementFail === 0 ? "the one document holds both modes." : enhancementFail + " mode claim(s) contradicted."}`);
