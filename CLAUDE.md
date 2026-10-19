@@ -1027,6 +1027,12 @@ enhancement editions existed for is in it: ask for the file, never reconstruct a
 model from memory, inventory before editing, hand back the whole file, and prove
 nothing was lost with a before-and-after table.
 
+**`llms.txt` is the same file under a name Pages types `text/plain`.** Pages
+types `.md` as `text/markdown`, and some readers (ChatGPT's web reader) refuse
+it with `400 Unsupported content-type: text/markdown`. `llms.txt` is a byte copy,
+held by `check-spec.mjs`; refresh it with `cp llms.md llms.txt` whenever
+`llms.md` is re-vendored. `llms.md` stays the canonical URL.
+
 **It is vendored, byte for byte, from `website/llmtext/llms.md` in
 `businessappwithai/app-with-ai-tanstack`.** Edit it there, where
 `bun run test:llmtext` holds it to the real checker, and copy it here. Its

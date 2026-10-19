@@ -639,6 +639,13 @@ for (const [pattern, label] of [
   enh(pattern.test(detailedProse), `llms.md: ${label}`);
 }
 
+/* llms.txt is llms.md under a name the web server types text/plain. Some
+ * readers (ChatGPT's among them) refuse the text/markdown that Pages sends for
+ * .md with "400 Unsupported content-type". It is a byte copy, so it can never
+ * say anything the protocol document does not. */
+enh(readFileSync(root + "llms.txt", "utf8") === detailed,
+  "llms.txt is a byte-for-byte copy of llms.md (for readers that refuse text/markdown)");
+
 /* The four retired documents are stubs pointing here, so a URL a model was once
    given still leads somewhere — and never to a second, staler account of the
    language. */
