@@ -639,6 +639,24 @@ for (const [pattern, label] of [
   enh(pattern.test(detailedProse), `llms.md: ${label}`);
 }
 
+/* Chapter 11's Audit button runs the published audit() function in the page. The
+   page must carry the button, the controller must import audit-model.mjs rather
+   than reimplement it, and that module must still export audit() without
+   touching Node at import time. */
+{
+  const page = readFileSync(root + "guide/11-check-a-model.html", "utf8");
+  const ctl = readFileSync(root + "assets/js/validator.js", "utf8");
+  enh(/id="audit"/.test(page), "chapter 11 has an Audit button");
+  enh(ctl.includes('import("../../guide/audit-model.mjs")') && !/say\(/.test(ctl),
+    "validator.js imports the published audit-model.mjs and holds no audit logic of its own");
+  const mod = await import(new URL("../guide/audit-model.mjs", import.meta.url));
+  const checker = await import(new URL("../guide/checker.js", import.meta.url));
+  const fixer = await import(new URL("../guide/fixer.js", import.meta.url));
+  const model = readFileSync(root + "guide/models/dance-studio.eml.mmd", "utf8");
+  const r = mod.audit(model, { check: checker.check, checkAndFix: fixer.checkAndFix, file: "dance-studio.mmd" });
+  enh(r.ok && r.failed.length === 0, `audit() as a library scores the dance-studio model ${r.score}`);
+}
+
 /* llms.txt is llms.md under a name the web server types text/plain. Some
  * readers (ChatGPT's among them) refuse the text/markdown that Pages sends for
  * .md with "400 Unsupported content-type". It is a byte copy, so it can never
