@@ -885,6 +885,11 @@ generator would not.
 
 ## Vendored files
 
+**`scripts/check-upstream.mjs` holds them to upstream, and CI runs it.** It fetches each straight copy
+listed below from `app-with-ai-tanstack` (`main`, or `UPSTREAM_REF`) and fails on any byte of difference.
+The protocol document once drifted here — this site's copy documented an exit code upstream's had dropped —
+and nothing noticed. It is red while this site is ahead of upstream's `main`, so merge the upstream change first.
+
 Everything under `assets/vendor/`, plus `assets/js/appwithai-*.js`, `assets/js/run-*.js`,
 `guide/wasm-app/sw.js`, `guide/checker.js`, `guide/fixer.js` and `llms.txt` comes
 from `businessappwithai/app-with-ai-tanstack`. Re-copy them rather than editing by hand.

@@ -119,3 +119,8 @@ jobs:
       # generator bundles, against the behaviour they are supposed to carry.
       - name: Website end-to-end tests
         run: node scripts/website-e2e.mjs
+
+      # Every vendored file is upstream's, byte for byte. Red while this site is
+      # ahead of app-with-ai-tanstack's main: merge the upstream change first.
+      - name: Vendored files match app-with-ai-tanstack
+        run: node scripts/check-upstream.mjs
