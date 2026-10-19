@@ -639,6 +639,13 @@ for (const [pattern, label] of [
   enh(pattern.test(detailedProse), `llms.md: ${label}`);
 }
 
+/* llms.txt is llms.md under a name the web server types text/plain. Some
+ * readers (ChatGPT's among them) refuse the text/markdown that Pages sends for
+ * .md with "400 Unsupported content-type". It is a byte copy, so it can never
+ * say anything the protocol document does not. */
+enh(readFileSync(root + "llms.txt", "utf8") === detailed,
+  "llms.txt is a byte-for-byte copy of llms.md (for readers that refuse text/markdown)");
+
 /* The four retired documents are stubs pointing here, so a URL a model was once
    given still leads somewhere — and never to a second, staler account of the
    language. */
@@ -646,6 +653,8 @@ for (const retired of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.t
   const stub = readFileSync(root + retired, "utf8");
   enh(stub.includes("https://www.appwithai.org/llms.md") && stub.split("\n").length < 40,
     `${retired}: is a short stub pointing at https://www.appwithai.org/llms.md`);
+  enh(stub.includes("https://www.appwithai.org/llms.txt"),
+    `${retired}: names https://www.appwithai.org/llms.txt as the plain-text fallback`);
 }
 
 console.log(`\n${enhancementFail === 0 ? "the one document holds both modes." : enhancementFail + " mode claim(s) contradicted."}`);
