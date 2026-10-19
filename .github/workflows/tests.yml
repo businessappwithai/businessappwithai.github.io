@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: "22"
 
-      # llms-full.txt's own examples and claims, against the published checker.
+      # llms.md's own examples and claims, against the published checker.
       - name: Specification
         run: node scripts/check-spec.mjs
 
@@ -37,7 +37,7 @@ jobs:
       # missing half the language: no state machine, no access rules, a
       # reference column that forgot its FK modifier, help that restates the
       # column's own name. Every published model is meant to be a worked
-      # example, so every one of them scores 22/22 or this fails.
+      # example, so every one of them scores 23/23 or this fails.
       - name: Models are finished, not merely valid
         run: |
           for f in guide/models/*.eml.mmd; do

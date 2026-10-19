@@ -13,10 +13,10 @@
  * proxies it, logs it, or sends it anywhere else — and `analytics.js` is
  * configured never to record a key, a model, or a prompt (see privacy.html).
  *
- * The loop is the same one `llmtextenhancement.txt` describes, run here rather
+ * The loop is the same one `llms.md` describes for a change, run here rather
  * than pasted into somebody else's chat window:
  *
- *   1. the published enhancement protocol becomes the system prompt
+ *   1. the published protocol document becomes the system prompt
  *   2. the visitor's current .mmd and their instruction become the user turn
  *   3. the reply is stripped to its Mermaid and checked with `guide/checker.js`
  *   4. a download is offered only when that check finds no errors
@@ -122,12 +122,13 @@ const PROVIDERS = {
   },
 };
 
-/* The protocol document this page runs. `llmtextenhancement.txt` is the
-   enhancement edition — start from a model that exists, change what was asked,
-   keep everything else, and prove it — which is precisely this page's job. The
-   authoring edition would rewrite the visitor's model instead, which is the
-   failure that edition exists to prevent. Same origin, so no egress to fetch it. */
-const PROTOCOL_URL = "llmtextenhancement.txt";
+/* The protocol document this page runs. `llms.md` is the one document for
+   writing a model and for changing one, and it decides which from whether a
+   `.mmd` was given — here one always is, so it runs as a change: start from the
+   model that exists, change what was asked, keep everything else, and prove it.
+   This page is one request with nobody on the other end to answer a question,
+   so the user turn asks for the one-pass pace. Same origin, so no egress. */
+const PROTOCOL_URL = "llms.md";
 
 const KEY_STORAGE = "awai.assistant.key";
 const PROVIDER_STORAGE = "awai.assistant.provider";
@@ -357,7 +358,9 @@ async function run() {
 
     const user =
       `Here is my current EML model. Apply the change I describe and hand back ` +
-      `the whole file, exactly as the protocol above requires.\n\n` +
+      `the whole file, exactly as the protocol above requires. JUST BUILD IT: ` +
+      `this is a single request and nobody can answer a question, so run every ` +
+      `phase yourself in one pass and list your assumptions.\n\n` +
       `## The change I want\n\n${instruction}\n\n` +
       `## My current model\n\n\`\`\`mermaid\n${state.source}\n\`\`\``;
 

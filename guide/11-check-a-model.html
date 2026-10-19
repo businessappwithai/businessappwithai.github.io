@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Check an EML model against the published validators — the same engines the command line runs — and follow the authoring protocol that turns a business description into a model a generator will accept.">
-  <meta name="keywords" content="AppWithAI, EML checker, EML fixer, model validation, authoring protocol, Mermaid model, ERD, business rules, BPMN workflow, saga, code generation, LLM specification, llms-full.txt">
+  <meta name="keywords" content="AppWithAI, EML checker, EML fixer, model validation, authoring protocol, Mermaid model, ERD, business rules, BPMN workflow, saga, code generation, LLM specification, llms.md">
   <title>11 · Check a model — Build a CRM with AppWithAI</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="icon" href="../favicon.ico" sizes="48x48">
@@ -182,7 +182,7 @@ console.log(formatReport(report));</code></pre>
         </button>
         <button type="button" class="choice" id="choice-dance" aria-pressed="false">
           <span class="choice__name">The dance-studio model</span>
-          <span class="choice__desc">Nine entities: a booking business, and the worked example for the interactive protocol in <code>llmdetailed.txt</code> §10. It comes back clean, which is what a model written against that section is supposed to do.</span>
+          <span class="choice__desc">Nine entities: a booking business, and the worked example for the office-hours protocol in <code>llms.md</code> §1. It comes back clean, which is what a model written against that section is supposed to do.</span>
           <span class="choice__meta">dance-studio.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-investment" aria-pressed="false">
@@ -419,7 +419,7 @@ node audit-model.mjs my-business.mmd</code></pre>
 </p>
 <div class="code">
   <div class="code-head"><span class="tag">url</span></div>
-<pre><code data-url="../llms-full.txt">https://www.appwithai.org/llms-full.txt</code></pre>
+<pre><code data-url="../llms.md">https://www.appwithai.org/llms.md</code></pre>
 </div>
 <p>
   Point a language model at it before asking for a model, and it has the language definition, the

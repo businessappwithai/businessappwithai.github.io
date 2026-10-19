@@ -197,7 +197,7 @@ function notAModel(issues) {
     prose to the parser, however thorough they are. If a language model answered you with a
     specification, ask it again for the file itself: one <code>.mmd</code>, every line Mermaid or an
     EML <code>%%</code> directive, as
-    <a href="../llms-full.txt">section 1 of the specification</a> requires. If it answered with a
+    <a href="../llms.md">section 1 of llms.md</a> requires. If it answered with a
     report that contains the model in a fenced block, paste the contents of that block here
     instead.</p>`;
 }

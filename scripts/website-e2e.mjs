@@ -392,12 +392,10 @@ console.log("\nThe reporting application in the deployable archive");
 // ---------------------------------------------------------------------------
 // 7. The four prompts on try-it-yourself.html.
 //
-// The page makes a claim about each pair — that the second prompt is the first
-// one word for word below its opening line, and that only the document and the
-// section number change. It is the kind of claim that is true when it is
-// written and false after the next edit to either block, because the two are
-// four hundred lines apart in the source and nothing reads both. A prompt pair
-// that has drifted sends one reader through the wrong protocol.
+// The page carries one prompt for a new model and for a change to an existing
+// one. It makes promises a reader acts on — that attaching a .mmd changes that
+// model and gets the whole file back, that the form layout is required — and
+// the anchors other pages link to have to keep landing on it.
 console.log("\n7. The prompts on try-it-yourself.html");
 {
   const page = readFileSync(path.join(ROOT, "try-it-yourself.html"), "utf8");
@@ -412,49 +410,46 @@ console.log("\n7. The prompts on try-it-yourself.html");
       .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
   };
 
-  const pairs = [
-    ["authoring", "research-prompt", "enterprise-research-prompt", "llms-full.txt", "llmdetailed.txt"],
-    ["enhancement", "enhance-prompt", "enterprise-enhance-research-prompt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"],
-  ];
-
-  for (const [label, batchId, gatedId, batchDoc, gatedDoc] of pairs) {
-    const a = promptBody(batchId);
-    const b = promptBody(gatedId);
-    if (!a || !b) { fail(`the ${label} pair is on the page`, `missing #${a ? gatedId : batchId}`); continue; }
-
-    const aLines = a.split("\n");
-    const bLines = b.split("\n");
-    aLines.slice(1).join("\n") === bLines.slice(1).join("\n")
-      ? ok(`the ${label} prompts are identical below their first line`)
-      : fail(`the ${label} prompts are identical below their first line`,
-             "they have drifted — edit one and you must edit the other");
-    aLines[0] !== bLines[0]
-      ? ok(`the ${label} pair's first lines differ, which is where all four differences live`)
-      : fail(`the ${label} pair's first lines differ`, "both name the same document and section");
-    aLines[0].includes(batchDoc) && bLines[0].includes(gatedDoc)
-      ? ok(`the ${label} pair names ${batchDoc} and ${gatedDoc}`)
-      : fail(`the ${label} pair names its two documents`, `got: ${aLines[0].slice(0, 80)}`);
+  /* One prompt, and one document. The page used to carry four prompts in two
+     pairs that had to stay word for word identical below their first line; they
+     are one prompt now, pointing at llms.md, which decides new-or-change from
+     whether a .mmd is attached. What the enhancement pair existed to guarantee
+     is held on the one prompt instead. */
+  const body = promptBody("research-prompt");
+  if (!body) fail("the prompt is on the page", "missing #research-prompt");
+  else {
+    body.split("\n")[0].includes("llms.md") && /section 1/.test(body.split("\n")[0])
+      ? ok("the prompt names llms.md and its section 1")
+      : fail("the prompt names llms.md and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    /If I have attached a \.mmd file, it is my existing model/.test(body) && /Never rebuild it from memory/.test(body)
+      ? ok("the prompt changes an attached model and refuses to rebuild it")
+      : fail("the prompt changes an attached model", "it does not tell the AI what an attached .mmd means");
+    /give me back the whole file with before-and-after counts/.test(body)
+      ? ok("the prompt asks for the whole model back, with counts")
+      : fail("the prompt asks for the whole model back", "the prompt permits a patch");
+    /%%section/.test(body) && /two-column rows/.test(body)
+      ? ok("the prompt requires every form laid out in %%section rows")
+      : fail("the prompt requires the form layout", "no %%section requirement");
   }
+  for (const id of ["enterprise-research-prompt", "enhance-prompt", "enterprise-enhance-research-prompt"])
+    !page.includes(`id="${id}"`)
+      ? ok(`the retired #${id} is gone`)
+      : fail(`the retired #${id} is gone`, "a second prompt is still on the page");
+  for (const anchor of ["the-prompt", "enterprise-prompt", "enhance", "enterprise-enhance-prompt"])
+    page.includes(`id="${anchor}"`)
+      ? ok(`#${anchor} still resolves — other pages link to it`)
+      : fail(`#${anchor} still resolves`, "an inbound link would land nowhere");
 
-  /* Every document the four prompts name has to be served from this origin —
-     a prompt is a URL a reader pastes, and a 404 is silent to them until the
-     model says it cannot read it. */
-  for (const doc of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"])
-    existsSync(path.join(ROOT, doc))
-      ? ok(`${doc} is published here`)
-      : fail(`${doc} is published here`, "a prompt names a document this site does not serve");
-
-  /* The enhancement pair exists because the authoring pair, pointed at an
-     existing model, rewrites it. Both enhancement prompts must therefore hand
-     the user's file over and refuse a reconstruction. */
-  for (const id of ["enhance-prompt", "enterprise-enhance-research-prompt"]) {
-    const body = promptBody(id) ?? "";
-    /My model is attached/.test(body) && /do not rebuild it/i.test(body)
-      ? ok(`#${id} tells the model to read the attached file and not rebuild it`)
-      : fail(`#${id} tells the model to read the attached file`, "the prompt does not require the user's own model");
-    /Not a patch, not a diff/.test(body)
-      ? ok(`#${id} asks for the whole model back rather than a patch`)
-      : fail(`#${id} asks for the whole model back`, "the prompt permits a diff");
+  /* The document the prompt names is served here, and the four it replaced are
+     stubs that send an AI to it. */
+  existsSync(path.join(ROOT, "llms.md"))
+    ? ok("llms.md is published here")
+    : fail("llms.md is published here", "the prompt names a document this site does not serve");
+  for (const doc of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
+    const stub = readFileSync(path.join(ROOT, doc), "utf8");
+    stub.includes("https://www.appwithai.org/llms.md")
+      ? ok(`${doc} is a stub pointing at llms.md`)
+      : fail(`${doc} is a stub pointing at llms.md`, "an old URL still serves a second account of the language");
   }
 }
 
@@ -478,12 +473,12 @@ console.log("\n8. The model assistant");
   const assistant = readFileSync(p("assistant.html"), "utf8");
   const controller = readFileSync(p("assets", "js", "assistant.js"), "utf8");
 
-  /* The enhancement edition, not the authoring one. */
-  /PROTOCOL_URL\s*=\s*"llmtextenhancement\.txt"/.test(controller)
-    ? ok("the assistant runs the enhancement protocol, not the authoring one")
+  /* The one protocol document, run as a change in one pass. */
+  /PROTOCOL_URL\s*=\s*"llms\.md"/.test(controller) && /JUST BUILD IT/.test(controller)
+    ? ok("the assistant runs llms.md, in one pass")
     : fail(
-        "the assistant runs the enhancement protocol",
-        "PROTOCOL_URL is not llmtextenhancement.txt — the authoring edition rewrites the model it is given"
+        "the assistant runs llms.md, in one pass",
+        "PROTOCOL_URL is not llms.md, or the user turn does not ask for one pass — a single request cannot answer a question"
       );
 
   /* Every host the controller can reach. A key goes on these requests, so the

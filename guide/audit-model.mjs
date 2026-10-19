@@ -20,9 +20,10 @@
  * nobody can use.
  *
  * So this runs the mechanical half of §1.2's file contract and §10's checklist
- * in `https://www.appwithai.org/llms-full.txt`: the file's name and shape, the
+ * in `https://www.appwithai.org/llms.md`: the file's name and shape, the
  * keys, the enum bindings, the state machines, the rules, the sagas, the access
  * rules, help that says something rather than restating a column's own name,
+ * every form laid out in `%%section` rows,
  * line items declared where they belong — and the three checker passes over the
  * file's own bytes, so a clean audit implies a clean check.
  *
@@ -43,7 +44,7 @@
 
 
 /**
- * The audit as a library: the twenty-two checks over a model's text, with no
+ * The audit as a library: the twenty-three checks over a model's text, with no
  * file system and no network, so a browser can run exactly what this runner
  * runs. `check` and `checkAndFix` are the published modules' functions, passed
  * in rather than imported, because where they come from is the runner's
@@ -135,7 +136,22 @@ export function audit(src, { check, checkAndFix, file = "model.mmd" }) {
       + (codes.length ? `; ${missing} missing, ${restated} restated` : "") + ")");
   }
 
-  /* §10.11 — line items, and where the dictionary puts them.
+  /* §10.11 — the form layout. Every entity's form is headed sections of
+     two-column rows, declared with %%section; an entity with none is one flat
+     list nobody designed (EML170), a column left out of every row lands in a
+     trailing "Other" section (EML172), and a section with no help is a heading
+     with nothing under it (EML177). Scored as one check, named per code. */
+  {
+    const codes = check(src).issues.filter((i) => ["EML170", "EML172", "EML177"].includes(i.code));
+    const sections = (src.match(/^\s*%%section\b/gm) || []).length;
+    const count = (code) => codes.filter((i) => i.code === code).length;
+    say(codes.length === 0,
+      `every entity's form laid out in %%section rows, every column placed, every section explained `
+      + `(${sections} section lines`
+      + (codes.length ? `; ${count("EML170")} entities with none, ${count("EML172")} with unplaced columns, ${count("EML177")} sections without help` : "") + ")");
+  }
+
+  /* §10.12 — line items, and where the dictionary puts them.
      EML150 is mechanical and fails here. EML149 is a judgement the checker cannot
      make, so it is reported rather than scored: a candidate the author has walked
      and rejected is a legitimate outcome, and one they have not seen is not. */
@@ -258,7 +274,7 @@ async function importFrom(base, { fatal = true } = {}) {
           "     and run this script again — it prefers local copies and needs no network;\n" +
           "  2. or pass --base <directory> naming where those two files are;\n" +
           "  3. or, if neither is possible, walk the checklist in section 10 of\n" +
-          "     https://www.appwithai.org/llms-full.txt by hand and say in your delivery\n" +
+          "     https://www.appwithai.org/llms.md by hand and say in your delivery\n" +
           "     that you did. Never report a score you did not obtain."
       );
       process.exit(2);

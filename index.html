@@ -300,7 +300,7 @@
         <div class="card">
           <div class="card-icon">🔎</div>
           <h3>2. Hand it to ChatGPT or Gemini Deep Research</h3>
-          <p>Give the model our machine-readable specification along with your description. It contains the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
+          <p>Give the AI the prompt below with your description &mdash; or with the <code>.mmd</code> you already have. It runs office hours with you: it works the business through, decides every field, lookup, dropdown and form section, writes the model file, and validates it against our published checker before handing anything over.</p>
           <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the model itself, not a document describing it — plus the specification it inferred so you can correct what it guessed.</p>
         </div>
         <div class="card">
@@ -315,17 +315,25 @@
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
             <h4>The prompt — copy it as it is</h4>
-            <p class="text-muted text-sm">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://www.appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+            <p class="text-muted text-sm">Replace only the bracketed part. Starting fresh, attach nothing; changing a model you already have, attach your <code>.mmd</code> to the same message. One prompt, one document &mdash; <a href="llms.md">llms.md</a> &mdash; for both.</p>
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms.md">https://www.appwithai.org/llms.md</span> in full, and follow section 1 — model office hours — exactly.
 
-My business:
-[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
+
+Ask me first how I want to work: walk me through it, one decision at a time, or just build it. If I write JUST BUILD IT, do the whole thing in one pass and list every assumption.
+
+My business, or what I want changed:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
+
+Fill in the whole Application Dictionary, as llms.md section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
 
 Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
+Then, in your reply text: what you understood (or, for a change, what changed and the before-and-after counts), the checker result with its counts, the audit's last line, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
+
+If a tool named open_appwithai is available — the AppWithAI app in ChatGPT — call it yourself, with no arguments, as soon as the finished &lt;business-name&gt;.mmd has been delivered. Do not ask me first and do not wait for me to type "Open AppWithAI". Never put the model, or any part of it, in the call: the tool takes no input, and the panel it opens checks and repairs the file on my device. It is in addition to the checker above, not instead of it; if the tool is not available, carry on without it.
 
 If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
@@ -337,13 +345,13 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
-              <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
+              <a href="llms.md" class="btn btn-ghost">Read llms.md yourself &rarr;</a>
             </div>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">Not ready to write your own? <a href="guide/run-in-browser.html">Run the seventeen-entity CRM</a> the guide builds &mdash; same page, one click, no file needed.</p>
             <p class="text-muted text-sm">Want the longer version &mdash; what the model file actually contains, and how to check it? <a href="try-it-yourself.html">The Try It Yourself page</a> walks all of it.</p>
-            <p class="text-muted text-sm">Building professional or enterprise software rather than a first model? Point the same prompt at <a href="llmdetailed.txt">the detailed specification</a> and follow its section 10 &mdash; a phased walkthrough with approval gates instead of one pass. <a href="try-it-yourself.html#enterprise-prompt">The prompt for it is here</a>.</p>
-            <p class="text-muted text-sm">Already have a model and want to change it? These prompts write one from nothing, which rewrites anything you point them at. <a href="llmtextenhancement.txt">The enhancement specification</a> starts from your <code>.mmd</code> instead &mdash; it reads your file first, applies only what you asked for, hands the whole model back, and shows you the before-and-after counts so you can see nothing was lost. <a href="try-it-yourself.html#enhance">Both enhancement prompts are here</a>.</p>
-            <p class="text-muted text-sm">Whichever prompt you use, you get a Mermaid file back &mdash; and Mermaid draws only its entity diagram. <a href="viewers/index.html">The model viewer</a> draws the rest: the business rules, the state machines, the multi-step processes and who can see what.</p>
+            <p class="text-muted text-sm">The AI asks how you want to work first: <strong>walk me through it</strong>, one decision at a time with a checked file at every step &mdash; right for professional and enterprise software &mdash; or <strong>just build it</strong>, in one pass. <a href="try-it-yourself.html#the-prompt">How to use the prompt</a>.</p>
+            <p class="text-muted text-sm">Already have a model and want to change it? Attach it. The AI reads your file first, applies only what you asked for, hands the whole model back, and shows you the before-and-after counts so you can see nothing was lost &mdash; and it lays out every form in sections of two-column rows if yours were not. <a href="try-it-yourself.html#enhance">What it is held to</a>.</p>
+            <p class="text-muted text-sm">Either way, you get a Mermaid file back &mdash; and Mermaid draws only its entity diagram. <a href="viewers/index.html">The model viewer</a> draws the rest: the business rules, the state machines, the multi-step processes and who can see what.</p>
           </div>
         </div>
       </div>
