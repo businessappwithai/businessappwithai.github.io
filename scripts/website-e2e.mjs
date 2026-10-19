@@ -418,9 +418,14 @@ console.log("\n7. The prompts on try-it-yourself.html");
   const body = promptBody("research-prompt");
   if (!body) fail("the prompt is on the page", "missing #research-prompt");
   else {
-    body.split("\n")[0].includes("llms.md") && /section 1/.test(body.split("\n")[0])
-      ? ok("the prompt names llms.md and its section 1")
-      : fail("the prompt names llms.md and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    /* The prompt points at llms.txt, the byte copy Pages serves as text/plain: some
+       readers (ChatGPT's among them) refuse the text/markdown it sends for .md. */
+    body.split("\n")[0].includes("llms.txt") && /section 1/.test(body.split("\n")[0])
+      ? ok("the prompt names llms.txt and its section 1")
+      : fail("the prompt names llms.txt and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    !/llms\.md/.test(body)
+      ? ok("the prompt never sends a reader to the .md URL")
+      : fail("the prompt never sends a reader to the .md URL", "a reader that refuses text/markdown would fail on it");
     /If I have attached a \.mmd file, it is my existing model/.test(body) && /Never rebuild it from memory/.test(body)
       ? ok("the prompt changes an attached model and refuses to rebuild it")
       : fail("the prompt changes an attached model", "it does not tell the AI what an attached .mmd means");
@@ -442,6 +447,9 @@ console.log("\n7. The prompts on try-it-yourself.html");
 
   /* The document the prompt names is served here, and the four it replaced are
      stubs that send an AI to it. */
+  existsSync(path.join(ROOT, "llms.txt"))
+    ? ok("llms.txt, the document the prompt names, is published here")
+    : fail("llms.txt is published here", "the prompt names a document this site does not serve");
   existsSync(path.join(ROOT, "llms.md"))
     ? ok("llms.md is published here")
     : fail("llms.md is published here", "the prompt names a document this site does not serve");

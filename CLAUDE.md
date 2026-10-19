@@ -388,7 +388,7 @@ nav points at the page, the home page keeps the short version and links to it. B
 them the path spans five files. If you change one, check the others. There is **one
 prompt**, for a new model and for a change to an existing one.
 
-1. **The prompt block** carries the specification URL inside a `[data-url]` span, so a
+1. **The prompt block** names `llms.txt`, not `llms.md` — the byte copy Pages serves as `text/plain`, because ChatGPT's reader refuses `text/markdown`. It carries the specification URL inside a `[data-url]` span, so a
    visitor copies a link to the host they are actually on. The copy button is
    `[data-copy]` pointing at `#research-prompt`. Both are handled by `main.js`. The home
    page and `try-it-yourself.html` carry the **same** prompt text.
