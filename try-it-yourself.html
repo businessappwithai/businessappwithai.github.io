@@ -112,7 +112,7 @@
         <div class="card">
           <div class="card-icon">&#128270;</div>
           <h3>2. Hand it over to ChatGPT, Claude or Gemini</h3>
-          <p>Give the AI the prompt below. It runs office hours with you: it asks how you want to work, puts its understanding of your business in front of you as premises, proposes two versions of the model — a minimal one and a complete one — and walks through every record type with you before it writes the file and validates it against our published checker.</p>
+          <p>Give the AI the prompt below. It runs office hours with you: it asks how you want to work, researches your business domain as widely as it can, attacks its own research and plan as a sceptical expert would &mdash; even when you attached a model &mdash; then puts what survived in front of you as premises, proposes two versions of the model — a minimal one and a complete one — and walks through every record type with you before it writes the file and validates it against our published checker.</p>
           <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the whole model, not a document describing it.</p>
         </div>
         <div class="card">
@@ -146,6 +146,8 @@ If I have attached a .mmd file, it is my existing model: change that file — re
 
 Ask me first how I want to work: walk me through it, one decision at a time, or just build it. If I write JUST BUILD IT, do the whole thing in one pass and list every assumption.
 
+Before you build anything, put on your thinking cap: research my business domain as widely and deeply as you can, then review your own research and plan adversarially, as a sceptical expert would, and fix what that review finds. Only then start building and reviewing with me. Do this even if I attached a .mmd.
+
 My business, or what I want changed:
 [Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
 
@@ -172,7 +174,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
             </div>
             <div class="card mt-3" style="box-shadow: none; border: 1px solid var(--gray-200);">
               <h3 style="margin-top: 0;">Choose the pace</h3>
-              <p class="text-sm text-muted"><strong>Walk me through it</strong> is the default for anything serious: one decision at a time, with real options, and a checked file at every step. <strong>Just build it</strong> — write <code>JUST BUILD IT</code> in your description — gets you the finished file in one reply, with every assumption listed for you to correct.</p>
+              <p class="text-sm text-muted"><strong>Walk me through it</strong> is the default for anything serious: one decision at a time, with real options, and a checked file at every step. <strong>Just build it</strong> — write <code>JUST BUILD IT</code> in your description — gets you the finished file in one reply, with every assumption listed for you to correct. Either way the AI researches and reviews its own plan first, and tells you what the research found and which objections changed the plan.</p>
             </div>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-md);">Then upload the <code>.mmd</code> and press Generate, then Run. Got a report instead of a file? Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download a real <code>.mmd</code> from there.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
