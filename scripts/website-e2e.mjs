@@ -439,6 +439,17 @@ console.log("\n7. The prompts on try-it-yourself.html");
     /%%section/.test(body) && /two-column rows/.test(body)
       ? ok("the prompt requires every form laid out in %%section rows")
       : fail("the prompt requires the form layout", "no %%section requirement");
+    /If you are ChatGPT, the TinyFish plugin must be installed and signed in/.test(body) && /stop and tell me how to install it/.test(body)
+      ? ok("the prompt stops a ChatGPT run until the TinyFish plugin is installed")
+      : fail("the prompt stops a ChatGPT run until the TinyFish plugin is installed", "no ChatGPT prerequisite in the prompt");
+    /* The same prompt is on both pages, and the install steps are on one of them. */
+    const home = readFileSync(path.join(ROOT, "index.html"), "utf8");
+    /If you are ChatGPT, the TinyFish plugin must be installed/.test(home)
+      ? ok("index.html: the prompt carries the ChatGPT prerequisite too")
+      : fail("index.html: the prompt carries the ChatGPT prerequisite too", "the two copies of the prompt differ");
+    /id="chatgpt-tinyfish"/.test(page) && /Install plugin/.test(page) && /https:\/\/docs\.tinyfish\.ai\/plugins/.test(page)
+      ? ok("try-it-yourself.html: says how to install the TinyFish plugin, and links its instructions")
+      : fail("try-it-yourself.html: says how to install the TinyFish plugin", "missing #chatgpt-tinyfish, the steps or the link");
   }
   for (const id of ["enterprise-research-prompt", "enhance-prompt", "enterprise-enhance-research-prompt"])
     !page.includes(`id="${id}"`)
@@ -457,7 +468,7 @@ console.log("\n7. The prompts on try-it-yourself.html");
   /* llms.txt is a controller; the chunks it names must be served here too, or a
      model told to fetch one gets a 404 in the middle of a run. */
   const controllerText = readFileSync(path.join(ROOT, "llms.txt"), "utf8");
-  const named = [...controllerText.matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]).filter((n) => n !== "llms.txt");
+  const named = [...new Set([...controllerText.matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]))].filter((n) => n !== "llms.txt");
   named.length === 6 && named.every((name) => existsSync(path.join(ROOT, name)))
     ? ok("every chunk llms.txt names is published here")
     : fail("every chunk llms.txt names is published here", `named ${named.join(", ")}`);

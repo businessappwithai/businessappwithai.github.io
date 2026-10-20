@@ -144,6 +144,8 @@
 
 If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
 
+If you are ChatGPT, the TinyFish plugin must be installed and signed in before you start. If it is not, stop and tell me how to install it; do nothing else until it works.
+
 Ask me first how I want to work: walk me through it, one decision at a time, or just build it. If I write JUST BUILD IT, do the whole thing in one pass and list every assumption.
 
 Before you build anything, put on your thinking cap: research my business domain as widely and deeply as you can, then review your own research and plan adversarially, as a sceptical expert would, and fix what that review finds. Only then start building and reviewing with me. Do this even if I attached a .mmd.
@@ -171,6 +173,10 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
             <div class="card mt-3" id="enterprise-enhance-prompt" style="box-shadow: none; border: 1px solid var(--gray-200);">
               <h3 style="margin-top: 0;">Changing a model you already have</h3>
               <p class="text-sm text-muted">Attach your <code>.mmd</code> to the same message, and replace the bracketed part with the change you want. The AI reads and counts your model first, applies only what you asked, and hands back the <strong>whole</strong> file — never a patch — with the before-and-after counts that prove nothing was lost. It also fills any gaps in the original&rsquo;s dictionary, and names each one.</p>
+            </div>
+            <div class="card mt-3" id="chatgpt-tinyfish" style="box-shadow: none; border: 1px solid var(--gray-200);">
+              <h3 style="margin-top: 0;">Using ChatGPT? Install TinyFish first</h3>
+              <p class="text-sm text-muted">ChatGPT cannot reliably read this protocol or the checker on its own, so the prompt needs the <strong>TinyFish plugin</strong>. In ChatGPT open <strong>Plugins</strong>, search <strong>TinyFish</strong>, choose <strong>Install plugin</strong> and sign in to your TinyFish account. In a Business, Enterprise or Edu workspace an administrator may have to approve it first. <a href="https://docs.tinyfish.ai/plugins" target="_blank" rel="noopener noreferrer">TinyFish&rsquo;s own instructions</a>. If it is not installed, the prompt makes ChatGPT stop and say so instead of guessing. Other assistants do not need it.</p>
             </div>
             <div class="card mt-3" style="box-shadow: none; border: 1px solid var(--gray-200);">
               <h3 style="margin-top: 0;">Choose the pace</h3>
