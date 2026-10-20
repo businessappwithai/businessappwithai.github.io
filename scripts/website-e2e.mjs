@@ -421,6 +421,15 @@ console.log("\n7. The prompts on try-it-yourself.html");
     body.split("\n")[0].includes("llms.txt") && /section 1/.test(body.split("\n")[0])
       ? ok("the prompt names llms.txt and its section 1")
       : fail("the prompt names llms.txt and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    /* Both pages carry the prompt, and both must be free of the removed ChatGPT
+       app's tool call: a tool that does not exist is an instruction nobody can follow. */
+    for (const file of ["index.html", "try-it-yourself.html"]) {
+      const html = readFileSync(path.join(ROOT, file), "utf8");
+      const block = /<pre id="research-prompt"[\s\S]*?<\/pre>/.exec(html)?.[0] ?? "";
+      block && !/open_appwithai|Open AppWithAI|\bMCP\b/i.test(block)
+        ? ok(`${file}: the prompt asks for no tool call (the ChatGPT app is gone)`)
+        : fail(`${file}: the prompt asks for no tool call`, "it still tells the AI to call open_appwithai, or the prompt block is missing");
+    }
     /If I have attached a \.mmd file, it is my existing model/.test(body) && /Never rebuild it from memory/.test(body)
       ? ok("the prompt changes an attached model and refuses to rebuild it")
       : fail("the prompt changes an attached model", "it does not tell the AI what an attached .mmd means");
