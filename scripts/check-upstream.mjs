@@ -30,6 +30,12 @@ const BASE = `https://raw.githubusercontent.com/businessappwithai/app-with-ai-ta
 
 const PAIRS = [
   ["llms.txt", "website/llmtext/llms.txt"],
+  ["working-session.txt", "website/llmtext/working-session.txt"],
+  ["eml-syntax.txt", "website/llmtext/eml-syntax.txt"],
+  ["eml-dictionary.txt", "website/llmtext/eml-dictionary.txt"],
+  ["eml-reporting.txt", "website/llmtext/eml-reporting.txt"],
+  ["checker-rules.txt", "website/llmtext/checker-rules.txt"],
+  ["enhancement-examples.txt", "website/llmtext/enhancement-examples.txt"],
   ["guide/checker.js", "html/checker.js"],
   ["guide/fixer.js", "html/fixer.js"],
   ["guide/wasm-app/sw.js", "html/wasm-app/sw.js"],

@@ -905,7 +905,7 @@ Where each one comes from:
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
-| `llms.txt` | `website/llmtext/llms.txt` | — |
+| `llms.txt` and its six chunks | `website/llmtext/*.txt` | — |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
 **`website/viewers/README.md` upstream is not vendored.** It documents the
@@ -1018,6 +1018,17 @@ bundle tabulates all three, and `privacy.html` is written to match. Neither
 claim is guesswork — both were read off the network in a browser.
 
 ## `llms.txt` — the one protocol document
+
+**Shape: a ~1k-token controller plus six lazy-loaded chunks.** `llms.txt` holds the
+MUST rules, the load order, the validate commands, the stop conditions and the
+output contract, and names each chunk by its full URL — `working-session.txt`,
+`eml-syntax.txt`, `eml-dictionary.txt`, `eml-reporting.txt`, `checker-rules.txt`,
+`enhancement-examples.txt` — which a model fetches only when a step needs it. All
+seven are vendored byte for byte from `website/llmtext/` upstream and listed in
+`scripts/check-upstream.mjs`. `check-spec.mjs` reads them as one document;
+`assistant.js` sends all of them in its single request (it cannot fetch mid-run).
+Where the text below says "`llms.txt`" for a section (§1.1, §3.7, §8.4…), the
+section lives in the chunk named in each chunk's header map.
 
 There is **one** published protocol document, `llms.txt`, at
 `https://www.appwithai.org/llms.txt`. It is `.txt` and not `.md` on purpose: GitHub Pages types

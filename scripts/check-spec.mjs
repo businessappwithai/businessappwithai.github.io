@@ -26,7 +26,20 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 
 /* ---------------------------------------------- 1. the document's examples */
 
-const spec = readFileSync(root + "llms.txt", "utf8").split("\n");
+/* llms.txt is a short controller; the rest of the protocol is lazy-loaded chunks
+   it names. Every claim below is held against all of them read as one document,
+   because a reader who loads a chunk is reading the same protocol. */
+const CHUNKS = [
+  "llms.txt",
+  "working-session.txt",
+  "eml-syntax.txt",
+  "eml-dictionary.txt",
+  "eml-reporting.txt",
+  "checker-rules.txt",
+  "enhancement-examples.txt",
+];
+const protocol = CHUNKS.map((name) => readFileSync(root + name, "utf8")).join("\n");
+const spec = protocol.split("\n");
 const blocks = [];
 let current = null, start = 0;
 spec.forEach((line, i) => {
@@ -482,7 +495,7 @@ expect(/^### 8\.5 /m.test(specText), "§8.5 exists — the header and §10 both 
  * exactly what goes stale when check-model.mjs changes underneath it.
  */
 
-const detailed = readFileSync(root + "llms.txt", "utf8");
+const detailed = protocol;
 const detailedProse = detailed.replace(/\s+/g, " ");
 const checkerSource = readFileSync(root + "guide/checker.js", "utf8");
 const runnerSource = readFileSync(runner, "utf8");
@@ -655,6 +668,14 @@ for (const [pattern, label] of [
   const model = readFileSync(root + "guide/models/dance-studio.eml.mmd", "utf8");
   const r = mod.audit(model, { check: checker.check, checkAndFix: fixer.checkAndFix, file: "dance-studio.mmd" });
   enh(r.ok && r.failed.length === 0, `audit() as a library scores the dance-studio model ${r.score}`);
+}
+
+/* The controller is what every run pays for: it stays small and names every chunk. */
+{
+  const controller = readFileSync(root + "llms.txt", "utf8");
+  held(controller.length <= 9000, `llms.txt controller stays small (${controller.length} chars, budget 9000)`);
+  for (const name of CHUNKS.filter((n) => n !== "llms.txt"))
+    held(controller.includes("https://www.appwithai.org/" + name), `llms.txt controller names ${name} by its published URL`);
 }
 
 /* llms.txt is the only protocol file. There is no llms.txt (Pages types it

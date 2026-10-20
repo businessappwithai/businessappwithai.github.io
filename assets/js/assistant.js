@@ -129,6 +129,17 @@ const PROVIDERS = {
    This page is one request with nobody on the other end to answer a question,
    so the user turn asks for the one-pass pace. Same origin, so no egress. */
 const PROTOCOL_URL = "llms.txt";
+/* `llms.txt` is a short controller that tells a model to fetch these chunks as
+   each step arrives. This page is one request and cannot fetch mid-run, so it
+   sends the controller and every chunk together, in the controller's order. */
+const PROTOCOL_CHUNKS = [
+  "working-session.txt",
+  "eml-syntax.txt",
+  "eml-dictionary.txt",
+  "eml-reporting.txt",
+  "checker-rules.txt",
+  "enhancement-examples.txt",
+];
 
 const KEY_STORAGE = "awai.assistant.key";
 const PROVIDER_STORAGE = "awai.assistant.provider";
@@ -323,14 +334,18 @@ function clearReport() {
 
 async function loadProtocol() {
   if (state.protocol) return state.protocol;
-  const response = await fetch(PROTOCOL_URL);
-  if (!response.ok) {
-    throw new Error(
-      `Could not load ${PROTOCOL_URL} from this site (${response.status}). ` +
-        `That is this page's own file, so this is a problem here rather than with your key.`
-    );
+  const parts = [];
+  for (const name of [PROTOCOL_URL, ...PROTOCOL_CHUNKS]) {
+    const response = await fetch(name);
+    if (!response.ok) {
+      throw new Error(
+        `Could not load ${name} from this site (${response.status}). ` +
+          `That is this page's own file, so this is a problem here rather than with your key.`
+      );
+    }
+    parts.push(await response.text());
   }
-  state.protocol = await response.text();
+  state.protocol = parts.join("\n\n");
   return state.protocol;
 }
 
