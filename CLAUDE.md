@@ -187,7 +187,7 @@ Deployment is fully automatic:
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
 | `contact.html` | Demo request and contact form |
 | `justification.html` | Position paper — the structural gap AppWithAI addresses, and why engineering standards belong in the platform. In the primary nav as "Why AppWithAI", and linked from the home page, Features, How It Works, Pricing and every footer. |
-| `llms.txt` | The one protocol document language models are pointed at — the EML language, the Application Dictionary, and one office-hours procedure for writing a model or changing one (new or change decided by whether a `.mmd` is attached). Vendored from upstream. It is the only protocol file |
+| `llms.txt` | The one protocol document language models are pointed at — the EML language, the Application Dictionary, and one working-session procedure for writing a model or changing one (new or change decided by whether a `.mmd` is attached). Vendored from upstream. It is the only protocol file |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
 | `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: completely agentic workflows on the DeepSeek Harness. The five before 1.0.0 are one line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. The after-1.0.0 item is the one exception to that brevity: it carries a six-card brief on *how* it would be built, because the harness is new and the item is meaningless without it. Each card maps a step of the AppWithAI pipeline onto a mechanism the harness actually documents — Cordis plugins and bundles, `ctx.tools`, `ask_user_question`, the `ctx.subagents` seam and `ralph`, the sandboxed filesystem/subprocess providers, and the `web`/`headless`/`sdk` profiles with their durable session log. Those come from the harness's own `docs/` (architecture, agent-lifecycle, capability-seams, tool-catalog), which the page cites — **check them before editing a claim there**, since the harness is in developer preview and expects breaking changes. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
 | `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs; and the Model Assistant's own section on the key. Linked from every footer, from chapter 09's note and from `assistant.html` |
@@ -389,7 +389,7 @@ prompt**, for a new model and for a change to an existing one.
    visitor copies a link to the host they are actually on. The copy button is
    `[data-copy]` pointing at `#research-prompt`. Both are handled by `main.js`. The home
    page and `try-it-yourself.html` carry the **same** prompt text.
-2. **`llms.txt`** is what that prompt tells the model to read. Its §1 is the office-hours
+2. **`llms.txt`** is what that prompt tells the model to read. Its §1 is the working-session
    protocol; the three steps on the page are a plain-English retelling of it. If §1
    changes, the three cards should change with it — and so should the section number
    quoted in the prompt block.
@@ -1027,7 +1027,7 @@ two enhancement editions) and the deriver that built them are deleted, and `chec
 any of them comes back.
 
 **New or change is decided by one fact: did the user give a `.mmd`?** §1 runs as
-office hours (after gstack's `/office-hours`): the mode, then the pace — *walk me
+a working session (modelled on gstack's `/office-hours`): the mode, then the pace — *walk me
 through it* (gated, one decision at a time) or *just build it* (one pass) — then
 the forcing questions, premises (Gate A), two rosters, minimal and complete (Gate
 B), an Application Dictionary dossier per entity including its form layout (Gate
@@ -1143,7 +1143,7 @@ These notes describe `llms.txt`, from §2 on.
 `llms.txt` is the EML language and nothing else, because the only thing a language model has to produce
 is a model file.
 
-- **§1 is the office-hours protocol** — one procedure for "build me an app for X" and "change my model".
+- **§1 is the working-session protocol** — one procedure for "build me an app for X" and "change my model".
   Both prompt blocks (the home page and `try-it-yourself.html`) quote that section number.
 - **§1.0 states the deliverable**, and it is there for one reason: the observed failure is a model
   answering with an *enhanced specification* — headings, entity glossary, lifecycle prose — and never
