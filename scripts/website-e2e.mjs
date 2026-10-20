@@ -454,6 +454,13 @@ console.log("\n7. The prompts on try-it-yourself.html");
   existsSync(path.join(ROOT, "llms.txt"))
     ? ok("llms.txt is published here")
     : fail("llms.txt is published here", "the prompt names a document this site does not serve");
+  /* llms.txt is a controller; the chunks it names must be served here too, or a
+     model told to fetch one gets a 404 in the middle of a run. */
+  const controllerText = readFileSync(path.join(ROOT, "llms.txt"), "utf8");
+  const named = [...controllerText.matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]).filter((n) => n !== "llms.txt");
+  named.length === 6 && named.every((name) => existsSync(path.join(ROOT, name)))
+    ? ok("every chunk llms.txt names is published here")
+    : fail("every chunk llms.txt names is published here", `named ${named.join(", ")}`);
   for (const doc of ["llms.md", "llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
     !existsSync(path.join(ROOT, doc))
       ? ok(`${doc} is gone: llms.txt is the only protocol file`)
@@ -488,6 +495,13 @@ console.log("\n8. The model assistant");
         "the assistant runs llms.txt, in one pass",
         "PROTOCOL_URL is not llms.txt, or the user turn does not ask for one pass — a single request cannot answer a question"
       );
+
+  /* A single request cannot fetch mid-run, so the assistant sends the controller
+     and every chunk the controller names. */
+  const chunkNames = [...readFileSync(p("llms.txt"), "utf8").matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]);
+  chunkNames.length > 0 && chunkNames.every((name) => controller.includes(`"${name}"`))
+    ? ok("the assistant sends the controller and every chunk it names")
+    : fail("the assistant sends the controller and every chunk it names", `missing from assistant.js: ${chunkNames.filter((n) => !controller.includes(`"${n}"`)).join(", ")}`);
 
   /* Every host the controller can reach. A key goes on these requests, so the
      list has to stay exactly the two providers and nothing else — this is the
