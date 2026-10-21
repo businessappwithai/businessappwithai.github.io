@@ -287,7 +287,7 @@
       <div class="section-header">
         <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">No Account &middot; No Install &middot; Ten Minutes</span>
         <h2 style="color: white;">Try It Yourself</h2>
-        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Describe your business to an AI you already use, bring back one file, and watch a working application start in this browser. Ten minutes, start to finish.</p>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Describe your business to an AI you already use, bring back one file, and watch a working demo of your application start in this browser. Ten minutes, start to finish &mdash; and when it looks right, download the real application, ready to run under Docker.</p>
       </div>
 
       <div class="grid grid-3" style="margin-top: var(--spacing-2xl);">
@@ -305,9 +305,9 @@
         </div>
         <div class="card">
           <div class="card-icon">▶️</div>
-          <h3>3. Run it, here, in this browser</h3>
-          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, a real interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
-          <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
+          <h3>3. Try it in the browser — then download the real thing</h3>
+          <p>Upload that file and watch it become a working <strong>demo</strong> — PostgreSQL compiled to WebAssembly, an API, an interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p class="text-muted text-sm">When it looks right, press <strong>Download the deployable app (.zip)</strong> on the same page: the production source, with a <code>docker-compose.yml</code> that runs it. <a href="try-it-yourself.html#deploy">What is in it, and how to run it &rarr;</a></p>
         </div>
       </div>
 
@@ -343,6 +343,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
           <div>
             <h4>Then bring the file back</h4>
             <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
+            <p class="text-muted text-sm">The browser run is a demo. The same page&rsquo;s <strong>Download the deployable app (.zip)</strong> gives you the production source and a <code>docker-compose.yml</code> for Docker Desktop or any cloud server with Docker &mdash; <a href="try-it-yourself.html#deploy">what is in it and how to run it</a>.</p>
             <p class="text-muted text-sm">Got a report instead of a file? Some models can only answer with a document. Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download it as a <code>.mmd</code> from there.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
@@ -449,7 +450,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
       <div class="section-header">
         <span class="hero-badge" style="background: var(--accent-100); color: var(--accent-700);">Live Demo · No Sign-Up</span>
         <h2>See AppWithAI in Action — Right Here, Right Now</h2>
-        <p class="section-subtitle">Most software demos are a recording, a sandbox someone else reset, or a calendar invite. This one is the real generated application, compiled and started inside your own browser tab while you watch.</p>
+        <p class="section-subtitle">Most software demos are a recording, a sandbox someone else reset, or a calendar invite. This one is generated from a real model and started inside your own browser tab while you watch &mdash; a demo of the application, compiled for one tab. The production application, with its source, is a download on the same page.</p>
       </div>
       <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
         <div>
@@ -475,7 +476,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
         <div class="card text-center" style="padding: var(--spacing-2xl);">
           <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">⚡</div>
           <h3 style="margin-bottom: var(--spacing-md);">Enterprise CRM, in this tab</h3>
-          <p class="text-muted mb-4">The generated application runs in your browser — no server, no account, no install</p>
+          <p class="text-muted mb-4">The demo runs in your browser — no server, no account, no install</p>
           <div style="background: var(--success-50); padding: var(--spacing-md); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg);">
             <strong style="color: var(--success-700);">Nothing leaves your machine</strong>
             <p class="text-sm text-muted">The model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab</p>
@@ -484,6 +485,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
             Launch the Live Demo
           </a>
           <p class="text-sm text-muted">Or <a href="guide/run-in-browser.html#upload">upload your own model</a> and run that instead</p>
+          <p class="text-sm text-muted">Ready for the real thing? <a href="try-it-yourself.html#deploy">Download the deployable app and run it under Docker</a></p>
         </div>
       </div>
       <div class="text-center mt-5">
@@ -535,7 +537,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
             <li style="padding: var(--spacing-sm) 0;">✓ Status lifecycles with role guards on every transition</li>
             <li style="padding: var(--spacing-sm) 0;">✓ Multi-step processes that write across tables</li>
             <li style="padding: var(--spacing-sm) 0;">✓ The admin dictionary, the audit log and per-screen help</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ The same application generated and run in your browser, with nothing to install</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ A demo of the same application in your browser, and the deployable source as a download</li>
             <li style="padding: var(--spacing-sm) 0;">✓ A published checker and fixer any page or agent can import</li>
           </ul>
           <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
@@ -574,7 +576,7 @@ Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org
         <a href="guide/run-in-browser.html" class="card">
           <div class="card-icon">⚡</div>
           <h3>Run It in Your Browser</h3>
-          <p>Generate the application from the model and run it in the page — PostgreSQL in WebAssembly, no server, no install.</p>
+          <p>Generate the application from the model and try a demo of it in the page — PostgreSQL in WebAssembly, no server, no install — then download the deployable source.</p>
         </a>
       </div>
     </div>

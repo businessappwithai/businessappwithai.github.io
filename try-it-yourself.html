@@ -47,9 +47,11 @@
       <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">No Account &middot; No Install &middot; Ten Minutes</span>
       <h1 style="margin-top: var(--spacing-lg); color: white;">Describe Your Business. <span style="color: var(--accent-300);">Run the Application.</span></h1>
       <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Tell an AI you already use what your business does, bring back one file, and watch a working application start in this browser — database, API, forms, rules and workflows.</p>
+      <p style="color: rgba(255,255,255,0.9); max-width: 48rem; margin: var(--spacing-md) auto 0;"><strong>What runs in the browser is a demo</strong> — the same model, compiled for a single tab, so you can click through it in seconds. <strong>The real application is the download:</strong> a <code>.zip</code> with the full NestJS and TanStack Start source and a <code>docker-compose.yml</code> that runs it, with PostgreSQL and the reporting platform, on Docker Desktop or any cloud server with Docker. <a href="#deploy" style="color: var(--accent-300);">What is in it, and how to run it &darr;</a></p>
       <div style="display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap; margin-top: var(--spacing-xl);">
         <a href="#the-prompt" class="btn btn-accent btn-lg">Start with the prompt &darr;</a>
         <a href="guide/run-in-browser.html" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.6); color: white;">Or run the ready-made CRM</a>
+        <a href="#deploy" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.6); color: white;">Get the real application &darr;</a>
       </div>
 
       <!-- Every model this site publishes, each a link that opens chapter 09
@@ -58,8 +60,8 @@
            an unknown one falls back to the CRM. Add a model there and here
            together, or this box offers something the page cannot select. -->
       <div style="margin-top: var(--spacing-2xl); border: 1px solid rgba(255,255,255,0.35); border-radius: var(--radius-lg); padding: var(--spacing-xl); background: rgba(255,255,255,0.07); text-align: left; max-width: 62rem; margin-left: auto; margin-right: auto;">
-        <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the six worked examples</p>
-        <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser runtime with the model already loaded, and nothing is installed or uploaded. Each one builds <strong>two</strong> applications: the one you click through, and Enterprise Reporting beside it, with a sign-in of its own and one reporting role per role the model declares &mdash; in the browser a preview drawn in the platform&rsquo;s own layout, and in the deployable download the platform itself, built unmodified from its source.</p>
+        <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the eight worked examples</p>
+        <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser demo with the model already loaded, and nothing is installed or uploaded. Each one builds <strong>two</strong> applications: the one you click through, and Enterprise Reporting beside it, with a sign-in of its own and one reporting role per role the model declares. The demo shows reporting as a preview; the <strong>Download the deployable app (.zip)</strong> button on the same page gives you the real thing, the platform included.</p>
         <div class="grid grid-3" style="gap: var(--spacing-md);">
           <a href="guide/run-in-browser.html#crm" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Sales CRM</strong>
@@ -125,9 +127,9 @@
         </div>
         <div class="card">
           <div class="card-icon">&#9654;&#65039;</div>
-          <h3>3. Run it, here, in this browser</h3>
-          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, real forms laid out the way the model says, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
-          <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
+          <h3>3. Try it in the browser — then download the real thing</h3>
+          <p>Upload that file and watch it become a working <strong>demo</strong> — PostgreSQL compiled to WebAssembly, an API, forms laid out the way the model says, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p class="text-muted text-sm">The demo lives in one tab and is gone when you clear it. When it looks right, press <strong>Download the deployable app (.zip)</strong> on the same page: that is the production application, and it runs under Docker. <a href="#deploy">How to run it &rarr;</a></p>
         </div>
       </div>
     </div>
@@ -344,16 +346,143 @@ node check-model.mjs my-business.mmd</pre>
       <div class="card mt-5">
         <div class="card-icon">&#9745;</div>
         <h3>And one more line, for whether it is <em>finished</em></h3>
-        <p>A clean report says the generator would accept the file. It does not say the model is done — nothing in the checker requires a model to <em>have</em> a lifecycle, a rule, an access rule or a word of help text. One entity with a primary key and a name is a valid model with none of them, and it checks clean.</p>
+        <p>A clean report says the generator would accept the file. It does not say the model is done — nothing in the checker requires a model to <em>have</em> a lifecycle, a rule, an access rule or a word of help text. One entity with a primary key and a name is a valid model with none of them, and the generator accepts it — the checker reports only three dictionary warnings.</p>
         <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/audit-model.mjs">https://www.appwithai.org/guide/audit-model.mjs</span>
 node audit-model.mjs my-business.mmd</pre>
-        <p class="text-muted text-sm">Twenty-two checks against the delivery checklist — the <code>FK</code> modifier on every reference, an enum behind every status, a state machine with a beginning and an end, help that says something rather than restating a column's own name. Its last line is the score, <code>22 passed, 0 failed</code>. That bare entity above passes the checker and fails this nine ways, which is why both are published. <a href="guide/11-check-a-model.html#audit">What it scores &rarr;</a></p>
+        <p class="text-muted text-sm">Twenty-three checks against the delivery checklist — the <code>FK</code> modifier on every reference, an enum behind every status, a state machine with a beginning and an end, help that says something rather than restating a column's own name. Its last line is the score, <code>23 passed, 0 failed</code>. That bare entity above is accepted by the checker and fails eight of them, which is why both are published. <a href="guide/11-check-a-model.html#audit">What it scores &rarr;</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The demo and the real application. Every fact below is the generator's
+       own: the services and ports are docker-compose.yml.hbs, the accounts are
+       reporting/README.md.hbs and pack.ts, the file list is what
+       appwithai-fullstack.js writes with `overlay: false` (the download's
+       flag). Re-check them against a generated zip when re-vendoring. -->
+  <section class="section section-white" id="deploy">
+    <div class="container">
+      <div class="section-header">
+        <h2>The browser demo, and the real application</h2>
+        <p class="section-subtitle">One model gives you both. The demo is for looking at a model in seconds; the <code>.zip</code> is the application you run for real users. Both come from the same page &mdash; <a href="guide/run-in-browser.html#download-stack">chapter 09</a> &mdash; after you press Generate.</p>
+      </div>
+
+      <div class="card" style="overflow-x: auto;">
+        <table class="comparison-table" style="width: 100%;">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Browser demo</th>
+              <th class="highlight">Deployable app (.zip)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>What it is</td>
+              <td>A compact runtime that reads the compiled model &mdash; built to show it working</td>
+              <td class="highlight">The full NestJS + Fastify + Kysely API and TanStack Start front end, as source code you own</td>
+            </tr>
+            <tr>
+              <td>Where it runs</td>
+              <td>One browser tab, nothing installed</td>
+              <td class="highlight">Docker &mdash; Docker Desktop on your machine, or any server with Docker</td>
+            </tr>
+            <tr>
+              <td>Database</td>
+              <td>PostgreSQL compiled to WebAssembly, kept in that browser&rsquo;s storage</td>
+              <td class="highlight">PostgreSQL 18 with pgvector, on a Docker volume that survives restarts</td>
+            </tr>
+            <tr>
+              <td>Who can use it</td>
+              <td>Only you, in that tab</td>
+              <td class="highlight">Anyone you give the address to</td>
+            </tr>
+            <tr>
+              <td>Enterprise Reporting</td>
+              <td>A preview, drawn in the platform&rsquo;s own layout</td>
+              <td class="highlight">The platform itself &mdash; SQL editor, natural-language query, scheduled jobs &mdash; built from its source</td>
+            </tr>
+            <tr>
+              <td>State machines</td>
+              <td>Shown, but a status can be set to anything</td>
+              <td class="highlight">Enforced: the API refuses a status change the model&rsquo;s diagram does not draw</td>
+            </tr>
+            <tr>
+              <td>Use it for</td>
+              <td>Trying a model, showing it to someone, checking it before you build</td>
+              <td class="highlight">Development, testing and production</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid grid-2 mt-5" style="align-items: start;">
+        <div class="card">
+          <div class="card-icon">&#128230;</div>
+          <h3>What is in the zip</h3>
+          <p>About five hundred files &mdash; what the command-line generator writes, assembled in your browser when you press the button:</p>
+          <ul>
+            <li><code>backend/</code> &mdash; the NestJS API: one module per entity, the rules engine, workflows, access control, database migrations and seeds, and its <code>Dockerfile</code></li>
+            <li><code>frontend/</code> &mdash; the TanStack Start web application, its <code>Dockerfile</code>, and <code>public/manual.html</code>, the user manual generated from your model</li>
+            <li><code>reporting/</code> &mdash; the reporting pack derived from your model (saved queries, reports, charts, a dashboard and one reporting role per role), the <code>Dockerfile</code> that builds the platform, and a <code>README.md</code> listing every account</li>
+            <li><code>tests/</code> &mdash; an end-to-end test suite that drives the API</li>
+            <li><code>docker-compose.yml</code>, <code>.env.example</code>, a single-image <code>Dockerfile</code>, <code>model/model.eml.mmd</code> and GitHub Actions workflows under <code>.github/</code></li>
+          </ul>
+          <p class="text-muted text-sm">There is no <code>bun.lock</code>: the Docker build installs the dependencies and writes it.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#128051;</div>
+          <h3>What <code>docker compose up</code> starts</h3>
+          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">postgres        PostgreSQL 18 + pgvector
+electric        syncs the dictionary to browsers
+                (internal, never published)
+backend         the API             :4001
+frontend        the application     :4000
+report          Enterprise Reporting :3100
+report-seeder   loads your reports, then exits</pre>
+          <p class="text-sm">Open <strong>http://localhost:4000</strong> for the application and <strong>http://localhost:3100</strong> for reporting. They have separate sign-ins. In the application, <code>admin@admin.com</code> / <code>admin123</code> or one account per role your model declares; in reporting, <code>admin@admin.com</code> / <code>admin</code> or one <code>&hellip;@&lt;app&gt;.reports.example.com</code> account per role. <code>reporting/README.md</code> lists every one.</p>
+          <p class="text-muted text-sm">The browser only ever talks to port 4000 &mdash; the front end forwards <code>/api</code> to the API itself. 4001 is published for <code>curl</code> and health checks.</p>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mt-5" style="align-items: start;">
+        <div class="card">
+          <div class="card-icon">&#128187;</div>
+          <h3>Run it on your machine &mdash; Docker Desktop</h3>
+          <ol>
+            <li>Install <a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> (Windows, macOS or Linux). In <em>Settings &rarr; Resources</em>, give it <strong>at least 8&nbsp;GB of memory</strong> &mdash; building the front end bundles the rule editor and peaks at around 7&nbsp;GB.</li>
+            <li>Unzip the download and open a terminal in that folder.</li>
+            <li>Copy the settings file, then build and start:</li>
+          </ol>
+          <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">cp .env.example .env
+docker compose up --build</pre>
+          <p class="text-sm">The first build takes several minutes and needs internet access: it downloads the dependencies, and the reporting image fetches the platform&rsquo;s source. The application migrates and seeds itself on first start. Reporting is up but empty until <code>report-seeder</code> finishes &mdash; <code>docker compose logs -f report-seeder</code> shows it working.</p>
+          <p class="text-muted text-sm"><code>docker compose down</code> stops everything and keeps the data; <code>docker compose down -v</code> deletes the databases too. On Windows, use PowerShell and <code>copy .env.example .env</code>.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#9729;&#65039;</div>
+          <h3>Run it in the cloud &mdash; any server with Docker</h3>
+          <p>Use any Linux virtual machine that runs Docker Engine with the Compose plugin &mdash; an AWS EC2 instance, an Azure or Google Cloud VM, a DigitalOcean droplet, a Hetzner server &mdash; with at least <strong>8&nbsp;GB of memory</strong> (or 4&nbsp;GB plus swap). Copy the folder to it and run the same two commands.</p>
+          <p class="text-sm"><strong>Before anyone else can reach it</strong>, edit <code>.env</code>:</p>
+          <ul class="text-sm">
+            <li>Set real secrets in <code>BETTER_AUTH_SECRET</code>, <code>JWT_SECRET</code>, <code>SESSION_SECRET</code> and <code>REPORT_AUTH_SECRET</code> (<code>openssl rand -base64 32</code>), and <code>REPORT_ENCRYPTION_KEY</code> (<code>openssl rand -hex 32</code>). <strong>Never change <code>REPORT_ENCRYPTION_KEY</code> afterwards</strong> &mdash; it encrypts the stored database password, and a new one leaves reporting unable to connect.</li>
+            <li>Set <code>CORS_ORIGIN</code> to the address people will use, such as <code>https://crm.example.com</code>, or sign-in answers <em>Invalid origin</em>.</li>
+            <li>Set <code>REPORT_ADMIN_PASSWORD</code>, and change the application&rsquo;s seeded passwords after the first sign-in.</li>
+            <li>Pin <code>REPORT_REF</code> to a commit, so a rebuild cannot pick up a newer reporting platform.</li>
+          </ul>
+          <p class="text-sm">Put HTTPS in front with a reverse proxy (Caddy, nginx or your cloud&rsquo;s load balancer) forwarding to ports 4000 and 3100, and open only 80 and 443 in the firewall.</p>
+          <p class="text-muted text-sm">Services that run a single container rather than a Compose file need the stack split up by hand: a managed PostgreSQL, and the <code>backend</code>, <code>frontend</code> and <code>report</code> images deployed separately.</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-5">
+        <p class="text-muted text-sm">The archive explains itself as well: <code>README.md</code> and <code>reporting/README.md</code> name the addresses and accounts, and every service in <code>docker-compose.yml</code> carries a comment saying why it is set up the way it is.</p>
+        <a href="guide/run-in-browser.html#download-stack" class="btn btn-accent btn-lg mt-3">Generate a model and download the app</a>
       </div>
     </div>
   </section>
 
   <!-- Next -->
-  <section class="section section-white">
+  <section class="section section-gray">
     <div class="container text-center">
       <div class="section-header">
         <h2>Not ready to write your own?</h2>
