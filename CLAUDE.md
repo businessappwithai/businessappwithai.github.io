@@ -92,7 +92,8 @@ businessappwithai.github.io/
 │   ├── models/               # Example EML models the chapters load (crm,
 │   │                         # drug-discovery, hospital-management-system,
 │   │                         # dance-studio, investment-planning-wealth-
-│   │                         # management-system and education-management-system)
+│   │                         # management-system, education-management-system
+│   │                         # and airport-management-system)
 │   └── wasm-app/sw.js        # Service Worker that hosts the generated app
 ├── viewers/                  # The model viewers — appwithai.org/viewers. Vendored
 │   │                         # from `website/viewers/` upstream; only index.html
@@ -905,6 +906,7 @@ Where each one comes from:
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
+| `guide/models/airport-management-system.eml.mmd` | `examples/airport-management-system.eml.mmd` | — |
 | `llms.txt` and its six chunks | `website/llmtext/*.txt` | — |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
 
@@ -934,7 +936,7 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
 | `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
-| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Three extra `BUILT_IN` entries — `hospital`, `dance` and `education` | The site publishes six models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
+| `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Four extra `BUILT_IN` entries — `hospital`, `dance`, `education` and `airport` | The site publishes seven models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
 | `assets/js/run-in-browser.js` | Any `BUILT_IN` key works as a URL hash, not only `#upload` | `try-it-yourself.html` links straight to a named example. An unknown hash falls back to the CRM |
 | `assets/js/run-in-browser.js` | `overlay: false` in the `#download-stack` handler | The zip is unzipped and run under Docker against a real PostgreSQL. Upstream's pages have no zip download, so the option exists for this caller. See above |
 | `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | `?theme=dark` appended to the frame's URL | **This is the `data-awv-theme="dark"` problem again**, one directory over. The site serves one theme to everybody and the stage around the frame is near-black; a generated application follows the reader's machine, so on a light machine a light application rendered inside a dark page. A parent cannot reach into a frame, so the application reads `?theme=` as its *default* — a reader who picks a theme in the application's own control keeps it. Upstream honours it in the pre-paint script, so there is no flash |
@@ -1233,7 +1235,7 @@ is a model file.
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **`%%report` is documented here now, and the published checker validates it.**
-  The six models under `guide/models/` carry 217 of them between them, and for a
+  The seven models under `guide/models/` carry 227 of them between them, and for a
   while the directive was in none of the specifications this site publishes and in
   neither of its checkers — a reader who opened a model found lines the protocol
   never defined, and an author who added their own got a clean result from a checker
@@ -1272,7 +1274,7 @@ is a model file.
   `%%action`/`%%hook`/saga/`%%rbac` presence, help that says something, line-item placement, and the
   three checker passes over its own bytes. Twenty-two checks; §8.5 documents it, and `check-spec.mjs`
   pins the figure §8.5 quotes to a real run — so adding or dropping a check fails CI rather than
-  leaving the spec quoting a number nothing produces. All six published models score 23/23, and
+  leaving the spec quoting a number nothing produces. All seven published models score 23/23, and
   `tests.yml` asserts that on every one.
 - **`node scripts/check-model.mjs <file.mmd>`** is the same audit, forwarded, for a run inside a
   checkout.
@@ -1483,6 +1485,12 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   `language/examples/` upstream, **not** `html/models/`, so the
   byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
   step with `language/examples/dance-studio.eml.mmd` instead.
+- **`guide/models/airport-management-system.eml.mmd` — `#airport`.** An airport in 23 entities, 12 state
+  machines, one saga, 13 rules, 10 hooks, **137 access restrictions across 8 roles** and 10 `%%report`
+  directives; checker 0 errors and 0 warnings, 23/23 under the audit. Held to
+  `examples/airport-management-system.eml.mmd` upstream, where a full application generated from it with
+  the `appwithai` CLI was migrated, seeded and driven before it was published here. Its cards state those
+  figures as digits, which is what `website-e2e.mjs` measures them against.
 - Every published model lays out every form with `%%section` — headed sections of
   two-column rows. Re-vendor them from upstream rather than editing them here.
 
@@ -1499,7 +1507,7 @@ the scripts it runs have no dependencies.
 |---|---|
 | `node scripts/check-spec.mjs` | `llms.txt`'s fenced examples and its claims, against the published checker — plus its tooling claims, the new-or-change rules by their wording, and that the four retired files are stubs |
 | `node guide/check-model.mjs` on each model | every published model, through the runner §8.4 tells a language model to use |
-| `node guide/audit-model.mjs` on each model | the same six, through the **checklist audit** — every one scores 23/23, because every published model is meant to be a worked example |
+| `node guide/audit-model.mjs` on each model | the same seven, through the **checklist audit** — every one scores 23/23, because every published model is meant to be a worked example |
 | the audit on a bare ERD | it has to still bite. A single entity with a free-text status passes `check-model.mjs` with exit 0 and must fail the audit, or a vendored checker that stopped emitting `EML151`-`EML153` would leave the scorer silently toothless |
 | `node scripts/build-validator-source-page.mjs --check` | the page-carried copies of the validators still match the files they carry |
 | `node scripts/check-validator-source-pages.mjs` | …and still decode back to those bytes, hash correctly, and *run* |
