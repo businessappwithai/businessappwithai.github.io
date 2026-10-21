@@ -410,19 +410,19 @@ node check-model.mjs my-business.mmd</code></pre>
 node audit-model.mjs my-business.mmd</code></pre>
 <p>
   That is the second runner, published beside the first and resolved the same way. It scores the model
-  against the delivery checklist — twenty-two checks: the file's shape, a primary key per entity, the
+  against the delivery checklist — twenty-three checks: the file's shape, a primary key per entity, the
   <code>FK</code> modifier on every reference column, an enum binding on every status, a state machine
   with a beginning and an end, <code>%%action</code>, <code>%%hook</code>, <code>kind: saga</code> and
   <code>%%rbac</code> all present, help on every entity and every column that says something rather
   than restating its own name, every line item declared out of its category, and the three checker
-  passes over the file's own bytes. Its last line is the score, <code>22 passed, 0 failed</code>, and it
+  passes over the file's own bytes. Its last line is the score, <code>23 passed, 0 failed</code>, and it
   exits <code>0</code> only when nothing failed.
 </p>
 <p>
   <b>It is a scorer, not a third checker.</b> Every diagnostic it reads comes from the same
   <code>checker.js</code> this page runs; it adds no codes of its own, and it cannot tell you the model
   says what the business meant. The bare entity above passes <code>check-model.mjs</code> with exit
-  <code>0</code> and fails this nine ways — which is the whole reason it is published rather than kept
+  <code>0</code> and fails eight of them — which is the whole reason it is published rather than kept
   as a maintainer's script. Run both before you hand a model over, and report both.
 </p>
 

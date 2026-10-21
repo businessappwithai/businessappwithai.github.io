@@ -60,7 +60,7 @@
            an unknown one falls back to the CRM. Add a model there and here
            together, or this box offers something the page cannot select. -->
       <div style="margin-top: var(--spacing-2xl); border: 1px solid rgba(255,255,255,0.35); border-radius: var(--radius-lg); padding: var(--spacing-xl); background: rgba(255,255,255,0.07); text-align: left; max-width: 62rem; margin-left: auto; margin-right: auto;">
-        <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the six worked examples</p>
+        <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the eight worked examples</p>
         <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser demo with the model already loaded, and nothing is installed or uploaded. Each one builds <strong>two</strong> applications: the one you click through, and Enterprise Reporting beside it, with a sign-in of its own and one reporting role per role the model declares. The demo shows reporting as a preview; the <strong>Download the deployable app (.zip)</strong> button on the same page gives you the real thing, the platform included.</p>
         <div class="grid grid-3" style="gap: var(--spacing-md);">
           <a href="guide/run-in-browser.html#crm" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
@@ -346,10 +346,10 @@ node check-model.mjs my-business.mmd</pre>
       <div class="card mt-5">
         <div class="card-icon">&#9745;</div>
         <h3>And one more line, for whether it is <em>finished</em></h3>
-        <p>A clean report says the generator would accept the file. It does not say the model is done — nothing in the checker requires a model to <em>have</em> a lifecycle, a rule, an access rule or a word of help text. One entity with a primary key and a name is a valid model with none of them, and it checks clean.</p>
+        <p>A clean report says the generator would accept the file. It does not say the model is done — nothing in the checker requires a model to <em>have</em> a lifecycle, a rule, an access rule or a word of help text. One entity with a primary key and a name is a valid model with none of them, and the generator accepts it — the checker reports only three dictionary warnings.</p>
         <pre style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto;">curl -sO <span data-url="guide/audit-model.mjs">https://www.appwithai.org/guide/audit-model.mjs</span>
 node audit-model.mjs my-business.mmd</pre>
-        <p class="text-muted text-sm">Twenty-two checks against the delivery checklist — the <code>FK</code> modifier on every reference, an enum behind every status, a state machine with a beginning and an end, help that says something rather than restating a column's own name. Its last line is the score, <code>22 passed, 0 failed</code>. That bare entity above passes the checker and fails this nine ways, which is why both are published. <a href="guide/11-check-a-model.html#audit">What it scores &rarr;</a></p>
+        <p class="text-muted text-sm">Twenty-three checks against the delivery checklist — the <code>FK</code> modifier on every reference, an enum behind every status, a state machine with a beginning and an end, help that says something rather than restating a column's own name. Its last line is the score, <code>23 passed, 0 failed</code>. That bare entity above is accepted by the checker and fails eight of them, which is why both are published. <a href="guide/11-check-a-model.html#audit">What it scores &rarr;</a></p>
       </div>
     </div>
   </section>
