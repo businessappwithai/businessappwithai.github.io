@@ -47,6 +47,7 @@ const PAIRS = [
   ["guide/models/dance-studio.eml.mmd", "language/examples/dance-studio.eml.mmd"],
   ["guide/models/hospital-management-system.eml.mmd", "examples/hospital-management-system.mmd"],
   ["guide/models/education-management-system.eml.mmd", "docs/eml-sessions/education-management-system/education-management-system.mmd"],
+  ["guide/models/airport-management-system.eml.mmd", "examples/airport-management-system.eml.mmd"],
   ...["eml-model.js", "canvas.js", "layout.js", "erd-viewer.js", "workflow-viewer.js", "rules-viewer.js", "decision-table.js", "model-viewer.js", "viewers.css"].map(
     (f) => [`viewers/${f}`, `website/viewers/${f}`]
   ),

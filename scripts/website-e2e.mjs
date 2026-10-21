@@ -53,6 +53,7 @@ const KEY_OF = {
   "dance-studio.eml.mmd": "dance",
   "drug-discovery.eml.mmd": "drug",
   "education-management-system.eml.mmd": "education",
+  "airport-management-system.eml.mmd": "airport",
   "hospital-management-system.eml.mmd": "hospital",
   "investment-planning-wealth-management-system.eml.mmd": "investment",
 };

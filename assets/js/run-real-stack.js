@@ -90,6 +90,11 @@ const BUILT_IN = {
     label: "education-management-system.eml.mmd",
     name: "Education Management System",
   },
+  airport: {
+    path: "models/airport-management-system.eml.mmd",
+    label: "airport-management-system.eml.mmd",
+    name: "Airport Management System",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -197,6 +202,7 @@ const choices = [
   [$("choice-dance"), "dance"],
   [$("choice-investment"), "investment"],
   [$("choice-education"), "education"],
+  [$("choice-airport"), "airport"],
   [$("choice-upload"), "upload"],
 ];
 
