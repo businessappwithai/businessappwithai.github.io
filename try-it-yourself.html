@@ -63,38 +63,86 @@
         <p style="color: white; font-weight: 600; margin: 0 0 var(--spacing-xs); text-align: center;">Or start from one of the eight worked examples</p>
         <p style="color: rgba(255,255,255,0.75); margin: 0 0 var(--spacing-lg); text-align: center; font-size: 0.95rem;">Each one is a complete model — entities, rules, state machines, sagas, access control and the <code>%%report</code> queries a reporting layer is derived from. Pick the one nearest your business; it opens in the browser demo with the model already loaded, and nothing is installed or uploaded. Each one builds <strong>two</strong> applications: the one you click through, and Enterprise Reporting beside it, with a sign-in of its own and one reporting role per role the model declares. The demo shows reporting as a preview; the <strong>Download the deployable app (.zip)</strong> button on the same page gives you the real thing, the platform included.</p>
         <div class="grid grid-3" style="gap: var(--spacing-md);">
-          <a href="guide/run-in-browser.html#crm" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#crm" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Sales CRM</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">17 entities. Leads, accounts, opportunities, quotes, contracts and support cases. Five state machines, five sagas, eight rules, seven roles, 32 access restrictions and 33 <code>%%report</code> directives.</span>
           </a>
-          <a href="guide/run-in-browser.html#dance" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/crm.eml.mmd" download="crm.eml.mmd" data-model-download="crm" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download crm.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="crm" data-model-path="guide/models/crm.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for crm in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#dance" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Dance studio</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">9 entities. Classes, sessions, bookings, a waitlist and class packs — the smallest, and the quickest to read end to end. Two state machines, one saga, two rules, four roles, 21 access restrictions and 18 <code>%%report</code> directives.</span>
           </a>
-          <a href="guide/run-in-browser.html#hospital" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/dance-studio.eml.mmd" download="dance-studio.eml.mmd" data-model-download="dance" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download dance-studio.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="dance" data-model-path="guide/models/dance-studio.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for dance-studio in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#hospital" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Hospital management</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">30 entities. Admissions, wards and beds, orders and results, billing and stock. Ten state machines, ten sagas, 18 rules, ten roles, 132 access restrictions and 44 <code>%%report</code> directives.</span>
           </a>
-          <a href="guide/run-in-browser.html#drug" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/hospital-management-system.eml.mmd" download="hospital-management-system.eml.mmd" data-model-download="hospital" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download hospital-management-system.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="hospital" data-model-path="guide/models/hospital-management-system.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for hospital-management-system in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#drug" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Drug discovery</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">19 entities. A regulated lab: compound registry, experiments, instrument bookings, deviations and CAPAs. Three state machines, three sagas, three rules, eight roles, 27 access restrictions and 33 <code>%%report</code> directives. The one where rules refuse a write in front of you.</span>
           </a>
-          <a href="guide/run-in-browser.html#investment" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/drug-discovery.eml.mmd" download="drug-discovery.eml.mmd" data-model-download="drug" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download drug-discovery.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="drug" data-model-path="guide/models/drug-discovery.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for drug-discovery in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#investment" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Wealth management</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">91 entities. Households and advisors, compliance, financial plans, a security master, portfolios, orders, recommendations and commissions. Ten state machines, three sagas, nine rules, five roles, 102 access restrictions and 49 <code>%%report</code> directives. The enterprise-scale one.</span>
           </a>
-          <a href="guide/run-in-browser.html#education" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/investment-planning-wealth-management-system.eml.mmd" download="investment-planning-wealth-management-system.eml.mmd" data-model-download="investment" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download investment-planning-wealth-management-system.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="investment" data-model-path="guide/models/investment-planning-wealth-management-system.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for investment-planning-wealth-management-system in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#education" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Education management</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">19 entities. Admissions, the roll, timetabled sections, attendance, assessment, fees and discipline. Eleven state machines, five sagas, ten rules, eight roles, 68 access restrictions and 40 <code>%%report</code> directives.</span>
           </a>
-          <a href="guide/run-in-browser.html#airport" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/education-management-system.eml.mmd" download="education-management-system.eml.mmd" data-model-download="education" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download education-management-system.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="education" data-model-path="guide/models/education-management-system.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for education-management-system in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#airport" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Airport management</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">23 entities. Flights and the stands, gates and belts they are allocated, turnaround, baggage and cargo, assets and work orders, safety and security, and tariffs through to invoices. 12 state machines, 13 rules, 8 roles, 137 access restrictions and 10 <code>%%report</code> directives.</span>
           </a>
-          <a href="guide/run-in-browser.html#shipping" style="display: block; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/airport-management-system.eml.mmd" download="airport-management-system.eml.mmd" data-model-download="airport" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download airport-management-system.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="airport" data-model-path="guide/models/airport-management-system.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for airport-management-system in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
+          <div class="example-card" style="display: flex; flex-direction: column; gap: var(--spacing-xs);">
+          <a href="guide/run-in-browser.html#shipping" style="display: block; flex: 1; padding: var(--spacing-md); border: 1px solid rgba(255,255,255,0.25); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.15);">
             <strong style="color: white; display: block;">Shipping management</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">53 entities. A freight forwarder from quote to claim: shipments and cargo, bookings, transport legs and containers, shipping instructions and transport documents, customs, release and delivery, and invoices through settlement and cost accruals. 20 state machines, 2 sagas, 37 rules, 7 roles, 333 access restrictions and 17 <code>%%report</code> directives.</span>
           </a>
+            <div style="display: flex; gap: var(--spacing-xs); flex-wrap: wrap;">
+              <a href="guide/models/shipping-management-system.eml.mmd" download="shipping-management-system.eml.mmd" data-model-download="shipping" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Download shipping-management-system.eml.mmd">&#11015; Download .mmd</a>
+              <button type="button" data-model-manual="shipping" data-model-path="guide/models/shipping-management-system.eml.mmd" style="display:inline-block;padding:0.35rem 0.8rem;border:1px solid rgba(255,255,255,0.45);border-radius:var(--radius-md);color:white;background:rgba(0,0,0,0.15);font-size:0.85rem;font-weight:600;text-decoration:none;cursor:pointer;font-family:inherit;" aria-label="Generate the manual for shipping-management-system in a new tab">&#128214; Generate manual</button>
+            </div>
+          </div>
           <a href="guide/run-in-browser.html#upload" style="display: block; padding: var(--spacing-md); border: 1px dashed rgba(255,255,255,0.45); border-radius: var(--radius-md); text-decoration: none; background: rgba(0,0,0,0.05);">
             <strong style="color: white; display: block;">Your own model</strong>
             <span style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">Already have a <code>.mmd</code> from the prompt below? Drop it in. It is read in your tab and uploaded nowhere.</span>
@@ -541,5 +589,6 @@ docker compose up --build</pre>
 
   <script src="assets/js/analytics.js"></script>
   <script src="assets/js/main.js"></script>
+  <script type="module" src="assets/js/example-actions.js"></script>
 </body>
 </html>
