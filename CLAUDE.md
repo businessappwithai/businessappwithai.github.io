@@ -1403,11 +1403,11 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
   entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
   restrictions; 0 errors, 0 warnings, 0 notes, and 23/23 under `guide/audit-model.mjs`.
-  The hospital model scores 23/23 as well, and is the larger worked example: **30
-  entities, 323 columns, 39 enums, 10 state machines, 10 sagas, 18 rules, 27 hooks and
-  132 access rules**, 0 errors and 0 warnings. It was rebuilt end to end through §10's
-  interactive protocol — seven gates, a dossier per entity — and the record of that build
-  is what the section's claims are evidence for. **Run the scorer on a model before
+  The hospital model scores 23/23 as well, and is the larger worked example: **88
+  entities, 799 columns, 132 enums, 51 state machines, one saga, 3 rules, one hook
+  and 139 access rules across 30 roles**, 0 errors and 0 warnings (113 notes, nearly
+  all EML155 nested line items). It declares no `%%report` directives. It is held
+  byte for byte to `examples/hospital-management-system.mmd` upstream. **Run the scorer on a model before
   publishing it**, not only the checker: a model can be 0/0 and still be missing half the
   language.
 
