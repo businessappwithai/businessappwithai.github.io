@@ -142,10 +142,9 @@
   IndexedDB &mdash; nothing you load here is uploaded anywhere, and every file this page needs is
   served from this site.
   <br><br>
-  One thing does leave: anonymous usage analytics, so we can see where readers get stuck &mdash; which
-  step ran, how long it took, how many errors the checker found. The model's <i>contents</i> are never
-  sent, and the recording of this page blanks out the editor, the model preview and the application
-  frame. <a href="../privacy.html">What is collected, and how to turn it off &rarr;</a>
+  One thing does leave: this page, like every page of the site, loads Google&rsquo;s analytics tag, which
+  records page visits. It is handed nothing from the editor, the model or the application frame, and
+  there are no session recordings. <a href="../privacy.html">What is collected, and how to turn it off &rarr;</a>
   <br><br>
   <b>That guarantee is about this chapter, and it still holds here.</b> One page on this site does
   send a model elsewhere, and only because that is what it is for: the
@@ -597,7 +596,6 @@ bun run wasm serve ./crm</code></pre>
       </form>
     </dialog>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
   <script type="module" src="../assets/js/run-in-browser.js"></script>

@@ -12,8 +12,8 @@
 </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="What this site measures, what it deliberately does not, and three ways to turn it off. Your model file, the application generated from it and the database it fills never leave your browser.">
-  <meta name="keywords" content="AppWithAI, privacy, analytics, PostHog, session replay, opt out, do not track, GPC, cookies">
+  <meta name="description" content="What this site measures with Google Analytics, what it does not, and how to turn it off. Your model file, the application generated from it and the database it fills never leave your browser.">
+  <meta name="keywords" content="AppWithAI, privacy, analytics, Google Analytics, Google tag, cookies, opt out">
   <title>Privacy — What AppWithAI Measures, and How to Turn It Off</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="icon" href="favicon.ico" sizes="48x48">
@@ -56,8 +56,8 @@
       <h1 style="color: white;">Privacy</h1>
       <p class="hero-subtitle" style="color: rgba(255,255,255,0.9);">
         Your model file, the application generated from it, and the database it fills never leave your
-        browser. What does leave is a count of which step you reached. This page says exactly which,
-        and gives you three ways to stop it.
+        browser. What does leave is ordinary page-visit data, sent to Google Analytics. This page says
+        exactly what, and how to stop it.
       </p>
     </div>
   </section>
@@ -78,111 +78,74 @@
         <div class="card">
           <h3>What does leave</h3>
           <ul>
-            <li>Anonymous product analytics: which step of the demo ran, whether it succeeded, and how long it took.</li>
-            <li>The usual web request data your browser sends anywhere &mdash; page URL, referrer, browser and operating system, and a coarse country from the IP address.</li>
-            <li>On four pages, a session recording of the page itself &mdash; with the model editor, the model preview and the application frame blanked out.</li>
+            <li>Page-visit measurement by Google Analytics: which pages are opened, and roughly by whom and from where.</li>
+            <li>The usual web request data your browser sends anywhere &mdash; page URL, referrer, browser, device and operating system, language, and a coarse location derived from the IP address.</li>
+            <li>A Google cookie that tells one visit from another (see <a href="#cookies">Cookies</a> below).</li>
           </ul>
         </div>
       </div>
       <p class="text-muted text-sm mt-3">
-        Analytics are processed by <a href="https://posthog.com/" target="_blank" rel="noopener noreferrer">PostHog</a>.
-        The library itself is served from this site rather than from a content delivery network, and it
-        is configured not to fetch any further code from one. When analytics are on, your browser makes
-        exactly three kinds of request to PostHog and no others: one asking for this project&rsquo;s
-        settings, one asking which features are on, and the events below. When you have opted out, or
-        before the site is configured with a key at all, it makes none of them &mdash; the library is not
-        even downloaded.
+        Measurement is by <a href="https://marketingplatform.google.com/about/analytics/" target="_blank" rel="noopener noreferrer">Google Analytics</a>,
+        loaded through Google&rsquo;s tag (<code>googletagmanager.com</code>) on every page of this site.
+        Google processes that data under <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">its own privacy policy</a>.
+        The tag is given no part of your model, your generated application, your database or your API
+        key &mdash; but it is third-party script running on the page, and it sees what any analytics
+        script on a page sees, so the page URL and referrer go to Google.
+        <strong>This site does not use any other analytics service and records no sessions.</strong>
       </p>
     </div>
   </section>
 
   <section class="section section-gray">
     <div class="container container-narrow">
-      <h2>Every event, by name</h2>
-      <p class="text-muted">
-        This is the whole list. It is short on purpose: the point is a funnel &mdash; how many readers who
-        arrive get as far as an application they can click on &mdash; not a profile of anybody.
-      </p>
-      <table class="comparison-table">
-        <thead>
-          <tr><th>Event</th><th>When it fires</th><th>What travels with it</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>try_it_viewed</code></td><td>The Try It Yourself page opens, or its section on the home page scrolls into view</td><td>Which of the two</td></tr>
-          <tr><td><code>prompt_copied</code></td><td>The &ldquo;Copy the prompt&rdquo; button is pressed</td><td>Which block was copied</td></tr>
-          <tr><td><code>upload_started</code></td><td>The upload or paste choice is selected</td><td>&mdash;</td></tr>
-          <tr><td><code>model_uploaded</code></td><td>A model is loaded, whether an example or your own</td><td>File name, size in bytes, line count, and whether it was an example</td></tr>
-          <tr><td><code>checker_started</code></td><td>The model is handed to the EML checker</td><td>File name</td></tr>
-          <tr><td><code>checker_passed</code> / <code>checker_failed</code></td><td>The checker returns</td><td>How many errors, warnings and notes; which diagnostic <i>codes</i>; how long it took</td></tr>
-          <tr><td><code>generate_started</code></td><td>Generate is pressed</td><td>Sample rows requested</td></tr>
-          <tr><td><code>generate_succeeded</code></td><td>The application is assembled</td><td>Milliseconds taken, file count, total bytes, entity count, sample rows</td></tr>
-          <tr><td><code>generate_failed</code></td><td>Assembly stops</td><td>Whether the checker or the compiler refused, and the compiler&rsquo;s message</td></tr>
-          <tr><td><code>run_started</code></td><td>Run the application is pressed</td><td>Whether it is a fresh database</td></tr>
-          <tr><td><code>app_ready</code> / <code>run_failed</code></td><td>The generated server answers, or does not</td><td>Milliseconds from press to answer</td></tr>
-          <tr><td><code>app_interaction</code></td><td>The first click or keystroke lands inside the running application</td><td>Milliseconds since it became ready</td></tr>
-          <tr><td><code>model_viewed</code></td><td>A model is drawn by the <a href="viewers/index.html">model viewer</a></td><td>How many entities, relationships, rules, state machines and sagas it declares, and the checker&rsquo;s error and warning counts &mdash; never a name, a column or a line of it</td></tr>
-          <tr><td><code>app_downloaded</code>, <code>stack_downloaded</code>, <code>model_downloaded</code></td><td>A download is started</td><td>File count and archive size</td></tr>
-          <tr><td><code>github_clicked</code>, <code>guide_clicked</code></td><td>A link to the source or to the guide is followed</td><td>The link&rsquo;s address and its text</td></tr>
-          <tr><td><code>assistant_started</code></td><td>&ldquo;Make the change&rdquo; is pressed on the <a href="assistant.html">Model Assistant</a></td><td>Which provider was chosen, and how many bytes the model is &mdash; never the key, the model or the instruction</td></tr>
-          <tr><td><code>assistant_completed</code></td><td>The provider answers and the checker has run on the result</td><td>Which provider, milliseconds taken, and how many errors and warnings the checker found</td></tr>
-          <tr><td><code>assistant_failed</code></td><td>The call does not complete</td><td>Which provider &mdash; not the error text, which can quote your own model back</td></tr>
-          <tr><td><code>assistant_downloaded</code></td><td>The changed model is downloaded</td><td>Which provider</td></tr>
-          <tr><td><code>contact_submitted</code></td><td>The contact form is submitted</td><td>&mdash; (the form&rsquo;s own contents go to email, not to analytics)</td></tr>
-        </tbody>
-      </table>
-      <p class="text-sm text-muted mt-3">
-        Note what is <i>not</i> in that list. No event carries a line of your model, a field name, an
-        entity name or a checker message &mdash; only the diagnostic codes, because a message can quote
-        your own names back and a code is what a report would group by anyway.
-      </p>
-    </div>
-  </section>
-
-  <section class="section section-white">
-    <div class="container container-narrow">
-      <h2>Session recordings</h2>
+      <h2>What Google Analytics collects</h2>
       <p>
-        Four pages record the page itself, so that a reader stuck at a dropzone or staring at a
-        report they cannot read is something we can actually see: <b>Try It Yourself</b>, and guide
-        chapters <b>09</b>, <b>10</b> and <b>11</b>. The marketing pages do not, and neither does
-        the <a href="viewers/index.html">model viewer</a>.
+        We add the standard Google tag and nothing more: this site does not define custom events, and
+        no line of code here passes Google a model name, a checker result, a file, a field or a
+        prompt. What Google Analytics itself records, with its default configuration, is:
       </p>
-      <p>A recording is of this site&rsquo;s own interface, and three things are blanked out of it:</p>
       <ul>
-        <li><b>Every input and text area</b>, including the box you paste a model into.</li>
-        <li><b>Every code and preview block</b> &mdash; so the model listing, the checker report and the file tree never appear in a recording.</li>
-        <li><b>The application frame</b>, entirely. Whatever you do inside the application you generated is yours; the recording shows an empty rectangle.</li>
+        <li>Which pages are viewed, when, for how long, and how you arrived (the referrer).</li>
+        <li>Your browser, device type, operating system and language.</li>
+        <li>An approximate location (country, region or city) derived from your IP address.</li>
+        <li>An identifier stored in a cookie, so two page views in one visit count as one visit.</li>
+        <li>Depending on how the Google Analytics property is set up, simple interactions such as
+            scrolling, outbound link clicks and file downloads.</li>
       </ul>
+      <p class="text-sm text-muted mt-3">
+        Google decides what its product collects, so that list can change without this site changing.
+        This site does <strong>not</strong> make session recordings, and the pages where you paste or
+        load a model do not send Google what you paste or load. The tag does see the address and
+        title of the page you are on.
+      </p>
     </div>
   </section>
 
   <section class="section section-gray">
     <div class="container container-narrow">
       <h2>Turning it off</h2>
-      <p>Three ways, and the first two need nothing from you at all.</p>
+      <p>
+        Be aware of what changed: this site&rsquo;s earlier analytics honoured Global Privacy Control,
+        Do Not Track and a <code>?analytics=off</code> switch. <strong>Google&rsquo;s tag does not read
+        any of those here</strong>, so they no longer switch anything off on this site. What does:
+      </p>
       <div class="grid grid-3">
         <div class="card">
           <div class="card-icon">1</div>
-          <h3>Global Privacy Control</h3>
-          <p class="text-sm">If your browser or an extension sends GPC, this site collects nothing. The analytics library is never even fetched.</p>
+          <h3>Block the tag</h3>
+          <p class="text-sm">An ad or tracker blocker, or your browser&rsquo;s tracking protection, stops <code>googletagmanager.com</code> from loading. Nothing on this site depends on it.</p>
         </div>
         <div class="card">
           <div class="card-icon">2</div>
-          <h3>Do Not Track</h3>
-          <p class="text-sm">Same. DNT is widely ignored on the web; it is honoured here, before any request is made.</p>
+          <h3>Google&rsquo;s opt-out add-on</h3>
+          <p class="text-sm">Google publishes a <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">browser add-on</a> that stops Google Analytics from receiving data from any site you visit.</p>
         </div>
         <div class="card">
           <div class="card-icon">3</div>
-          <h3>Ask directly</h3>
-          <p class="text-sm">Open <a href="privacy.html?analytics=off"><code>?analytics=off</code></a> on any page of this site. The choice is remembered in this browser. <a href="privacy.html?analytics=on"><code>?analytics=on</code></a> undoes it.</p>
+          <h3>Clear the cookie</h3>
+          <p class="text-sm">Deleting this site&rsquo;s cookies (they begin <code>_ga</code>) resets the identifier. It will be set again on your next visit unless you did one of the above.</p>
         </div>
       </div>
-      <p class="text-muted text-sm mt-4">
-        An ad or tracker blocker also works, and nothing on this site depends on analytics loading &mdash;
-        the demo generates and runs an application either way. If you would rather see for yourself,
-        the whole of it is one readable file:
-        <a href="https://github.com/businessappwithai/businessappwithai.github.io/blob/main/assets/js/analytics.js" target="_blank" rel="noopener noreferrer">assets/js/analytics.js</a>.
-      </p>
     </div>
   </section>
 
@@ -203,7 +166,7 @@
                 This site is static &mdash; there is no server here to receive it, so it does not
                 pass through anything of ours, is not logged, and is not recoverable by us.</li>
             <li><strong>Your model, or your instruction.</strong> Both go to the provider and nowhere
-                else. No event carries a line of a model, an entity name, or a word of what you typed.</li>
+                else. Nothing on this page hands a line of a model, an entity name, or a word of what you typed to any analytics service.</li>
           </ul>
         </div>
         <div class="card">
@@ -212,9 +175,9 @@
             <li>Your model, your instruction and the published enhancement protocol go
                 <strong>to the provider you picked</strong>, under your key and their terms and
                 retention policy &mdash; not ours.</li>
-            <li>Four analytics events, listed above, carrying only which provider was chosen, how
-                many bytes the model was, how long the call took, and how many errors the checker
-                then found.</li>
+            <li>Nothing about the request is sent to Google. The Google tag is on this page like every
+                other, so Google sees that the page was visited &mdash; not the key, the model or
+                the instruction.</li>
           </ul>
         </div>
       </div>
@@ -228,11 +191,14 @@
       </p>
 
       <h2>The rest of it</h2>
-      <h3>Cookies</h3>
+      <h3 id="cookies">Cookies</h3>
       <p>
-        Analytics store an anonymous identifier in this browser so that two page views in one visit
-        count as one visit rather than two. There is no advertising, no cross-site tracking and no
-        data sold or shared with anybody. Opting out above removes the identifier.
+        Google Analytics sets first-party cookies in this browser (their names begin <code>_ga</code>)
+        holding an anonymous identifier, so that two page views in one visit count as one visit
+        rather than two. Beyond that, this site sets none of its own for tracking. Whether Google
+        uses the data for advertising purposes is governed by the settings of the Google Analytics
+        property and by Google&rsquo;s policy; we run no advertising and sell no data.
+        Deleting the cookies removes the identifier.
       </p>
       <h3>The contact form</h3>
       <p>
@@ -252,9 +218,9 @@
       <h3>Hosting</h3>
       <p>
         The site is served by GitHub Pages, which keeps its own request logs. The guide&rsquo;s chapter 10
-        downloads its runtime from StackBlitz and its packages from npm when you run it. That and the
-        video players above are the only things on this site that reach a host other than this one, and
-        both of them say so where they are.
+        downloads its runtime from StackBlitz and its packages from npm when you run it. That, the
+        video players above and Google&rsquo;s analytics tag are the only things on this site that reach a
+        host other than this one. The first two say so where they are; the tag is on every page.
       </p>
       <h3>Questions</h3>
       <p>
@@ -308,7 +274,6 @@
     </div>
   </footer>
 
-  <script src="assets/js/analytics.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

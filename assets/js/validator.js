@@ -75,12 +75,6 @@ const BROKEN = `erDiagram
 const $ = (id) => document.getElementById(id);
 const state = { label: "crm.eml.mmd" };
 
-/*
- * Analytics — see assets/js/analytics.js, which owns every decision about what
- * these mean. `window.awTrack` is a no-op when analytics are off or absent, so
- * these lines are unconditional. The codes travel; the messages do not, because
- * a message carries the reader's own entity names.
- */
 const verdictOf = (result, extra) => {
   // `check` reports its findings as `issues`; `checkAndFix` reports the ones
   // that survived the repair as `remaining`. Both call through here, and reading
@@ -214,17 +208,8 @@ $("check").addEventListener("click", () => {
   const source = $("model").value;
   if (!source.trim()) return report(`<div class="failure">There is no model to check.</div>`);
 
-  window.awTrack?.("checker_started", { model_name: state.label, mode: "check" });
   const startedAt = performance.now();
   const result = check(source);
-  window.awTrack?.(
-    result.ok ? "checker_passed" : "checker_failed",
-    verdictOf(result, {
-      mode: "check",
-      model_size: new Blob([source]).size,
-      check_time_ms: Math.round(performance.now() - startedAt),
-    })
-  );
   $("download-fixed").hidden = !result.ok;
   report(
     verdict(result.ok, result.counts) +
@@ -239,21 +224,11 @@ $("fix").addEventListener("click", () => {
   const source = $("model").value;
   if (!source.trim()) return report(`<div class="failure">There is no model to repair.</div>`);
 
-  window.awTrack?.("checker_started", { model_name: state.label, mode: "fix" });
   const startedAt = performance.now();
   const result = checkAndFix(source);
   $("model").value = result.source;
 
   const applied = result.fixes.filter((fix) => fix.applied);
-  window.awTrack?.(
-    result.ok ? "checker_passed" : "checker_failed",
-    verdictOf(result, {
-      mode: "fix",
-      model_size: new Blob([source]).size,
-      fixes_applied: applied.length,
-      check_time_ms: Math.round(performance.now() - startedAt),
-    })
-  );
   const extra = cell(applied.length, "Repairs");
 
   report(
@@ -328,7 +303,6 @@ function fileName(source) {
 }
 
 $("download-fixed").addEventListener("click", () => {
-  window.awTrack?.("model_downloaded", { model_name: state.label });
   const blob = new Blob([$("model").value], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -347,7 +321,6 @@ $("choice-dance").addEventListener("click", () => load("dance"));
 $("choice-investment").addEventListener("click", () => load("investment"));
 $("choice-broken").addEventListener("click", () => load("broken"));
 $("choice-paste").addEventListener("click", () => {
-  window.awTrack?.("upload_started", { method: "paste" });
   load("paste");
 });
 
@@ -356,11 +329,6 @@ $("file").addEventListener("change", async (event) => {
   if (!file) return;
   state.label = file.name;
   $("model").value = await file.text();
-  window.awTrack?.("model_uploaded", {
-    model_name: file.name,
-    model_size: file.size,
-    model_source: "upload",
-  });
   for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", "false");
   }
