@@ -54,7 +54,6 @@ businessappwithai.github.io/
 │   │   └── dark-theme.css    # Dark Precision — loaded last on every page
 │   ├── js/
 │   │   ├── main.js               # Main JS (scroll animations, nav, forms)
-│   │   ├── analytics.js          # PostHog: the funnel, the opt-outs, window.awTrack
 │   │   ├── guide.js              # Guide chapter nav and screenshot lightbox
 │   │   ├── coi.js                # Registers the cross-origin isolation worker (ch. 10)
 │   │   ├── run-in-browser.js     # Controller for chapter 09
@@ -66,7 +65,6 @@ businessappwithai.github.io/
 │   │   ├── appwithai-wasm.js     # Vendored: browser generator (parser + compilers)
 │   │   └── appwithai-fullstack.js# Vendored: full NestJS/TanStack generator
 │   └── vendor/                   # Third-party payloads, served from this origin
-│       ├── posthog/              # posthog-js, the no-external build (~640KB)
 │       ├── pglite/               # PostgreSQL 18 compiled to WebAssembly (~18MB)
 │       ├── webcontainer/         # @webcontainer/api, unbundled ESM
 │       ├── app-fonts/            # The four typefaces the template bundle cannot carry
@@ -129,7 +127,7 @@ businessappwithai.github.io/
 ├── index.html                # Home/landing page
 ├── justification.html        # Position paper: why the platform exists
 ├── try-it-yourself.html      # The conversion path as a page of its own (in the nav)
-├── privacy.html              # Every event by name, and three ways to turn it off
+├── privacy.html              # What Google Analytics collects, and how to turn it off
 ├── todo.html                 # Five items before 1.0.0, one after — the short list
 ├── features.html             # Product features detail
 ├── how-it-works.html         # AI pipeline explanation
@@ -182,7 +180,7 @@ Deployment is fully automatic:
 | File | Purpose |
 |------|---------|
 | `index.html` | Landing page: hero (with the **experimental-software notice** and the GitHub source link), stats, problem/solution, feature previews, the **Try It Yourself** section, the live in-browser demo, and the CRM guide preview |
-| `features.html` | Detailed feature breakdown (AI modeling, forms, workflows, security, analytics) |
+| `features.html` | Detailed feature breakdown (AI modeling, forms, workflows, security) |
 | `how-it-works.html` | Step-by-step AI pipeline with multi-agent architecture diagram |
 | `technology.html` | Two tech stack options: Modern Web Stack and Enterprise SAP-Style Stack |
 | `pricing.html` | Pricing tiers, cost comparison vs. traditional development, ROI metrics |
@@ -191,7 +189,7 @@ Deployment is fully automatic:
 | `llms.txt` | The one protocol document language models are pointed at — the EML language, the Application Dictionary, and one working-session procedure for writing a model or changing one (new or change decided by whether a `.mmd` is attached). Vendored from upstream. It is the only protocol file |
 | `try-it-yourself.html` | The conversion path with room to explain itself: the three steps, the prompt block, a complete worked `.mmd` and what each of its lines does, the four habits §3.7 turns into diagnostics, and both ways to run the checker. In the nav directly after "Why AppWithAI". |
 | `todo.html` | The short list, and deliberately short. **Before 1.0.0**: comprehensive test coverage, security assessment, complete product documentation, DeepSeek harness integration, the reporting application (`enterprise_reporting_tanstack`). **After it**: completely agentic workflows on the DeepSeek Harness. The five before 1.0.0 are one line each — the detail lives in `ROADMAP.md` in `app-with-ai-tanstack`, which the page links. The after-1.0.0 item is the one exception to that brevity: it carries a six-card brief on *how* it would be built, because the harness is new and the item is meaningless without it. Each card maps a step of the AppWithAI pipeline onto a mechanism the harness actually documents — Cordis plugins and bundles, `ctx.tools`, `ask_user_question`, the `ctx.subagents` seam and `ralph`, the sandboxed filesystem/subprocess providers, and the `web`/`headless`/`sdk` profiles with their durable session log. Those come from the harness's own `docs/` (architecture, agent-lifecycle, capability-seams, tool-catalog), which the page cites — **check them before editing a claim there**, since the harness is in developer preview and expects breaking changes. Linked from every footer's Product column and from both experimental-software notices on the home page. Deliberately **not** in the primary nav: it is at its seven-item ceiling |
-| `privacy.html` | What analytics collect, event by event; what session recordings blank out; the three opt-outs; and the Model Assistant's own section on the key. Linked from every footer, from chapter 09's note and from `assistant.html` |
+| `privacy.html` | What Google Analytics collects through the Google tag, the cookies it sets, how to block it (the old GPC/DNT/`?analytics=off` switches no longer apply); and the Model Assistant's own section on the key. Linked from every footer, from chapter 09's note and from `assistant.html` |
 | `assistant.html` | **The Model Assistant.** Bring an OpenAI or Claude key, load a model, say what to change, and the browser calls the provider directly. The result goes through `guide/checker.js` before a download is offered. Linked from `try-it-yourself.html#enhance` and every footer's Product column — **not** in the nav, which is at its seven-item ceiling |
 | `guide/index.html` | "Build a CRM" guide overview, chapters 00–11 |
 | `guide/run-in-browser.html` | Chapter 09: generates and runs a full application in the visitor's browser |
@@ -327,9 +325,8 @@ real phone is 360–390px, and the overflow below was invisible at 767 and obvio
   the placeholder in the source. Falls back to selecting the text where the clipboard
   API is refused (private windows, plain `http://`).
 
-`assets/js/analytics.js` is loaded on every page, immediately **before** `main.js`,
-and defines `window.awTrack(event, properties)` synchronously — see **Analytics**
-below.
+Every page carries the Google tag (`G-Y5Z3WM5G1F`) as the first thing inside `<head>`
+— see **Analytics** below. There is no `analytics.js` and no `awTrack`.
 
 Utility functions available globally via the `utils` object:
 ```js
@@ -420,7 +417,7 @@ prompt**, for a new model and for a change to an existing one.
    Third-party code that genuinely has to be here is *vendored* into
    `assets/vendor/` and served from this origin, with a `README.md` beside it
    naming the exact published version and the command that fetched it. PGlite,
-   the WebContainer API and posthog-js are all there on those terms.
+   the WebContainer API and PGlite are there on those terms.
 5. **Preserve the design system** — CSS variable names and spacing scale are intentional; do not rename or restructure them.
 6. **Static only** — there is no backend, no API, no database. Forms do not submit to a server by default.
    This is what shapes `assistant.html`: CopilotKit's runtime and Mastra are both servers and neither
@@ -485,7 +482,7 @@ visitor's tab. It is the only page on the site with moving parts, so it has its 
 2. The generated files are posted to the Service Worker at `guide/wasm-app/sw.js`, which serves them
    from Cache Storage under `guide/wasm-app/run/` and forwards that app's `/api` calls to a worker thread.
 3. PostgreSQL is PGlite, served from `assets/vendor/pglite/` on this origin, and the database lives in
-   the visitor's IndexedDB. **The chapter makes no request to any other host.**
+   the visitor's IndexedDB. **The chapter itself makes no request to any other host** — the Google tag in every page's `<head>` is the one exception, and it is handed nothing from the chapter.
 
 That last sentence is scoped to this chapter and is still true of it. `assistant.html`
 is the one page that does reach another host, because sending the model to a provider
@@ -829,9 +826,9 @@ Pages first** — there is nowhere for one to run.
   counts are nested and `ok` is the verdict. Reading `verdict.errors` gets
   `undefined`, `undefined === 0` is false, and the download button silently never
   appears. That was a real bug in the first draft of this file.
-- **Four events, and `privacy.html` lists all four** — it promises its table is
-  every event by name, so §8 fails on an event that page does not carry. None of
-  them carries the key, the model or the instruction.
+- **No analytics call lives in the controller**, and §8 fails if an `awTrack` or
+  PostHog reference comes back. The Google tag is on the page like every other and
+  is handed neither the key, the model nor the instruction.
 - **The provider list is the whole egress surface.** §8 greps every `https://`
   host out of the controller and fails on anything that is not the two API hosts
   and their two consoles. That is the assertion that catches a proxy or a
@@ -877,12 +874,9 @@ generator would not.
 - **`llms.txt` §1 sends readers here** while a model is written and at delivery, to
   see the rules, workflows, roles and forms Mermaid draws as comments. A rename or a
   move breaks a walkthrough in the middle; `check-spec.mjs` is what notices.
-- **Session replay is off here**, deliberately: `REPLAY_SURFACES` in
-  `analytics.js` is unchanged, and the surface is named `viewers` by a pattern
-  placed *before* the home-page catch-all, which would otherwise label any
-  directory index as the landing page. The one event is `model_viewed`, and it
-  carries counts only — never a name, a column or a line of a model.
-  `privacy.html` lists it.
+- **Nothing is recorded here.** `model-viewer.js` still guards a `model_viewed`
+  call behind `if (window.awTrack)`; with no `awTrack` defined it never runs. It
+  is vendored, so leave it for upstream to remove.
 
 ## Vendored files
 
@@ -933,8 +927,6 @@ all deliberate and all commented at the point of change:
 | `assets/js/run-real-stack.js` | Vendored API and template URLs; font restore; boot timeout; environment check | No third-party module host; a hang becomes a message |
 | `assets/js/run-in-browser.js` | Imports `checkAndFix` from `../../guide/fixer.js`, not upstream's `../fixer.js` | The validators are published under `guide/` here; this module lives under `assets/js/` |
 | `assets/js/run-real-stack.js` | The same import path | The same |
-| `assets/js/run-in-browser.js` | `window.awTrack?.(…)` at each funnel step | Analytics — see below. One line per step, no logic |
-| `assets/js/validator.js` | `window.awTrack?.(…)` around the checker runs | The same |
 | `assets/js/run-in-browser.js` | The storage permission dialog — `askToReclaimStorage()` and `#storage-ask` | Site-only. See below |
 | `assets/js/run-in-browser.js`, `assets/js/run-real-stack.js` | Five extra `BUILT_IN` entries — `hospital`, `dance`, `education`, `airport` and `shipping` | The site publishes eight models where upstream's pages offer three. `investment` is *not* a delta: it is in upstream's copy too |
 | `assets/js/run-in-browser.js` | Any `BUILT_IN` key works as a URL hash, not only `#upload` | `try-it-yourself.html` links straight to a named example. An unknown hash falls back to the CRM |
@@ -952,72 +944,21 @@ match, which 404'd `app/schema.sys.sql` against a file the worker was holding.
 Both properties are gone from the lookup, so there is nothing left to re-apply:
 copy it straight.
 
-**Re-vendoring one of the last two loses its `awTrack` lines.** They are
-deliberately greppable: `grep -n awTrack assets/js/*.js` finds every one, and
-`assets/js/analytics.js` documents what each is for. Put them back.
+## Analytics — Google Analytics, and nothing else
 
-## Analytics — the funnel, and where each event lives
+PostHog was removed (the vendored `assets/vendor/posthog/`, `assets/js/analytics.js`, every
+`window.awTrack?.(…)` call and the session recordings). What remains is Google's tag, pasted
+verbatim as the first element inside `<head>` on every HTML page, `guide/source/*` included —
+those five are generated, so the tag also lives in the `page` and `index` templates of
+`scripts/build-validator-source-page.mjs`, or `--check` fails.
 
-The whole of it is `assets/js/analytics.js`, loaded on every page before
-`main.js`. It vendors posthog-js (`assets/vendor/posthog/`, see the README
-there), and it is the only file that decides anything about measurement.
-
-**The key is set, and measurement is live.** `POSTHOG.key` at the top of
-`analytics.js` carries the project token for AppWithAI, project 578899 on US
-Cloud. This paragraph said the field was empty for as long as it was, and a
-reader who trusted that would conclude no request leaves the page and nothing is
-collected — neither of which is true now. A `phc_` project API key is
-write-only and publish-safe and belongs in client source; `phx_` (personal) and
-`phs_` (project secret) read private data and do not. Emptying the key is still
-the switch it always was: with no key the library is never fetched and nothing
-is collected. Change `POSTHOG.host` to `https://eu.i.posthog.com` for an
-EU-cloud project.
-
-**What is being measured is a funnel, not a page count.** The path this site
-exists to move people along runs:
-
-```
-try_it_viewed → prompt_copied → model_uploaded → checker_passed
-              → generate_succeeded → app_ready → app_interaction
-```
-
-Every step except the first two is a real function in `run-in-browser.js` or
-`validator.js`, so it is recorded **where the step happens**, with the real
-numbers that step produced — `generation_time_ms` is measured around the
-compile, not guessed from a click. `privacy.html` lists every event and every
-property, and it is reader-facing, so **an event added here is added there too**.
-
-**`window.awTrack(event, properties)` is the whole interface.** It is defined
-synchronously, queues until PostHog loads, and is a safe no-op when analytics
-are off, absent, blocked or unconfigured — which is why the two vendored files
-call it unconditionally and neither of them contains a decision. Keep it that
-way: a rule about *what* an event means goes in `analytics.js`.
-
-**Session replay is on four pages** — `try-it-yourself.html` and guide chapters
-09, 10 and 11 — and off everywhere else, because the free allowance is five
-thousand recordings a month and the home page would spend it on bounces.
-Widening `REPLAY_SURFACES` means budgeting for it.
-
-**A recording blanks out the reader's model.** Someone pasting their own
-business model into this site is handing over entity names, field names and the
-shape of their company. `maskAllInputs`, a `maskTextSelector` covering every
-`textarea`, `pre` and `code`, and `blockSelector: "iframe"` for the generated
-application. No event carries a line of a model, an entity name or a checker
-*message* either — only diagnostic codes. Do not relax any of that to make a
-report prettier.
-
-**Three opt-outs, checked before the library is fetched**: Global Privacy
-Control, Do Not Track, and `?analytics=off` (remembered; `?analytics=on`
-forgets it). PostHog's own bot filter drops anything reporting
-`navigator.webdriver`, which is worth knowing before concluding that events are
-not being sent — a headless browser will never produce one.
-
-**What `disable_external_dependency_loading` does and does not buy.** It stops
-the recorder, surveys and toolbar being pulled from PostHog's CDN. It does not
-mean no request: a page load still asks `us-assets.i.posthog.com` for the
-project config and `api_host` for flags, before any event. The README beside the
-bundle tabulates all three, and `privacy.html` is written to match. Neither
-claim is guesswork — both were read off the network in a browser.
+- **It is third-party script on every page.** That ends the old claims that chapter 09 reaches
+  no other host and that GPC, Do Not Track and `?analytics=off` switch measurement off —
+  Google's tag reads none of them. `privacy.html` says so, and says how to block it instead.
+  Any new claim of "no request leaves this page" has to carve the tag out.
+- **Re-vendoring** `run-in-browser.js` from upstream brings back its `awTrack` lines; they
+  are inert without a definition, but strip them again to keep the delta list honest.
+- **Do not add a custom event** without adding it to `privacy.html`.
 
 ## `llms.txt` — the one protocol document
 

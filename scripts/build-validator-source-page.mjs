@@ -59,6 +59,15 @@ const wrap = (s, n = 76) => s.replace(new RegExp(`(.{${n}})`, "g"), "$1\n").trim
 const page = ({ name, what, base64, sha, bytes }) => `<!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
@@ -121,6 +130,15 @@ this and fails if it no longer matches <code>guide/${name}</code> byte for byte.
 const index = (rows) => `<!doctype html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">

@@ -530,12 +530,11 @@ console.log("\n8. The model assistant");
         `it also names ${unexpected.join(", ")} — a key rides these requests`
       );
 
-  /* The key must not leave on anything of ours. `awTrack` sends to analytics,
-     so the key must never appear in one of those calls. */
-  const tracked = [...controller.matchAll(/awTrack\?\.\([^)]*\)/gs)].map((m) => m[0]).join("\n");
-  !/\bkey\b/.test(tracked)
-    ? ok("no analytics event carries the key")
-    : fail("no analytics event carries the key", "an awTrack call names `key`");
+  /* No analytics call survives in the controller: the only measurement left
+     is the Google tag, which is handed nothing from this page. */
+  !/awTrack|posthog/i.test(controller)
+    ? ok("the assistant calls no analytics")
+    : fail("the assistant calls no analytics", "an awTrack or PostHog reference remains");
 
   /* The warning is above the key field, not below it. */
   const warnAt = assistant.indexOf("aia-warning");
@@ -564,14 +563,6 @@ console.log("\n8. The model assistant");
     new RegExp(`id="${id}"[^>]*\\bhidden\\b`).test(assistant)
       ? ok(`${id} starts hidden`)
       : fail(`${id} starts hidden`, `it is offered before a run has produced one`);
-
-  /* privacy.html promises its event list is complete, so every event this
-     page can emit has to be in it. */
-  const privacy = readFileSync(p("privacy.html"), "utf8");
-  for (const event of [...new Set([...controller.matchAll(/awTrack\?\.\("([a-z_]+)"/g)].map((m) => m[1]))])
-    privacy.includes(event)
-      ? ok(`privacy.html lists ${event}`)
-      : fail(`privacy.html lists ${event}`, "the page promises the list is every event, by name");
 
   /* The nav is at its seven-item ceiling; an eighth overflows the header at
      every desktop width. The assistant is linked from the footer and from

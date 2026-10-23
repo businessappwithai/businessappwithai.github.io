@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Compile a Mermaid model into the full NestJS and TanStack Start application and run it inside this browser tab — the five hundred files the command-line generator writes, installed and started by a WebContainer.">
@@ -270,7 +279,7 @@
     <h3>Chapter 09 — the browser runtime</h3>
     <ul>
       <li>Starts in about ten seconds</li>
-      <li>No install, no build, and nothing fetched from another host</li>
+      <li>No install, no build, and nothing fetched from another host to run it (Google&rsquo;s analytics tag aside)</li>
       <li>PostgreSQL in the tab, application server on a worker</li>
       <li>Its interface is a <b>port</b> of the generated one</li>
       <li>Nothing to open and edit per entity</li>
@@ -375,7 +384,6 @@
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
   <script type="module" src="../assets/js/run-real-stack.js"></script>

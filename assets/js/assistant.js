@@ -10,8 +10,8 @@
  * That is a deliberate trade and the page says so out loud. The key never
  * reaches this origin: it is held in localStorage and attached to a request
  * that goes straight to api.anthropic.com or api.openai.com. Nothing here
- * proxies it, logs it, or sends it anywhere else — and `analytics.js` is
- * configured never to record a key, a model, or a prompt (see privacy.html).
+ * proxies it, logs it, or sends it anywhere else — and nothing on this page hands the Google tag a
+ * key, a model, or a prompt (see privacy.html).
  *
  * The loop is the same one `llms.txt` describes for a change, run here rather
  * than pasted into somebody else's chat window:
@@ -366,10 +366,6 @@ async function run() {
     const protocol = await loadProtocol();
 
     setBusy(true, `Asking ${provider.modelLabel} to make the change…`);
-    window.awTrack?.("assistant_started", {
-      provider: state.provider,
-      model_bytes: state.source.length,
-    });
 
     const user =
       `Here is my current EML model. Apply the change I describe and hand back ` +
@@ -410,15 +406,8 @@ async function run() {
     const verdict = check(state.result);
     renderVerdict(verdict, usage, Date.now() - started);
 
-    window.awTrack?.("assistant_completed", {
-      provider: state.provider,
-      duration_ms: Date.now() - started,
-      errors: verdict.counts.errors,
-      warnings: verdict.counts.warnings,
-    });
   } catch (error) {
     report(error.message);
-    window.awTrack?.("assistant_failed", { provider: state.provider });
   } finally {
     setBusy(false);
   }
@@ -485,7 +474,6 @@ function download() {
   a.download = `${name}.eml.mmd`;
   a.click();
   URL.revokeObjectURL(url);
-  window.awTrack?.("assistant_downloaded", { provider: state.provider });
 }
 
 function repair() {
