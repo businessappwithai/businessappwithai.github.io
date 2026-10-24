@@ -680,10 +680,13 @@ no dots on purpose — the audit's *name is lower-case and hyphenated* check rea
 
 **The education model — `#education`.** `guide/models/education-management-system.eml.mmd` is a fee-charging
 school in 24 entities, 36 enums, 15 rules, 16 state machines, five sagas and 91 access restrictions across
-eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, no notes, 23/23 under the audit. **Its
-own header comment is stale** — it still says nineteen entities, five lifecycles and two sagas — and the
-cards state what `readModel()` measures, not what that comment says. It is vendored, so correct it upstream
-(`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`), not here.
+eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, no notes, 23/23 under the audit.
+Its header comment used to say nineteen entities, five lifecycles and two sagas (the original model's
+figures) and now says twenty-four, sixteen and five. The per-entity notes and narrative documents
+beside it upstream (`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`) were
+regenerated for the 24 entities. One inconsistency inside the model is left as delivered:
+`Student.has_support_plan`'s help still says the plan is held outside the system, which the
+`SupportPlan` entity contradicts. Fix it upstream, not here.
 
 **Constraints to respect**
 
