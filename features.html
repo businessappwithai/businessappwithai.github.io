@@ -227,7 +227,7 @@
     <div class="container">
       <div class="section-header">
         <h2>Workflow and Document Routing Engine</h2>
-        <p class="section-subtitle">A state-machine engine routes documents through your organization for review, approval, escalation and action — with full audit trails. The CRM declares ten processes: five state machines and five multi-step sagas.</p>
+        <p class="section-subtitle">A state-machine engine routes documents through your organization for review, approval, escalation and action — with full audit trails. The CRM declares 37 processes: five state machines and 32 multi-step sagas, 27 of them the moves that change a record&rsquo;s state &mdash; because no person changes one.</p>
       </div>
       <div class="grid grid-2">
         <div class="card">
@@ -277,7 +277,7 @@
 
       <div class="card mt-5">
         <h4>The CRM's five state machines</h4>
-        <p class="text-muted text-sm mb-3">Each one is a <code>stateDiagram-v2</code> in the model. The generated application applies the states, guards every transition by role, and refuses a move the diagram does not draw.</p>
+        <p class="text-muted text-sm mb-3">Each one is a <code>stateDiagram-v2</code> in the model. The generated application applies the states and keeps them out of reach of a form: the state is shown read-only in the record&rsquo;s header and in every list, only a background workflow moves it, and even a workflow is refused a move the diagram does not draw.</p>
         <div class="grid grid-3">
           <div>
             <strong>Lead</strong>
