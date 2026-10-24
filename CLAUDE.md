@@ -670,7 +670,7 @@ fire on it and the roles that may read it.
 
 **The wealth-management model — `#investment`.** `guide/models/investment-planning-wealth-management-system.eml.mmd`
 is the v1.1.0 revision (`%%meta version: 1.1.0`) of that business and the only wealth model published. It is
-the largest model here: 103 entities, 54 enums, nine rules, 14 state machines, three sagas, 114 access
+the largest model here: 103 entities, 54 enums, 23 rules, 14 state machines, 86 sagas, 114 access
 restrictions across six declared roles, and **58 `%%report` directives**. Its checker result is 0 errors,
 0 warnings and six notes, all deliberate: three self-referencing hierarchies (`OrganizationUnit`,
 `AssetClass`, `RevenueHierarchy`), the standalone audit log, and two line-item hints
@@ -679,7 +679,7 @@ against the schema the generator emits by the orchestrator's `check:pack` in CI,
 no dots on purpose — the audit's *name is lower-case and hyphenated* check reads it.
 
 **The education model — `#education`.** `guide/models/education-management-system.eml.mmd` is a fee-charging
-school in 25 entities, 37 enums, 15 rules, 16 state machines, seven sagas and 94 access restrictions across
+school in 25 entities, 37 enums, 31 rules, 16 state machines, 63 sagas and 71 access restrictions across
 eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, no notes, 23/23 under the audit.
 Its header comment used to say nineteen entities, five lifecycles and two sagas (the original model's
 figures); it states the current ones. The per-entity notes and narrative documents beside it upstream
@@ -1124,17 +1124,23 @@ is a model file.
   model and still handed over only the prose about it. Two files means the reader opens the wrong one.
 - **Four places mirror §1 and change together**: `guide/11-check-a-model.html#protocol`, the home
   page's prompt block, the three "Try It Yourself" cards, and `try-it-yourself.html`.
-- **§5.2 says a drawn edge is the only legal move.** The NestJS stack seeds every
-  declared transition into `sys_workflow_transitions` and its entity-access guard
-  refuses, with a 403, any status write that crosses an edge the diagram never
-  drew — an administrator included, because the refusal is topological rather than
-  about roles. An entity with no `kind: state` workflow seeds no rows and stays
-  unconstrained. The browser application does not enforce it, which is why the
-  paragraph names the stack. It came across from
-  `businessappwithai/app-with-ai-tanstack` with the templates that implement it
-  (`012_add_workflow_transitions`, `entity-access.guard`, the seed the full-stack
-  bundle now writes); `check-spec.mjs` does not verify it, so check the guard
-  before editing it.
+- **§5.2 says no person changes a state, and a drawn edge is the only legal move.**
+  An entity with a `kind: state` workflow has a system-managed state field
+  (`status`, else `state`, else `stage`). Both generated stacks drop it from a
+  create (the record starts in the initial state), strip it from an update that
+  sends it back unchanged, and refuse a change with **403
+  `STATE_FIELD_SYSTEM_MANAGED`** — an administrator included. Only background
+  workflows write it: a person records the fact a move rests on (a `<state>_at`
+  time), the entity's `StateProgress` rule starts the saga whose `UpdateEntity`
+  step writes the state, and even that write may only cross an edge the diagram
+  drew. The form shows the state read-only in the record's header and the list
+  always shows it as a column. `%%rbac` never grants a transition (`EML215`); a
+  state no saga writes is `EML507`, a saga writing an undrawn state `EML508`, a
+  `%%section` row placing the state field `EML178`. That is why every published
+  model's saga and rule counts jumped: most of its sagas are those moves.
+  `check-spec.mjs` §9–10 hold the diagnostics; the runtime enforcement came across
+  from `businessappwithai/app-with-ai-tanstack` (`entity-access.guard`,
+  `sagas.js`) and is checked there.
 - **§6 is access control, and it carries the functional-role rule** — name the roles a
   business has, then give every entity a `%%rbac … .read` directive naming the roles
   that work with it. `read` is the only operation that changes what a role *sees*;
@@ -1414,11 +1420,11 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   booking business end to end and holds the model it builds to a standard — help text on
   every entity and every column, one `%%rbac … .read` per entity, every state backed by a
   declared `%%enum` — so the model is the evidence the standard is reachable. Nine
-  entities, two state machines, a saga that promotes a waitlisted member, 21 `%%rbac`
-  restrictions; 0 errors, 0 warnings, 0 notes, and 23/23 under `guide/audit-model.mjs`.
+  entities, two state machines, eight sagas (one promotes a waitlisted member, the
+  rest are the moves that change a state), 18 `%%rbac` restrictions; 0 errors, 0 warnings, 0 notes, and 23/23 under `guide/audit-model.mjs`.
   The hospital model scores 23/23 as well, and is the larger worked example: **88
-  entities, 799 columns, 132 enums, 51 state machines, one saga, 3 rules, one hook
-  and 139 access rules across 30 roles**, 0 errors and 0 warnings (113 notes, nearly
+  entities, 1012 columns, 132 enums, 51 state machines, 232 sagas, 54 rules, one hook
+  and 88 access rules across 30 roles**, 0 errors and 0 warnings (113 notes, nearly
   all EML155 nested line items). It declares no `%%report` directives. It is held
   byte for byte to `examples/hospital-management-system.mmd` upstream. **Run the scorer on a model before
   publishing it**, not only the checker: a model can be 0/0 and still be missing half the
@@ -1440,7 +1446,7 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
   step with `language/examples/dance-studio.eml.mmd` instead.
 - **`guide/models/airport-management-system.eml.mmd` — `#airport`.** An airport in 23 entities, 12 state
-  machines, one saga, 13 rules, 10 hooks, **137 access restrictions across 8 roles** and 10 `%%report`
+  machines, 42 sagas, 25 rules, 10 hooks, **92 access restrictions across 8 roles** and 10 `%%report`
   directives; checker 0 errors and 0 warnings, 23/23 under the audit. Held to
   `examples/airport-management-system.eml.mmd` upstream, where a full application generated from it with
   the `appwithai` CLI was migrated, seeded and driven before it was published here. Its cards state those

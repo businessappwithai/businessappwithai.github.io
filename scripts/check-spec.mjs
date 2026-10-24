@@ -91,7 +91,7 @@ const erd = (body, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n${extra
 // --- 1. version and auto-fixable list (header + §8.3) -----------------------
 const expectedFixable = [
   "EML001", "EML103", "EML112", "EML114", "EML117", "EML172", "EML174", "EML175",
-  "EML287", "EML421", "EML422",
+  "EML178", "EML215", "EML287", "EML421", "EML422",
 ];
 say(LANGUAGE_VERSION === "1.2.0", `header states EML version 1.2.0 (checker says ${LANGUAGE_VERSION})`);
 say(
@@ -104,7 +104,7 @@ say(
    corrected to "eight", and would have passed one claiming "nine". */
 const NUMBER_WORDS = [
   "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-  "nine", "ten", "eleven", "twelve",
+  "nine", "ten", "eleven", "twelve", "thirteen",
 ];
 const countWord = NUMBER_WORDS[AUTO_FIXABLE.length] ?? String(AUTO_FIXABLE.length);
 const specBody = spec.join("\n");
@@ -189,7 +189,14 @@ for (const [k, v] of [["version","1.0.0"],["entity","Thing"],["stack","tanstack-
   t(`meta key ${k}`, `%%meta name: Audit\n%%meta kind: erd\n%%meta ${k}: ${v}\nerDiagram\n    Thing {\n        string id PK\n    }\n`);
 
 // --- 9. §5.2 state machine rules --------------------------------------------
-const state = (sd, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n${sd}\n${extra}`;
+/* No person changes a state: each state a machine can move into needs a saga
+   whose UpdateEntity step writes it, or the checker reports EML507. `writers`
+   gives the fixture one per state its diagram moves into. */
+const writers = (sd) =>
+  [...new Set([...sd.matchAll(/-->\s*(\w+)/g)].map((m) => m[1]))]
+    .map((to) => `\n%%meta name: Audit ${to} move\n%%meta kind: workflow\n%%workflow Thing${to}Move entity: Thing kind: saga\nflowchart TD\n    A([Start]) --> B[Set the status]\n    B --> Z([End])\n\n    %%step B UpdateEntity field: status value: ${to}\n`)
+    .join("");
+const state = (sd, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n${sd}\n${extra}${writers(sd)}`;
 t("state machine, enum-backed, initial and terminal", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]"));
 t("no initial transition raises EML421", state("    draft --> live : publish\n    live --> done : finish\n    done --> [*]"), "EML421");
 t("no terminal state raises EML422", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish"), "EML422");
@@ -198,7 +205,11 @@ t("an enum value no state uses raises EML427", state("    [*] --> draft\n    dra
 t("a machine with no enum at all raises EML428", `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`, "EML428");
 
 // --- 10. §6 rbac on a transition and on CRUD --------------------------------
-t("rbac on a transition", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n"));
+// A transition is not grantable: only background workflows change a state.
+t("rbac on a transition raises EML215", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n"), "EML215");
+// A state nothing writes, and a saga writing a state the diagram never drew.
+t("a state no saga writes raises EML507", `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`, "EML507");
+t("a saga writing an undrawn state raises EML508", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", writers("--> archived")), "EML508");
 t("rbac on CRUD", erd(`    Thing {\n        string id PK\n    }`) + "\n%%rbac role:admin on Thing.*\n");
 t("rbac on an unknown target raises EML214", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor on Thing.teleport\n"), "EML214");
 
@@ -209,7 +220,7 @@ t("%%field naming a missing enum raises EML501", `%%meta name: Audit\n%%meta kin
 /* --------------------------------- 3. the traps the spec now warns about ---- */
 
 // §5.2 — the machine tracks a column called status / state / stage (EML500).
-const machine = (entity, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string ${entity}\n    }\n${extra}\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`;
+const machine = (entity, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string ${entity}\n    }\n${extra}\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n${entity === "status" ? writers("--> live --> done") : ""}`;
 t("a lifecycle column called status is accepted", machine("status", "%%field Thing.status enum: ThingStatus"));
 t("a lifecycle column called approval_status raises EML500", machine("approval_status", "%%field Thing.approval_status enum: ThingStatus"), "EML500");
 
@@ -516,7 +527,7 @@ held(cited.length >= 20 && unknown.length === 0,
 held(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(detailed)),
   `llms.txt tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
 {
-  const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+  const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen"];
   const stated = [...detailedProse.matchAll(/\bThe ([a-z]+) auto-repairs\b/gi)].map((m) => WORDS.indexOf(m[1].toLowerCase()));
   held(stated.length > 0 && stated.every((n) => n === AUTO_FIXABLE.length),
     `llms.txt counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
