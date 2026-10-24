@@ -679,14 +679,19 @@ against the schema the generator emits by the orchestrator's `check:pack` in CI,
 no dots on purpose — the audit's *name is lower-case and hyphenated* check reads it.
 
 **The education model — `#education`.** `guide/models/education-management-system.eml.mmd` is a fee-charging
-school in 24 entities, 36 enums, 15 rules, 16 state machines, five sagas and 91 access restrictions across
+school in 25 entities, 37 enums, 15 rules, 16 state machines, seven sagas and 94 access restrictions across
 eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, no notes, 23/23 under the audit.
 Its header comment used to say nineteen entities, five lifecycles and two sagas (the original model's
-figures) and now says twenty-four, sixteen and five. The per-entity notes and narrative documents
-beside it upstream (`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`) were
-regenerated for the 24 entities. One inconsistency inside the model is left as delivered:
-`Student.has_support_plan`'s help still says the plan is held outside the system, which the
-`SupportPlan` entity contradicts. Fix it upstream, not here.
+figures); it states the current ones. The per-entity notes and narrative documents beside it upstream
+(`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`) are regenerated with it.
+Four behaviours were added late and are worth knowing before editing the model: `Student.has_support_plan`
+is kept in step with `SupportPlan` by three hooks (true while a plan is active or under review); a paid
+`Refund` returns its invoice to `part_paid` or `issued` through two sagas (the invoice machine draws
+`paid → part_paid`, `paid → issued` and `part_paid → issued` for it, and `applied_to_invoice_at` makes it
+once only, since the runtime does not de-duplicate a saga); `refuseSelfApprovedRefund` refuses an approver
+who is the requester; and `ConcernFeedback`, the 25th entity, lets a teacher who reported a safeguarding
+concern read back its outcome without being able to read the concern (`%%rbac` cannot scope rows, so the
+feedback carries a case reference and a neutral message and never a student).
 
 **Constraints to respect**
 
