@@ -669,16 +669,21 @@ fire on it and the roles that may read it.
   repository's `html/models/` copy did not — and a unit test upstream now asserts it.
 
 **The wealth-management model — `#investment`.** `guide/models/investment-planning-wealth-management-system.eml.mmd`
-is the v1.0.1 revision (`%%meta version: 1.0.1`) of that business and the only wealth model published: the
-older, smaller one was removed rather than kept beside it. Ninety-one entities, 40 enums, nine rules, ten
-state machines, three sagas, 102 access restrictions, and **49 `%%report` directives** — one set for every
-role, each query read-only, `bus_`-only (a reporting role reads nothing else) and run against the schema the
-model generates (458 pack queries, none failing). Its checker result is 0 errors, 0 warnings and five notes,
-all deliberate: three self-referencing hierarchies, the standalone audit log, and a naming hint on
-`OrganizationUnit`. It declares **no foreign key to an entity it does not define**: a closed vocabulary is an
-`%%enum` (`Document.document_type`) and a link the model cannot enforce is an explicit `…_reference` string.
-A second link to a parent the model already declares cannot be a second relationship line (EML124). The file
-name has no dots on purpose — the audit's *name is lower-case and hyphenated* check reads it.
+is the v1.1.0 revision (`%%meta version: 1.1.0`) of that business and the only wealth model published. It is
+the largest model here: 103 entities, 54 enums, nine rules, 14 state machines, three sagas, 114 access
+restrictions across six declared roles, and **58 `%%report` directives**. Its checker result is 0 errors,
+0 warnings and six notes, all deliberate: three self-referencing hierarchies (`OrganizationUnit`,
+`AssetClass`, `RevenueHierarchy`), the standalone audit log, and two line-item hints
+(`OrganizationUnit`, `ClientAgreement`). The reporting pack it derives (540 queries, 437 reports) is run
+against the schema the generator emits by the orchestrator's `check:pack` in CI, not here. The file name has
+no dots on purpose — the audit's *name is lower-case and hyphenated* check reads it.
+
+**The education model — `#education`.** `guide/models/education-management-system.eml.mmd` is a fee-charging
+school in 24 entities, 36 enums, 15 rules, 16 state machines, five sagas and 91 access restrictions across
+eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, no notes, 23/23 under the audit. **Its
+own header comment is stale** — it still says nineteen entities, five lifecycles and two sagas — and the
+cards state what `readModel()` measures, not what that comment says. It is vendored, so correct it upstream
+(`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`), not here.
 
 **Constraints to respect**
 
