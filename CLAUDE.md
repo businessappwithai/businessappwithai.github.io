@@ -4,17 +4,27 @@
 
 This is the **AppWithAI** marketing website — a static site promoting an AI-powered business application generator. The site is deployed via GitHub Pages with no build step required.
 
-## Bun 1.4.3, and only Bun 1.4.3
+## Bun 1.4.4, and only Bun 1.4.4 — mandatory
 
-**Every repository in this project uses Bun 1.4.3 and no other version** —
-`app-with-ai-tanstack`, `app-and-report-with-ai-tanstack`,
-`enterprise_reporting_tanstack` and `businessappwithai.github.io`. That is the
+**MANDATORY: every repository in this project uses Bun 1.4.4 and no other
+version** — `app-with-ai-tanstack`, `app-and-report-with-ai-tanstack`,
+`app-and-report-with-ai-rust`, `enterprise_reporting_tanstack` and
+`businessappwithai.github.io`. This is not a default or a recommendation; a
+change that runs, pins or documents any other Bun is wrong and must not be
+merged. That is the
 rule for every runtime, install, build, test and type-check, in CI, in Docker
 images and locally. There are no exceptions: the WASM build and the
-`appwithai-wasm` CLI run on 1.4.3 too (the second 1.3.11 pin they used to have
+`appwithai-wasm` CLI run on 1.4.4 too (the second 1.3.11 pin they used to have
 is gone).
 
-- **Never use another Bun.** Not 1.3, not 1.4.0–1.4.2, not a newer release. Bun's
+**1.4.4 is the latest stable Bun release** (npm `latest` and Docker `oven/bun:latest`,
+published 2026-10-22). The rule is *the latest stable Bun, pinned exactly*: when a
+newer stable release ships, move every repository to it in one change — the pins,
+this section, and a rebuild of every committed bundle. Never pin `latest` or a
+range: the bundles are byte-compared, so a floating version turns CI red the day
+Bun releases.
+
+- **Never use another Bun.** Not 1.3, not 1.4.0–1.4.3, and not a newer release until every repository moves to it together. Bun's
   bundler output depends on the exact version, so a committed bundle built on
   another one is byte-wrong for CI; and `bun check`, the type checker every
   repository runs, first shipped in 1.4.3 — on 1.4.2, `bun check` silently runs a
@@ -22,9 +32,9 @@ is gone).
 - **Never use npm, pnpm or yarn** as the package manager, and never `tsc` as the
   type checker — `bun check` is the static check, and there is no linter or
   formatter.
-- **Pin it exactly** wherever a version is stated: `BUN_VERSION: "1.4.3"` in CI,
-  `oven/bun:1.4.3` in Dockerfiles, `"bun": ">=1.4.3"` in `engines`. Moving to a
-  different Bun is one deliberate change made in all four repositories together,
+- **Pin it exactly** wherever a version is stated: `BUN_VERSION: "1.4.4"` in CI,
+  `oven/bun:1.4.4` in Dockerfiles, `"bun": ">=1.4.4"` in `engines`. Moving to a
+  different Bun is one deliberate change made in all five repositories together,
   never in one alone.
 - **What a generated application runs on is a separate question.** The browser
   (WASM) application the generator writes is Bun-free by design — its overlay
@@ -34,7 +44,7 @@ is gone).
 **Here:** this site runs on Node alone and installs nothing, so it has no Bun of
 its own to pin. But everything it vendors — `guide/checker.js`,
 `guide/fixer.js`, `assets/js/appwithai-*.js`, `viewers/eml-model.js`,
-`assets/vendor/stack-templates.json` — is built upstream on Bun 1.4.3. Re-vendor
+`assets/vendor/stack-templates.json` — is built upstream on Bun 1.4.4. Re-vendor
 those files from upstream rather than rebuilding them, and never rebuild one
 with any other Bun.
 
