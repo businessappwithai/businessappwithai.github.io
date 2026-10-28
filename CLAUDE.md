@@ -4,26 +4,32 @@
 
 This is the **AppWithAI** marketing website — a static site promoting an AI-powered business application generator. The site is deployed via GitHub Pages with no build step required.
 
-## Bun 1.4.3, and only Bun 1.4.3
+## Bun 1.4.4, and only Bun 1.4.4
 
-**Every repository in this project uses Bun 1.4.3 and no other version** —
-`app-with-ai-tanstack`, `app-and-report-with-ai-tanstack`,
+**Every repository in this project uses Bun 1.4.4 and no other version** —
+`app-with-ai-tanstack`, `app-and-report-with-ai-rust` (the orchestrator),
 `enterprise_reporting_tanstack` and `businessappwithai.github.io`. That is the
-rule for every runtime, install, build, test and type-check, in CI, in Docker
-images and locally. There are no exceptions: the WASM build and the
-`appwithai-wasm` CLI run on 1.4.3 too (the second 1.3.11 pin they used to have
-is gone).
+rule for every runtime, install, build, test, type-check and lint, in CI, in
+Docker images and locally. There are no exceptions: the WASM build and the
+`appwithai-wasm` CLI run on 1.4.4 too.
 
-- **Never use another Bun.** Not 1.3, not 1.4.0–1.4.2, not a newer release. Bun's
+- **Never use another Bun.** Not 1.3, not 1.4.0–1.4.3, not a newer release. Bun's
   bundler output depends on the exact version, so a committed bundle built on
-  another one is byte-wrong for CI; and `bun check`, the type checker every
-  repository runs, first shipped in 1.4.3 — on 1.4.2, `bun check` silently runs a
-  package script named `check` instead, if there is one.
-- **Never use npm, pnpm or yarn** as the package manager, and never `tsc` as the
-  type checker — `bun check` is the static check, and there is no linter or
-  formatter.
-- **Pin it exactly** wherever a version is stated: `BUN_VERSION: "1.4.3"` in CI,
-  `oven/bun:1.4.3` in Dockerfiles, `"bun": ">=1.4.3"` in `engines`. Moving to a
+  another one is byte-wrong for CI; and a Bun older than 1.4.3 has no type
+  checker behind `bun check` at all.
+- **The linter is `bun check`, and only `bun check`.** Every `lint` and
+  `type-check` script runs it; no repository carries Biome, ESLint, Prettier or
+  any other linter or formatter, and none runs `tsc` as its static check. Style
+  is kept by hand.
+- **No `package.json` may have a script named `check`.** On 1.4.4 as on every
+  earlier Bun, `bun check` in a directory whose manifest has a `check` script
+  runs that script instead of the type checker, silently. Measured in the
+  orchestrator: its `lint` (`bun check`) ran the whole `check` chain, which ran
+  `lint` again. Name an aggregate script `check:all`.
+- **Never use npm, pnpm or yarn** as the package manager.
+- **Pin it exactly** wherever a version is stated: `BUN_VERSION: "1.4.4"` in CI,
+  `bun-version: 1.4.4` in a `setup-bun` step, `oven/bun:1.4.4` in Dockerfiles,
+  `"bun": ">=1.4.4"` in `engines`, `1.4.4` in `.bun-version`. Moving to a
   different Bun is one deliberate change made in all four repositories together,
   never in one alone.
 - **What a generated application runs on is a separate question.** The browser
@@ -34,9 +40,12 @@ is gone).
 **Here:** this site runs on Node alone and installs nothing, so it has no Bun of
 its own to pin. But everything it vendors — `guide/checker.js`,
 `guide/fixer.js`, `assets/js/appwithai-*.js`, `viewers/eml-model.js`,
-`assets/vendor/stack-templates.json` — is built upstream on Bun 1.4.3. Re-vendor
+`assets/vendor/stack-templates.json` — is built upstream on Bun 1.4.4. Re-vendor
 those files from upstream rather than rebuilding them, and never rebuild one
-with any other Bun.
+with any other Bun. The bundles built on 1.4.3 and on 1.4.4 are byte-identical
+(every upstream `--check` passed unchanged on 1.4.4), so the move to 1.4.4 needed
+no re-vendoring. The site has no linter; were one ever added, it would be
+`bun check`.
 
 ## Repository Structure
 
