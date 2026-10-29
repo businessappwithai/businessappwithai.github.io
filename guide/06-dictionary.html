@@ -185,7 +185,8 @@
   <code>stage</code>), and that one column is system-managed. Its field is never on the form — it is shown
   read-only as a badge in the record's header — and it is always a column of the list grid, whatever an
   administrator does to grid visibility. Its <code>sys_column</code> row is read-only and not updateable, so
-  a person's write that changes it is refused with <code>STATE_FIELD_SYSTEM_MANAGED</code>. A
+  a save that changes it is refused with <code>STATE_FIELD_SYSTEM_MANAGED</code>; the record moves by its
+  action buttons instead, one per edge the diagram draws out of its current status. A
   <code>%%section</code> row that places it is a checker warning (<code>EML178</code>), and the fixer takes
   it out.
 </p>
