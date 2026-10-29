@@ -91,7 +91,7 @@ const erd = (body, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n${extra
 // --- 1. version and auto-fixable list (header + §8.3) -----------------------
 const expectedFixable = [
   "EML001", "EML103", "EML112", "EML114", "EML117", "EML172", "EML174", "EML175",
-  "EML178", "EML215", "EML287", "EML421", "EML422",
+  "EML178", "EML287", "EML421", "EML422", "EML512",
 ];
 say(LANGUAGE_VERSION === "1.2.0", `header states EML version 1.2.0 (checker says ${LANGUAGE_VERSION})`);
 say(
@@ -189,9 +189,9 @@ for (const [k, v] of [["version","1.0.0"],["entity","Thing"],["stack","tanstack-
   t(`meta key ${k}`, `%%meta name: Audit\n%%meta kind: erd\n%%meta ${k}: ${v}\nerDiagram\n    Thing {\n        string id PK\n    }\n`);
 
 // --- 9. §5.2 state machine rules --------------------------------------------
-/* No person changes a state: each state a machine can move into needs a saga
-   whose UpdateEntity step writes it, or the checker reports EML507. `writers`
-   gives the fixture one per state its diagram moves into. */
+/* A person moves a record with an action button along a drawn edge; a saga may
+   still write the state, but only one the diagram draws (EML508). `writers`
+   gives the fixture one saga per state its diagram moves into. */
 const writers = (sd) =>
   [...new Set([...sd.matchAll(/-->\s*(\w+)/g)].map((m) => m[1]))]
     .map((to) => `\n%%meta name: Audit ${to} move\n%%meta kind: workflow\n%%workflow Thing${to}Move entity: Thing kind: saga\nflowchart TD\n    A([Start]) --> B[Set the status]\n    B --> Z([End])\n\n    %%step B UpdateEntity field: status value: ${to}\n`)
@@ -205,10 +205,13 @@ t("an enum value no state uses raises EML427", state("    [*] --> draft\n    dra
 t("a machine with no enum at all raises EML428", `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`, "EML428");
 
 // --- 10. §6 rbac on a transition and on CRUD --------------------------------
-// A transition is not grantable: only background workflows change a state.
-t("rbac on a transition raises EML215", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n"), "EML215");
-// A state nothing writes, and a saga writing a state the diagram never drew.
-t("a state no saga writes raises EML507", `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`, "EML507");
+// A move is granted by naming it: %%rbac names the button's event.
+t("rbac on every move is clean", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n    %%rbac role:admin on Thing.finish\n"));
+// A move no %%rbac line names is open to anyone who may update the record.
+t("a move no rbac line names is listed by EML511", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n"), "EML511");
+// `final` and `error` belong to the lifecycle, not to a model's machine.
+t("a state named final raises EML509", `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, final\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> final : finish\n    final --> [*]\n`, "EML509");
+// A saga writing a state the diagram never drew.
 t("a saga writing an undrawn state raises EML508", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", writers("--> archived")), "EML508");
 t("rbac on CRUD", erd(`    Thing {\n        string id PK\n    }`) + "\n%%rbac role:admin on Thing.*\n");
 t("rbac on an unknown target raises EML214", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor on Thing.teleport\n"), "EML214");

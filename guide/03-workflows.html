@@ -124,10 +124,13 @@
 <h2>State machines</h2>
 <p>
   Each state is a value of the entity's status column; each transition is a move the application will
-  allow. Everything else is refused. <strong>Nobody moves a record by hand.</strong> The status column is
-  system-managed: a form shows it read-only in the record's header and the list always shows it as a
-  column, and a person's write that changes it is refused with <code>STATE_FIELD_SYSTEM_MANAGED</code> —
-  an administrator's included. Only background workflows write it.
+  allow. Everything else is refused. Every record has one lifecycle: a save puts it in <strong>Draft</strong>
+  and runs its rules and workflows; accepted, it moves to the flow's first status; refused, it goes to
+  <strong>Error</strong> with the reason and stays editable. From there it moves only when someone presses
+  one of its <strong>action buttons</strong> — one per edge the diagram draws out of its current status.
+  Every end state is <strong>Final</strong>: the record is locked, and <strong>Reopen</strong> takes it back
+  to Draft. Nobody types the status: the form shows it read-only in the record's header beside the
+  buttons, and the list always shows it as a column.
 </p>
 
 <div class="code">
@@ -150,6 +153,10 @@
     disqualified --&gt; [*]
 
     <span class="c-dir">%%rbac</span> role:sales_rep|account_executive|sales_manager on Lead.update
+    <span class="c-dir">%%rbac</span> role:sales_rep|account_executive|sales_manager on Lead.qualify
+    <span class="c-dir">%%rbac</span> role:account_executive|sales_manager on Lead.convert
+    <span class="c-dir">%%rbac</span> role:sales_rep|sales_manager on Lead.disqualify
+    <span class="c-dir">%%rbac</span> role:sales_manager on Lead.reopen
     <span class="c-dir">%%trigger</span> webhook:marketing -&gt; ingestInboundLead on Lead
     <span class="c-dir">%%trigger</span> cron:0 7 * * 1 -&gt; recycleStaleLeads on Lead</code></pre>
 </div>
@@ -164,47 +171,38 @@
 </div>
 
 <p>
-  <code>%%rbac … on Lead.update</code> says who may edit a lead; it never grants a transition, and the
-  checker refuses one that tries (<code>EML215</code>). <code>%%trigger</code> declares what else can start
+  <code>%%rbac … on Lead.update</code> says who may edit a lead. <code>%%rbac … on Lead.convert</code> gives
+  the <em>Convert</em> button to those roles and nobody else; an edge with no label is named
+  <code>from-&gt;to</code>, and <code>reopen</code> names Reopen. (The excerpt shows four of the model's
+  nine move lines.) A move no line names is open to anyone who may update the record, and the checker
+  lists those (<code>EML511</code>). <code>%%trigger</code> declares what else can start
   work on the entity: <code>cron:</code>, <code>webhook:</code> or <code>message:</code>. Both are
   renderer-safe comments, so the diagram still draws as a plain state chart.
 </p>
 
 <h3>Who moves the record</h3>
 <p>
-  A person records the fact a move depends on — here, the time a lead was qualified — and a rule turns
-  that fact into the saga that writes the state. One rule per entity, one action per edge, one saga per
-  state it moves into. The checker reports a state no saga writes (<code>EML507</code>) and a saga that
-  writes a state the diagram does not draw (<code>EML508</code>).
+  Whoever holds a move out of the record's current status. A record therefore moves between roles as it
+  moves through its flow — a rep qualifies a lead, an account executive converts it — and each person's
+  list can show just the records <em>waiting for them</em>. When the move is pressed the application stamps
+  the state's <code>_at</code> time, where the model keeps one, and runs the rules and workflows bound to the
+  move in the same transaction; if a rule refuses, nothing moves.
 </p>
-
-<div class="code">
-  <div class="code-head"><span class="tag">eml</span><span>language/examples/crm.eml.mmd · the lead's moves</span></div>
-<pre><code><span class="c-dir">%%rule</span> leadStateProgress on Lead event: beforeUpdate priority: 90
-<span class="c-kw">flowchart TD</span>
-    A([Lead updated]) --&gt; B{Is the time of a move recorded?}
-    B --&gt;|Yes| C[Start that move's workflow]
-    B --&gt;|No| E([Nothing to move])
-    C --&gt; E
-
-    <span class="c-dir">%%action</span> moveWorkingToQualified trigger-workflow when: status == "working" and qualified_at != null workflow: LeadQualifiedMove
-
-<span class="c-dir">%%workflow</span> LeadQualifiedMove entity: Lead kind: saga trigger: rule
-<span class="c-kw">flowchart TD</span>
-    A([Move to qualified recorded]) --&gt; B[Set the status to qualified]
-    B --&gt; C[Clear working at for the next move]
-    C --&gt; Z([Qualified])
-
-    <span class="c-dir">%%step</span> B UpdateEntity field: status value: qualified
-    <span class="c-dir">%%step</span> C UpdateEntity field: working_at value: null</code></pre>
-</div>
+<p>
+  Models written before the buttons moved a record with a rule and one saga per state — a person recorded
+  the time of a move and the saga wrote the status. The checker reports that pattern
+  (<code>EML512</code>) and the fixer removes it, keeping the <code>_at</code> columns. A saga may still
+  write the status, but only a state the diagram draws (<code>EML508</code>), and only along a drawn edge.
+</p>
 
 <h3>What the generator does with it</h3>
 <p>
   Each state machine becomes a workflow definition holding BPMN. On <strong>create</strong> the definition
   puts the new record into the machine's starting state — the <code>[*] --&gt; new</code> edge, written to
-  the entity's <code>status</code> column. On <strong>update</strong> it records a run without touching the
-  state: a person's write may not change it, and a saga's write may only cross an edge the diagram drew. The full
+  the entity's <code>status</code> column. Each edge becomes an action button, served to the caller only if
+  one of their roles holds that move; a press needs the version the button was drawn from, so two people
+  cannot move one record twice. A save that tries to change the status directly is refused, and a saga's
+  write may only cross an edge the diagram drew. The full
   machine is stored in the definition's description, which is what the Workflow Designer displays.
 </p>
 
@@ -354,7 +352,7 @@
 <div class="code">
   <div class="code-head"><span class="tag">eml</span></div>
 <pre><code><span class="c-dir">%%workflow</span> LeadConversion   entity: Lead        kind: saga trigger: rule
-<span class="c-dir">%%workflow</span> ClosedWonHandoff entity: Opportunity kind: saga trigger: automatic operation: UPDATE</code></pre>
+<span class="c-dir">%%workflow</span> RenewalPlaybook  entity: Contract    kind: saga trigger: automatic operation: UPDATE</code></pre>
 </div>
 <p>
   <code>trigger: rule</code> runs only when a rule's <code>trigger-workflow</code> action names it, so the
@@ -369,8 +367,8 @@
   <figcaption>
     <b>Five sagas, as the application sees them.</b> Each row prints its step chain and its trigger mode —
     "every write" for the two automatic ones, "when a rule triggers it" for the three the rules gate.
-    <em>From the model</em> means regeneration owns them. (Taken before the state rule: the CRM now
-    declares 32 sagas, the five shown plus one per state a record can move into.)
+    <em>From the model</em> means regeneration owns them. (The CRM declares exactly these five. Taken while ClosedWonHandoff was
+    still automatic; the model now starts it from a rule, when a deal reaches closed won.)
   </figcaption>
   <img src="img/13-crm-workflow-designer-top.png" alt="The Workflow Designer listing RenewalPlaybook, ClosedWonHandoff, CriticalCaseEscalation, QuoteApprovalEscalation and LeadConversion, each marked FROM THE MODEL with its step chain and trigger mode.">
 </figure>
