@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A tour of the generated CRM: dashboard, lists, forms, lookups, dropdowns and the draft-to-final save cycle.">
@@ -236,7 +245,9 @@
 <figure>
   <figcaption>
     <b>Enums and lookups side by side.</b> Three dropdowns from <code>%%field … enum:</code>, one integer,
-    two lookups. The difference between a dropdown and a text box here is one line in the model.
+    two lookups. The difference between a dropdown and a text box here is one line in the model. Status is
+    the one exception now: a state machine's column is shown read-only in the record's header, beside
+    the action buttons that move it.
   </figcaption>
   <img src="img/32-crm-enum-dropdowns.png" alt="The Lead form with Lead Source, Rating and Status rendered as Dropdown selects while Score stays an integer input and Owner Id stays a Direct Lookup.">
 </figure>
@@ -352,7 +363,6 @@
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
             <li><a href="../todo.html">Todo</a></li>
-            <li><a href="../chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -377,7 +387,6 @@
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
 </body>

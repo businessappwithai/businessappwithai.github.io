@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Compile a Mermaid model into the full NestJS and TanStack Start application and run it inside this browser tab — the four hundred files the command-line generator writes, installed and started by a WebContainer.">
+  <meta name="description" content="Compile a Mermaid model into the full NestJS and TanStack Start application and run it inside this browser tab — the five hundred files the command-line generator writes, installed and started by a WebContainer.">
   <meta name="keywords" content="AppWithAI, CRM generator, EML, Mermaid model, ERD, business rules, GoRules, BPMN workflow, saga, NestJS, TanStack Start, PostgreSQL, code generation, low-code CRM, WebAssembly, PGlite, browser demo">
   <title>10 · Run the real stack — Build a CRM with AppWithAI</title>
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
@@ -102,7 +111,7 @@
   <a href="run-in-browser.html">Chapter 09</a> compiles a model into a runtime that needs no install and
   no build step — which is what makes it start in ten seconds, and also what makes its interface a port
   of the real one rather than the real one. This chapter makes the other trade. It assembles the
-  <b>actual</b> generated application, four hundred files of NestJS and TanStack Start, and hands them
+  <b>actual</b> generated application, five hundred files of NestJS and TanStack Start, and hands them
   to a WebContainer: real Node.js compiled to WebAssembly, a real <code>npm install</code>, the real
   Vite build.
 </p>
@@ -151,7 +160,7 @@
       <div class="choices">
         <button type="button" class="choice" id="choice-crm" aria-pressed="true">
           <span class="choice__name">Use the CRM example</span>
-          <span class="choice__desc">Seventeen entities, eight rules, ten processes, thirty-two access restrictions.</span>
+          <span class="choice__desc">Seventeen entities, 9 rules, 37 processes, 72 access restrictions.</span>
           <span class="choice__meta">language/examples/crm.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-drug" aria-pressed="false">
@@ -161,23 +170,33 @@
         </button>
         <button type="button" class="choice" id="choice-hospital" aria-pressed="false">
           <span class="choice__name">Use the hospital example</span>
-          <span class="choice__desc">Thirty entities — admissions, wards and beds, orders and results, billing, stock. Ten state machines, ten sagas and twenty-seven lifecycle hooks.</span>
+          <span class="choice__desc">88 entities — patients and admissions, wards and beds, orders and results, medication, stores, billing and claims, payroll, the ledger and assets. 51 state machines, one saga and a lifecycle hook.</span>
           <span class="choice__meta">examples/hospital-management-system.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-dance" aria-pressed="false">
           <span class="choice__name">Use the dance-studio example</span>
-          <span class="choice__desc">Nine entities — classes, sessions, bookings, a waitlist and class packs. Two state machines, a saga, and the fastest of the six to assemble.</span>
+          <span class="choice__desc">Nine entities — classes, sessions, bookings, a waitlist and class packs. Two state machines, a saga, and the fastest of the seven to assemble.</span>
           <span class="choice__meta">examples/dance-studio.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-investment" aria-pressed="false">
           <span class="choice__name">Use the wealth-management example</span>
-          <span class="choice__desc">Ninety-one entities — households and advisors, compliance, planning, portfolios, orders, recommendations and commissions. Eleven state machines and three sagas; the largest, and the slowest to assemble.</span>
+          <span class="choice__desc">103 entities — households and advisors, compliance and regulatory governance, planning, portfolios, orders, recommendations and commissions. 14 state machines and 3 sagas; the largest, and the slowest to assemble.</span>
           <span class="choice__meta">examples/investment-planning-wealth-management-system.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-education" aria-pressed="false">
           <span class="choice__name">Use the education example</span>
-          <span class="choice__desc">Nineteen entities &mdash; admissions, the roll, sections and sessions, attendance, assessment, fees and discipline. Eleven state machines, five sagas and eight roles.</span>
+          <span class="choice__desc">25 entities &mdash; admissions, the roll, sections and sessions, attendance, assessment, fees, discipline and student support. 16 state machines, 7 sagas and eight roles.</span>
           <span class="choice__meta">examples/education-management-system.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-airport" aria-pressed="false">
+          <span class="choice__name">Use the airport example</span>
+          <span class="choice__desc">23 entities &mdash; flights and their stands and gates, turnaround, baggage and cargo, assets and work orders, safety and security, and tariffs through to invoices. 12 state machines, 13 rules and 8 roles.</span>
+          <span class="choice__meta">examples/airport-management-system.eml.mmd</span>
+        </button>
+        <button type="button" class="choice" id="choice-shipping" aria-pressed="false">
+          <span class="choice__name">Use the shipping example</span>
+          <span class="choice__desc">53 entities &mdash; quotes, shipments and cargo, bookings, transport legs and containers, documents, customs, delivery, invoices and settlement, accruals and claims. 20 state machines, 37 rules and 7 roles.</span>
+          <span class="choice__meta">examples/shipping-management-system.eml.mmd</span>
         </button>
         <!-- The upload choice *is* the file picker: a label wrapping the input,
              so one click both selects this option and opens the dialog. It used
@@ -260,7 +279,7 @@
     <h3>Chapter 09 — the browser runtime</h3>
     <ul>
       <li>Starts in about ten seconds</li>
-      <li>No install, no build, and nothing fetched from another host</li>
+      <li>No install, no build, and nothing fetched from another host to run it (Google&rsquo;s analytics tag aside)</li>
       <li>PostgreSQL in the tab, application server on a worker</li>
       <li>Its interface is a <b>port</b> of the generated one</li>
       <li>Nothing to open and edit per entity</li>
@@ -273,7 +292,7 @@
       <li>Needs the network and cross-origin isolation</li>
       <li>Real Node, real NestJS, real Vite build</li>
       <li>The <b>actual</b> generated React front end</li>
-      <li>Four hundred files you can read and change</li>
+      <li>Five hundred files you can read and change</li>
     </ul>
   </div>
 </div>
@@ -308,7 +327,7 @@
   environment this chapter was built in — so the install-and-start path has been written against the
   API's documented contract and verified up to the point where it leaves the browser. If it fails for
   you, the message under the button is the real one from the API rather than a guess, and everything
-  before it — the model, the check, the four hundred files — has already happened in your tab and can be
+  before it — the model, the check, the five hundred files — has already happened in your tab and can be
   downloaded from <a href="run-in-browser.html">chapter 09</a>.
 </p>
 
@@ -341,7 +360,6 @@
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
             <li><a href="../todo.html">Todo</a></li>
-            <li><a href="../chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -366,7 +384,6 @@
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
   <script type="module" src="../assets/js/run-real-stack.js"></script>

@@ -75,12 +75,6 @@ const BROKEN = `erDiagram
 const $ = (id) => document.getElementById(id);
 const state = { label: "crm.eml.mmd" };
 
-/*
- * Analytics — see assets/js/analytics.js, which owns every decision about what
- * these mean. `window.awTrack` is a no-op when analytics are off or absent, so
- * these lines are unconditional. The codes travel; the messages do not, because
- * a message carries the reader's own entity names.
- */
 const verdictOf = (result, extra) => {
   // `check` reports its findings as `issues`; `checkAndFix` reports the ones
   // that survived the repair as `remaining`. Both call through here, and reading
@@ -197,7 +191,7 @@ function notAModel(issues) {
     prose to the parser, however thorough they are. If a language model answered you with a
     specification, ask it again for the file itself: one <code>.mmd</code>, every line Mermaid or an
     EML <code>%%</code> directive, as
-    <a href="../llms-full.txt">section 1 of the specification</a> requires. If it answered with a
+    <a href="../llms.txt">section 1 of llms.txt</a> requires. If it answered with a
     report that contains the model in a fenced block, paste the contents of that block here
     instead.</p>`;
 }
@@ -214,17 +208,8 @@ $("check").addEventListener("click", () => {
   const source = $("model").value;
   if (!source.trim()) return report(`<div class="failure">There is no model to check.</div>`);
 
-  window.awTrack?.("checker_started", { model_name: state.label, mode: "check" });
   const startedAt = performance.now();
   const result = check(source);
-  window.awTrack?.(
-    result.ok ? "checker_passed" : "checker_failed",
-    verdictOf(result, {
-      mode: "check",
-      model_size: new Blob([source]).size,
-      check_time_ms: Math.round(performance.now() - startedAt),
-    })
-  );
   $("download-fixed").hidden = !result.ok;
   report(
     verdict(result.ok, result.counts) +
@@ -239,21 +224,11 @@ $("fix").addEventListener("click", () => {
   const source = $("model").value;
   if (!source.trim()) return report(`<div class="failure">There is no model to repair.</div>`);
 
-  window.awTrack?.("checker_started", { model_name: state.label, mode: "fix" });
   const startedAt = performance.now();
   const result = checkAndFix(source);
   $("model").value = result.source;
 
   const applied = result.fixes.filter((fix) => fix.applied);
-  window.awTrack?.(
-    result.ok ? "checker_passed" : "checker_failed",
-    verdictOf(result, {
-      mode: "fix",
-      model_size: new Blob([source]).size,
-      fixes_applied: applied.length,
-      check_time_ms: Math.round(performance.now() - startedAt),
-    })
-  );
   const extra = cell(applied.length, "Repairs");
 
   report(
@@ -276,6 +251,30 @@ $("fix").addEventListener("click", () => {
   );
 
   $("download-fixed").hidden = !result.ok;
+});
+
+/* The audit is the published function, not a copy: `audit-model.mjs` exports
+   `audit(src, { check, checkAndFix, file })` with no file system and no network
+   precisely so this page can run what the command line runs. It is loaded on the
+   click, because a reader who only wants the checker should not fetch it. */
+$("audit").addEventListener("click", async () => {
+  const source = $("model").value;
+  if (!source.trim()) return report(`<div class="failure">There is no model to audit.</div>`);
+
+  try {
+    const { audit } = await import("../../guide/audit-model.mjs");
+    const result = audit(source, { check, checkAndFix, file: fileName(source) });
+    const items = (list, cls) =>
+      list.map((label) => `<li class="diag ${cls}"><span class="diag__msg">${escapeHtml(label)}</span></li>`).join("");
+    report(
+      `<div class="verdict ${result.ok ? "verdict--ok" : "verdict--bad"}">${escapeHtml(result.score)}</div>` +
+        (result.failed.length ? `<h4>Failed</h4><ul class="diags">${items(result.failed, "diag--error")}</ul>` : "") +
+        (result.notes.length ? `<h4>Notes</h4><ul class="diags">${items(result.notes, "diag--info")}</ul>` : "") +
+        `<h4>Passed</h4><ul class="diags">${items(result.passed, "diag--fixed")}</ul>`
+    );
+  } catch (error) {
+    report(`<div class="failure">Could not run the audit: ${escapeHtml(error.message)}</div>`);
+  }
 });
 
 /**
@@ -304,7 +303,6 @@ function fileName(source) {
 }
 
 $("download-fixed").addEventListener("click", () => {
-  window.awTrack?.("model_downloaded", { model_name: state.label });
   const blob = new Blob([$("model").value], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -323,7 +321,6 @@ $("choice-dance").addEventListener("click", () => load("dance"));
 $("choice-investment").addEventListener("click", () => load("investment"));
 $("choice-broken").addEventListener("click", () => load("broken"));
 $("choice-paste").addEventListener("click", () => {
-  window.awTrack?.("upload_started", { method: "paste" });
   load("paste");
 });
 
@@ -332,11 +329,6 @@ $("file").addEventListener("change", async (event) => {
   if (!file) return;
   state.label = file.name;
   $("model").value = await file.text();
-  window.awTrack?.("model_uploaded", {
-    model_name: file.name,
-    model_size: file.size,
-    model_source: "upload",
-  });
   for (const id of ["choice-crm", "choice-drug", "choice-hospital", "choice-dance", "choice-investment", "choice-broken", "choice-paste"]) {
     $(id).setAttribute("aria-pressed", "false");
   }

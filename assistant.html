@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Change an existing EML model with your own OpenAI or Claude key. The published enhancement protocol is the system prompt, your key stays in your browser, and the result is checked by the real validator before you can download it.">
@@ -118,6 +127,8 @@
               <button type="button" class="aia-example" data-example="hospital-management-system">hospital</button>
               <button type="button" class="aia-example" data-example="education-management-system">education</button>
               <button type="button" class="aia-example" data-example="investment-planning-wealth-management-system">wealth</button>
+              <button type="button" class="aia-example" data-example="airport-management-system">airport</button>
+              <button type="button" class="aia-example" data-example="shipping-management-system">shipping</button>
             </div>
           </div>
 
@@ -154,7 +165,7 @@
 
           <div class="aia-panel" style="margin-top: var(--spacing-lg);">
             <h3>What this actually does</h3>
-            <p class="text-sm">It is the four steps of <a href="llmtextenhancement.txt">the enhancement protocol</a>, run in this tab:</p>
+            <p class="text-sm">It is <a href="llms.txt">the protocol</a> for changing a model, run in one pass in this tab:</p>
             <ol class="text-sm">
               <li>That protocol — the whole language reference, byte for byte the same as the one you would paste into a chat window — becomes the system prompt.</li>
               <li>Your model and your instruction become the message.</li>
@@ -162,7 +173,7 @@
               <li>A download appears <strong>only</strong> if that check finds no errors.</li>
             </ol>
             <p class="text-sm">Step four is the reason this page exists rather than a chat window. Any assistant will hand you back a model; what this site has that they do not is the validator the generator itself runs, so a file that would be refused is caught here instead of three steps later.</p>
-            <p class="text-sm text-muted">The protocol is about 34,000 tokens and is sent on every request, so a large model costs a few tens of cents a change. On Claude it is cached after the first call, which makes the ones after it markedly cheaper.</p>
+            <p class="text-sm text-muted">The protocol is about 43,000 tokens and is sent on every request, so a large model costs a few tens of cents a change. On Claude it is cached after the first call, which makes the ones after it markedly cheaper.</p>
           </div>
 
           <div class="aia-panel" style="margin-top: var(--spacing-lg);">
@@ -195,7 +206,6 @@
             <li><a href="technology.html">Technology</a></li>
             <li><a href="guide/index.html">Build a CRM Guide</a></li>
             <li><a href="todo.html">Todo</a></li>
-            <li><a href="chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -220,7 +230,6 @@
     </div>
   </footer>
 
-  <script src="assets/js/analytics.js"></script>
   <script src="assets/js/main.js"></script>
   <script type="module" src="assets/js/assistant.js"></script>
 </body>

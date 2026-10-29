@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="AppWithAI — Open source AI-powered business application generator. Transform your business domain description into a production-ready full-stack application with TanStack Start, NestJS, and PostgreSQL.">
@@ -287,7 +296,7 @@
       <div class="section-header">
         <span class="hero-badge" style="background: rgba(255,255,255,0.15); color: white;">No Account &middot; No Install &middot; Ten Minutes</span>
         <h2 style="color: white;">Try It Yourself</h2>
-        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Describe your business to an AI you already use, bring back one file, and watch a working application start in this browser. Ten minutes, start to finish.</p>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">You do not need an account, an install, a sales call, or our permission. Describe your business to an AI you already use, bring back one file, and watch a working demo of your application start in this browser. Ten minutes, start to finish &mdash; and when it looks right, download the real application, ready to run under Docker.</p>
       </div>
 
       <div class="grid grid-3" style="margin-top: var(--spacing-2xl);">
@@ -300,14 +309,14 @@
         <div class="card">
           <div class="card-icon">🔎</div>
           <h3>2. Hand it to ChatGPT or Gemini Deep Research</h3>
-          <p>Give the model our machine-readable specification along with your description. It contains the authoring protocol: enhance the brief into a full entity model, workflows and business rules; write the model file; then validate it against our published checker before handing anything over.</p>
+          <p>Give the AI the prompt below with your description &mdash; or with the <code>.mmd</code> you already have. It runs a working session with you: it researches your business domain as widely as it can, then reviews its own research adversarially before it builds anything &mdash; even if you attached a model. Then it works the business through with you, decides every field, lookup, dropdown and form section, writes the model file, and validates it against our published checker before handing anything over.</p>
           <p class="text-muted text-sm">You get back a single <code>.mmd</code> file — the model itself, not a document describing it — plus the specification it inferred so you can correct what it guessed.</p>
         </div>
         <div class="card">
           <div class="card-icon">▶️</div>
-          <h3>3. Run it, here, in this browser</h3>
-          <p>Upload that file and watch it become a complete application — PostgreSQL compiled to WebAssembly, a real API, a real interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
-          <p class="text-muted text-sm">Your model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab.</p>
+          <h3>3. Try it in the browser — then download the real thing</h3>
+          <p>Upload that file and watch it become a working <strong>demo</strong> — PostgreSQL compiled to WebAssembly, an API, an interface, business rules and workflows running. No install. No signup. Nothing leaves your machine.</p>
+          <p class="text-muted text-sm">When it looks right, press <strong>Download the deployable app (.zip)</strong> on the same page: the production source, with a <code>docker-compose.yml</code> that runs it. <a href="try-it-yourself.html#deploy">What is in it, and how to run it &rarr;</a></p>
         </div>
       </div>
 
@@ -315,35 +324,47 @@
         <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: start;">
           <div>
             <h4>The prompt — copy it as it is</h4>
-            <p class="text-muted text-sm">Replace only the description. Everything else tells the model where the specification lives and what it must do before it answers you.</p>
-            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms-full.txt">https://www.appwithai.org/llms-full.txt</span> in full, and follow section 1 — the authoring protocol — exactly.
+            <p class="text-muted text-sm">Replace only the bracketed part. Starting fresh, attach nothing; changing a model you already have, attach your <code>.mmd</code> to the same message. One prompt, one document &mdash; <a href="llms.txt">llms.txt</a> &mdash; for both.</p>
+            <pre id="research-prompt" style="background: var(--gray-900); color: var(--gray-100); padding: var(--spacing-lg); border-radius: var(--radius-lg); font-size: var(--text-sm); line-height: 1.7; overflow-x: auto; white-space: pre-wrap; margin: var(--spacing-md) 0;">Read <span data-url="llms.txt">https://www.appwithai.org/llms.txt</span> in full, and follow section 1 — model working session — exactly, fetching the chunks it names only when a step needs them.
 
-My business:
-[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails.]
+If I have attached a .mmd file, it is my existing model: change that file — read it, inventory it, apply only what I ask, and give me back the whole file with before-and-after counts. Never rebuild it from memory. If I have attached nothing, build a new model from my description.
+
+If you are ChatGPT, the TinyFish plugin must be installed and signed in before you start. If it is not, stop and tell me how to install it; do nothing else until it works.
+
+Ask me first how I want to work: walk me through it, one decision at a time, or just build it. If I write JUST BUILD IT, do the whole thing in one pass and list every assumption.
+
+Before you build anything, put on your thinking cap: research my business domain as widely and deeply as you can, then review your own research and plan adversarially, as a sceptical expert would, and fix what that review finds. Only then start building and reviewing with me. Do this even if I attached a .mmd.
+
+My business, or what I want changed:
+[Describe it here. What you sell or service. Every kind of record you keep and how they relate. Who does what. The states each record moves through. What has to be approved, and by whom. What happens when a step fails. Or, with your .mmd attached: the change you want.]
+
+Fill in the whole Application Dictionary, as llms.txt section 3.7 requires: every reference column marked FK so it becomes a lookup, every closed list bound to an enum so it becomes a dropdown, help text on every entity, column and section that says something a new employee needs to know, and every form laid out with %%section as headed sections of two-column rows.
 
 Deliver exactly one file I can download: &lt;business-name&gt;.mmd. It must open on a %% line with %%meta name: before the first diagram, and every line in it must be Mermaid or an EML %% directive — no Markdown, no headings, no prose. A document that describes the model is not the model; the checker scores that EML004.
 
 Send no other file — no specification document, no report, no README. If you can only answer with a document, put the entire model in the first fenced mermaid block of that document, before any prose.
 
-Then, in your reply text: the enhanced specification you inferred, the checker result with its counts, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
+Then, in your reply text: what you understood (or, for a change, what changed and the before-and-after counts), the checker result with its counts, the audit's last line, and anything you assumed. If the checker cannot be reached from where you are running, say which host failed and how, deliver the model anyway, and keep going — never invent counts, and never hold a phase open waiting for a network call.
 
-If your code tool has no network — ChatGPT's sandbox has none, so every host fails there, not only this one — do not retry and do not try another host. Ask me to attach <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit on the attached file, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
+Read <span data-url="guide/check-model-standalone.mjs">https://www.appwithai.org/guide/check-model-standalone.mjs</span>, then run node check-model-standalone.mjs &lt;business-name&gt;.mmd and the same with --audit, and report the checker's verdict line (it starts OK — or FAILED —), the audit's last line, and both exit codes.</pre>
             <button type="button" class="btn btn-primary" data-copy="research-prompt">Copy the prompt</button>
           </div>
           <div>
             <h4>Then bring the file back</h4>
             <p class="text-muted">Upload the <code>.mmd</code> and press Generate, then Run. The first time PostgreSQL loads it takes a few seconds; after that it is instant.</p>
+            <p class="text-muted text-sm">The browser run is a demo. The same page&rsquo;s <strong>Download the deployable app (.zip)</strong> gives you the production source and a <code>docker-compose.yml</code> for Docker Desktop or any cloud server with Docker &mdash; <a href="try-it-yourself.html#deploy">what is in it and how to run it</a>.</p>
             <p class="text-muted text-sm">Got a report instead of a file? Some models can only answer with a document. Copy its <code>mermaid</code> block into the <a href="guide/11-check-a-model.html">checker page</a>, check it, and download it as a <code>.mmd</code> from there.</p>
             <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
               <a href="guide/run-in-browser.html#upload" class="btn btn-accent btn-lg">Upload Your Model &amp; Run It &rarr;</a>
               <a href="guide/11-check-a-model.html" class="btn btn-outline">Check the file first &rarr;</a>
-              <a href="llms-full.txt" class="btn btn-ghost">Read the specification yourself &rarr;</a>
+              <a href="llms.txt" class="btn btn-ghost">Read llms.txt yourself &rarr;</a>
             </div>
             <p class="text-muted text-sm" style="margin-top: var(--spacing-lg);">Not ready to write your own? <a href="guide/run-in-browser.html">Run the seventeen-entity CRM</a> the guide builds &mdash; same page, one click, no file needed.</p>
             <p class="text-muted text-sm">Want the longer version &mdash; what the model file actually contains, and how to check it? <a href="try-it-yourself.html">The Try It Yourself page</a> walks all of it.</p>
-            <p class="text-muted text-sm">Building professional or enterprise software rather than a first model? Point the same prompt at <a href="llmdetailed.txt">the detailed specification</a> and follow its section 10 &mdash; a phased walkthrough with approval gates instead of one pass. <a href="try-it-yourself.html#enterprise-prompt">The prompt for it is here</a>.</p>
-            <p class="text-muted text-sm">Already have a model and want to change it? These prompts write one from nothing, which rewrites anything you point them at. <a href="llmtextenhancement.txt">The enhancement specification</a> starts from your <code>.mmd</code> instead &mdash; it reads your file first, applies only what you asked for, hands the whole model back, and shows you the before-and-after counts so you can see nothing was lost. <a href="try-it-yourself.html#enhance">Both enhancement prompts are here</a>.</p>
-            <p class="text-muted text-sm">Whichever prompt you use, you get a Mermaid file back &mdash; and Mermaid draws only its entity diagram. <a href="viewers/index.html">The model viewer</a> draws the rest: the business rules, the state machines, the multi-step processes and who can see what.</p>
+            <p class="text-muted text-sm">The AI asks how you want to work first: <strong>walk me through it</strong>, one decision at a time with a checked file at every step &mdash; right for professional and enterprise software &mdash; or <strong>just build it</strong>, in one pass. <a href="try-it-yourself.html#the-prompt">How to use the prompt</a>.</p>
+            <p class="text-muted text-sm"><strong>Using ChatGPT?</strong> Install the TinyFish plugin first (Plugins, then TinyFish, then Install plugin). The prompt stops without it. <a href="try-it-yourself.html#chatgpt-tinyfish">How to install it</a>.</p>
+            <p class="text-muted text-sm">Already have a model and want to change it? Attach it. The AI reads your file first, applies only what you asked for, hands the whole model back, and shows you the before-and-after counts so you can see nothing was lost &mdash; and it lays out every form in sections of two-column rows if yours were not. <a href="try-it-yourself.html#enhance">What it is held to</a>.</p>
+            <p class="text-muted text-sm">Either way, you get a Mermaid file back &mdash; and Mermaid draws only its entity diagram. <a href="viewers/index.html">The model viewer</a> draws the rest: the business rules, the state machines, the multi-step processes and who can see what.</p>
           </div>
         </div>
       </div>
@@ -438,7 +459,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
       <div class="section-header">
         <span class="hero-badge" style="background: var(--accent-100); color: var(--accent-700);">Live Demo · No Sign-Up</span>
         <h2>See AppWithAI in Action — Right Here, Right Now</h2>
-        <p class="section-subtitle">Most software demos are a recording, a sandbox someone else reset, or a calendar invite. This one is the real generated application, compiled and started inside your own browser tab while you watch.</p>
+        <p class="section-subtitle">Most software demos are a recording, a sandbox someone else reset, or a calendar invite. This one is generated from a real model and started inside your own browser tab while you watch &mdash; a demo of the application, compiled for one tab. The production application, with its source, is a download on the same page.</p>
       </div>
       <div class="grid grid-2" style="align-items: center; gap: var(--spacing-2xl);">
         <div>
@@ -464,7 +485,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
         <div class="card text-center" style="padding: var(--spacing-2xl);">
           <div style="font-size: 80px; margin-bottom: var(--spacing-lg);">⚡</div>
           <h3 style="margin-bottom: var(--spacing-md);">Enterprise CRM, in this tab</h3>
-          <p class="text-muted mb-4">The generated application runs in your browser — no server, no account, no install</p>
+          <p class="text-muted mb-4">The demo runs in your browser — no server, no account, no install</p>
           <div style="background: var(--success-50); padding: var(--spacing-md); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg);">
             <strong style="color: var(--success-700);">Nothing leaves your machine</strong>
             <p class="text-sm text-muted">The model is parsed in the tab, the app is assembled in the tab, and its database lives in the tab</p>
@@ -473,6 +494,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             Launch the Live Demo
           </a>
           <p class="text-sm text-muted">Or <a href="guide/run-in-browser.html#upload">upload your own model</a> and run that instead</p>
+          <p class="text-sm text-muted">Ready for the real thing? <a href="try-it-yourself.html#deploy">Download the deployable app and run it under Docker</a></p>
         </div>
       </div>
       <div class="text-center mt-5">
@@ -521,10 +543,10 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
           <ul style="list-style: none; padding: 0; margin: var(--spacing-lg) 0;">
             <li style="padding: var(--spacing-sm) 0;">✓ Entities, types, keys, relationships, enums and indexes</li>
             <li style="padding: var(--spacing-sm) 0;">✓ Decision flows that score, route and gate a record</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ Status lifecycles with role guards on every transition</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ Status lifecycles moved only by background workflows</li>
             <li style="padding: var(--spacing-sm) 0;">✓ Multi-step processes that write across tables</li>
             <li style="padding: var(--spacing-sm) 0;">✓ The admin dictionary, the audit log and per-screen help</li>
-            <li style="padding: var(--spacing-sm) 0;">✓ The same application generated and run in your browser, with nothing to install</li>
+            <li style="padding: var(--spacing-sm) 0;">✓ A demo of the same application in your browser, and the deployable source as a download</li>
             <li style="padding: var(--spacing-sm) 0;">✓ A published checker and fixer any page or agent can import</li>
           </ul>
           <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
@@ -563,7 +585,7 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
         <a href="guide/run-in-browser.html" class="card">
           <div class="card-icon">⚡</div>
           <h3>Run It in Your Browser</h3>
-          <p>Generate the application from the model and run it in the page — PostgreSQL in WebAssembly, no server, no install.</p>
+          <p>Generate the application from the model and try a demo of it in the page — PostgreSQL in WebAssembly, no server, no install — then download the deployable source.</p>
         </a>
       </div>
     </div>
@@ -601,7 +623,6 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
             <li><a href="technology.html">Technology</a></li>
             <li><a href="guide/index.html">Build a CRM Guide</a></li>
             <li><a href="todo.html">Todo</a></li>
-            <li><a href="chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -627,7 +648,6 @@ If your code tool has no network — ChatGPT's sandbox has none, so every host f
     </div>
   </footer>
 
-  <script src="assets/js/analytics.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

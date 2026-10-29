@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Every EML directive, type, modifier, cardinality, hook and step type on one page, plus the commands and the checker codes worth knowing.">
@@ -116,7 +125,7 @@
     <tr><td><code>%%workflow</code></td><td><code>%%workflow Name entity: E kind: &lt;hook|state|saga&gt;</code></td><td>Names and classifies a workflow section.</td></tr>
     <tr><td><code>%%hook</code></td><td><code>%%hook &lt;type&gt; &lt;handler&gt; on E[field: c]</code></td><td>Binds a handler to a lifecycle event.</td></tr>
     <tr><td><code>%%step</code></td><td><code>%%step &lt;node&gt; &lt;StepType&gt; &lt;k&gt;: &lt;v&gt; …</code></td><td>Binds a saga flowchart node to an executable step.</td></tr>
-    <tr><td><code>%%rbac</code></td><td><code>%%rbac role:a|b on E.op</code></td><td>Restricts an operation or transition to roles.</td></tr>
+    <tr><td><code>%%rbac</code></td><td><code>%%rbac role:a|b on E.op</code></td><td>Restricts an operation (<code>create</code>, <code>read</code>, <code>update</code>, <code>delete</code>) to roles, or gives a state machine's move to them: <code>on E.&lt;event&gt;</code>, <code>on E.from-&gt;to</code> for an unlabelled edge, <code>on E.reopen</code>. A move no line names is open to anyone who may update (<code>EML511</code>).</td></tr>
     <tr><td><code>%%trigger</code></td><td><code>%%trigger cron:0 7 * * * -&gt; handler on E</code></td><td>An event source: <code>cron:</code>, <code>webhook:</code>, <code>message:</code>.</td></tr>
     <tr><td><code>%%guard</code></td><td><code>%%guard field &lt;op&gt; &lt;json&gt;</code></td><td>An automation condition (the builder's dialect).</td></tr>
     <tr><td><code>%%loop</code></td><td><code>%%loop L1 while: f &lt;op&gt; v max: n</code></td><td>Repeat-while inside an automation. <code>max:</code> is required.</td></tr>
@@ -313,7 +322,6 @@
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
             <li><a href="../todo.html">Todo</a></li>
-            <li><a href="../chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -338,7 +346,6 @@
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
 </body>

@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="A hands-on guide to building a complete enterprise CRM application from a single Mermaid model using the AppWithAI generator.">
@@ -329,7 +338,7 @@
   <a class="guide-card" href="run-real-stack.html">
     <div class="guide-card-num">Chapter 10</div>
     <h3>Run the real stack</h3>
-    <p>The four hundred files the CLI writes, installed and started by a WebContainer &mdash; real Node, real NestJS, the real Vite build.</p>
+    <p>The five hundred files the CLI writes, installed and started by a WebContainer &mdash; real Node, real NestJS, the real Vite build.</p>
   </a>
   <a class="guide-card" href="11-check-a-model.html">
     <div class="guide-card-num">Chapter 11</div>
@@ -345,7 +354,7 @@
 <table>
   <thead><tr><th>Requirement</th><th>Why</th></tr></thead>
   <tbody>
-    <tr><td><code>bun</code> ≥ 1.3.14</td><td>The repository is Bun-only. Never <code>npm</code> or <code>pnpm</code>.</td></tr>
+    <tr><td><code>bun</code> ≥ 1.4.3</td><td>The repository is Bun-only. Never <code>npm</code> or <code>pnpm</code>.</td></tr>
     <tr><td>PostgreSQL 16+</td><td>The generated backend targets Postgres. One database for the generator, one per generated app.</td></tr>
     <tr><td>The repository</td><td><code>bun install</code> at the root once.</td></tr>
   </tbody>
@@ -397,7 +406,7 @@ bun run dev                            <span class="c-com"># API :4001, web :400
     business description into a model a generator will accept, and how to prove it. The checker and
     fixer it runs are published as ES modules at
     <code>/guide/checker.js</code> and <code>/guide/fixer.js</code>, and the whole specification,
-    written for language models, is one file at <a href="../llms-full.txt">llms-full.txt</a>.
+    written for language models, is one file at <a href="../llms.txt">llms.txt</a>.
   </p>
 </div>
 
@@ -440,7 +449,6 @@ bun run dev                            <span class="c-com"># API :4001, web :400
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
             <li><a href="../todo.html">Todo</a></li>
-            <li><a href="../chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -465,7 +473,6 @@ bun run dev                            <span class="c-com"># API :4001, web :400
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
 </body>

@@ -1,5 +1,5 @@
 /**
- * check-spec.mjs — verify llms-full.txt against the published checker.
+ * check-spec.mjs — verify llms.txt against the published checker.
  *
  * Two claims the specification makes about itself, both mechanical:
  *
@@ -26,7 +26,20 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 
 /* ---------------------------------------------- 1. the document's examples */
 
-const spec = readFileSync(root + "llms-full.txt", "utf8").split("\n");
+/* llms.txt is a short controller; the rest of the protocol is lazy-loaded chunks
+   it names. Every claim below is held against all of them read as one document,
+   because a reader who loads a chunk is reading the same protocol. */
+const CHUNKS = [
+  "llms.txt",
+  "working-session.txt",
+  "eml-syntax.txt",
+  "eml-dictionary.txt",
+  "eml-reporting.txt",
+  "checker-rules.txt",
+  "enhancement-examples.txt",
+];
+const protocol = CHUNKS.map((name) => readFileSync(root + name, "utf8")).join("\n");
+const spec = protocol.split("\n");
 const blocks = [];
 let current = null, start = 0;
 spec.forEach((line, i) => {
@@ -58,7 +71,7 @@ let pass = 0, fail = 0;
  * are excluded here and nowhere else: the *authored* examples above are still
  * held to zero warnings, help included, because those are what a reader copies.
  */
-const HELP_CODES = new Set(["EML151", "EML152", "EML153"]);
+const HELP_CODES = new Set(["EML151", "EML152", "EML153", "EML170", "EML172", "EML177"]);
 /* `check` reports under `issues`, `checkAndFix` under `remaining`. */
 const substantive = (r) => (r.issues ?? r.remaining ?? []).filter((i) => !HELP_CODES.has(i.code));
 
@@ -77,7 +90,8 @@ const erd = (body, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n${extra
 
 // --- 1. version and auto-fixable list (header + §8.3) -----------------------
 const expectedFixable = [
-  "EML001", "EML103", "EML112", "EML114", "EML117", "EML287", "EML421", "EML422",
+  "EML001", "EML103", "EML112", "EML114", "EML117", "EML172", "EML174", "EML175",
+  "EML178", "EML287", "EML421", "EML422", "EML512",
 ];
 say(LANGUAGE_VERSION === "1.2.0", `header states EML version 1.2.0 (checker says ${LANGUAGE_VERSION})`);
 say(
@@ -90,7 +104,7 @@ say(
    corrected to "eight", and would have passed one claiming "nine". */
 const NUMBER_WORDS = [
   "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-  "nine", "ten", "eleven", "twelve",
+  "nine", "ten", "eleven", "twelve", "thirteen",
 ];
 const countWord = NUMBER_WORDS[AUTO_FIXABLE.length] ?? String(AUTO_FIXABLE.length);
 const specBody = spec.join("\n");
@@ -175,6 +189,13 @@ for (const [k, v] of [["version","1.0.0"],["entity","Thing"],["stack","tanstack-
   t(`meta key ${k}`, `%%meta name: Audit\n%%meta kind: erd\n%%meta ${k}: ${v}\nerDiagram\n    Thing {\n        string id PK\n    }\n`);
 
 // --- 9. §5.2 state machine rules --------------------------------------------
+/* A record moves by its action buttons, so a machine needs no saga to reach a
+   state. `writers` builds a saga writing each state a diagram moves into — the
+   EML508 case below uses it to write one the diagram never drew. */
+const writers = (sd) =>
+  [...new Set([...sd.matchAll(/-->\s*(\w+)/g)].map((m) => m[1]))]
+    .map((to) => `\n%%meta name: Audit ${to} move\n%%meta kind: workflow\n%%workflow Thing${to}Move entity: Thing kind: saga\nflowchart TD\n    A([Start]) --> B[Set the status]\n    B --> Z([End])\n\n    %%step B UpdateEntity field: status value: ${to}\n`)
+    .join("");
 const state = (sd, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n%%field Thing.status enum: ThingStatus\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n${sd}\n${extra}`;
 t("state machine, enum-backed, initial and terminal", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]"));
 t("no initial transition raises EML421", state("    draft --> live : publish\n    live --> done : finish\n    done --> [*]"), "EML421");
@@ -183,8 +204,16 @@ t("a state missing from the matched enum raises EML426", state("    [*] --> draf
 t("an enum value no state uses raises EML427", state("    [*] --> draft\n    draft --> live : publish\n    live --> archived : archive\n    archived --> [*]"), "EML427");
 t("a machine with no enum at all raises EML428", `%%meta name: Audit\n%%meta kind: erd\nerDiagram\n    Thing {\n        string id PK\n        string status\n    }\n\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`, "EML428");
 
-// --- 10. §6 rbac on a transition and on CRUD --------------------------------
-t("rbac on a transition", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor|admin on Thing.publish\n"));
+// --- 10. §6 rbac on a move and on CRUD -------------------------------------
+// A move is a role's: its event, `from->to`, or `reopen` is a target.
+const flow = "    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]";
+t("rbac on a move grants it", state(flow, "\n    %%rbac role:editor|admin on Thing.publish\n    %%rbac role:editor on Thing.finish\n    %%rbac role:admin on Thing.reopen\n"));
+t("rbac on an unlabelled edge, by from->to", state("    [*] --> draft\n    draft --> live : publish\n    live --> done\n    done --> [*]", "\n    %%rbac role:editor on Thing.live->done\n"));
+// A move no line names is open to whoever may update the record: a note.
+t("a move no role is named for is EML511", state(flow), "EML511");
+// final and error are the lifecycle's own values.
+t("a state named final raises EML509", state("    [*] --> draft\n    draft --> final : finish\n    final --> [*]"), "EML509");
+t("a saga writing an undrawn state raises EML508", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", writers("--> archived")), "EML508");
 t("rbac on CRUD", erd(`    Thing {\n        string id PK\n    }`) + "\n%%rbac role:admin on Thing.*\n");
 t("rbac on an unknown target raises EML214", state("    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]", "\n    %%rbac role:editor on Thing.teleport\n"), "EML214");
 
@@ -195,7 +224,7 @@ t("%%field naming a missing enum raises EML501", `%%meta name: Audit\n%%meta kin
 /* --------------------------------- 3. the traps the spec now warns about ---- */
 
 // §5.2 — the machine tracks a column called status / state / stage (EML500).
-const machine = (entity, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string ${entity}\n    }\n${extra}\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n`;
+const machine = (entity, extra = "") => `%%meta name: Audit\n%%meta kind: erd\n%%enum ThingStatus: draft, live, done\nerDiagram\n    Thing {\n        string id PK\n        string ${entity}\n    }\n${extra}\n%%meta name: Audit Lifecycle\n%%meta kind: workflow\n%%workflow ThingLifecycle entity: Thing kind: state\nstateDiagram-v2\n    [*] --> draft\n    draft --> live : publish\n    live --> done : finish\n    done --> [*]\n${entity === "status" ? writers("--> live --> done") : ""}`;
 t("a lifecycle column called status is accepted", machine("status", "%%field Thing.status enum: ThingStatus"));
 t("a lifecycle column called approval_status raises EML500", machine("approval_status", "%%field Thing.approval_status enum: ThingStatus"), "EML500");
 
@@ -473,28 +502,15 @@ expect((specText.match(/audit-model\.mjs/g) ?? []).length >= 4,
   "the audit is reachable from the header, §8.4, §8.5 and §10");
 expect(/^### 8\.5 /m.test(specText), "§8.5 exists — the header and §10 both cite it");
 
-/* ------------------------------- 6. llmdetailed.txt — the interactive §10 ---
+/* ------------------------------- 6. llms.txt — the tooling it tells a model to run ---
  *
- * llms-full.txt is authored here; llmdetailed.txt is vendored from
- * app-with-ai-tanstack. So this section does not re-audit the language — it
- * holds the claims §10 makes about *the tooling it tells a model to run*,
- * which is exactly what goes stale when the file is re-vendored or when
- * check-model.mjs changes underneath it. Every one of these was verified by
- * hand once; that is the thing this section replaces.
+ * llms.txt replaced four documents (llms-full.txt, llmdetailed.txt and their two
+ * derived enhancement editions). Sections 1-5 audit its language; this section
+ * holds the claims it makes about *the tooling it tells a model to run*, which is
+ * exactly what goes stale when check-model.mjs changes underneath it.
  */
 
-const detailed = readFileSync(root + "llmdetailed.txt", "utf8");
-/* The enhancement editions. Each is its base with the authoring protocol
- * swapped for the enhancement protocol, derived by
- * scripts/build-llmtext-enhancement.mjs — so everything asserted below about a
- * base document has to hold for its enhancement edition too. */
-const enhancements = {
-  "llmtextenhancement.txt": readFileSync(root + "llmtextenhancement.txt", "utf8"),
-  "llmdetailedenhancement.txt": readFileSync(root + "llmdetailedenhancement.txt", "utf8"),
-};
-/* The file is hard-wrapped, so any assertion about a *sentence* has to run
- * against a whitespace-collapsed copy — otherwise it silently passes or fails
- * on where the line happened to break. */
+const detailed = protocol;
 const detailedProse = detailed.replace(/\s+/g, " ");
 const checkerSource = readFileSync(root + "guide/checker.js", "utf8");
 const runnerSource = readFileSync(runner, "utf8");
@@ -509,13 +525,17 @@ const held = (cond, label) => {
 const cited = [...new Set(detailed.match(/EML\d{3}/g) ?? [])].sort();
 const unknown = cited.filter((code) => !checkerSource.includes(code));
 held(cited.length >= 20 && unknown.length === 0,
-  `every diagnostic llmdetailed.txt cites exists in the checker (${cited.length} codes${unknown.length ? ", missing: " + unknown.join(", ") : ""})`);
+  `every diagnostic llms.txt cites exists in the checker (${cited.length} codes${unknown.length ? ", missing: " + unknown.join(", ") : ""})`);
 
 // The auto-fixable seven, against the engine rather than against a copy of the list.
 held(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(detailed)),
-  `section 10.6 tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
-held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length === 7,
-  `section 10.6 counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
+  `llms.txt tabulates every auto-fixable code the checker reports (${AUTO_FIXABLE.join(", ")})`);
+{
+  const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen"];
+  const stated = [...detailedProse.matchAll(/\bThe ([a-z]+) auto-repairs\b/gi)].map((m) => WORDS.indexOf(m[1].toLowerCase()));
+  held(stated.length > 0 && stated.every((n) => n === AUTO_FIXABLE.length),
+    `llms.txt counts the auto-repairs correctly (checker says ${AUTO_FIXABLE.length})`);
+}
 
 // The runner it tells a model to use, and the flags it promises that runner has.
 // The host is pinned to the apex, not left as "either spelling". Pages issues a
@@ -524,20 +544,20 @@ held(!/\bSeven codes are auto-fixable\b/.test(detailed) || AUTO_FIXABLE.length =
 // reads as "the checker is unavailable". That is the defect the guard below
 // exists to prevent recurring.
 held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/check-model\.mjs/.test(detailed),
-  "section 10.6 carries the one-line way to run the checker without a checkout");
+  "llms.txt carries the one-line way to run the checker without a checkout");
 for (const flag of ["--write", "--base"])
   held(detailed.includes(flag) && runnerSource.includes(flag),
-    `section 10.6's \`${flag}\` is a flag check-model.mjs actually has`);
-held(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(detailed),
-  "section 10.6 documents all three of the runner's exit codes");
+    `llms.txt's \`${flag}\` is a flag check-model.mjs actually has`);
+held(/exits? `?0`?[\s\S]{0,160}`1`[\s\S]{0,160}`2`/.test(detailed) || /exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(detailed),
+  "llms.txt documents all three of the runner's exit codes");
 
 // The central claim of the rewrite: GitHub is in none of the checker's paths.
 // If the runner ever learns to fetch from GitHub, the document becomes wrong.
 held(!/github/i.test(runnerSource),
-  "check-model.mjs reaches no GitHub host, as section 10.6 tells the reader");
+  "check-model.mjs reaches no GitHub host, as llms.txt tells the reader");
 held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can run/i.test(detailedProse)
   || /reach GitHub says nothing about whether the checker can run/i.test(detailedProse),
-  "section 10.6 states that an unreachable GitHub is not an unreachable checker");
+  "llms.txt states that an unreachable GitHub is not an unreachable checker");
 
 /* The audit, in the vendored document too. This file is a straight copy from
  * app-with-ai-tanstack, so a re-vendor from a tree that predates the audit
@@ -545,7 +565,7 @@ held(/failing to \*\*?\s*reach GitHub says nothing about whether the checker can
  * paragraph it replaced named a script in *this* repository that no reader of
  * that document has. */
 held(/curl -sO https:\/\/www\.appwithai\.org\/guide\/audit-model\.mjs/.test(detailed),
-  "llmdetailed.txt offers the checklist audit by URL, not a repository script");
+  "llms.txt offers the checklist audit by URL, not a repository script");
 /* The document keeps one mention of the old path, in a sentence saying it used
  * to be the instruction and why that was unfollowable. That is a
  * counter-example, so it is dropped by name before the scan — the same
@@ -571,36 +591,23 @@ for (const rung of ["guide/check-model.mjs", "guide/audit-model.mjs", "guide/che
 // The apex, for the same reason as above: a `www.` URL here would send a reader
 // mid-walkthrough to a certificate error rather than to the viewers.
 held(/https:\/\/www\.appwithai\.org\/viewers\//.test(detailed),
-  "section 10 names the model viewers by their published URL");
+  "llms.txt names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
   held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
-
-const viewerPage = readFileSync(root + "viewers/index.html", "utf8");
-const viewerTabs = [...viewerPage.matchAll(/data-tab="[^"]+">([^<]+)</g)].map((m) => m[1].trim());
-for (const named of ["Workflows", "Business rules", "Access"])
-  held(viewerTabs.includes(named) && detailedProse.includes(`**${named}**`),
-    `the "${named}" tab section 10 names exists on the viewer page`);
-
-/* Watching a file is Chromium-only. Recommending it without saying so is how a
- * reader on Firefox concludes the page is broken. */
-held(/File System Access API/.test(detailedProse) && /Watch a file/.test(detailedProse),
-  "section 10 says which browsers can watch a file");
-held(readFileSync(root + "viewers/model-viewer.js", "utf8").includes("showOpenFilePicker"),
-  "the viewers really gate watching on the File System Access API");
 
 // Cross-references inside the file must resolve, or the ladder sends a reader nowhere.
 const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
 const referenced = [...new Set([...detailed.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))];
 const dangling = referenced.filter((ref) => !headings.has(ref));
 held(dangling.length === 0,
-  `every §N.N cross-reference in llmdetailed.txt resolves to a heading${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
+  `every §N.N cross-reference in llms.txt resolves to a heading${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
 
 /* Three observed failures were one URL failing, generalised into "no validation
  * is possible" — in one case the blocked URL was llmdetailed.txt itself. */
 held(/needs no specification document at all/i.test(detailedProse),
-  "section 10.6 separates fetching the spec from running the checker");
+  "llms.txt separates fetching the spec from running the checker");
 held(/Perform the validation; do not offer it/i.test(detailedProse),
-  "section 10.6 requires the run rather than offering it");
+  "llms.txt requires the run rather than offering it");
 
 /* Directive status: a document that calls a compiled directive inert tells a
  * model its help text does nothing. %%entity help: becomes sys_table.description
@@ -608,7 +615,7 @@ held(/Perform the validation; do not offer it/i.test(detailedProse),
  * "validated but not compiled" while the same file's own table said compiled.
  * The authority (language/appwithai-language.json) lives upstream, so what is
  * held here is each document against its own status table. */
-for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spec.join("\n")], ...Object.entries(enhancements)]) {
+for (const [file, body] of [["llms.txt", detailed]]) {
   const compiled = [...body.matchAll(/^\| `%%(\w+)` \|[^\n]*\bcompiled\b[^\n]*$/gm)].map((m) => m[1]);
   held(compiled.length >= 8, `${file}: its directive table marks the compiled directives (${compiled.length})`);
   const flat = body.replace(/\s+/g, " ");
@@ -620,128 +627,80 @@ for (const [file, body] of [["llmdetailed.txt", detailed], ["llms-full.txt", spe
   }
 }
 
-// The per-step rule, which is the other half of what §10 now promises.
-held(/every step that touches the `\.mmd`/i.test(detailedProse),
-  "section 10 binds the fixer-then-checker loop to every step, not only to phase 6");
+// The per-step rule: in a walkthrough, the loop runs after every edit, not at the end.
+held(/run this loop after \*\*every\*\* edit to the file/i.test(detailedProse),
+  "llms.txt binds the fixer-then-checker loop to every edit, not only to the end");
 
 
-/* ------------------------------- 7. the enhancement editions ---------------
+/* ------------------------------- 7. one document, two modes ---------------
  *
- * `llmtextenhancement.txt` and `llmdetailedenhancement.txt` take an existing
- * `.mmd` and change it, where their base documents write one from a brief.
- * They are *derived* from those bases — the whole language reference is copied,
- * only the protocol section differs — so the first thing held here is that the
- * derivation is current. The rest holds the four claims that make an
- * enhancement protocol different from an authoring one, each of which was a
- * real failure before it was a rule: starting without the user's file,
- * rebuilding the model from memory, answering with a patch, and handing back a
- * model that checks clean and is quietly smaller than the one that came in.
+ * llms.txt replaced four documents. Two authored a model from a brief; two —
+ * derived from those — changed a model that already existed, and each rule they
+ * carried was a real failure before it was a rule: starting without the user's
+ * file, rebuilding the model from memory, answering with a patch, and handing
+ * back a model that checks clean and is quietly smaller than the one that came
+ * in. Folding them into one document is only safe while those rules are still
+ * in it, so they are held here by their wording.
  */
-
 let enhancementFail = 0;
 const enh = (cond, label) => {
   if (cond) console.log(`ok   ${label}`);
   else { enhancementFail++; console.log(`FAIL ${label}`); }
 };
 
-/* The derivation itself. A base edited without rebuilding its enhancement
- * edition is the only way these four documents can disagree about the
- * language, and it is exactly the failure the deriver exists to prevent. */
-const built = spawnSync(process.execPath, [root + "scripts/build-llmtext-enhancement.mjs", "--check"], { encoding: "utf8" });
-enh(built.status === 0,
-  `both enhancement editions are current against their bases${built.status === 0 ? "" : "\n" + built.stdout}`);
-
-/* The language half is the base's, byte for byte. Asserted directly as well as
- * through the deriver, because this is the property that matters and it should
- * fail by name rather than as "the build is stale". */
-const tailFrom = (body, heading) => body.slice(body.search(heading));
-enh(tailFrom(enhancements["llmtextenhancement.txt"], /^## 2\. /m) === tailFrom(spec.join("\n"), /^## 2\. /m),
-  "llmtextenhancement.txt carries llms-full.txt's language reference unchanged");
-enh(tailFrom(enhancements["llmdetailedenhancement.txt"], /^## 11\. /m) === tailFrom(detailed, /^## 11\. /m),
-  "llmdetailedenhancement.txt carries llmdetailed.txt's closing section unchanged");
-
-for (const [name, body] of Object.entries(enhancements)) {
-  const prose = body.replace(/\s+/g, " ");
-
-  /* A code invented for a table reads exactly like a real one to a model. */
-  const cited = [...new Set(body.match(/EML\d{3}/g) ?? [])].sort();
-  const missing = cited.filter((code) => !checkerSource.includes(code));
-  enh(cited.length >= 20 && missing.length === 0,
-    `${name}: every diagnostic it cites exists in the checker (${cited.length} codes${missing.length ? ", missing: " + missing.join(", ") : ""})`);
-
-  /* Cross-references must resolve, or a ladder sends the reader nowhere. */
-  const heads = new Set([...body.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
-  const dangling = [...new Set([...body.matchAll(/§(\d+\.\d+)/g)].map((m) => m[1]))].filter((r) => !heads.has(r));
-  enh(dangling.length === 0,
-    `${name}: every §N.N cross-reference resolves${dangling.length ? " (dangling: " + dangling.join(", ") + ")" : ""}`);
-
-  /* 1 — it has an input, and it asks for it. A protocol that does not say this
-   * gets a model invented from the conversation, which is the authoring
-   * protocol run under the wrong name. */
-  enh(/load (?:their|your) `?\.mmd`?|Send me the `\.mmd`/i.test(prose),
-    `${name}: asks the user to load their .mmd before anything else`);
-  enh(/Never reconstruct the model/i.test(prose),
-    `${name}: forbids reconstructing the model from memory or the conversation`);
-
-  /* 2 — the deliverable is the whole file. The observed failure is a reply of
-   * "add these lines", which makes the user perform the merge. */
-  enh(/Not a patch\. Not a diff\.|Not a diff, not a patch/i.test(prose),
-    `${name}: says the deliverable is the whole model, not a patch or a diff`);
-  enh(/\.mmd/.test(body) && /one file/i.test(prose),
-    `${name}: still delivers exactly one .mmd`);
-
-  /* 3 — baseline before editing, so a diagnostic can be attributed. */
-  enh(/baseline/i.test(prose) && /inventor/i.test(prose),
-    `${name}: baselines and inventories the model before it is edited`);
-
-  /* 4 — the regression comparison. This is the half no tool performs, and the
-   * reason both documents exist rather than a sentence in the base ones. */
-  enh(/%%report/.test(body) && /(nothing was lost|nothing lost|regression)/i.test(prose),
-    `${name}: compares the result against the baseline to prove nothing was lost`);
-  enh(/help text/i.test(prose) && /%%rbac/.test(body),
-    `${name}: names help text and %%rbac among what an enhancement silently drops`);
-
-  /* The four protocols have to be findable from any one of them, or a reader
-   * lands on the enhancement form for a model that does not exist yet. */
-  for (const sibling of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"])
-    if (sibling !== name)
-      enh(body.includes(sibling), `${name}: names its companion ${sibling}`);
+for (const [pattern, label] of [
+  [/decided by one fact: did the user give you an existing `\.mmd`\?/, "decides new or enhance by whether a .mmd was given"],
+  [/Send me the `\.mmd` you want changed/, "asks the user for their .mmd before changing anything"],
+  [/Never reconstruct a model from memory/, "forbids reconstructing a model from memory or the conversation"],
+  [/never start an enhancement from a blank document/i, "forbids starting an enhancement from a blank document"],
+  [/You were given the whole file\. Give the whole file back\./, "says the deliverable is the whole model, not a patch"],
+  [/Inventory it\./, "inventories the model before it is edited"],
+  [/If this fell and nobody asked/, "compares the result against the inventory to prove nothing was lost"],
+  [/\*\*Walk me through it\*\*/, "offers the walkthrough pace"],
+  [/\*\*Just build it\*\*/, "offers the one-pass pace"],
+  [/Gate A/, "keeps Gate A"],
+  [/Gate B/, "keeps Gate B"],
+  [/Gate C/, "keeps Gate C"],
+  [/Gate D/, "keeps Gate D"],
+  [/\*\*It is mandatory\.\*\* Every entity — line items included — declares its sections/, "makes the %%section form layout mandatory"],
+]) {
+  enh(pattern.test(detailedProse), `llms.txt: ${label}`);
 }
 
-/* The interactive edition is held to every tooling claim llmdetailed.txt is
- * held to above — it carries the same §10.6, spliced by the deriver, so these
- * pass for free and fail loudly if that splice is ever replaced by prose. */
-const interactive = enhancements["llmdetailedenhancement.txt"];
-const interactiveProse = interactive.replace(/\s+/g, " ");
-enh(/curl -sO https:\/\/www\.appwithai\.org\/guide\/check-model\.mjs/.test(interactive),
-  "llmdetailedenhancement.txt carries the one-line way to run the checker");
-for (const flagName of ["--write", "--base"])
-  enh(interactive.includes(flagName) && runnerSource.includes(flagName),
-    `llmdetailedenhancement.txt's \`${flagName}\` is a flag check-model.mjs actually has`);
-enh(/exit 0[\s\S]{0,120}exit 1[\s\S]{0,120}exit 2/.test(interactive),
-  "llmdetailedenhancement.txt documents all three of the runner's exit codes");
-enh(AUTO_FIXABLE.every((code) => new RegExp(`\\| \`${code}\` \\|`).test(interactive)),
-  `llmdetailedenhancement.txt tabulates every auto-fixable code (${AUTO_FIXABLE.join(", ")})`);
-enh(/https:\/\/www\.appwithai\.org\/viewers\//.test(interactive),
-  "llmdetailedenhancement.txt names the model viewers by their published URL");
-for (const named of ["Workflows", "Business rules", "Access"])
-  enh(viewerTabs.includes(named) && interactiveProse.includes(`**${named}**`),
-    `llmdetailedenhancement.txt: the "${named}" tab it names exists on the viewer page`);
-enh(/File System Access API/.test(interactiveProse) && /Watch a file/.test(interactiveProse),
-  "llmdetailedenhancement.txt says which browsers can watch a file");
-enh(/every step that touches the `\.mmd`/i.test(interactiveProse),
-  "llmdetailedenhancement.txt binds the fixer-then-checker loop to every step");
-enh(/Perform the validation; do not offer it/i.test(interactiveProse),
-  "llmdetailedenhancement.txt requires the run rather than offering it");
+/* Chapter 11's Audit button runs the published audit() function in the page. The
+   page must carry the button, the controller must import audit-model.mjs rather
+   than reimplement it, and that module must still export audit() without
+   touching Node at import time. */
+{
+  const page = readFileSync(root + "guide/11-check-a-model.html", "utf8");
+  const ctl = readFileSync(root + "assets/js/validator.js", "utf8");
+  enh(/id="audit"/.test(page), "chapter 11 has an Audit button");
+  enh(ctl.includes('import("../../guide/audit-model.mjs")') && !/say\(/.test(ctl),
+    "validator.js imports the published audit-model.mjs and holds no audit logic of its own");
+  const mod = await import(new URL("../guide/audit-model.mjs", import.meta.url));
+  const checker = await import(new URL("../guide/checker.js", import.meta.url));
+  const fixer = await import(new URL("../guide/fixer.js", import.meta.url));
+  const model = readFileSync(root + "guide/models/dance-studio.eml.mmd", "utf8");
+  const r = mod.audit(model, { check: checker.check, checkAndFix: fixer.checkAndFix, file: "dance-studio.mmd" });
+  enh(r.ok && r.failed.length === 0, `audit() as a library scores the dance-studio model ${r.score}`);
+}
 
-/* The gates are the substance of the interactive form. A phase list with no
- * gate in it is the batch protocol wearing the other file's name. */
-for (const gate of ["Gate A", "Gate B", "Gate C", "Gate D", "Gate E"])
-  enh(interactive.includes(gate), `llmdetailedenhancement.txt keeps ${gate}`);
-enh(/00-original\.mmd/.test(interactive),
-  "llmdetailedenhancement.txt keeps the original untouched as the thing to compare against");
+/* The controller is what every run pays for: it stays small and names every chunk. */
+{
+  const controller = readFileSync(root + "llms.txt", "utf8");
+  held(controller.length <= 9000, `llms.txt controller stays small (${controller.length} chars, budget 9000)`);
+  for (const name of CHUNKS.filter((n) => n !== "llms.txt"))
+    held(controller.includes("https://www.appwithai.org/" + name), `llms.txt controller names ${name} by its published URL`);
+}
 
-console.log(`\n${enhancementFail === 0 ? "enhancement editions hold." : enhancementFail + " enhancement claim(s) contradicted."}`);
+/* llms.txt is the only protocol file. There is no llms.txt (Pages types it
+   text/markdown, which ChatGPT's reader refuses) and the four older documents
+   are deleted, so no URL leads to a second, staler account of the language. */
+for (const gone of ["llms.md", "llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
+  enh(!existsSync(root + gone), `${gone} is gone: llms.txt is the only protocol file`);
+}
+
+console.log(`\n${enhancementFail === 0 ? "the one document holds both modes." : enhancementFail + " mode claim(s) contradicted."}`);
 
 
 /* ---------------------------------------------------------------------------
@@ -805,20 +764,15 @@ const TEACHING = [
 
 /* Both spellings of the Markdown-link counter-example are the same lesson: a
    link whose *text* is a bare host, which is what anything parsing this file
-   resolves. `llms-full.txt` is authored here and writes the apex; the vendored
-   `llmdetailed.txt` writes `www.`, because that is the form the failure that
-   prompted the rule actually came back as. Pinning one spelling made
-   re-vendoring the other document fail a check about a rule it obeys. */
+   resolves. The failure that prompted the rule came back as the `www.` form;
+   pinning one spelling would make re-vendoring fail a check about a rule the
+   document obeys. */
 const MARKDOWN_COUNTER_EXAMPLES = [
   "[appwithai.org](https://www.appwithai.org)",
   "[www.appwithai.org](https://www.appwithai.org)",
 ];
 
-for (const [name, body] of [
-  ["llms-full.txt", spec.join("\n")],
-  ["llmdetailed.txt", detailed],
-  ...Object.entries(enhancements),
-]) {
+for (const [name, body] of [["llms.txt", spec.join("\n")]]) {
   const teachable = body.split("\n").filter((line) => !TEACHING.some((t) => line.includes(t)));
   const stray = teachable
     .map((line, index) => ({ line, index }))

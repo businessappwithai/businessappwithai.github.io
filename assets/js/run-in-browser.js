@@ -20,7 +20,7 @@
  */
 
 // The published validator, not the copy inside the generator bundle. Same engine
-// either way — but this is the file `llms-full.txt` §1.3 and §8 tell a model to
+// either way — but this is the file `llms.txt` §1.3 and §8 tell a model to
 // validate against, so the page and the protocol cannot drift into disagreeing
 // about whether a document is acceptable. `fixer.js` carries the checker with
 // it, which is what lets it re-check what it repaired.
@@ -63,6 +63,16 @@ const BUILT_IN = {
     label: "education-management-system.eml.mmd",
     name: "Education Management System",
   },
+  airport: {
+    path: "models/airport-management-system.eml.mmd",
+    label: "airport-management-system.eml.mmd",
+    name: "Airport Management System",
+  },
+  shipping: {
+    path: "models/shipping-management-system.eml.mmd",
+    label: "shipping-management-system.eml.mmd",
+    name: "Shipping Management System",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -75,7 +85,7 @@ const state = {
   registration: null,
   review: null,
   pgliteUrl: null,
-  // Analytics only: "built_in" or "upload". See assets/js/analytics.js.
+  // "built_in" or "upload".
   origin: "",
 };
 
@@ -192,6 +202,8 @@ const choices = [
   [$("choice-dance"), "dance"],
   [$("choice-investment"), "investment"],
   [$("choice-education"), "education"],
+  [$("choice-airport"), "airport"],
+  [$("choice-shipping"), "shipping"],
   [$("choice-upload"), "upload"],
 ];
 
@@ -211,7 +223,6 @@ async function selectChoice(kind) {
 
   if (kind === "upload") {
     state.origin = "upload";
-    window.awTrack?.("upload_started");
     setModel("", "");
     return;
   }
@@ -309,18 +320,11 @@ function setModel(source, label) {
   setStep("step-model", "done");
   build.done("model");
 
-  window.awTrack?.("model_uploaded", {
-    model_name: label,
-    model_size: new Blob([source]).size,
-    model_lines: source.split("\n").length,
-    model_source: state.origin || "built_in",
-  });
 
   // Checked here rather than at the point of generating, because this is the
   // moment the reader is looking at the model — and because a model with an
   // error is not going to become a working application by pressing Generate.
   build.start("check", "Checking the model against the EML language definition");
-  window.awTrack?.("checker_started", { model_name: label });
   const checkedAt = performance.now();
   const review = checkModel(source);
   const checkedIn = Math.round(performance.now() - checkedAt);
@@ -333,18 +337,11 @@ function setModel(source, label) {
     check_time_ms: checkedIn,
   };
   if (!review.ok) {
-    window.awTrack?.("checker_failed", {
-      ...verdict,
-      // The codes, not the messages: a message can carry the reader's own
-      // entity names, and a code is what a report would group by anyway.
-      codes: [...new Set(review.issues.filter((i) => i.severity === "error").map((i) => i.code))],
-    });
     build.fail("check", `${review.counts.errors} error(s) — nothing was generated`);
     setStep("step-generate", "idle");
     setStep("step-run", "idle");
     return;
   }
-  window.awTrack?.("checker_passed", verdict);
   build.done("check", describeReview(review));
 
   setStep("step-generate", "active");
@@ -510,10 +507,6 @@ $("generate").addEventListener("click", () => {
   button.innerHTML = '<span class="working"></span>Generating';
   build.start("compile", "Compiling the model into an application");
 
-  window.awTrack?.("generate_started", {
-    model_name: state.label,
-    sample_records: sampleRecords(),
-  });
   const generatingSince = performance.now();
 
   // A frame so the button's state paints before the compiler blocks the thread.
@@ -536,14 +529,6 @@ $("generate").addEventListener("click", () => {
 
       state.files = result.files;
       state.summary = result.summary;
-      window.awTrack?.("generate_succeeded", {
-        model_name: state.label,
-        generation_time_ms: Math.round(performance.now() - generatingSince),
-        file_count: result.summary.fileCount,
-        bytes: result.summary.bytes,
-        entity_count: result.summary.entities.length,
-        sample_rows: result.summary.sampleRows ?? 0,
-      });
       showResult(result);
       $("download").disabled = false;
       $("download-stack").disabled = false;
@@ -557,13 +542,6 @@ $("generate").addEventListener("click", () => {
     } catch (error) {
       // A ModelCheckError carries the findings; anything else is a compiler
       // failure, which is a different thing and should not be dressed as one.
-      window.awTrack?.("generate_failed", {
-        model_name: state.label,
-        generation_time_ms: Math.round(performance.now() - generatingSince),
-        reason: error.review ? "checker" : "compiler",
-        checker_error_count: error.review?.counts.errors ?? 0,
-        message: error.review ? undefined : String(error.message).slice(0, 200),
-      });
       if (error.review) {
         state.review = error.review;
         renderDiagnostics(error.review);
@@ -665,12 +643,23 @@ function fail(html) {
  * whole point is that it has no dependencies. A single self-extracting shell
  * script is the honest trade: it is readable before it is run, which a zip is
  * not.
+ *
+ * It cannot carry PGlite's eighteen megabytes, so it is generated again without
+ * this page's PGlite URL — which would make this site the CDN for every copy
+ * downloaded — and starts with `npm install && npm start`: the application's own
+ * `serve.mjs` then serves the installed package. Same name, records and seed as
+ * the one on screen.
  */
 $("download").addEventListener("click", () => {
   if (!state.files) return;
-  window.awTrack?.("app_downloaded", {
-    model_name: state.label,
-    file_count: state.summary?.fileCount,
+  const { files } = generateFromSource({
+    source: state.source,
+    name: $("app-name").value.trim() || "Generated App",
+    adminEmail: $("admin-email").value.trim() || "admin@admin.com",
+    adminPassword: $("admin-password").value || "admin",
+    adminName: ($("admin-email").value.split("@")[0] || "admin").trim(),
+    sampleRecords: sampleRecords(),
+    sampleSeed: $("app-name").value.trim() || "Generated App",
   });
   const name = ($("app-name").value.trim() || "generated-app")
     .toLowerCase()
@@ -685,16 +674,16 @@ $("download").addEventListener("click", () => {
     `mkdir -p "${name}"`,
     `cd "${name}"`,
     "",
-    ...Object.entries(state.files).flatMap(([path, contents]) => [
+    ...Object.entries(files).flatMap(([path, contents]) => [
       `mkdir -p "$(dirname "${path}")"`,
       `cat > "${path}" <<'APPWITHAI_EOF'`,
       contents.replace(/\r/g, ""),
       "APPWITHAI_EOF",
       "",
     ]),
-    `echo "Wrote ${Object.keys(state.files).length} files into ${name}/"`,
-    `echo "Serve it over http (a Service Worker cannot start from file://):"`,
-    `echo "  npx serve ${name}"`,
+    `echo "Wrote ${Object.keys(files).length} files into ${name}/"`,
+    `echo "Start it (npm install fetches PostgreSQL, which ships as an npm package):"`,
+    `echo "  cd ${name} && npm install && npm start"`,
     "",
   ].join("\n");
 
@@ -740,15 +729,12 @@ async function freshTemplatesUrl(url) {
 const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
 const FONTS_DIR = "frontend/public/fonts";
 const FONTS = [
-  "inter-400-latin.woff2",
-  "inter-500-latin.woff2",
-  "inter-600-latin.woff2",
-  "inter-700-latin.woff2",
-  "jetbrains-mono-400-latin.woff2",
-  "jetbrains-mono-600-latin.woff2",
-  "newsreader-400-latin.woff2",
+  // The generated frontend's own four (upstream halved them on 2026-09-19); its
+  // CSS asks for exactly these names, so a stale list ships an app with no fonts.
+  "inter-variable-latin.woff2",
+  "jetbrains-mono-variable-latin.woff2",
+  "newsreader-variable-latin.woff2",
   "newsreader-400-italic-latin.woff2",
-  "newsreader-600-latin.woff2",
 ];
 
 /** Loaded once per page, because both are large and neither changes. */
@@ -778,7 +764,6 @@ async function withFonts(files) {
 
 $("download-stack").addEventListener("click", async () => {
   if (!state.source) return;
-  window.awTrack?.("stack_download_started", { model_name: state.label });
   const assemblingSince = performance.now();
 
   const button = $("download-stack");
@@ -834,12 +819,6 @@ $("download-stack").addEventListener("click", async () => {
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    window.awTrack?.("stack_downloaded", {
-      model_name: state.label,
-      file_count: Object.keys(tree).length,
-      bytes: zip.size,
-      assemble_time_ms: Math.round(performance.now() - assemblingSince),
-    });
 
     $("download-stack-hint").innerHTML =
       `<b>${Object.keys(tree).length} files</b>, ${(zip.size / 1024 / 1024).toFixed(1)}MB. ` +
@@ -852,10 +831,6 @@ $("download-stack").addEventListener("click", async () => {
     /* A checker failure here would already have stopped step 2, so anything
        reaching this is the assembly itself — usually a template bundle that did
        not download. Say which, rather than "failed". */
-    window.awTrack?.("stack_download_failed", {
-      model_name: state.label,
-      message: String(error.message ?? "").slice(0, 200),
-    });
     $("download-stack-hint").innerHTML =
       `<b>The deployable application could not be assembled.</b> ${escapeHtml(error.message)}`;
     $("download-stack-hint").classList.add("hint--bad");
@@ -944,12 +919,10 @@ async function askToReclaimStorage() {
   });
 
   if (answer !== "clear") {
-    window.awTrack?.("storage_kept", { databases: count, bytes: held.bytes });
     return;
   }
 
   await dropDatabases(held.names);
-  window.awTrack?.("storage_cleared", { databases: count, bytes: held.bytes });
   say(
     `Cleared ${count} database${count === 1 ? "" : "s"}` +
       (megabytes ? `, freeing about ${megabytes} MB` : ""),
@@ -970,12 +943,18 @@ async function run(fresh) {
     fail("Generate the application first.");
     return;
   }
+  if (!state.pgliteUrl) {
+    fail(
+      "PostgreSQL (PGlite) did not load from this site, and it is never fetched from a CDN. " +
+        "Reload the page and try again."
+    );
+    return;
+  }
 
   const button = $("run");
   button.disabled = true;
   button.innerHTML = '<span class="working"></span>Starting';
 
-  window.awTrack?.("run_started", { model_name: state.label, fresh: Boolean(fresh) });
   runningSince = performance.now();
 
   const log = $("log");
@@ -1168,11 +1147,6 @@ window.addEventListener("message", (event) => {
   }
 
   if (message.type === "running") {
-    window.awTrack?.("app_ready", {
-      model_name: state.label,
-      run_time_ms: runningSince ? Math.round(performance.now() - runningSince) : undefined,
-      sample_rows: state.summary?.sampleRows ?? 0,
-    });
     build.done("boot", "The server is answering requests");
     build.start("ready");
     build.done("ready", `${message.project?.name ?? "The application"} is running`);
@@ -1181,11 +1155,6 @@ window.addEventListener("message", (event) => {
   }
 
   if (message.type === "failed") {
-    window.awTrack?.("run_failed", {
-      model_name: state.label,
-      run_time_ms: runningSince ? Math.round(performance.now() - runningSince) : undefined,
-      message: String(message.message ?? "").slice(0, 200),
-    });
     build.fail("boot", message.message);
     say(message.message, "bad");
   }
@@ -1280,14 +1249,13 @@ const titleCase = (value) => value.replace(/\b\w/g, (character) => character.toU
 /**
  * Find the PostgreSQL build this site ships.
  *
- * The generated application looks for PGlite in three places, in order: beside
- * itself, at whatever URL it was generated with, and finally jsDelivr. This site
- * vendors its own copy under `assets/vendor/pglite/`, so the first two are made
- * to hit that and the CDN is never reached — the chapter works on a network that
- * blocks third-party hosts, and it keeps working if jsDelivr does not.
+ * The generated application looks for PGlite beside itself, then at whatever URL
+ * it was generated with — and nowhere else: there is no CDN after those. This
+ * site vendors its own copy under `assets/vendor/pglite/`, so both are made to
+ * hit that, and the chapter works on a network that blocks third-party hosts.
  *
- * Probed rather than assumed: if the copy is ever missing the page still runs,
- * it just falls back the way upstream does.
+ * Probed rather than assumed: if the copy is ever missing, `run()` says so
+ * rather than starting an application that cannot open its database.
  */
 async function findVendoredPglite() {
   try {
@@ -1295,7 +1263,7 @@ async function findVendoredPglite() {
     const response = await fetch(url, { method: "HEAD" });
     if (response.ok) state.pgliteUrl = url;
   } catch {
-    // Left unset: the generated application falls back to the CDN on its own.
+    // Left unset; `run()` refuses and says why.
   }
 }
 

@@ -53,6 +53,8 @@ const KEY_OF = {
   "dance-studio.eml.mmd": "dance",
   "drug-discovery.eml.mmd": "drug",
   "education-management-system.eml.mmd": "education",
+  "airport-management-system.eml.mmd": "airport",
+  "shipping-management-system.eml.mmd": "shipping",
   "hospital-management-system.eml.mmd": "hospital",
   "investment-planning-wealth-management-system.eml.mmd": "investment",
 };
@@ -392,12 +394,10 @@ console.log("\nThe reporting application in the deployable archive");
 // ---------------------------------------------------------------------------
 // 7. The four prompts on try-it-yourself.html.
 //
-// The page makes a claim about each pair — that the second prompt is the first
-// one word for word below its opening line, and that only the document and the
-// section number change. It is the kind of claim that is true when it is
-// written and false after the next edit to either block, because the two are
-// four hundred lines apart in the source and nothing reads both. A prompt pair
-// that has drifted sends one reader through the wrong protocol.
+// The page carries one prompt for a new model and for a change to an existing
+// one. It makes promises a reader acts on — that attaching a .mmd changes that
+// model and gets the whole file back, that the form layout is required — and
+// the anchors other pages link to have to keep landing on it.
 console.log("\n7. The prompts on try-it-yourself.html");
 {
   const page = readFileSync(path.join(ROOT, "try-it-yourself.html"), "utf8");
@@ -412,49 +412,72 @@ console.log("\n7. The prompts on try-it-yourself.html");
       .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#39;/g, "'").replace(/&amp;/g, "&");
   };
 
-  const pairs = [
-    ["authoring", "research-prompt", "enterprise-research-prompt", "llms-full.txt", "llmdetailed.txt"],
-    ["enhancement", "enhance-prompt", "enterprise-enhance-research-prompt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"],
-  ];
-
-  for (const [label, batchId, gatedId, batchDoc, gatedDoc] of pairs) {
-    const a = promptBody(batchId);
-    const b = promptBody(gatedId);
-    if (!a || !b) { fail(`the ${label} pair is on the page`, `missing #${a ? gatedId : batchId}`); continue; }
-
-    const aLines = a.split("\n");
-    const bLines = b.split("\n");
-    aLines.slice(1).join("\n") === bLines.slice(1).join("\n")
-      ? ok(`the ${label} prompts are identical below their first line`)
-      : fail(`the ${label} prompts are identical below their first line`,
-             "they have drifted — edit one and you must edit the other");
-    aLines[0] !== bLines[0]
-      ? ok(`the ${label} pair's first lines differ, which is where all four differences live`)
-      : fail(`the ${label} pair's first lines differ`, "both name the same document and section");
-    aLines[0].includes(batchDoc) && bLines[0].includes(gatedDoc)
-      ? ok(`the ${label} pair names ${batchDoc} and ${gatedDoc}`)
-      : fail(`the ${label} pair names its two documents`, `got: ${aLines[0].slice(0, 80)}`);
+  /* One prompt, and one document. The page used to carry four prompts in two
+     pairs that had to stay word for word identical below their first line; they
+     are one prompt now, pointing at llms.txt, which decides new-or-change from
+     whether a .mmd is attached. What the enhancement pair existed to guarantee
+     is held on the one prompt instead. */
+  const body = promptBody("research-prompt");
+  if (!body) fail("the prompt is on the page", "missing #research-prompt");
+  else {
+    body.split("\n")[0].includes("llms.txt") && /section 1/.test(body.split("\n")[0])
+      ? ok("the prompt names llms.txt and its section 1")
+      : fail("the prompt names llms.txt and its section 1", `got: ${body.split("\n")[0].slice(0, 80)}`);
+    /* Both pages carry the prompt, and both must be free of the removed ChatGPT
+       app's tool call: a tool that does not exist is an instruction nobody can follow. */
+    for (const file of ["index.html", "try-it-yourself.html"]) {
+      const html = readFileSync(path.join(ROOT, file), "utf8");
+      const block = /<pre id="research-prompt"[\s\S]*?<\/pre>/.exec(html)?.[0] ?? "";
+      block && !/open_appwithai|Open AppWithAI|\bMCP\b/i.test(block)
+        ? ok(`${file}: the prompt asks for no tool call (the ChatGPT app is gone)`)
+        : fail(`${file}: the prompt asks for no tool call`, "it still tells the AI to call open_appwithai, or the prompt block is missing");
+    }
+    /If I have attached a \.mmd file, it is my existing model/.test(body) && /Never rebuild it from memory/.test(body)
+      ? ok("the prompt changes an attached model and refuses to rebuild it")
+      : fail("the prompt changes an attached model", "it does not tell the AI what an attached .mmd means");
+    /give me back the whole file with before-and-after counts/.test(body)
+      ? ok("the prompt asks for the whole model back, with counts")
+      : fail("the prompt asks for the whole model back", "the prompt permits a patch");
+    /%%section/.test(body) && /two-column rows/.test(body)
+      ? ok("the prompt requires every form laid out in %%section rows")
+      : fail("the prompt requires the form layout", "no %%section requirement");
+    /If you are ChatGPT, the TinyFish plugin must be installed and signed in/.test(body) && /stop and tell me how to install it/.test(body)
+      ? ok("the prompt stops a ChatGPT run until the TinyFish plugin is installed")
+      : fail("the prompt stops a ChatGPT run until the TinyFish plugin is installed", "no ChatGPT prerequisite in the prompt");
+    /* The same prompt is on both pages, and the install steps are on one of them. */
+    const home = readFileSync(path.join(ROOT, "index.html"), "utf8");
+    /If you are ChatGPT, the TinyFish plugin must be installed/.test(home)
+      ? ok("index.html: the prompt carries the ChatGPT prerequisite too")
+      : fail("index.html: the prompt carries the ChatGPT prerequisite too", "the two copies of the prompt differ");
+    /id="chatgpt-tinyfish"/.test(page) && /Install plugin/.test(page) && /https:\/\/docs\.tinyfish\.ai\/plugins/.test(page)
+      ? ok("try-it-yourself.html: says how to install the TinyFish plugin, and links its instructions")
+      : fail("try-it-yourself.html: says how to install the TinyFish plugin", "missing #chatgpt-tinyfish, the steps or the link");
   }
+  for (const id of ["enterprise-research-prompt", "enhance-prompt", "enterprise-enhance-research-prompt"])
+    !page.includes(`id="${id}"`)
+      ? ok(`the retired #${id} is gone`)
+      : fail(`the retired #${id} is gone`, "a second prompt is still on the page");
+  for (const anchor of ["the-prompt", "enterprise-prompt", "enhance", "enterprise-enhance-prompt"])
+    page.includes(`id="${anchor}"`)
+      ? ok(`#${anchor} still resolves — other pages link to it`)
+      : fail(`#${anchor} still resolves`, "an inbound link would land nowhere");
 
-  /* Every document the four prompts name has to be served from this origin —
-     a prompt is a URL a reader pastes, and a 404 is silent to them until the
-     model says it cannot read it. */
-  for (const doc of ["llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"])
-    existsSync(path.join(ROOT, doc))
-      ? ok(`${doc} is published here`)
-      : fail(`${doc} is published here`, "a prompt names a document this site does not serve");
-
-  /* The enhancement pair exists because the authoring pair, pointed at an
-     existing model, rewrites it. Both enhancement prompts must therefore hand
-     the user's file over and refuse a reconstruction. */
-  for (const id of ["enhance-prompt", "enterprise-enhance-research-prompt"]) {
-    const body = promptBody(id) ?? "";
-    /My model is attached/.test(body) && /do not rebuild it/i.test(body)
-      ? ok(`#${id} tells the model to read the attached file and not rebuild it`)
-      : fail(`#${id} tells the model to read the attached file`, "the prompt does not require the user's own model");
-    /Not a patch, not a diff/.test(body)
-      ? ok(`#${id} asks for the whole model back rather than a patch`)
-      : fail(`#${id} asks for the whole model back`, "the prompt permits a diff");
+  /* The document the prompt names is served here, and the four it replaced are
+     stubs that send an AI to it. */
+  existsSync(path.join(ROOT, "llms.txt"))
+    ? ok("llms.txt is published here")
+    : fail("llms.txt is published here", "the prompt names a document this site does not serve");
+  /* llms.txt is a controller; the chunks it names must be served here too, or a
+     model told to fetch one gets a 404 in the middle of a run. */
+  const controllerText = readFileSync(path.join(ROOT, "llms.txt"), "utf8");
+  const named = [...new Set([...controllerText.matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]))].filter((n) => n !== "llms.txt");
+  named.length === 6 && named.every((name) => existsSync(path.join(ROOT, name)))
+    ? ok("every chunk llms.txt names is published here")
+    : fail("every chunk llms.txt names is published here", `named ${named.join(", ")}`);
+  for (const doc of ["llms.md", "llms-full.txt", "llmdetailed.txt", "llmtextenhancement.txt", "llmdetailedenhancement.txt"]) {
+    !existsSync(path.join(ROOT, doc))
+      ? ok(`${doc} is gone: llms.txt is the only protocol file`)
+      : fail(`${doc} is gone`, "a second protocol file would let an AI read a staler account of the language");
   }
 }
 
@@ -478,13 +501,20 @@ console.log("\n8. The model assistant");
   const assistant = readFileSync(p("assistant.html"), "utf8");
   const controller = readFileSync(p("assets", "js", "assistant.js"), "utf8");
 
-  /* The enhancement edition, not the authoring one. */
-  /PROTOCOL_URL\s*=\s*"llmtextenhancement\.txt"/.test(controller)
-    ? ok("the assistant runs the enhancement protocol, not the authoring one")
+  /* The one protocol document, run as a change in one pass. */
+  /PROTOCOL_URL\s*=\s*"llms\.txt"/.test(controller) && /JUST BUILD IT/.test(controller)
+    ? ok("the assistant runs llms.txt, in one pass")
     : fail(
-        "the assistant runs the enhancement protocol",
-        "PROTOCOL_URL is not llmtextenhancement.txt — the authoring edition rewrites the model it is given"
+        "the assistant runs llms.txt, in one pass",
+        "PROTOCOL_URL is not llms.txt, or the user turn does not ask for one pass — a single request cannot answer a question"
       );
+
+  /* A single request cannot fetch mid-run, so the assistant sends the controller
+     and every chunk the controller names. */
+  const chunkNames = [...readFileSync(p("llms.txt"), "utf8").matchAll(/https:\/\/www\.appwithai\.org\/([a-z-]+\.txt)/g)].map((m) => m[1]);
+  chunkNames.length > 0 && chunkNames.every((name) => controller.includes(`"${name}"`))
+    ? ok("the assistant sends the controller and every chunk it names")
+    : fail("the assistant sends the controller and every chunk it names", `missing from assistant.js: ${chunkNames.filter((n) => !controller.includes(`"${n}"`)).join(", ")}`);
 
   /* Every host the controller can reach. A key goes on these requests, so the
      list has to stay exactly the two providers and nothing else — this is the
@@ -500,12 +530,11 @@ console.log("\n8. The model assistant");
         `it also names ${unexpected.join(", ")} — a key rides these requests`
       );
 
-  /* The key must not leave on anything of ours. `awTrack` sends to analytics,
-     so the key must never appear in one of those calls. */
-  const tracked = [...controller.matchAll(/awTrack\?\.\([^)]*\)/gs)].map((m) => m[0]).join("\n");
-  !/\bkey\b/.test(tracked)
-    ? ok("no analytics event carries the key")
-    : fail("no analytics event carries the key", "an awTrack call names `key`");
+  /* No analytics call survives in the controller: the only measurement left
+     is the Google tag, which is handed nothing from this page. */
+  !/awTrack|posthog/i.test(controller)
+    ? ok("the assistant calls no analytics")
+    : fail("the assistant calls no analytics", "an awTrack or PostHog reference remains");
 
   /* The warning is above the key field, not below it. */
   const warnAt = assistant.indexOf("aia-warning");
@@ -535,14 +564,6 @@ console.log("\n8. The model assistant");
       ? ok(`${id} starts hidden`)
       : fail(`${id} starts hidden`, `it is offered before a run has produced one`);
 
-  /* privacy.html promises its event list is complete, so every event this
-     page can emit has to be in it. */
-  const privacy = readFileSync(p("privacy.html"), "utf8");
-  for (const event of [...new Set([...controller.matchAll(/awTrack\?\.\("([a-z_]+)"/g)].map((m) => m[1]))])
-    privacy.includes(event)
-      ? ok(`privacy.html lists ${event}`)
-      : fail(`privacy.html lists ${event}`, "the page promises the list is every event, by name");
-
   /* The nav is at its seven-item ceiling; an eighth overflows the header at
      every desktop width. The assistant is linked from the footer and from
      #enhance instead. */
@@ -554,6 +575,138 @@ console.log("\n8. The model assistant");
   readFileSync(p("try-it-yourself.html"), "utf8").includes("assistant.html")
     ? ok("try-it-yourself.html links the assistant")
     : fail("try-it-yourself.html links the assistant", "the page it belongs beside does not point at it");
+}
+
+// ---------------------------------------------------------------------------
+// 9. The archive keeps its scripts executable.
+//
+// `docker compose up` bind-mounts `reporting/pg-init/` into Postgres's
+// /docker-entrypoint-initdb.d, and an init script without its execute bit is
+// one Docker cannot run. `zip.js` wrote every entry 0644 — and marked the
+// archive as made on MS-DOS, which makes unzip ignore the mode anyway — so the
+// archive the download button produced could not start the reporting database.
+// Nothing about the application looked wrong: every file was there and correct.
+console.log("\n9. The deployable archive keeps script permissions");
+{
+  const { createZip } = await import(`file://${p("assets", "js", "zip.js")}`);
+  /* The unix mode of each entry, read back from the central directory the way
+     unzip does: only trusted when "version made by" says Unix (high byte 3). */
+  const modes = async (files) => {
+    const bytes = new Uint8Array(await (await createZip(files)).arrayBuffer());
+    const view = new DataView(bytes.buffer);
+    let at = view.getUint32(bytes.length - 22 + 16, true);
+    const out = {};
+    while (view.getUint32(at, true) === 0x02014b50) {
+      const madeBy = view.getUint16(at + 4, true);
+      const nameLength = view.getUint16(at + 28, true);
+      const extra = view.getUint16(at + 30, true) + view.getUint16(at + 32, true);
+      const name = new TextDecoder().decode(bytes.subarray(at + 46, at + 46 + nameLength));
+      out[name] = madeBy >> 8 === 3 ? (view.getUint32(at + 38, true) >>> 16) & 0o777 : null;
+      at += 46 + nameLength + extra;
+    }
+    return out;
+  };
+  const m = await modes({
+    "a/init.sh": "echo hi\n",
+    "a/tool": "#!/bin/sh\necho hi\n",
+    "a/notes.txt": "hello\n",
+  });
+  m["a/init.sh"] === 0o755 ? ok("a .sh file is stored 0755") : fail("a .sh file is stored 0755", `mode ${m["a/init.sh"]?.toString(8)}`);
+  m["a/tool"] === 0o755 ? ok("a #! file is stored 0755") : fail("a #! file is stored 0755", `mode ${m["a/tool"]?.toString(8)}`);
+  m["a/notes.txt"] === 0o644 ? ok("an ordinary file stays 0644") : fail("an ordinary file stays 0644", `mode ${m["a/notes.txt"]?.toString(8)}`);
+
+  const templatesPath = p("assets", "vendor", "stack-templates.json");
+  const bundlePath = p("assets", "js", "appwithai-fullstack.js");
+  if (!existsSync(templatesPath) || !existsSync(bundlePath)) {
+    console.log("  note stack-templates.json or appwithai-fullstack.js absent — real archive skipped");
+  } else {
+    const { generateFullStack } = await import(`file://${bundlePath}`);
+    const realLog = console.log;
+    console.log = () => {};
+    let files;
+    try {
+      files = (await generateFullStack({
+        source: STATS["crm.eml.mmd"].src,
+        name: "crm",
+        templates: JSON.parse(readFileSync(templatesPath, "utf8")),
+        overlay: false,
+      })).files;
+    } finally {
+      console.log = realLog;
+    }
+    const real = await modes(files);
+    for (const script of Object.keys(files).filter((f) => /\.sh$/.test(f))) {
+      real[script] === 0o755
+        ? ok(`${script} is executable in the archive`)
+        : fail(`${script} is executable in the archive`, `mode ${real[script]?.toString(8)}`);
+    }
+    "reporting/pg-init/01-reporting-database.sh" in files
+      ? ok("the archive carries the reporting init script")
+      : fail("the archive carries the reporting init script", "reporting/pg-init/01-reporting-database.sh is missing");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. The archive's seed survives a reference with no parent.
+//
+// A model can mark a column as a required FK and declare no entity for it
+// (EML502, an info note). The seed returned null for it, the column's NOT NULL
+// refused the insert, and the generated backend never started. Every figure on
+// every page was right; the application just did not run.
+//
+// The published wealth-management model used to be the fixture for this, with
+// `Document.document_type_id`. It declares a closed vocabulary instead now, so
+// the group drives the same path with a model that is small enough to read.
+const ORPHAN_REFERENCE_MODEL = `%%meta name: Orphan Reference
+%%meta kind: erd
+erDiagram
+    Party {
+        string id PK
+        string name
+    }
+    Document {
+        string id PK
+        string party_id FK
+        string document_type_id FK
+        string file_name
+    }
+    Party ||--o{ Document : "holds"
+`;
+console.log("\n10. The deployable archive's seed handles a reference with no parent");
+{
+  const templatesPath = p("assets", "vendor", "stack-templates.json");
+  const bundlePath = p("assets", "js", "appwithai-fullstack.js");
+  if (!existsSync(templatesPath) || !existsSync(bundlePath)) {
+    console.log("  note templates or bundle absent — group skipped");
+  } else {
+    const { generateFullStack } = await import(`file://${bundlePath}`);
+    const realLog = console.log;
+    console.log = () => {};
+    let files;
+    try {
+      files = (await generateFullStack({
+        source: ORPHAN_REFERENCE_MODEL,
+        name: "orphan-reference",
+        templates: JSON.parse(readFileSync(templatesPath, "utf8")),
+        overlay: false,
+      })).files;
+    } finally {
+      console.log = realLog;
+    }
+    const seed = files["backend/seeds/03_business_data.ts"] ?? "";
+    seed.includes("fk('document_type_id', 0, true)")
+      ? ok("the seed tells fk() that document_type_id is required")
+      : fail("the seed tells fk() that document_type_id is required", "the call does not carry the required flag");
+    seed.includes("orphanIds")
+      ? ok("the seed has a fallback for a required reference with no parent")
+      : fail("the seed has a fallback for a required reference with no parent", "fk() still returns null for it, and NOT NULL refuses the insert");
+    /* Any call that passes `false` for a column the model requires would
+       reintroduce it, so every document_type_id call must say true. */
+    const calls = seed.match(/document_type_id: fk\([^)]*\)/g) ?? [];
+    calls.length > 0 && calls.every((c) => c.endsWith("true)"))
+      ? ok(`all ${calls.length} document_type_id values are drawn as required`)
+      : fail("every document_type_id value is drawn as required", calls.find((c) => !c.endsWith("true)")) ?? "no calls found");
+  }
 }
 
 // ---------------------------------------------------------------------------

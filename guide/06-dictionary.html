@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Windows, tabs and fields; the rule editor, the workflow editor, roles, the audit log and per-screen help.">
@@ -170,6 +179,18 @@
   <img src="img/34-crm-tab-reference-resolved.png" alt="The tab grid inside the Opportunity window, with the Table column reading 'Opportunity'.">
 </figure>
 
+<h3>The state field is placed by the dictionary, not by the model</h3>
+<p>
+  An entity with a state machine keeps its state in <code>status</code> (else <code>state</code>, else
+  <code>stage</code>), and that one column is system-managed. Its field is never on the form — it is shown
+  read-only as a badge in the record's header — and it is always a column of the list grid, whatever an
+  administrator does to grid visibility. Its <code>sys_column</code> row is read-only and not updateable, so
+  a save that changes it is refused with <code>STATE_FIELD_SYSTEM_MANAGED</code>; the record moves by its
+  action buttons instead, one per edge the diagram draws out of its current status. A
+  <code>%%section</code> row that places it is a checker warning (<code>EML178</code>), and the fixer takes
+  it out.
+</p>
+
 <h2>Business Rules</h2>
 <p>
   The rules your model declared, plus a validation rule per entity, all live and editable. An operations
@@ -249,9 +270,9 @@
 
 <figure>
   <figcaption>
-    <b>Four roles, seeded with the application.</b> One master and three standard. A transition guarded by
-    <code>[Manager]</code> in the model is a permission check against this row at runtime — which is why
-    chapter 03's state machines could name roles without anyone wiring them up.
+    <b>Four roles, seeded with the application.</b> One master and three standard. A role an
+    <code>%%rbac</code> line names is a permission check against this row at runtime — which is why a model
+    can name roles without anyone wiring them up.
   </figcaption>
   <img src="img/51-crm-roles.png" alt="The Role Management screen listing four roles: Administrator, marked Master and Active, described as system administrator with full access to all modules; Analyst, Standard and Active, reviews and analyses application data; Manager, Standard and Active, manages operations and team assignments; and User, Standard and Active, standard user with basic access.">
 </figure>
@@ -335,7 +356,6 @@
             <li><a href="../technology.html">Technology</a></li>
             <li><a href="index.html">Build a CRM Guide</a></li>
             <li><a href="../todo.html">Todo</a></li>
-            <li><a href="../chatgpt-app.html">AppWithAI in ChatGPT</a></li>
             <li><a href="../pricing.html">Pricing</a></li>
           </ul>
         </div>
@@ -360,7 +380,6 @@
     </div>
   </footer>
 
-  <script src="../assets/js/analytics.js"></script>
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/guide.js"></script>
 </body>

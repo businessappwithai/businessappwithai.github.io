@@ -16,7 +16,7 @@
  * that is what a WebContainer is — and the page says so.
  */
 
-// The published validator — the same file `llms-full.txt` §1.3 and §8 point a
+// The published validator — the same file `llms.txt` §1.3 and §8 point a
 // model at. Checking here, when the model is chosen, rather than only inside
 // `generateFullStack`: the reader is looking at the model now, and a document
 // with an error is not going to become an application by pressing Assemble.
@@ -49,15 +49,12 @@ async function freshTemplatesUrl(url) {
  *  has the typefaces the CLI would have written. */
 const FONTS_BASE = new URL("../vendor/app-fonts/", import.meta.url).href;
 const FONTS = [
-  "inter-400-latin.woff2",
-  "inter-500-latin.woff2",
-  "inter-600-latin.woff2",
-  "inter-700-latin.woff2",
-  "jetbrains-mono-400-latin.woff2",
-  "jetbrains-mono-600-latin.woff2",
-  "newsreader-400-latin.woff2",
+  // The generated frontend's own four (upstream halved them on 2026-09-19); its
+  // CSS asks for exactly these names, so a stale list ships an app with no fonts.
+  "inter-variable-latin.woff2",
+  "jetbrains-mono-variable-latin.woff2",
+  "newsreader-variable-latin.woff2",
   "newsreader-400-italic-latin.woff2",
-  "newsreader-600-latin.woff2",
 ];
 const FONTS_DIR = "frontend/public/fonts";
 
@@ -92,6 +89,16 @@ const BUILT_IN = {
     path: "models/education-management-system.eml.mmd",
     label: "education-management-system.eml.mmd",
     name: "Education Management System",
+  },
+  airport: {
+    path: "models/airport-management-system.eml.mmd",
+    label: "airport-management-system.eml.mmd",
+    name: "Airport Management System",
+  },
+  shipping: {
+    path: "models/shipping-management-system.eml.mmd",
+    label: "shipping-management-system.eml.mmd",
+    name: "Shipping Management System",
   },
 };
 
@@ -200,6 +207,8 @@ const choices = [
   [$("choice-dance"), "dance"],
   [$("choice-investment"), "investment"],
   [$("choice-education"), "education"],
+  [$("choice-airport"), "airport"],
+  [$("choice-shipping"), "shipping"],
   [$("choice-upload"), "upload"],
 ];
 

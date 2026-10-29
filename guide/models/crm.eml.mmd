@@ -86,7 +86,7 @@
 %%rbac role:sales_manager|sales_ops|support_manager on User.read
 %%rbac role:sales_manager|sales_ops on Team.read
 
-%% ---- The reporting pass (llmdetailed §10.5.1) -----------------------------
+%% ---- The reporting pass (llms.txt §1.1.7) ----------------------------------
 %%
 %% What the derived pack already gives this model without being asked: a
 %% register per entity, a breakdown per %%enum-bound column, created-per-month,
@@ -273,6 +273,10 @@ erDiagram
         string  owner_id FK
         datetime converted_at OPTIONAL
         string  disqualification_reason OPTIONAL
+        datetime working_at OPTIONAL
+        datetime nurturing_at OPTIONAL
+        datetime qualified_at OPTIONAL
+        datetime disqualified_at OPTIONAL
     }
 
     Campaign {
@@ -318,6 +322,12 @@ erDiagram
         string  next_step OPTIONAL
         string  loss_reason OPTIONAL
         string  owner_id FK
+        datetime qualification_at OPTIONAL
+        datetime needs_analysis_at OPTIONAL
+        datetime closed_lost_at OPTIONAL
+        datetime proposal_at OPTIONAL
+        datetime negotiation_at OPTIONAL
+        datetime closed_won_at OPTIONAL
     }
 
     OpportunityLineItem {
@@ -361,6 +371,11 @@ erDiagram
         datetime approved_at OPTIONAL
         text     approval_notes OPTIONAL
         string   owner_id FK
+        datetime rejected_at OPTIONAL
+        datetime draft_at OPTIONAL
+        datetime presented_at OPTIONAL
+        datetime expired_at OPTIONAL
+        datetime accepted_at OPTIONAL
     }
 
     QuoteLineItem {
@@ -389,6 +404,12 @@ erDiagram
         string   signed_by_id FK OPTIONAL
         datetime signed_at OPTIONAL
         string   owner_id FK
+        datetime in_approval_at OPTIONAL
+        datetime draft_at OPTIONAL
+        datetime active_at OPTIONAL
+        datetime terminated_at OPTIONAL
+        datetime renewed_at OPTIONAL
+        datetime expired_at OPTIONAL
     }
 
     SupportCase {
@@ -412,6 +433,10 @@ erDiagram
         integer  satisfaction_score OPTIONAL
         string   escalated_by_id FK OPTIONAL
         string   owner_id FK
+        datetime assigned_at OPTIONAL
+        datetime in_progress_at OPTIONAL
+        datetime waiting_on_customer_at OPTIONAL
+        datetime closed_at OPTIONAL
     }
 
     SlaPolicy {
@@ -527,6 +552,29 @@ erDiagram
     %%field Opportunity.description           ui: textarea
     %%field SupportCase.description           ui: textarea
     %%field Contract.auto_renew               default: false
+
+    %% ---- Field logic -----------------------------------------------------------
+    %% Compiere's Display, Read Only and Mandatory Logic: `@column@=value` over the
+    %% record being edited, `!` for not equal, joined by & and | and read left to
+    %% right. The form shows, locks and requires these fields as the record is
+    %% edited; the API refuses a save that breaks a mandatory or read-only rule.
+    %%field Opportunity.loss_reason            display: @stage@=closed_lost
+    %%field Opportunity.loss_reason            mandatory: @stage@=closed_lost
+    %%field Opportunity.actual_close_date      display: @stage@=closed_won | @stage@=closed_lost
+    %%field Opportunity.amount                 readonly: @stage@=closed_won | @stage@=closed_lost
+    %%field Lead.disqualification_reason       display: @status@=disqualified
+    %%field Lead.disqualification_reason       mandatory: @status@=disqualified
+    %%field Quote.discount_percent             readonly: @status@!draft
+    %%field Quote.discount_amount              readonly: @status@!draft
+    %%field Contract.renewal_notice_days       display: @auto_renew@=Y
+    %%field Contract.renewal_notice_days       mandatory: @auto_renew@=Y
+    %%field SupportCase.resolution_notes       display: @status@=resolved | @status@=closed
+    %%field SupportCase.resolution_notes       mandatory: @status@=resolved
+    %%field SupportCase.resolution_notes       readonly: @status@=closed
+    %%field SupportCase.satisfaction_score     display: @status@=closed
+    %%field Activity.completed_at              display: @status@=completed
+    %%field Activity.completed_at              mandatory: @status@=completed
+    %%field Activity.duration_minutes          display: @activity_type@!note & @activity_type@!email
 
     %% ---- Help text -----------------------------------------------------------
     %% What `%%entity … help:` and `%%field … help:` buy: they are compiled into
@@ -767,6 +815,62 @@ erDiagram
     %%field Activity.support_case_id help: The case it was part of handling.
     %%field Activity.contract_id help: The agreement it concerned.
     %%field Activity.owner_id help: The user who did it, or has to.
+
+    %% ---------------------------------------------------------------
+    %% Form layout. Each record's form is headed sections of two-column
+    %% rows: `|` between rows, `,` between the two fields of a row, and a
+    %% row of one spans the full width.
+    %% ---------------------------------------------------------------
+    %%section entity: User; name: Person; help: Who this user is and how colleagues reach them — the name on every record they own.; rows: first_name, last_name | email, phone | job_title, role
+    %%section entity: User; name: Team and target; help: Where the user sits in the sales organisation and what they are measured against; rows: team_id, quota_annual | is_active, last_login
+    %%section entity: Team; name: Team; help: The selling group, who leads it, and the target its members' quotas roll up to.; rows: name, manager_id | region, quota_annual | is_active
+    %%section entity: Territory; name: Territory; help: The patch of the market this territory covers and the manager accounts in it report to.; rows: name, manager_id | region, country_code | is_active
+    %%section entity: Territory; name: Account size; help: The band of company sizes routed here — accounts outside it belong to another territory.; rows: employee_count_floor, employee_count_ceiling
+    %%section entity: Account; name: Account; help: The customer organisation, the number it is known by, where it stands, and who owns the relationship.; rows: name, account_number | account_type, status | owner_id, territory_id
+    %%section entity: Account; name: Company profile; help: What kind of business this is and how big — what segmentation, tiering and routing read.; rows: industry, tier | employee_count, annual_revenue | website, phone
+    %%section entity: Account; name: Billing address; help: Where invoices are sent; it must match what the customer's accounts payable expects.; rows: billing_street | billing_city, billing_postal_code | billing_country
+    %%section entity: Account; name: Service; help: The support terms the account is entitled to and how healthy the relationship currently looks.; rows: sla_policy_id, health_score
+    %%section entity: Contact; name: Person; help: Who the person is, which account they work for, and their role there.; rows: first_name, last_name | account_id, is_primary | job_title, department
+    %%section entity: Contact; name: Reaching them; help: The channels sales and support use — the email is where every notification goes.; rows: email, phone | mobile
+    %%section entity: Contact; name: Consent; help: What the person has said they do not want; campaigns and dialers must honour both before contacting them.; rows: email_opt_out, do_not_call
+    %%section entity: Contact; name: Ownership; help: Whether the contact is current, who looks after them, and where they first came from.; rows: status, owner_id | lead_source
+    %%section entity: Lead; name: Lead; help: The person who showed interest and how to get back to them.; rows: first_name, last_name | email, phone | job_title
+    %%section entity: Lead; name: Company; help: The business behind the lead — what decides whether it is worth a sales rep's time.; rows: company_name, industry | employee_count, annual_revenue
+    %%section entity: Lead; name: Qualification; help: Where the lead stands, who is working it, how warm it is, and which campaign produced it.; rows: owner_id | rating, score | lead_source, campaign_id
+    %%section entity: Lead; name: Outcome; help: How the lead ended — converted into an account and opportunity, or ruled out and why.; rows: converted_at | disqualification_reason
+    %%section entity: Campaign; name: Campaign; help: What the campaign is, who runs it, and whom it is aimed at.; rows: name, campaign_type | status, owner_id | target_audience
+    %%section entity: Campaign; name: Schedule; help: When the campaign runs; members can only respond inside these dates.; rows: start_date, end_date
+    %%section entity: Campaign; name: Budget and return; help: What the campaign was allowed to spend, what it did spend, and what it was expected to bring back.; rows: budgeted_cost, actual_cost | expected_revenue, expected_response_count
+    %%section entity: CampaignMember; name: Member; help: Who was targeted by the campaign — a lead or a contact, never both.; rows: campaign_id | lead_id, contact_id
+    %%section entity: CampaignMember; name: Response; help: Whether and when the member answered, which is what the campaign's results are counted from.; rows: member_status, has_responded | responded_at
+    %%section entity: Opportunity; name: Deal; help: What is being sold, to which account and buyer, and who is selling it.; rows: name, owner_id | account_id, contact_id | description
+    %%section entity: Opportunity; name: Value; help: What the deal is worth and in which currency — the figure the forecast adds up.; rows: amount, currency_code
+    %%section entity: Opportunity; name: Pipeline; help: How far the deal has got and when it is expected to close; probability and forecast follow from the stage.; rows: probability | forecast_category, expected_close_date | next_step
+    %%section entity: Opportunity; name: Origin; help: Where the deal came from, so marketing is credited with what it produced.; rows: lead_source, campaign_id
+    %%section entity: Opportunity; name: Outcome; help: When the deal closed and, if it was lost, the reason — what the win-loss review is built on.; rows: actual_close_date | loss_reason
+    %%section entity: OpportunityLineItem; name: Line; help: Which product this line of the deal is for, in the words the buyer will read.; rows: opportunity_id, product_id | line_description
+    %%section entity: OpportunityLineItem; name: Pricing; help: How many, at what price and discount, and what the line adds to the deal's amount.; rows: quantity, unit_price | discount_percent, line_total
+    %%section entity: Product; name: Product; help: What is sold, the code it is ordered by, its product family, and whether it can still be quoted.; rows: name, product_code | family, is_active | description
+    %%section entity: Product; name: Price; help: What the product lists at, what it costs to deliver, and how often it is billed.; rows: list_price, unit_cost | billing_frequency
+    %%section entity: Quote; name: Quote; help: Which quote this is, the deal and account it prices, where it stands, and how long it is valid.; rows: quote_number, version_number | name | opportunity_id, account_id | owner_id | valid_until
+    %%section entity: Quote; name: Totals; help: What the customer is asked to pay — the lines' subtotal, the discount, tax, and the grand total.; rows: subtotal, discount_percent | discount_amount, tax_amount | grand_total
+    %%section entity: Quote; name: Approval; help: Who signed off a discount beyond a rep's authority, when, and on what grounds.; rows: approved_by_id, approved_at | approval_notes
+    %%section entity: QuoteLineItem; name: Line; help: Which product this line prices and where it sits on the printed quote.; rows: quote_id, sort_order | product_id
+    %%section entity: QuoteLineItem; name: Pricing; help: How many, at what price and discount, and what the line adds to the quote's subtotal.; rows: quantity, unit_price | discount_percent, line_total
+    %%section entity: Contract; name: Contract; help: The agreement, the account it binds, the quote it came from, and who manages it.; rows: contract_number | account_id, quote_id | owner_id
+    %%section entity: Contract; name: Term; help: When the contract runs and what it is worth a year — what revenue recognition reads.; rows: start_date, end_date | term_months, annual_value
+    %%section entity: Contract; name: Renewal; help: Whether the contract renews itself and how much notice either side must give to stop it.; rows: auto_renew, renewal_notice_days
+    %%section entity: Contract; name: Signature; help: Who signed for the customer and when; the contract is not in force until both are set.; rows: signed_by_id, signed_at
+    %%section entity: SupportCase; name: Case; help: The number the customer quotes, where the case stands, and what is wrong in their words.; rows: case_number | subject | description
+    %%section entity: SupportCase; name: Customer; help: Who raised the case and which account it is charged against.; rows: account_id, contact_id
+    %%section entity: SupportCase; name: Triage; help: What kind of problem it is, how urgent, how it arrived, and who is working it.; rows: case_type, priority | origin, owner_id | escalated_by_id
+    %%section entity: SupportCase; name: Service level; help: The response and resolution deadlines the account's SLA sets, and whether either was missed.; rows: sla_policy_id, is_sla_breached | first_response_due_at, first_response_at | resolution_due_at, resolved_at
+    %%section entity: SupportCase; name: Resolution; help: What fixed it and how the customer rated the outcome.; rows: resolution_notes | satisfaction_score
+    %%section entity: SlaPolicy; name: Policy; help: The support promise, the account tier it is sold to, and whether it is still offered.; rows: name, tier | is_active
+    %%section entity: SlaPolicy; name: Targets; help: How fast a case must be answered and resolved, and whether the clock stops outside office hours.; rows: first_response_minutes, resolution_hours | business_hours_only
+    %%section entity: Activity; name: Activity; help: What was done or has to be done, how urgent it is, and whose it is.; rows: activity_type, subject | status, priority | owner_id | description
+    %%section entity: Activity; name: Timing; help: When it is due, when it was done, and how long it took.; rows: due_at, completed_at | duration_minutes
+    %%section entity: Activity; name: Related to; help: The records this activity is about; it appears on the timeline of each one set here.; rows: account_id, contact_id | lead_id, opportunity_id | support_case_id, contract_id
 
     %%index User(email) unique
     %%index Account(account_number) unique
@@ -1015,6 +1119,7 @@ flowchart TD
     %% agent to notice it.
     %%action escalateCriticalCase trigger-workflow when: priority == "critical" workflow: CriticalCaseEscalation message: Critical case — escalating and raising an escalation task
     %%action requireResolutionNotes validation-error when: status == "resolved" and resolution_notes == null message: A resolved case needs resolution notes
+    %%action requireResolutionNotesOnMove validation-error when: resolved_at != null and resolution_notes == null message: A resolved case needs resolution notes
 
 %% ---- Section 9: Business rule — renewal risk -------------------------------
 %% Grades a contract as its renewal window opens. The renewal playbook in
@@ -1062,8 +1167,16 @@ stateDiagram-v2
     disqualified --> [*]
 
     %%rbac role:sales_rep|account_executive|sales_manager on Lead.update
-    %%rbac role:sales_manager|sales_ops on Lead.convert
-    %%rbac role:sales_manager on Lead.disqualify
+    %% Who presses each button. A move no line names is open to anyone who may update.
+    %%rbac role:sales_rep|account_executive|sales_manager on Lead.engage
+    %%rbac role:sales_rep|account_executive|sales_manager on Lead.nurture
+    %%rbac role:sales_rep|account_executive|sales_manager on Lead.re_engage
+    %%rbac role:sales_rep|account_executive|sales_manager on Lead.qualify
+    %%rbac role:sales_rep|account_executive|sales_manager on Lead.return_to_working
+    %%rbac role:account_executive|sales_manager on Lead.convert
+    %%rbac role:sales_rep|sales_manager on Lead.disqualify
+    %%rbac role:sales_rep|sales_manager on Lead.reject
+    %%rbac role:sales_manager on Lead.reopen
     %%trigger webhook:marketing -> ingestInboundLead on Lead
     %%trigger cron:0 7 * * 1 -> recycleStaleLeads on Lead
 
@@ -1087,8 +1200,19 @@ stateDiagram-v2
     closed_lost     --> [*]
 
     %%rbac role:sales_rep|account_executive on Opportunity.update
-    %%rbac role:sales_manager on Opportunity.close_won
     %%rbac role:sales_manager|sales_ops on Opportunity.delete
+    %% A rep works the deal; only a sales manager closes it won, and sales ops reopens one.
+    %%rbac role:sales_rep|account_executive on Opportunity.qualify
+    %%rbac role:sales_rep|account_executive on Opportunity.discover
+    %%rbac role:sales_rep|account_executive on Opportunity.send_proposal
+    %%rbac role:sales_rep|account_executive on Opportunity.negotiate
+    %%rbac role:sales_rep|account_executive on Opportunity.reprice
+    %%rbac role:sales_rep|account_executive|sales_manager on Opportunity.disqualify
+    %%rbac role:sales_rep|account_executive|sales_manager on Opportunity.no_fit
+    %%rbac role:sales_rep|account_executive|sales_manager on Opportunity.lose
+    %%rbac role:sales_rep|account_executive|sales_manager on Opportunity.close_lost
+    %%rbac role:sales_manager on Opportunity.close_won
+    %%rbac role:sales_ops on Opportunity.reopen
     %%trigger cron:0 7 * * * -> nudgeStalledOpportunities on Opportunity
 
 %% ---- Section 12: Workflow — quote approval (state machine) -----------------
@@ -1110,8 +1234,16 @@ stateDiagram-v2
     expired   --> [*]
 
     %%rbac role:sales_rep|account_executive on Quote.update
-    %%rbac role:sales_manager|sales_ops on Quote.approve
+    %% The rep prepares and presents; the sales manager approves.
+    %%rbac role:sales_rep|account_executive on Quote.submit_for_approval
+    %%rbac role:sales_manager on Quote.approve
     %%rbac role:sales_manager on Quote.reject
+    %%rbac role:sales_rep|account_executive on Quote.revise
+    %%rbac role:sales_rep|account_executive on Quote.present
+    %%rbac role:sales_rep|account_executive on Quote.accept
+    %%rbac role:sales_rep|account_executive on Quote.renegotiate
+    %%rbac role:sales_ops on Quote.lapse
+    %%rbac role:sales_manager on Quote.reopen
     %%trigger cron:0 6 * * * -> expireStaleQuotes on Quote
 
 %% ---- Section 13: Workflow — support case lifecycle (state machine) ---------
@@ -1132,8 +1264,18 @@ stateDiagram-v2
     closed              --> [*]
 
     %%rbac role:support_agent|support_manager on SupportCase.update
-    %%rbac role:support_manager on SupportCase.escalate
     %%rbac role:support_manager|administrator on SupportCase.delete
+    %% The support manager assigns and escalates; the agent works the case.
+    %%rbac role:support_manager on SupportCase.assign
+    %%rbac role:support_agent|support_manager on SupportCase.start_work
+    %%rbac role:support_agent|support_manager on SupportCase.request_information
+    %%rbac role:support_agent|support_manager on SupportCase.customer_responded
+    %%rbac role:support_manager on SupportCase.escalate
+    %%rbac role:support_manager on SupportCase.de_escalate
+    %%rbac role:support_agent|support_manager on SupportCase.resolve
+    %%rbac role:support_agent|support_manager on SupportCase.reopen
+    %%rbac role:support_agent|support_manager on SupportCase.close
+    %%rbac role:support_manager on SupportCase.closed->draft
     %%trigger cron:*/15 * * * * -> checkSlaBreaches on SupportCase
     %%trigger webhook:helpdesk -> ingestInboundCase on SupportCase
 
@@ -1156,8 +1298,16 @@ stateDiagram-v2
     terminated  --> [*]
 
     %%rbac role:sales_manager|sales_ops on Contract.update
-    %%rbac role:sales_ops|administrator on Contract.counter_signed
-    %%rbac role:administrator on Contract.terminate
+    %% Sales ops runs the paperwork and the renewal window; a sales manager terminates.
+    %%rbac role:sales_ops|sales_manager on Contract.submit_for_signature
+    %%rbac role:sales_ops|sales_manager on Contract.return_for_edit
+    %%rbac role:sales_ops|sales_manager on Contract.counter_signed
+    %%rbac role:sales_ops on Contract.enter_renewal_window
+    %%rbac role:sales_ops on Contract.renew
+    %%rbac role:sales_ops on Contract.activate_renewal
+    %%rbac role:sales_ops on Contract.lapse
+    %%rbac role:sales_manager on Contract.terminate
+    %%rbac role:sales_manager on Contract.reopen
     %%trigger cron:0 8 * * * -> openRenewalWindows on Contract
     %%trigger message:billing.invoice.paid -> markContractActive on Contract
 
@@ -1397,13 +1547,26 @@ flowchart TD
     %%step G REST url:https://hooks.example.com/crm/case-escalation method: POST bodyTemplate: {"case":"{{case_number}}","tier":"{{escalationTier}}","respondWithinHours":"{{responseHours}}"}
 
 %% ---- Section 25: Workflow — closed-won handoff (saga) ----------------------
-%% The other kind of trigger. Nothing gates this one on a rule: every
-%% opportunity that reaches closed_won is handed to delivery, because a deal
-%% that closes and is never onboarded is the failure mode this exists to stop.
-%% It runs on UPDATE, since closing is an update to an existing row.
+%% Every opportunity that reaches closed_won is handed to delivery, because a
+%% deal that closes and is never onboarded is the failure mode this exists to
+%% stop — and it is handed over once. A sales manager closes the deal with the
+%% Close won button; the entity's rules run again on that move, and the rule
+%% below starts the handoff. closed_won is Final, so the record is locked from
+%% then on and the rule cannot match a second time. Run instead on every
+%% UPDATE, it drafted a contract and booked a kickoff on each edit of every
+%% opportunity.
+%%rule opportunityHandoff on Opportunity event: beforeUpdate priority: 80
+flowchart TD
+    A([Opportunity moved]) --> B{Has the deal been closed won?}
+    B -->|Yes| C[Hand it to delivery]
+    B -->|No| D([Nothing to hand over])
+    C --> D
+
+    %%action handOffClosedWon trigger-workflow when: stage == "closed_won" workflow: ClosedWonHandoff
+
 %%meta name: Closed Won Handoff
 %%meta kind: workflow
-%%workflow ClosedWonHandoff entity: Opportunity kind: saga trigger: automatic operation: UPDATE
+%%workflow ClosedWonHandoff entity: Opportunity kind: saga trigger: rule
 flowchart TD
     A([Opportunity closed won]) --> B{Size the engagement}
     B --> C[Compute the monthly run rate]
@@ -1448,3 +1611,41 @@ flowchart TD
     %%step E CreateEntity entity: Activity as: renewalReviewId fields: {"activity_type":"meeting","subject":"Renewal review","status":"planned","priority":"high","account_id":"account_id","contract_id":"id","opportunity_id":"renewalOpportunityId","owner_id":"owner_id"}
     %%step F UpdateEntity field: status value: expiring
     %%step G UpdateEntity entity: Opportunity targetSource: renewalOpportunityId field: next_step source: renewalGrade
+
+%% ---- When each status was reached: stamped by the application ----
+%% A record moves by an action button, along an edge its state diagram draws,
+%% and the application writes the <state>_at time when it does.
+%%field Lead.working_at help: When this lead moved to working. Stamped by the application when the move is made; nobody types it.
+%%field Lead.nurturing_at help: When this lead moved to nurturing. Stamped by the application when the move is made; nobody types it.
+%%field Lead.qualified_at help: When this lead moved to qualified. Stamped by the application when the move is made; nobody types it.
+%%field Lead.disqualified_at help: When this lead moved to disqualified. Stamped by the application when the move is made; nobody types it.
+%%section entity: Lead; name: Progress; help: When this lead reached each status, stamped by the application as the record moves; the status itself is shown in the header.; rows: working_at, nurturing_at | qualified_at, disqualified_at
+
+%%field Opportunity.qualification_at help: When the move to qualification was recorded on this opportunity. Recording it moves an opportunity from prospecting to qualification: the workflows set the stage, which nobody changes by hand.
+%%field Opportunity.needs_analysis_at help: When the move to needs analysis was recorded on this opportunity. Recording it moves an opportunity from qualification to needs analysis: the workflows set the stage, which nobody changes by hand.
+%%field Opportunity.closed_lost_at help: When the move to closed lost was recorded on this opportunity. Recording it moves an opportunity from qualification, needs analysis, proposal or negotiation to closed lost: the workflows set the stage, which nobody changes by hand.
+%%field Opportunity.proposal_at help: When the move to proposal was recorded on this opportunity. Recording it moves an opportunity from needs analysis or negotiation to proposal: the workflows set the stage, which nobody changes by hand.
+%%field Opportunity.negotiation_at help: When the move to negotiation was recorded on this opportunity. Recording it moves an opportunity from proposal to negotiation: the workflows set the stage, which nobody changes by hand.
+%%field Opportunity.closed_won_at help: When the move to closed won was recorded on this opportunity. Recording it moves an opportunity from negotiation to closed won: the workflows set the stage, which nobody changes by hand.
+%%section entity: Opportunity; name: Progress; help: The times that move this opportunity along its lifecycle. Recording one is how its stage changes; the stage itself is shown in the header.; rows: qualification_at, needs_analysis_at | closed_lost_at, proposal_at | negotiation_at, closed_won_at
+
+%%field Quote.rejected_at help: When this quote moved to rejected. Stamped by the application when the move is made; nobody types it.
+%%field Quote.draft_at help: When this quote moved to draft. Stamped by the application when the move is made; nobody types it.
+%%field Quote.presented_at help: When this quote moved to presented. Stamped by the application when the move is made; nobody types it.
+%%field Quote.expired_at help: When this quote moved to expired. Stamped by the application when the move is made; nobody types it.
+%%field Quote.accepted_at help: When this quote moved to accepted. Stamped by the application when the move is made; nobody types it.
+%%section entity: Quote; name: Progress; help: When this quote reached each status, stamped by the application as the record moves; the status itself is shown in the header.; rows: rejected_at, draft_at | presented_at, expired_at | accepted_at
+
+%%field SupportCase.assigned_at help: When this support case moved to assigned. Stamped by the application when the move is made; nobody types it.
+%%field SupportCase.in_progress_at help: When this support case moved to in progress. Stamped by the application when the move is made; nobody types it.
+%%field SupportCase.waiting_on_customer_at help: When this support case moved to waiting on customer. Stamped by the application when the move is made; nobody types it.
+%%field SupportCase.closed_at help: When this support case moved to closed. Stamped by the application when the move is made; nobody types it.
+%%section entity: SupportCase; name: Progress; help: When this support case reached each status, stamped by the application as the record moves; the status itself is shown in the header.; rows: assigned_at, in_progress_at | waiting_on_customer_at, closed_at
+
+%%field Contract.in_approval_at help: When this contract moved to in approval. Stamped by the application when the move is made; nobody types it.
+%%field Contract.draft_at help: When this contract moved to draft. Stamped by the application when the move is made; nobody types it.
+%%field Contract.active_at help: When this contract moved to active. Stamped by the application when the move is made; nobody types it.
+%%field Contract.terminated_at help: When this contract moved to terminated. Stamped by the application when the move is made; nobody types it.
+%%field Contract.renewed_at help: When this contract moved to renewed. Stamped by the application when the move is made; nobody types it.
+%%field Contract.expired_at help: When this contract moved to expired. Stamped by the application when the move is made; nobody types it.
+%%section entity: Contract; name: Progress; help: When this contract reached each status, stamped by the application as the record moves; the status itself is shown in the header.; rows: in_approval_at, draft_at | active_at, terminated_at | renewed_at, expired_at
