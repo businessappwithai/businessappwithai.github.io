@@ -550,7 +550,7 @@ a:hover {
   margin: 0;
   padding-bottom: var(--spacing-md);
   font-size: 0.8125rem;
-  color: white;
+  color: var(--gray-500);
 }
 
 

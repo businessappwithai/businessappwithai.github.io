@@ -85,6 +85,7 @@ a:hover { color: #a5b4fc; }
 .quote-bar__attribution { color: #6b7280; }
 .quote-bar__attribution a:hover { color: #a5b4fc; }
 .quote-bar__rule { border-top-color: #1e1e2e; }
+.quote-bar__cta { color: white; }
 
 .hero {
   background: radial-gradient(ellipse 80% 60% at 50% -10%,
