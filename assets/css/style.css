@@ -535,11 +535,18 @@ a:hover {
   color: var(--primary-600);
 }
 
+.quote-bar__rule {
+  margin: 0 auto;
+  width: 40px;
+  border: none;
+  border-top: 1px solid var(--gray-200);
+}
+
 .quote-bar__cta {
   margin: 0;
   padding-bottom: var(--spacing-md);
   font-size: 0.8125rem;
-  color: var(--gray-500);
+  color: var(--gray-400);
   text-align: center;
 }
 
