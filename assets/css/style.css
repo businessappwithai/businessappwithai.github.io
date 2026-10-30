@@ -535,6 +535,25 @@ a:hover {
   color: var(--primary-600);
 }
 
+.quote-bar__cta {
+  margin: 0;
+  padding-bottom: var(--spacing-md);
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.quote-bar__cta a {
+  color: var(--primary-600);
+  text-decoration: none;
+  border-bottom: 1px solid var(--primary-300);
+}
+
+.quote-bar__cta a:hover {
+  color: var(--primary-700);
+  border-bottom-color: var(--primary-500);
+}
+
 .hero {
   padding: var(--spacing-4xl) 0;
   background: linear-gradient(135deg, var(--primary-50) 0%, var(--secondary-50) 100%);
