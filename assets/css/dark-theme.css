@@ -82,7 +82,8 @@ a:hover { color: #a5b4fc; }
 /* The epigraph band under the nav — see .quote-bar in style.css. */
 .quote-bar { background: #0d0d16; border-bottom-color: #1e1e2e; }
 .quote-bar__text { color: #cbd5e1; }
-.quote-bar__attribution { color: #6b7280; }
+.quote-bar__attribution { color: white; }
+.quote-bar__attribution a { color: white; }
 .quote-bar__attribution a:hover { color: #a5b4fc; }
 .quote-bar__rule { border-top-color: #1e1e2e; }
 .quote-bar__cta { color: white; }
