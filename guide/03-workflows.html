@@ -205,6 +205,26 @@
   write may only cross an edge the diagram drew. The full
   machine is stored in the definition's description, which is what the Workflow Designer displays.
 </p>
+<p>
+  A button is named after the status it moves the record into: the edge into <code>closed_won</code> is
+  the button <strong>Closed won</strong>, whatever the edge is called. The edge's event stays the move's
+  name, which is what <code>%%rbac</code>, the API and the record's history use.
+</p>
+
+<h3>A workflow bound to a status</h3>
+<p>
+  A saga or a hook workflow can run when a button moves a record into one particular status —
+  "after update on Contract, when the status becomes To be reviewed". Write <code>status: &lt;state&gt;</code>
+  on a <code>trigger: automatic operation: UPDATE</code> workflow:
+  <code>%%workflow Review entity: Contract kind: saga trigger: automatic operation: UPDATE status: to_be_reviewed</code>.
+  The press is two transactions. The first saves what is on the form and leaves the status where it is;
+  the second runs every workflow bound to the new status and moves the record only if all of them succeed.
+  If one fails, only the second is rolled back: the typed values stay saved, the status does not move, and
+  the reason is shown beside the buttons and kept in Run History. The checker requires the state to be one
+  the diagram draws (<code>EML243</code>), the workflow to be started by an update (<code>EML244</code>),
+  and some arrow to lead into the state (<code>EML245</code>). An entity with no status machine takes no
+  <code>status:</code> — its update workflows already run on the way to Final.
+</p>
 
 <h2>Hook workflows</h2>
 <p>
