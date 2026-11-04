@@ -214,10 +214,10 @@ const choices = [
   [$("choice-education"), "education"],
   [$("choice-airport"), "airport"],
   [$("choice-shipping"), "shipping"],
-  [$("choice-unified"), "unified"],
-  [$("choice-sales"), "sales"],
   [$("choice-upload"), "upload"],
 ];
+choices.push([$("choice-unified"), "unified"]);
+choices.push([$("choice-sales"), "sales"]);
 
 for (const [button, kind] of choices) {
   button.addEventListener("click", () => selectChoice(kind));
