@@ -956,6 +956,8 @@ Where each one comes from:
 | `guide/models/crm.eml.mmd`, `guide/models/drug-discovery.eml.mmd`, `guide/models/investment-planning-wealth-management-system.eml.mmd` | `html/models/*.eml.mmd` | — |
 | `guide/models/dance-studio.eml.mmd` | `language/examples/dance-studio.eml.mmd` | — |
 | `guide/models/education-management-system.eml.mmd` | `docs/eml-sessions/education-management-system/education-management-system.mmd` | — |
+| `guide/models/unified-education-management-system.eml.mmd` | `html/models/education-management-system.mmd` | — (169 entities; the 25-entity model above is a different one) |
+| `guide/models/enterprise-sales-crm.eml.mmd` | `html/models/sales.mmd` | — (110 entities; not the same model as `crm.eml.mmd`) |
 | `guide/models/airport-management-system.eml.mmd` | `examples/airport-management-system.eml.mmd` | — |
 | `llms.txt` and its six chunks | `website/llmtext/*.txt` | — |
 | `viewers/*.js`, `viewers/viewers.css` | `website/viewers/*` | `bun run build:viewers` (for `eml-model.js` only) |
