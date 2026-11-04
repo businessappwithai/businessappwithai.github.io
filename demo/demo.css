@@ -75,3 +75,13 @@
   .dm-tc { grid-auto-flow: column; justify-content: start; gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { .dm-hot { animation: none; } .dm-nudge { transition: none; } }
+
+/* slim page chrome: the demo pages carry a short bar and one-line footer, not the full site header */
+.dm-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 12px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid #2a3242; }
+.dm-bar nav { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.95rem; }
+.dm-bar nav a { color: #cbd5e1; text-decoration: none; }
+.dm-bar nav a:hover, .dm-bar nav a:focus-visible { color: #fff; text-decoration: underline; }
+.dm-end { padding: 28px max(16px, env(safe-area-inset-right, 0px)) 36px max(16px, env(safe-area-inset-left, 0px)); border-top: 1px solid #2a3242; text-align: center; font-size: 0.9rem; color: #9aa5b3; }
+.dm-end p { margin: 0; }
+.dm-end a { color: #2dd4bf; }
+.dm-root section[id] { scroll-margin-top: 12px; }

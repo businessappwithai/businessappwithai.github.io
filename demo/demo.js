@@ -57,3 +57,27 @@
 
   i = fromHash(); render();
 })();
+
+// Copy the voiceover script (the "Copy the script" button in #script).
+(function () {
+  var btn = document.getElementById('copy-vo'), st = document.getElementById('vo-status');
+  if (!btn) return;
+  function text() {
+    var out = ['BEST CRM DEMO - VOICEOVER SCRIPT', ''];
+    document.querySelectorAll('.dm-seg').forEach(function (s) {
+      out.push('[' + s.querySelector('.dm-tc').textContent.replace(/\s+/g, ' ').trim() + '] ' + s.querySelector('h3').textContent);
+      out.push(s.querySelector('.dm-line').textContent, '');
+    });
+    return out.join('\n');
+  }
+  btn.addEventListener('click', function () {
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(document.querySelector('.dm-segs'));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      st.textContent = 'Selected. Press Ctrl+C or Cmd+C to copy.';
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text()).then(function () { st.textContent = 'Copied.'; }, fallback);
+    } else { fallback(); }
+  });
+})();
