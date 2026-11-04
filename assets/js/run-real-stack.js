@@ -110,6 +110,11 @@ const BUILT_IN = {
     label: "unified-education-management-system.eml.mmd",
     name: "Unified Education Management System",
   },
+  service: {
+    path: "models/enterprise-service-management-system.eml.mmd",
+    label: "enterprise-service-management-system.eml.mmd",
+    name: "Enterprise Service Management System",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -221,7 +226,7 @@ const choices = [
   [$("choice-shipping"), "shipping"],
   [$("choice-upload"), "upload"],
 ];
-choices.push([$("choice-sales"), "sales"], [$("choice-unified"), "unified"]);
+choices.push([$("choice-sales"), "sales"], [$("choice-unified"), "unified"], [$("choice-service"), "service"]);
 
 for (const [button, kind] of choices) button.addEventListener("click", () => selectChoice(kind));
 
