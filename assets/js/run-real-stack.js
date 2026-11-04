@@ -100,15 +100,15 @@ const BUILT_IN = {
     label: "shipping-management-system.eml.mmd",
     name: "Shipping Management System",
   },
-  unified: {
-    path: "models/unified-education-management-system.eml.mmd",
-    label: "unified-education-management-system.eml.mmd",
-    name: "Unified Education Management System",
-  },
   sales: {
     path: "models/enterprise-sales-crm.eml.mmd",
     label: "enterprise-sales-crm.eml.mmd",
     name: "Enterprise Sales CRM",
+  },
+  unified: {
+    path: "models/unified-education-management-system.eml.mmd",
+    label: "unified-education-management-system.eml.mmd",
+    name: "Unified Education Management System",
   },
 };
 
@@ -219,8 +219,8 @@ const choices = [
   [$("choice-education"), "education"],
   [$("choice-airport"), "airport"],
   [$("choice-shipping"), "shipping"],
-  [$("choice-unified"), "unified"],
   [$("choice-sales"), "sales"],
+  [$("choice-unified"), "unified"],
   [$("choice-upload"), "upload"],
 ];
 
