@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A click-through tour of Best CRM: 18 real screenshots from generating it on appwithai.org to signing in as different roles.">
+  <meta name="keywords" content="AppWithAI, Best CRM, interactive demo, CRM example, generated application, click-through">
+  <title>Best CRM Interactive Demo — AppWithAI</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicon.ico" sizes="48x48">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/dark-theme.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-container">
+      <a href="../index.html" class="logo" aria-label="AppWithAI — home" title="AppWithAI — home">
+        <span class="logo-mark" aria-hidden="true">A</span>
+        <span class="logo-word">App<span class="logo-word-dim">With</span><span class="logo-word-ai">AI</span></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <nav class="nav" id="mainNav">
+        <ul class="nav-list">
+          <li><a href="../justification.html" class="nav-link">Why AppWithAI</a></li>
+          <li><a href="../try-it-yourself.html" class="nav-link">Try It Yourself</a></li>
+          <li><a href="../features.html" class="nav-link">Features</a></li>
+          <li><a href="../how-it-works.html" class="nav-link">How It Works</a></li>
+          <li><a href="../technology.html" class="nav-link">Technology</a></li>
+          <li><a href="../guide/index.html" class="nav-link">Guide</a></li>
+          <li><a href="../pricing.html" class="nav-link">Pricing</a></li>
+          <li><a href="../guide/run-in-browser.html" class="btn btn-accent" style="margin-right: var(--spacing-sm);">Live Demo</a></li>
+          <li><a href="../contact.html" class="btn btn-primary">Get Started</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dm-root">
+    <section class="section section-gray">
+      <div class="container container-wide">
+        <div class="dm-top">
+          <div>
+            <div class="dm-eyebrow">Interactive demo &middot; Best CRM</div>
+            <h1 class="dm-h1">Build and tour Best CRM, step by step</h1>
+          </div>
+          <div class="dm-count" id="count" aria-live="polite"></div>
+        </div>
+        <p class="dm-lede">Eighteen real screenshots of the CRM example on <a href="../try-it-yourself.html">Try It Yourself</a>, from loading the model to signing in as different roles. Click the pulsing target on each screen, or use Next, Back and the arrow keys. Prefer to watch? <a href="video.html">There is an eight-minute video</a>.</p>
+
+        <div class="dm-rail" id="rail" role="tablist" aria-label="Steps"></div>
+
+        <div class="dm-stage" id="stage">
+          <img id="shot" alt="">
+          <button class="dm-hot" id="hot" type="button"></button>
+          <div class="dm-nudge" id="nudge">Click the highlighted area to continue</div>
+        </div>
+
+        <section class="dm-panel" aria-live="polite">
+          <h2 id="title"></h2>
+          <p id="text"></p>
+          <div class="dm-cta" id="cta"></div>
+          <div class="dm-nav">
+            <button type="button" id="back" class="btn btn-outline">Back</button>
+            <button type="button" id="next" class="btn btn-primary">Next</button>
+          </div>
+        </section>
+
+        <p class="dm-foot">These are screenshots, not the running software: you can click the targets, but nothing inside an image responds. To use the real thing, <a href="../guide/run-in-browser.html#crm">generate and run Best CRM in your browser</a>.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <h3>AppWithAI</h3>
+          <p>Open source AI-powered generator for production-ready business applications. Licensed under the Apache License 2.0.</p>
+          <p class="mt-2"><a href="https://github.com/businessappwithai/app-with-ai-tanstack" target="_blank" rel="noopener noreferrer">Source on GitHub &rarr;</a></p>
+        </div>
+        <div>
+          <h3>Product</h3>
+          <ul class="footer-links">
+            <li><a href="../justification.html">Why AppWithAI</a></li>
+            <li><a href="../try-it-yourself.html">Try It Yourself</a></li>
+            <li><a href="../viewers/index.html">Model Viewer</a></li>
+            <li><a href="../features.html">Features</a></li>
+            <li><a href="../how-it-works.html">How It Works</a></li>
+            <li><a href="../technology.html">Technology</a></li>
+            <li><a href="../guide/index.html">Build a CRM Guide</a></li>
+            <li><a href="../todo.html">Todo</a></li>
+            <li><a href="../pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Company</h3>
+          <ul class="footer-links">
+            <li><a href="../contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <ul class="footer-links">
+            <li><a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer">Apache License 2.0</a></li>
+            <li><a href="../privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 AppWithAI Contributors. Open Source — <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" style="color: var(--primary-400);">Apache License 2.0</a>. Powered by Claude, OpenAI, and Ollama.</p>
+        <p class="mt-2"><a href="../guide/run-in-browser.html" style="color: var(--primary-400);">Run the CRM demo in your browser →</a></p>
+      </div>
+    </div>
+  </footer>
+  <script src="../assets/js/main.js"></script>
+  <script src="demo.js"></script>
+</body>
+</html>
