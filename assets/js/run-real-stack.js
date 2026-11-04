@@ -100,6 +100,16 @@ const BUILT_IN = {
     label: "shipping-management-system.eml.mmd",
     name: "Shipping Management System",
   },
+  sales: {
+    path: "models/enterprise-sales-crm.eml.mmd",
+    label: "enterprise-sales-crm.eml.mmd",
+    name: "Enterprise Sales CRM",
+  },
+  unified: {
+    path: "models/unified-education-management-system.eml.mmd",
+    label: "unified-education-management-system.eml.mmd",
+    name: "Unified Education Management System",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -211,6 +221,7 @@ const choices = [
   [$("choice-shipping"), "shipping"],
   [$("choice-upload"), "upload"],
 ];
+choices.push([$("choice-sales"), "sales"], [$("choice-unified"), "unified"]);
 
 for (const [button, kind] of choices) button.addEventListener("click", () => selectChoice(kind));
 

@@ -545,6 +545,7 @@ a:hover {
 .quote-bar__cta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
   margin: 0;
