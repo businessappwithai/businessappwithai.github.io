@@ -89,6 +89,11 @@ const BUILT_IN = {
     name: "Enterprise Sales CRM",
   },
 };
+BUILT_IN.construction = {
+  path: "models/construction-enterprise-management.eml.mmd",
+  label: "construction-enterprise-management.eml.mmd",
+  name: "Construction Enterprise Management",
+};
 
 const $ = (id) => document.getElementById(id);
 
@@ -224,6 +229,7 @@ const choices = [
 choices.push([$("choice-unified"), "unified"]);
 choices.push([$("choice-sales"), "sales"]);
 choices.push([$("choice-service"), "service"]);
+choices.push([$("choice-construction"), "construction"]);
 
 for (const [button, kind] of choices) {
   button.addEventListener("click", () => selectChoice(kind));
