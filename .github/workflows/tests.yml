@@ -57,6 +57,23 @@ jobs:
           node guide/audit-model.mjs "$work/bare-erd.mmd" --base guide/ --quiet && \
             { echo "expected the audit to fail a model with no rbac, no workflow and no help"; exit 1; } || true
 
+      # Reporting coverage is the same kind of gap. Every role a model declares
+      # needs 50 charted reports and 10 dashboards (EML298, EML299); both are
+      # warnings, so the checker accepts a model without them, and only the audit
+      # stands between that model and a delivery. Strip the reports and dashboards
+      # from a finished model: the checker must still accept it and the audit must
+      # fail it, naming the gap.
+      - name: The audit fails a model with no reporting coverage
+        run: |
+          work=$(mktemp -d)
+          grep -vE '^[[:space:]]*%%(report|dashboard)[[:space:]]' guide/models/dance-studio.eml.mmd > "$work/no-reports.mmd"
+          node guide/check-model.mjs "$work/no-reports.mmd" --quiet
+          out=$(node guide/audit-model.mjs "$work/no-reports.mmd" --base guide/ 2>&1 || true)
+          echo "$out" | tail -5
+          echo "$out" | grep -q 'three checker passes clean' || { echo "expected the audit to name the checker passes"; exit 1; }
+          node guide/audit-model.mjs "$work/no-reports.mmd" --base guide/ --quiet && \
+            { echo "expected the audit to fail a model with no reports or dashboards"; exit 1; } || true
+
       # The one-file checker carries checker.js, fixer.js and both runners
       # compressed inside it. Re-vendoring the validators without rebuilding it
       # would publish a single file that disagrees with the four beside it —

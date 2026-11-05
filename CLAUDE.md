@@ -687,7 +687,7 @@ fire on it and the roles that may read it.
 **The wealth-management model — `#investment`.** `guide/models/investment-planning-wealth-management-system.eml.mmd`
 is the v1.1.0 revision (`%%meta version: 1.1.0`) of that business and the only wealth model published. It is
 the largest model here: 103 entities, 54 enums, 9 rules, 14 state machines, 3 sagas, 114 access
-restrictions across six declared roles, and **58 `%%report` directives**. Its checker result is 0 errors,
+restrictions across six declared roles, and **397 `%%report` directives** (339 derived from the model's structure) and 60 `%%dashboard` lines. Its checker result is 0 errors,
 0 warnings and twenty notes: fourteen `EML511` (moves no `%%rbac` line names) and six deliberate ones: three self-referencing hierarchies (`OrganizationUnit`,
 `AssetClass`, `RevenueHierarchy`), the standalone audit log, and two line-item hints
 (`OrganizationUnit`, `ClientAgreement`). The reporting pack it derives (540 queries, 437 reports) is run
@@ -696,7 +696,7 @@ no dots on purpose — the audit's *name is lower-case and hyphenated* check rea
 
 **The education model — `#education`.** `guide/models/education-management-system.eml.mmd` is a fee-charging
 school in 25 entities, 37 enums, 15 rules, 16 state machines, 7 sagas and 71 access restrictions across
-eight roles, with **45 `%%report` directives**; 0 errors, 0 warnings, sixteen `EML511` notes, 23/23 under the audit.
+eight roles, with **147 `%%report` directives** and 80 `%%dashboard` lines; 0 errors, 0 warnings, sixteen `EML511` notes, 23/23 under the audit.
 Its header comment used to say nineteen entities, five lifecycles and two sagas (the original model's
 figures); it states the current ones. The per-entity notes and narrative documents beside it upstream
 (`docs/eml-sessions/education-management-system/` in `app-with-ai-tanstack`) are regenerated with it.
@@ -1244,7 +1244,7 @@ is a model file.
   names of one record join with a space while two records join with an em dash. `check-spec.mjs` asserts
   all of it against `appwithai-wasm.js`, so the table in §3.7 is a checked promise rather than prose.
 - **`%%report` is documented here now, and the published checker validates it.**
-  The eight models under `guide/models/` carry 244 of them between them, and for a
+  The twelve models under `guide/models/` carry about 4,400 of them between them, and for a
   while the directive was in none of the specifications this site publishes and in
   neither of its checkers — a reader who opened a model found lines the protocol
   never defined, and an author who added their own got a clean result from a checker
@@ -1474,7 +1474,7 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   The hospital model scores 23/23 as well, and is the larger worked example: **88
   entities, 1100 columns, 132 enums, 51 state machines, one saga, 3 rules, one hook
   and 88 access rules across 30 roles**, 0 errors and 0 warnings (164 notes, mostly
-  EML502 references with no parent entity and 51 EML511 moves no `%%rbac` line names). It declares no `%%report` directives. It is held
+  EML502 references with no parent entity and 51 EML511 moves no `%%rbac` line names). It carries 623 `%%report` directives, all derived from its structure, and 300 `%%dashboard` lines. It is held
   byte for byte to `examples/hospital-management-system.mmd` upstream. **Run the scorer on a model before
   publishing it**, not only the checker: a model can be 0/0 and still be missing half the
   language.
@@ -1495,13 +1495,38 @@ through — is now `llms.txt` §1, whose *walk me through it* pace is the same g
   byte-parity rule that binds `crm` and `drug-discovery` does not apply to it — keep it in
   step with `language/examples/dance-studio.eml.mmd` instead.
 - **`guide/models/airport-management-system.eml.mmd` — `#airport`.** An airport in 23 entities, 12 state
-  machines, one saga, 13 rules, 10 hooks, **92 access restrictions across 8 roles** and 10 `%%report`
+  machines, one saga, 13 rules, 10 hooks, **92 access restrictions across 8 roles** and 102 `%%report`
   directives; checker 0 errors and 0 warnings, 23/23 under the audit. Held to
   `examples/airport-management-system.eml.mmd` upstream, where a full application generated from it with
   the `appwithai` CLI was migrated, seeded and driven before it was published here. Its cards state those
   figures as digits, which is what `website-e2e.mjs` measures them against.
 - Every published model lays out every form with `%%section` — headed sections of
   two-column rows. Re-vendor them from upstream rather than editing them here.
+
+## Reporting minimums — every role, every published model
+
+Every role a model declares in `%%rbac` needs at least **50 charted `%%report` directives it can run** and
+at least **10 `%%dashboard` lines of three or more reports**. The checker reports a shortfall as `EML298`
+(reports) and `EML299` (dashboards); both are warnings, so `check-model.mjs` still exits 0, and the
+closing line names them as reporting coverage gaps. What stops a delivery is the audit: its
+"three checker passes clean" check fails on any warning. `tests.yml` holds that with a finished model
+stripped of its reports.
+
+- **All twelve published models meet it**, and `website-e2e.mjs` states their `%%report` counts from the
+  reader, so a page that goes stale fails. The counts on `try-it-yourself.html` and chapter 09 are the
+  models' totals, authored and derived together.
+- **Most of the reports are derived, not authored.** Upstream a script wrote them from each model's own
+  structure (lifecycles, enumerated columns, dates, yes/no flags, measures, parents, optional fields), so
+  each entity has a few and the narrowest role clears 56. They are generic by design; the hand-written ones
+  in each model are the real questions. Each model's header says which is which.
+- **A few roles had their read lists widened** to reach the minimum (investment: two finance roles; sales:
+  `compliance_officer`; hospital: `medical_director`; unified education: `partner`; construction: five
+  roles). Read only; the upstream PRs list every table.
+- **`check-spec.mjs` ignores `EML298`/`EML299` in the specification's own examples and probes.** They are
+  short on purpose and cannot hold 50 reports; upstream holds them to "no help or layout gaps" for the
+  same reason. The published models are held to the minimums by the audit, not by that script.
+- **The chapter-09 figures moved with the model:** the CRM pack holds 179 reports and offers the Support
+  Agent 76 of them. They come from `buildReportingPack` through the vendored bundle, not from this site.
 
 ## CI/CD Pipeline
 
