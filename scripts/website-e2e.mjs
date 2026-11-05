@@ -156,7 +156,7 @@ const runner = readFileSync(p("assets", "js", "run-in-browser.js"), "utf8");
 // A key is declared inside the BUILT_IN literal, or assigned onto it afterwards (BUILT_IN.key = {...}).
 const builtIn = new Set([
   ...runner.matchAll(/^\s*([a-z]+)\s*:\s*\{[^}]*?\.eml\.mmd/gms),
-  ...runner.matchAll(/^BUILT_IN\.([a-z]+)\s*=\s*\{[^}]*?\.eml\.mmd/gms),
+  ...[...runner.matchAll(/^BUILT_IN\.([a-z]+) = \{/gm)].filter((m) => runner.slice(m.index, m.index + 400).includes(".eml.mmd")),
 ].map((m) => m[1]));
 for (const key of Object.values(KEY_OF)) {
   builtIn.has(key)
