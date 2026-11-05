@@ -115,6 +115,11 @@ const BUILT_IN = {
     label: "enterprise-service-management-system.eml.mmd",
     name: "Enterprise Service Management System",
   },
+  construction: {
+    path: "models/construction-enterprise-management.eml.mmd",
+    label: "construction-enterprise-management.eml.mmd",
+    name: "Construction Enterprise Management",
+  },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -226,7 +231,7 @@ const choices = [
   [$("choice-shipping"), "shipping"],
   [$("choice-upload"), "upload"],
 ];
-choices.push([$("choice-sales"), "sales"], [$("choice-unified"), "unified"], [$("choice-service"), "service"]);
+choices.push([$("choice-sales"), "sales"], [$("choice-unified"), "unified"], [$("choice-service"), "service"], [$("choice-construction"), "construction"]);
 
 for (const [button, kind] of choices) button.addEventListener("click", () => selectChoice(kind));
 

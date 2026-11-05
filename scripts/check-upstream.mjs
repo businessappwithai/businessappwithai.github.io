@@ -52,6 +52,7 @@ const PAIRS = [
   ["guide/models/unified-education-management-system.eml.mmd", "html/models/education-management-system.mmd"],
   ["guide/models/enterprise-sales-crm.eml.mmd", "html/models/sales.mmd"],
   ["guide/models/enterprise-service-management-system.eml.mmd", "html/models/service-management.mmd"],
+  ["guide/models/construction-enterprise-management.eml.mmd", "html/models/construction-enterprise-management.mmd"],
   ...["eml-model.js", "canvas.js", "layout.js", "erd-viewer.js", "workflow-viewer.js", "rules-viewer.js", "decision-table.js", "model-viewer.js", "viewers.css"].map(
     (f) => [`viewers/${f}`, `website/viewers/${f}`]
   ),

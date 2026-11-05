@@ -43,6 +43,11 @@ const BUILT_IN = {
     label: "drug-discovery.eml.mmd",
     name: "Drug Discovery",
   },
+  construction: {
+    path: "models/construction-enterprise-management.eml.mmd",
+    label: "construction-enterprise-management.eml.mmd",
+    name: "Construction Enterprise Management",
+  },
   hospital: {
     path: "models/hospital-management-system.eml.mmd",
     label: "hospital-management-system.eml.mmd",
@@ -224,6 +229,7 @@ const choices = [
 choices.push([$("choice-unified"), "unified"]);
 choices.push([$("choice-sales"), "sales"]);
 choices.push([$("choice-service"), "service"]);
+choices.push([$("choice-construction"), "construction"]);
 
 for (const [button, kind] of choices) {
   button.addEventListener("click", () => selectChoice(kind));
