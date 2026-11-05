@@ -1522,6 +1522,13 @@ stripped of its reports.
 - **A few roles had their read lists widened** to reach the minimum (investment: two finance roles; sales:
   `compliance_officer`; hospital: `medical_director`; unified education: `partner`; construction: five
   roles). Read only; the upstream PRs list every table.
+- **A dashboard or a report title is used once** (`EML297` for dashboards, `EML292` for reports, trimmed and
+  case-insensitive). The reporting platform upserts by title, so two sharing one collapse into one row and the
+  pack is refused; the checker held only the name until this was added.
+- **SonarCloud's duplication gate fails on any change that re-vendors the bundles**, because `checker.js`,
+  `fixer.js`, `appwithai-wasm.js`, `appwithai-fullstack.js` and `viewers/eml-model.js` inline the same checker.
+  Excluding them is a SonarCloud project setting (Administration → Analysis Scope → Duplications); a
+  `sonar-project.properties` in the repository is not read by the PR analysis.
 - **`check-spec.mjs` ignores `EML298`/`EML299` in the specification's own examples and probes.** They are
   short on purpose and cannot hold 50 reports; upstream holds them to "no help or layout gaps" for the
   same reason. The published models are held to the minimums by the audit, not by that script.
