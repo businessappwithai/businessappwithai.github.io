@@ -239,7 +239,7 @@
           <span class="choice__desc">
             A school in 25 entities: admissions, the roll, timetabled sections and sessions,
             attendance, assessment, fees, discipline and student support. 16 state machines, 7 sagas and
-            71 access restrictions across eight roles &mdash; and 45 <code>%%report</code>
+            71 access restrictions across eight roles &mdash; and 147 <code>%%report</code>
             directives, which is what the reporting platform builds a dashboard from.
           </span>
           <span class="choice__meta">examples/education-management-system.eml.mmd</span>
@@ -250,7 +250,7 @@
             An airport in 23 entities: flights and the stands, gates and belts they are allocated,
             turnaround tasks, baggage and cargo, assets and work orders, safety cases, security passes,
             and tariffs through to invoices and receipts. 12 state machines, 13 rules and
-            92 access restrictions across 8 roles &mdash; and 10 <code>%%report</code> directives.
+            92 access restrictions across 8 roles &mdash; and 102 <code>%%report</code> directives.
           </span>
           <span class="choice__meta">examples/airport-management-system.eml.mmd</span>
         </button>
@@ -261,28 +261,28 @@
             legs and container use, shipping instructions and transport documents, customs filings,
             release and delivery, storage, and invoices through settlement, cost accruals and claims.
             20 state machines, 37 rules and 212 access restrictions across 7 roles &mdash; and
-            17 <code>%%report</code> directives.
+            176 <code>%%report</code> directives.
           </span>
           <span class="choice__meta">examples/shipping-management-system.eml.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-unified" aria-pressed="false">
           <span class="choice__name">Use the unified education example</span>
-          <span class="choice__desc">A multi-campus institution in 169 entities: the learner lifecycle from enquiry and admission to alumni, academic management, student success, scholarships and grants, finance, residences, library and institutional governance. 28 state machines, 1 saga, 17 rules, 3 hooks, 11 roles, 628 access restrictions and 25 <code>%%report</code> directives.</span>
+          <span class="choice__desc">A multi-campus institution in 169 entities: the learner lifecycle from enquiry and admission to alumni, academic management, student success, scholarships and grants, finance, residences, library and institutional governance. 28 state machines, 1 saga, 17 rules, 3 hooks, 11 roles, 628 access restrictions and 662 <code>%%report</code> directives.</span>
           <span class="choice__meta">html/models/education-management-system.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-sales" aria-pressed="false">
           <span class="choice__name">Use the enterprise sales CRM example</span>
-          <span class="choice__desc">A Salesforce-inspired enterprise CRM in 110 entities: sales, service, marketing and revenue operations around a Customer 360 &mdash; leads, opportunities, quotes, cases and entitlements, campaigns, subscriptions and invoices. 27 state machines, 1 saga, 5 rules, 1 hook, 9 roles, 330 access restrictions and 66 <code>%%report</code> directives.</span>
+          <span class="choice__desc">A Salesforce-inspired enterprise CRM in 110 entities: sales, service, marketing and revenue operations around a Customer 360 &mdash; leads, opportunities, quotes, cases and entitlements, campaigns, subscriptions and invoices. 27 state machines, 1 saga, 5 rules, 1 hook, 9 roles, 330 access restrictions and 463 <code>%%report</code> directives.</span>
           <span class="choice__meta">html/models/sales.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-service" aria-pressed="false">
           <span class="choice__name">Use the enterprise service management example</span>
-          <span class="choice__desc">A Salesforce-style service organisation in 76 entities: omnichannel routing, case management and knowledge, IT service (incidents, problems and changes), field service, inventory and returns, workforce management, digital engagement and AI governance. 8 state machines, 9 sagas, 14 rules, 3 hooks, 13 roles, 148 access restrictions and 28 <code>%%report</code> directives.</span>
+          <span class="choice__desc">A Salesforce-style service organisation in 76 entities: omnichannel routing, case management and knowledge, IT service (incidents, problems and changes), field service, inventory and returns, workforce management, digital engagement and AI governance. 8 state machines, 9 sagas, 14 rules, 3 hooks, 13 roles, 148 access restrictions and 256 <code>%%report</code> directives.</span>
           <span class="choice__meta">html/models/service-management.mmd</span>
         </button>
         <button type="button" class="choice" id="choice-construction" aria-pressed="false">
           <span class="choice__name">Use the construction enterprise example</span>
-          <span class="choice__desc">A construction enterprise in 194 entities: business development and bidding, contracts and change orders, project controls, field execution, quality and HSE, procurement and logistics, workforce and equipment, commissioning and handover, and the general ledger through to cash and tax. 65 state machines, 1 saga, 1 rule, 2 hooks, 34 roles, 842 access restrictions and 198 <code>%%report</code> directives.</span>
+          <span class="choice__desc">A construction enterprise in 194 entities: business development and bidding, contracts and change orders, project controls, field execution, quality and HSE, procurement and logistics, workforce and equipment, commissioning and handover, and the general ledger through to cash and tax. 65 state machines, 1 saga, 1 rule, 2 hooks, 34 roles, 842 access restrictions and 1197 <code>%%report</code> directives.</span>
           <span class="choice__meta">html/models/construction-enterprise-management.mmd</span>
         </button>
         <!-- The upload choice *is* the file picker: a label wrapping the input,
@@ -464,7 +464,7 @@
 </p>
 <p>
   Signing in as <code>support.agent@…</code> is the thing to try. It reads five of the model's
-  seventeen tables, so it is offered 36 of the 116 reports and its dashboard says
+  seventeen tables, so it is offered 76 of the 179 reports and its dashboard says
   <i>7 tiles hidden — Support Agent may not read the tables behind them</i>. Ask it for a report over
   an entity it does not own and it refuses by name. The administrator reads all seventeen. None of that
   is configured here: it is the same <code>%%rbac … .read</code> lines the application's navigation is
