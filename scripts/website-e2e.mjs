@@ -153,7 +153,11 @@ console.log(`  (${claimsChecked} figures checked across ${PAGES.length} pages)`)
 // ---------------------------------------------------------------------------
 console.log("\nEvery example a page offers is one chapter 09 can select");
 const runner = readFileSync(p("assets", "js", "run-in-browser.js"), "utf8");
-const builtIn = new Set([...runner.matchAll(/^\s*([a-z]+)\s*:\s*\{[^}]*?\.eml\.mmd/gms)].map((m) => m[1]));
+// A key is declared inside the BUILT_IN literal, or assigned onto it afterwards (BUILT_IN.key = {...}).
+const builtIn = new Set([
+  ...runner.matchAll(/^\s*([a-z]+)\s*:\s*\{[^}]*?\.eml\.mmd/gms),
+  ...runner.matchAll(/^BUILT_IN\.([a-z]+)\s*=\s*\{[^}]*?\.eml\.mmd/gms),
+].map((m) => m[1]));
 for (const key of Object.values(KEY_OF)) {
   builtIn.has(key)
     ? ok(`chapter 09 can select #${key}`)

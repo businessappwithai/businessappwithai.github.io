@@ -43,11 +43,6 @@ const BUILT_IN = {
     label: "drug-discovery.eml.mmd",
     name: "Drug Discovery",
   },
-  construction: {
-    path: "models/construction-enterprise-management.eml.mmd",
-    label: "construction-enterprise-management.eml.mmd",
-    name: "Construction Enterprise Management",
-  },
   hospital: {
     path: "models/hospital-management-system.eml.mmd",
     label: "hospital-management-system.eml.mmd",
@@ -93,6 +88,11 @@ const BUILT_IN = {
     label: "enterprise-sales-crm.eml.mmd",
     name: "Enterprise Sales CRM",
   },
+};
+BUILT_IN.construction = {
+  path: "models/construction-enterprise-management.eml.mmd",
+  label: "construction-enterprise-management.eml.mmd",
+  name: "Construction Enterprise Management",
 };
 
 const $ = (id) => document.getElementById(id);
