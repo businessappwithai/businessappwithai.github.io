@@ -1,0 +1,246 @@
+{
+  "file": "/home/user/businessappwithai.github.io/guide/models/construction-enterprise-management.eml.mmd",
+  "checkedAt": "2026-11-06T21:12:56.865Z",
+  "languageVersion": "1.2.0",
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "infos": 30,
+    "ok": true
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "code": "EML123",
+      "message": "Self-referential relationship on \"GLAccount\".",
+      "line": 2337,
+      "hint": "Self-references are valid (e.g. Category ||--o{ Category). Ensure parent_id is modelled.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML123",
+      "message": "Self-referential relationship on \"ProjectBudgetVersion\".",
+      "line": 2453,
+      "hint": "Self-references are valid (e.g. Category ||--o{ Category). Ensure parent_id is modelled.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectStakeholder\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 32,
+      "hint": "If a list of every ProjectStakeholder away from its Project is not a screen anyone opens, declare `%%entity ProjectStakeholder parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"OpportunityCompetitor\" looks like a line item of \"Opportunity\" but declares no parent.",
+      "line": 97,
+      "hint": "If a list of every OpportunityCompetitor away from its Opportunity is not a screen anyone opens, declare `%%entity OpportunityCompetitor parent: Opportunity` — the dictionary then drops its dashboard card and gives it a tab inside the Opportunity window, linked on opportunity_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"BidPackage\" looks like a line item of \"Bid\" but declares no parent.",
+      "line": 161,
+      "hint": "If a list of every BidPackage away from its Bid is not a screen anyone opens, declare `%%entity BidPackage parent: Bid` — the dictionary then drops its dashboard card and gives it a tab inside the Bid window, linked on bid_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ContractObligation\" looks like a line item of \"Contract\" but declares no parent.",
+      "line": 249,
+      "hint": "If a list of every ContractObligation away from its Contract is not a screen anyone opens, declare `%%entity ContractObligation parent: Contract` — the dictionary then drops its dashboard card and gives it a tab inside the Contract window, linked on contract_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectSite\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 318,
+      "hint": "If a list of every ProjectSite away from its Project is not a screen anyone opens, declare `%%entity ProjectSite parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectBudget\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 355,
+      "hint": "If a list of every ProjectBudget away from its Project is not a screen anyone opens, declare `%%entity ProjectBudget parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ActionItem\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 410,
+      "hint": "If a list of every ActionItem away from its Project is not a screen anyone opens, declare `%%entity ActionItem parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProgressEntry\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 437,
+      "hint": "If a list of every ProgressEntry away from its Project is not a screen anyone opens, declare `%%entity ProgressEntry parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"TransmittalItem\" looks like a line item of \"Transmittal\" but declares no parent.",
+      "line": 507,
+      "hint": "If a list of every TransmittalItem away from its Transmittal is not a screen anyone opens, declare `%%entity TransmittalItem parent: Transmittal` — the dictionary then drops its dashboard card and gives it a tab inside the Transmittal window, linked on transmittal_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"PunchItem\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 566,
+      "hint": "If a list of every PunchItem away from its Project is not a screen anyone opens, declare `%%entity PunchItem parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ResourceSkill\" looks like a line item of \"Resource\" but declares no parent.",
+      "line": 645,
+      "hint": "If a list of every ResourceSkill away from its Resource is not a screen anyone opens, declare `%%entity ResourceSkill parent: Resource` — the dictionary then drops its dashboard card and gives it a tab inside the Resource window, linked on resource_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"JournalEntry\" looks like a line item of \"Ledger\" but declares no parent.",
+      "line": 995,
+      "hint": "If a list of every JournalEntry away from its Ledger is not a screen anyone opens, declare `%%entity JournalEntry parent: Ledger` — the dictionary then drops its dashboard card and gives it a tab inside the Ledger window, linked on ledger_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"SupplierInvoice\" looks like a line item of \"Supplier\" but declares no parent.",
+      "line": 1163,
+      "hint": "If a list of every SupplierInvoice away from its Supplier is not a screen anyone opens, declare `%%entity SupplierInvoice parent: Supplier` — the dictionary then drops its dashboard card and gives it a tab inside the Supplier window, linked on supplier_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"SupplierPayment\" looks like a line item of \"Supplier\" but declares no parent.",
+      "line": 1194,
+      "hint": "If a list of every SupplierPayment away from its Supplier is not a screen anyone opens, declare `%%entity SupplierPayment parent: Supplier` — the dictionary then drops its dashboard card and gives it a tab inside the Supplier window, linked on supplier_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"CustomerContract\" looks like a line item of \"Customer\" but declares no parent.",
+      "line": 1219,
+      "hint": "If a list of every CustomerContract away from its Customer is not a screen anyone opens, declare `%%entity CustomerContract parent: Customer` — the dictionary then drops its dashboard card and gives it a tab inside the Customer window, linked on customer_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"CustomerInvoice\" looks like a line item of \"Customer\" but declares no parent.",
+      "line": 1248,
+      "hint": "If a list of every CustomerInvoice away from its Customer is not a screen anyone opens, declare `%%entity CustomerInvoice parent: Customer` — the dictionary then drops its dashboard card and gives it a tab inside the Customer window, linked on customer_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"CustomerReceipt\" looks like a line item of \"Customer\" but declares no parent.",
+      "line": 1279,
+      "hint": "If a list of every CustomerReceipt away from its Customer is not a screen anyone opens, declare `%%entity CustomerReceipt parent: Customer` — the dictionary then drops its dashboard card and gives it a tab inside the Customer window, linked on customer_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectCostTransaction\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 1292,
+      "hint": "If a list of every ProjectCostTransaction away from its Project is not a screen anyone opens, declare `%%entity ProjectCostTransaction parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectCostLedgerBalance\" looks like a line item of \"Project\" but declares no parent.",
+      "line": 1312,
+      "hint": "If a list of every ProjectCostLedgerBalance away from its Project is not a screen anyone opens, declare `%%entity ProjectCostLedgerBalance parent: Project` — the dictionary then drops its dashboard card and gives it a tab inside the Project window, linked on project_cost_balance_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"ProjectBudgetVersion\" looks like a line item of \"ProjectBudget\" but declares no parent.",
+      "line": 1360,
+      "hint": "If a list of every ProjectBudgetVersion away from its ProjectBudget is not a screen anyone opens, declare `%%entity ProjectBudgetVersion parent: ProjectBudget` — the dictionary then drops its dashboard card and gives it a tab inside the ProjectBudget window, linked on project_budget_version_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML149",
+      "message": "\"Item\" looks like a line item of \"InventoryAccount\" but declares no parent.",
+      "line": 1485,
+      "hint": "If a list of every Item away from its InventoryAccount is not a screen anyone opens, declare `%%entity Item parent: InventoryAccount` — the dictionary then drops its dashboard card and gives it a tab inside the InventoryAccount window, linked on inventory_account_id. If it is a thing in its own right, leave it: a reference is the opposite on all three questions (§3.5.1).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML502",
+      "message": "FK attribute \"GLAccount.gl_account_id\" has no relationship to \"GlAccount\".",
+      "hint": "Add:  GlAccount ||--o{ GLAccount : \"...\"  (or reverse for manyToOne).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML502",
+      "message": "FK attribute \"Timesheet.worker_id\" has no relationship to \"Worker\".",
+      "hint": "Add:  Worker ||--o{ Timesheet : \"...\"  (or reverse for manyToOne).",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML503",
+      "message": "Entity \"Lead\" has no relationships to other entities.",
+      "hint": "Is this intentional? Isolated entities are valid but may indicate a missing relationship.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML503",
+      "message": "Entity \"AccountingRule\" has no relationships to other entities.",
+      "hint": "Is this intentional? Isolated entities are valid but may indicate a missing relationship.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML503",
+      "message": "Entity \"PoLine\" has no relationships to other entities.",
+      "hint": "Is this intentional? Isolated entities are valid but may indicate a missing relationship.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML503",
+      "message": "Entity \"ReceiptLine\" has no relationships to other entities.",
+      "hint": "Is this intentional? Isolated entities are valid but may indicate a missing relationship.",
+      "autoFixable": false
+    },
+    {
+      "severity": "info",
+      "code": "EML503",
+      "message": "Entity \"SovLine\" has no relationships to other entities.",
+      "hint": "Is this intentional? Isolated entities are valid but may indicate a missing relationship.",
+      "autoFixable": false
+    }
+  ]
+}
