@@ -643,6 +643,11 @@ brings up PostgreSQL, the API and the web front end.
   CLI did not, and 413 of 419 byte-identical once the generation timestamp is
   normalised. **Do not drop the flag when re-vendoring, and do not add it to
   `run-real-stack.js`** — chapter 10 needs the overlay.
+- **The archive tests itself, and that is upstream's, not ours.** `docker-compose.yml` carries an `e2e` service
+  (`docker compose run --rm e2e`, the API suites against the application and the reporting platform together) and an
+  `e2e-ui` one (Playwright), behind the `test` profile, plus a `tests/` project with its own Dockerfiles. Both are
+  generated from the model by the vendored `appwithai-fullstack.js`; nothing here knows what they assert. Chapter 09's
+  download hint says so — keep it in step with `generatorContract.generatedE2E` upstream.
 - **The zip has no `bun.lock` and no `frontend/src/routeTree.gen.ts`**, because
   the CLI writes those by installing and running the router generator, and a
   browser can do neither. Both are produced by the Docker build:

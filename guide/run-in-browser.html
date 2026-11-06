@@ -365,6 +365,9 @@
         &mdash; <b>and the Enterprise Reporting platform beside them</b>, on its own port, holding
         this model&rsquo;s reports, charts and dashboard and one reporting role per role the model
         declares. <code>reporting/README.md</code> in the archive names both sets of accounts.
+        The archive also tests itself: <code>docker compose run --rm e2e</code> runs a suite
+        generated from the model against the application and its reporting platform together, and
+        <code>docker compose run --rm e2e-ui</code> drives both in a real browser.
         It is assembled here in your browser when you press the button, which takes a few seconds and
         fetches the stack templates from this site.
       </p>
