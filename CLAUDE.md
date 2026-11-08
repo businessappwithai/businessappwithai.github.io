@@ -648,6 +648,14 @@ brings up PostgreSQL, the API and the web front end.
   `e2e-ui` one (Playwright), behind the `test` profile, plus a `tests/` project with its own Dockerfiles. Both are
   generated from the model by the vendored `appwithai-fullstack.js`; nothing here knows what they assert. Chapter 09's
   download hint says so — keep it in step with `generatorContract.generatedE2E` upstream.
+- **The archive logs by error category, and that is upstream's too.** Its backend classifies every
+  error against an error-code catalogue (`backend/src/common/errors/`), logs declared events rather
+  than free text, stamps trace ids on its log lines, lets an administrator change a channel's level at
+  runtime and keep it across a restart (migration `025_log_level_overrides`), and its front end
+  reports browser errors to the API. All of it arrives in `appwithai-fullstack.js` and
+  `stack-templates.json` — which is why those two must be re-vendored together: a bundle naming
+  `025_log_level_overrides` beside a payload without it fails the zip with `ENOENT`. Upstream's
+  `docs/errorhandlingandlogging.md` is the design.
 - **The zip has no `bun.lock` and no `frontend/src/routeTree.gen.ts`**, because
   the CLI writes those by installing and running the router generator, and a
   browser can do neither. Both are produced by the Docker build:
