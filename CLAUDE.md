@@ -224,7 +224,7 @@ does not answer extension-less URLs the way Pages does).
 Deployment is fully automatic:
 - Push to `main` branch → GitHub Actions runs → site deploys to GitHub Pages
 - No manual steps required
-- The workflow builds with Docusaurus (`bun install --frozen-lockfile && bun run build`), runs
+- The workflow builds with Docusaurus (`bun install --frozen-lockfile --ignore-scripts && bun run build`), runs
   `scripts/check-build.mjs`, and uploads `build/` as the Pages artifact
 
 ### Branching
