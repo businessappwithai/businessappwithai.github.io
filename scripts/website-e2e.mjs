@@ -35,6 +35,10 @@ import path from "node:path";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const VERBOSE = process.argv.includes("--verbose");
 const p = (...s) => path.join(ROOT, ...s);
+// The pages are authored under site/ and served by Docusaurus at the same
+// paths (site/guide/run-in-browser.html is /guide/run-in-browser.html), with
+// their bodies unchanged. Every other published file is where it always was.
+const sitePage = (rel) => path.join(ROOT, "site", rel);
 
 let passed = 0;
 const failures = [];
@@ -132,9 +136,9 @@ for (const f of MODELS) {
 console.log("\nEvery figure a page states matches the model it describes");
 const PAGES = ["try-it-yourself.html", "guide/run-in-browser.html", "guide/run-real-stack.html", "guide/11-check-a-model.html"];
 let claimsChecked = 0;
-for (const page of PAGES) {
-  if (!existsSync(p(page))) { fail(page, "page is missing"); continue; }
-  const html = readFileSync(p(page), "utf8");
+for (const name of PAGES) {
+  if (!existsSync(sitePage(name))) { fail(name, "page is missing"); continue; }
+  const html = readFileSync(sitePage(name), "utf8");
   for (const [file, key] of Object.entries(KEY_OF)) {
     const block = blockFor(html, key);
     if (!block) continue;                      // not every page describes every model
@@ -144,7 +148,7 @@ for (const page of PAGES) {
       const claimed = num(m[1]);
       if (claimed === null) continue;          // not a number word we recognise — e.g. "the largest"
       claimsChecked++;
-      is(claimed, pick(STATS[file]), `${page} · ${key} · ${label}`);
+      is(claimed, pick(STATS[file]), `${name} · ${key} · ${label}`);
     }
   }
 }
@@ -163,7 +167,7 @@ for (const key of Object.values(KEY_OF)) {
     ? ok(`chapter 09 can select #${key}`)
     : fail(`chapter 09 can select #${key}`, `BUILT_IN has no "${key}" — the card offers a model the page cannot load`);
 }
-const tiy = readFileSync(p("try-it-yourself.html"), "utf8");
+const tiy = readFileSync(sitePage("try-it-yourself.html"), "utf8");
 for (const key of [...builtIn]) {
   tiy.includes(`run-in-browser.html#${key}`)
     ? ok(`try-it-yourself.html offers #${key}`)
@@ -346,7 +350,7 @@ console.log("\nThe reporting application in the deployable archive");
         "one reporting role per declared role, plus administrator and user");
 
       // Every figure chapter 09 states about the reporting side.
-      const chapter = readFileSync(p("guide", "run-in-browser.html"), "utf8");
+      const chapter = readFileSync(sitePage("guide/run-in-browser.html"), "utf8");
       const agent = roles.find((r) => /support\.agent@/.test(r.email));
       if (!agent) {
         fail("the CRM pack seeds a support.agent reporting account", "no such role in the pack");
@@ -408,7 +412,7 @@ console.log("\nThe reporting application in the deployable archive");
 // the anchors other pages link to have to keep landing on it.
 console.log("\n7. The prompts on try-it-yourself.html");
 {
-  const page = readFileSync(path.join(ROOT, "try-it-yourself.html"), "utf8");
+  const page = readFileSync(sitePage("try-it-yourself.html"), "utf8");
 
   const promptBody = (id) => {
     const m = page.match(new RegExp(`<pre id="${id}"[^>]*>([\\s\\S]*?)</pre>`));
@@ -434,7 +438,7 @@ console.log("\n7. The prompts on try-it-yourself.html");
     /* Both pages carry the prompt, and both must be free of the removed ChatGPT
        app's tool call: a tool that does not exist is an instruction nobody can follow. */
     for (const file of ["index.html", "try-it-yourself.html"]) {
-      const html = readFileSync(path.join(ROOT, file), "utf8");
+      const html = readFileSync(sitePage(file), "utf8");
       const block = /<pre id="research-prompt"[\s\S]*?<\/pre>/.exec(html)?.[0] ?? "";
       block && !/open_appwithai|Open AppWithAI|\bMCP\b/i.test(block)
         ? ok(`${file}: the prompt asks for no tool call (the ChatGPT app is gone)`)
@@ -453,7 +457,7 @@ console.log("\n7. The prompts on try-it-yourself.html");
       ? ok("the prompt stops a ChatGPT run until the TinyFish plugin is installed")
       : fail("the prompt stops a ChatGPT run until the TinyFish plugin is installed", "no ChatGPT prerequisite in the prompt");
     /* The same prompt is on both pages, and the install steps are on one of them. */
-    const home = readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const home = readFileSync(sitePage("index.html"), "utf8");
     /If you are ChatGPT, the TinyFish plugin must be installed/.test(home)
       ? ok("index.html: the prompt carries the ChatGPT prerequisite too")
       : fail("index.html: the prompt carries the ChatGPT prerequisite too", "the two copies of the prompt differ");
@@ -506,7 +510,7 @@ console.log("\n8. The model assistant");
  *     pasted by the time they read it.
  */
 {
-  const assistant = readFileSync(p("assistant.html"), "utf8");
+  const assistant = readFileSync(sitePage("assistant.html"), "utf8");
   const controller = readFileSync(p("assets", "js", "assistant.js"), "utf8");
 
   /* The one protocol document, run as a change in one pass. */
@@ -580,7 +584,7 @@ console.log("\n8. The model assistant");
     ? ok("the assistant page keeps the nav at seven items")
     : fail("the assistant page keeps the nav at seven items", `it has ${navItems}`);
 
-  readFileSync(p("try-it-yourself.html"), "utf8").includes("assistant.html")
+  readFileSync(sitePage("try-it-yourself.html"), "utf8").includes("assistant.html")
     ? ok("try-it-yourself.html links the assistant")
     : fail("try-it-yourself.html links the assistant", "the page it belongs beside does not point at it");
 }
