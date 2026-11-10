@@ -68,7 +68,7 @@ const lines = (text) => text.split("\n").map((line) => line.trim()).filter(Boole
 const tagLines = lines(GOOGLE_TAG);
 for (const rel of pages) {
   const built = path.join(BUILD, rel);
-  const head = existsSync(built) ? readFileSync(built, "utf8").match(/<head[^>]*>\s*([\s\S]*?)<\/head>/i)?.[1] : undefined;
+  const head = existsSync(built) ? readFileSync(built, "utf8").match(/<head[^>]*>([\s\S]*?)<\/head>/i)?.[1] : undefined;
   const opening = head === undefined ? [] : lines(head).slice(0, tagLines.length);
   held(opening.join("\n") === tagLines.join("\n"), `${rel}: the Google tag is the first thing in <head>`);
 }
