@@ -9,6 +9,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# The checks read the repository; none of them writes anything back.
+permissions:
+  contents: read
+
 jobs:
   checks:
     name: Spec, models and end-to-end
