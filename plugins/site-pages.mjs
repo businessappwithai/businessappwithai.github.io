@@ -17,11 +17,11 @@
 import { cpSync, existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
 
-const PAGES_DIR = "site";
+export const PAGES_DIR = "site";
 
 // What is build tooling rather than part of the published site. Everything
 // else at the repository root is copied as it is.
-const NOT_PUBLISHED = new Set([
+export const NOT_PUBLISHED = new Set([
   ".git",
   ".github",
   ".docusaurus",
@@ -37,16 +37,19 @@ const NOT_PUBLISHED = new Set([
   "package.json",
 ]);
 
-function listPages(dir, prefix = "") {
-  const pages = [];
+// Every file under dir, as paths relative to it.
+export function listFiles(dir, prefix = "") {
+  const files = [];
   for (const name of readdirSync(dir).sort()) {
     const full = path.join(dir, name);
     const rel = prefix ? `${prefix}/${name}` : name;
-    if (statSync(full).isDirectory()) pages.push(...listPages(full, rel));
-    else if (name.endsWith(".html")) pages.push(rel);
+    if (statSync(full).isDirectory()) files.push(...listFiles(full, rel));
+    else files.push(rel);
   }
-  return pages;
+  return files;
 }
+
+export const listPages = (dir) => listFiles(dir).filter((rel) => rel.endsWith(".html"));
 
 // Every spelling of a page's URL that GitHub Pages answers with that page.
 // Docusaurus's client router has to know each one: a path it does not match

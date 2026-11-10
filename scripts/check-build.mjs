@@ -15,14 +15,11 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { listFiles, listPages, NOT_PUBLISHED, PAGES_DIR } from "../plugins/site-pages.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BUILD = path.join(ROOT, "build");
-const SITE = path.join(ROOT, "site");
-const NOT_PUBLISHED = new Set([
-  ".git", ".github", ".docusaurus", ".gitignore", ".bun-version", "build", "node_modules",
-  "plugins", "src", "site", "bun.lock", "docusaurus.config.mjs", "package.json",
-]);
+const SITE = path.join(ROOT, PAGES_DIR);
 
 let failed = 0;
 const held = (cond, label) => {
@@ -30,23 +27,13 @@ const held = (cond, label) => {
   console.log(`${cond ? "ok  " : "FAIL"} ${label}`);
 };
 
-function walk(dir, prefix = "") {
-  const out = [];
-  for (const name of readdirSync(dir).sort()) {
-    const rel = prefix ? `${prefix}/${name}` : name;
-    if (statSync(path.join(dir, name)).isDirectory()) out.push(...walk(path.join(dir, name), rel));
-    else out.push(rel);
-  }
-  return out;
-}
-
 if (!existsSync(BUILD)) {
   console.error("No build/ — run `bun run build` first.");
   process.exit(2);
 }
 
 console.log("1. Pages");
-const pages = walk(SITE).filter((f) => f.endsWith(".html"));
+const pages = listPages(SITE);
 for (const rel of pages) {
   const built = path.join(BUILD, rel);
   const body = readFileSync(path.join(SITE, rel), "utf8").match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1];
@@ -59,7 +46,7 @@ let files = 0;
 for (const name of readdirSync(ROOT).sort()) {
   if (NOT_PUBLISHED.has(name)) continue;
   const top = path.join(ROOT, name);
-  for (const rel of statSync(top).isDirectory() ? walk(top, name) : [name]) {
+  for (const rel of statSync(top).isDirectory() ? listFiles(top, name) : [name]) {
     files++;
     const built = path.join(BUILD, rel);
     if (!existsSync(built) || !readFileSync(built).equals(readFileSync(path.join(ROOT, rel)))) {

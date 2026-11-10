@@ -156,8 +156,8 @@ Five things to keep true:
 - **Links between pages are plain `<a>`, so every click is a full page load.** Nothing here uses
   Docusaurus's `<Link>`; a client-side navigation would skip the scripts at the end of the body.
 - **Everything at the root that is not tooling is published**, as when the workflow uploaded the
-  whole repository. The tooling is listed in `NOT_PUBLISHED` in the plugin and in
-  `check-build.mjs` — add a new tooling file to both, or it will be served.
+  whole repository. The tooling is listed once, in `NOT_PUBLISHED` in the plugin, which
+  `check-build.mjs` imports — add a new tooling file there, or it will be served.
 
 ## Development Workflow
 
