@@ -9,6 +9,8 @@
 //      byte. These are URLs language models and old links were given.
 //   3. No page is served at a second path that breaks its relative links:
 //      /guide/ must not also be written as guide.html.
+//   4. The Google tag is the first thing in every built page's <head>, as it
+//      is in every page's source.
 //
 // Node only, no dependencies: it reads the plugin's own list of what is
 // published, so the two cannot disagree about it.
@@ -16,7 +18,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { isPage, listPublished } from "../plugins/site-pages.mjs";
+import { GOOGLE_TAG, isPage, listPublished } from "../plugins/site-pages.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BUILD = path.join(ROOT, "build");
@@ -57,6 +59,18 @@ console.log("\n3. No page at a second path");
 for (const rel of pages.filter((f) => f.endsWith("/index.html"))) {
   const stray = `${rel.slice(0, -"/index.html".length)}.html`;
   held(!existsSync(path.join(BUILD, stray)), `${stray} is not written beside ${rel}`);
+}
+
+console.log("\n4. The Google tag opens every <head>");
+// Docusaurus's template engine drops each line's indentation and blank lines,
+// so the tag is compared line by line with that whitespace set aside.
+const lines = (text) => text.split("\n").map((line) => line.trim()).filter(Boolean);
+const tagLines = lines(GOOGLE_TAG);
+for (const rel of pages) {
+  const built = path.join(BUILD, rel);
+  const head = existsSync(built) ? readFileSync(built, "utf8").match(/<head[^>]*>\s*([\s\S]*?)<\/head>/i)?.[1] : undefined;
+  const opening = head === undefined ? [] : lines(head).slice(0, tagLines.length);
+  held(opening.join("\n") === tagLines.join("\n"), `${rel}: the Google tag is the first thing in <head>`);
 }
 
 console.log(`\n${failed === 0 ? "OK — the build serves the site unchanged." : `${failed} check(s) failed.`}`);

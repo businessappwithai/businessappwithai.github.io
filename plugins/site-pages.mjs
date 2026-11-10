@@ -72,6 +72,23 @@ function routesFor(rel) {
   return [`/${rel}`, `/${rel.slice(0, -".html".length)}`];
 }
 
+// The Google tag, exactly as every page carries it as the first thing in its
+// <head>. Docusaurus's head manager regroups head tags by type (title, meta,
+// link, script), which would put it after every stylesheet; so readPage takes
+// it out of each page's head, and docusaurus.config.mjs writes it back as the
+// first thing in every built <head> through the ssrTemplate. A page whose head
+// does not open with this text exactly fails the build rather than losing it.
+export const GOOGLE_TAG = `<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5Z3WM5G1F"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-Y5Z3WM5G1F');
+</script>
+`;
+
 const ATTR = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
 
 function parseAttrs(text) {
@@ -101,7 +118,11 @@ export function readPage(file) {
   const head = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
   const body = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
   if (!head || !body) throw new Error(`${file}: expected a <head> and a <body>`);
-  return { head: parseHead(head[1]), body: body[1] };
+  const headText = head[1].replace(/^\n/, "");
+  if (!headText.startsWith(GOOGLE_TAG)) {
+    throw new Error(`${file}: the <head> must open with the Google tag, exactly as every page carries it`);
+  }
+  return { head: parseHead(headText.slice(GOOGLE_TAG.length)), body: body[1] };
 }
 
 export default function sitePages(context) {
