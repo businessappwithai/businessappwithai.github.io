@@ -157,7 +157,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - run: bun install --frozen-lockfile
+      - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun run build
       # Every page at its old path with its body unchanged, and every other
       # published file — validators, models, llms.txt — byte for byte.

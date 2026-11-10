@@ -37,7 +37,7 @@ Docker images and locally. There are no exceptions: the WASM build and the
   swaps bun for node — and that is about the *output*, not the toolchain that
   produced it.
 
-**Here:** Bun 1.4.4 installs Docusaurus (`bun install --frozen-lockfile`,
+**Here:** Bun 1.4.4 installs Docusaurus (`bun install --frozen-lockfile --ignore-scripts`,
 `bun.lock`) and runs the build (`bun run build`); `.bun-version`, `engines` in
 `package.json` and `bun-version: 1.4.4` in both workflows pin it. The site's own
 checks under `scripts/` stay Node-only with no dependencies. Everything it vendors — `guide/checker.js`,
