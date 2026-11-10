@@ -51,12 +51,10 @@ no re-vendoring. The site has no linter; were one ever added, it would be
 
 ## Repository Structure
 
-The tree below shows the **published** paths. Every page in it (each `.html` outside
-`guide/source/`) is authored under `site/` at the same relative path — `index.html` is
-`site/index.html`, `guide/run-in-browser.html` is `site/guide/run-in-browser.html` — and
-Docusaurus serves it back at the path shown. Beside them sit the build's own files:
-`package.json`, `bun.lock`, `.bun-version`, `docusaurus.config.mjs`, `plugins/site-pages.mjs`
-and `src/components/SitePage.jsx`.
+Every page in the tree (each `.html` outside `guide/source/`) is a Docusaurus route at its
+own path; see **Docusaurus** below. Beside them sit the build's own files: `package.json`,
+`bun.lock`, `.bun-version`, `docusaurus.config.mjs`, `plugins/site-pages.mjs`,
+`src/components/SitePage.jsx` and `scripts/check-build.mjs`.
 
 ```
 businessappwithai.github.io/
@@ -169,7 +167,7 @@ businessappwithai.github.io/
 **Docusaurus 3.10 (`@docusaurus/core`, React 19), installed with Bun 1.4.4, over pages
 that are still hand-written HTML.**
 
-- HTML5 (semantic markup) — every page is a complete document under `site/`
+- HTML5 (semantic markup) — every page is a complete document, where it has always been
 - CSS3 with custom properties (CSS variables)
 - Vanilla JavaScript (ES6+)
 - Docusaurus builds `build/`; GitHub Actions deploys it to GitHub Pages
@@ -182,7 +180,7 @@ and one local plugin. `package.json` pins `@docusaurus/core`, `react` and
 
 | File | What it does |
 |---|---|
-| `site/**/*.html` | **The pages.** Complete HTML documents, edited as HTML. `site/guide/run-in-browser.html` is served at `/guide/run-in-browser.html` — every URL is what it was |
+| `*.html`, `guide/*.html`, `viewers/index.html`, `demo/index.html` | **The pages.** Complete HTML documents, edited as HTML, in the same places as before. Every `.html` outside `guide/source/` is a page; `guide/source/` is a generated artifact and is copied as is |
 | `plugins/site-pages.mjs` | Gives each page a route at its old path (plus every other spelling Pages answers with it: `/guide/` and `/guide/index.html`, `/features.html` and `/features`), and after the build copies every other file at the repository root into `build/` unchanged |
 | `src/components/SitePage.jsx` | Renders one page: its `<head>` through Docusaurus's `<Head>`, its `<body>` verbatim |
 | `docusaurus.config.mjs` | `trailingSlash: false`, so pages keep their `.html` names; `BASE_URL` for a fork served under a sub-path |
@@ -192,14 +190,14 @@ Five things to keep true:
 
 - **The body is not rewritten as JSX, on purpose.** The interactive chapters, the viewers and the
   Model Assistant drive their markup by id; the scripts at the end of each body run as the browser
-  parses the built page, exactly as before. The checks read `site/` and `check-build.mjs` proves
+  parses the built page, exactly as before. The checks read the page files and `check-build.mjs` proves
   the build serves those same bytes.
 - **HTML minification is off** (`SKIP_HTML_MINIFICATION=true` in the `build` script). Docusaurus
   minifies built pages by default, including the pages' inline scripts; with it on, the deployed
   body is no longer the source.
 - **Every URL Pages serves a page at must be a route.** Docusaurus's client router draws "Page Not
   Found" over a page whose path it does not know — that is what `/guide/` did before it was an
-  alias. Add a page under `site/` and its routes follow; add a new URL form and add it to
+  alias. Add a page (any new `.html`) and its routes follow; add a new URL form and add it to
   `routesFor`.
 - **Links between pages are plain `<a>`, so every click is a full page load.** Nothing here uses
   Docusaurus's `<Link>`; a client-side navigation would skip the scripts at the end of the body.
@@ -218,7 +216,7 @@ bun run serve        # serve build/ at http://localhost:3000
 node scripts/check-build.mjs   # the build serves the site unchanged
 ```
 
-Edit pages under `site/`, then rebuild. `python3 -m http.server` inside `build/` works too (it
+Edit the pages in place, then rebuild. `python3 -m http.server` inside `build/` works too (it
 does not answer extension-less URLs the way Pages does).
 
 ### Deployment
@@ -470,7 +468,7 @@ prompt**, for a new model and for a change to an existing one.
 
 ## Key Conventions for AI Assistants
 
-1. **Docusaurus builds the site, and the pages stay HTML** — edit `site/`, rebuild, run `scripts/check-build.mjs`. Do not add npm, yarn or pnpm, a theme, or JSX versions of the pages; Bun installs.
+1. **Docusaurus builds the site, and the pages stay HTML** — edit the page, rebuild, run `scripts/check-build.mjs`. Do not add npm, yarn or pnpm, a theme, or JSX versions of the pages; Bun installs.
 2. **Reuse existing CSS classes** — the design system is comprehensive. Avoid adding new CSS unless absolutely necessary.
 3. **Keep pages consistent** — navigation, footer, and meta structure must match existing pages exactly.
 4. **No external JS dependencies** — do not add CDN script tags or npm packages.

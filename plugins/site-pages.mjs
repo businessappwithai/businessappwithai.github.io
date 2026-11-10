@@ -1,26 +1,23 @@
 // The site's pages, served by Docusaurus at the URLs they have always had.
 //
-// Every page is a complete HTML document under site/ — written and edited as
-// HTML, exactly as before. This plugin reads each one, gives it a route at its
-// old path (site/guide/run-in-browser.html is served at
-// /guide/run-in-browser.html), and hands its <head> and <body> to
-// src/components/SitePage.jsx, which renders them. The body is kept verbatim
-// rather than rewritten as JSX: the interactive chapters, the viewers and the
-// Model Assistant drive their own markup by id, and the site's checks read the
-// same text.
+// Every page is a complete HTML document where it has always been —
+// index.html, guide/run-in-browser.html, viewers/index.html — written and
+// edited as HTML. This plugin reads each one, gives it a route at its own path,
+// and hands its <head> and <body> to src/components/SitePage.jsx, which renders
+// them. The body is kept verbatim rather than rewritten as JSX: the interactive
+// chapters, the viewers and the Model Assistant drive their own markup by id,
+// and the site's checks read the same text.
 //
 // Everything that is not a page — assets/, the published validators, the
 // models, llms.txt and its chunks, guide/source/, the viewers' scripts, CNAME —
 // is copied into the build unchanged after Docusaurus has written its own
 // files, so every URL a language model or an old link was given still answers.
 
-import { cpSync, existsSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import path from "node:path";
 
-export const PAGES_DIR = "site";
-
 // What is build tooling rather than part of the published site. Everything
-// else at the repository root is copied as it is.
+// else at the repository root is published.
 export const NOT_PUBLISHED = new Set([
   ".git",
   ".github",
@@ -31,7 +28,6 @@ export const NOT_PUBLISHED = new Set([
   "node_modules",
   "plugins",
   "src",
-  PAGES_DIR,
   "bun.lock",
   "docusaurus.config.mjs",
   "package.json",
@@ -49,7 +45,17 @@ export function listFiles(dir, prefix = "") {
   return files;
 }
 
-export const listPages = (dir) => listFiles(dir).filter((rel) => rel.endsWith(".html"));
+// Every published file, relative to the repository root.
+export function listPublished(root) {
+  return readdirSync(root)
+    .sort()
+    .filter((name) => !NOT_PUBLISHED.has(name))
+    .flatMap((name) => (statSync(path.join(root, name)).isDirectory() ? listFiles(path.join(root, name), name) : [name]));
+}
+
+// A page is any published .html file except guide/source/, which is a
+// generated artifact carrying the validators byte for byte and is served as is.
+export const isPage = (rel) => rel.endsWith(".html") && !rel.startsWith("guide/source/");
 
 // Every spelling of a page's URL that GitHub Pages answers with that page.
 // Docusaurus's client router has to know each one: a path it does not match
@@ -100,17 +106,18 @@ export function readPage(file) {
 
 export default function sitePages(context) {
   const root = context.siteDir;
-  const pagesDir = path.join(root, PAGES_DIR);
 
   return {
     name: "site-pages",
 
     getPathsToWatch() {
-      return [path.join(pagesDir, "**/*.html")];
+      return listPublished(root).filter(isPage).map((rel) => path.join(root, rel));
     },
 
     async loadContent() {
-      return listPages(pagesDir).map((rel) => ({ rel, ...readPage(path.join(pagesDir, rel)) }));
+      return listPublished(root)
+        .filter(isPage)
+        .map((rel) => ({ rel, ...readPage(path.join(root, rel)) }));
     },
 
     async contentLoaded({ content, actions }) {
@@ -140,24 +147,14 @@ export default function sitePages(context) {
         if (existsSync(stray)) rmSync(stray);
       }
 
-      for (const name of readdirSync(root).sort()) {
-        if (NOT_PUBLISHED.has(name)) continue;
-        const from = path.join(root, name);
-        const to = path.join(outDir, name);
+      for (const rel of listPublished(root)) {
+        if (isPage(rel)) continue;
+        const dest = path.join(outDir, rel);
         // Docusaurus writes its bundles under assets/js and assets/css with
         // hashed names; the site's own files there must not replace one.
-        cpSync(from, to, {
-          recursive: true,
-          errorOnExist: true,
-          force: false,
-          filter: (src) => {
-            const dest = path.join(to, path.relative(from, src));
-            if (existsSync(dest) && !statSync(dest).isDirectory()) {
-              throw new Error(`${path.relative(root, src)} would overwrite a file Docusaurus wrote`);
-            }
-            return true;
-          },
-        });
+        if (existsSync(dest)) throw new Error(`${rel} would overwrite a file Docusaurus wrote`);
+        mkdirSync(path.dirname(dest), { recursive: true });
+        copyFileSync(path.join(root, rel), dest);
       }
     },
   };

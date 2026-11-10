@@ -17,7 +17,7 @@ This repository is the marketing and documentation site only. The generator live
 Built with [Docusaurus](https://docusaurus.io) 3.10, installed with Bun 1.4.4, over pages that are
 still hand-written HTML.
 
-- HTML5 / CSS3 (Lunaris Design System, custom properties throughout) — the pages live in `site/`
+- HTML5 / CSS3 (Lunaris Design System, custom properties throughout) — the pages are where they have always been
 - Vanilla JavaScript ES6+
 - Docusaurus (`@docusaurus/core` and one local plugin, `plugins/site-pages.mjs`) builds `build/`,
   serving every page at the URL it has always had
@@ -40,9 +40,8 @@ A Service Worker on `guide/run-in-browser.html` and `guide/run-real-stack.html` 
 businessappwithai.github.io/
 ├── package.json, bun.lock        # Docusaurus, installed with Bun 1.4.4
 ├── docusaurus.config.mjs         # trailingSlash: false — pages keep their .html URLs
-├── plugins/site-pages.mjs        # One route per page in site/; copies everything else into build/
+├── plugins/site-pages.mjs        # One route per .html page; copies everything else into build/
 ├── src/components/SitePage.jsx   # Renders a page's <head> and its <body> verbatim
-├── site/                         # THE PAGES — every .html below lives here, at the same path
 ├── index.html                    # Landing page
 ├── features.html                 # Feature detail
 ├── how-it-works.html             # AI pipeline
@@ -151,6 +150,6 @@ node guide/audit-model.mjs guide/models/crm.eml.mmd
 
 ## Contributing
 
-Edit the pages under `site/` (and the assets beside them), run `bun run build` and `node scripts/check-build.mjs`, and check the result with `bun run serve` before opening a pull request. Merging to `main` builds and deploys automatically.
+Edit the pages and assets in place, run `bun run build` and `node scripts/check-build.mjs`, and check the result with `bun run serve` before opening a pull request. Merging to `main` builds and deploys automatically.
 
 Navigation is at its seven-item ceiling (1024px). Adding a nav item means removing one.

@@ -23,10 +23,6 @@ import { check, AUTO_FIXABLE, LANGUAGE_VERSION } from "../guide/checker.js";
 import { checkAndFix } from "../guide/fixer.js";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-// The pages are authored under site/ and served by Docusaurus at the same paths
-// (site/guide/11-check-a-model.html is /guide/11-check-a-model.html); every
-// other published file is where it always was.
-const served = (rel) => (rel.endsWith(".html") && !rel.startsWith("guide/source/") ? root + "site/" + rel : root + rel);
 
 /* ---------------------------------------------- 1. the document's examples */
 
@@ -591,7 +587,7 @@ held(!/scripts\/check-model\.mjs/.test(withoutHistory),
 
 // Every rung of the ladder has to name something this site actually serves.
 for (const rung of ["guide/check-model.mjs", "guide/audit-model.mjs", "guide/checker.js", "guide/fixer.js", "guide/11-check-a-model.html"])
-  held(existsSync(served(rung)) && detailed.includes(rung.replace("guide/", "")),
+  held(existsSync(root + rung) && detailed.includes(rung.replace("guide/", "")),
     `the ladder's ${rung} is published here and named in the document`);
 
 /* The viewers. Section 10 sends a reader to /viewers/ at Phase 3 and names
@@ -604,7 +600,7 @@ for (const rung of ["guide/check-model.mjs", "guide/audit-model.mjs", "guide/che
 held(/https:\/\/www\.appwithai\.org\/viewers\//.test(detailed),
   "llms.txt names the model viewers by their published URL");
 for (const file of ["viewers/index.html", "viewers/eml-model.js", "viewers/model-viewer.js", "viewers/viewers.css"])
-  held(existsSync(served(file)), `${file} is published here — section 10 sends readers to it`);
+  held(existsSync(root + file), `${file} is published here — section 10 sends readers to it`);
 
 // Cross-references inside the file must resolve, or the ladder sends a reader nowhere.
 const headings = new Set([...detailed.matchAll(/^#{2,4} (\d+(?:\.\d+)*)[. ]/gm)].map((m) => m[1]));
@@ -683,7 +679,7 @@ for (const [pattern, label] of [
    than reimplement it, and that module must still export audit() without
    touching Node at import time. */
 {
-  const page = readFileSync(served("guide/11-check-a-model.html"), "utf8");
+  const page = readFileSync(root + "guide/11-check-a-model.html", "utf8");
   const ctl = readFileSync(root + "assets/js/validator.js", "utf8");
   enh(/id="audit"/.test(page), "chapter 11 has an Audit button");
   enh(ctl.includes('import("../../guide/audit-model.mjs")') && !/say\(/.test(ctl),
@@ -835,7 +831,7 @@ for (const name of ["index.html", "checker.js.html", "fixer.js.html", "check-mod
 
 /* The pages are held to the same form: a prompt is a URL a reader pastes. */
 for (const page of ["index.html", "try-it-yourself.html"]) {
-  const markup = readFileSync(served(page), "utf8");
+  const markup = readFileSync(root + page, "utf8");
   const bare = [...markup.matchAll(/[^/w.]((?:www\.)?appwithai\.org)/g)].map((m) => m[1]);
   host(bare.length === 0,
     `${page}: names the host only as https://www.appwithai.org${bare.length ? ` (${bare.length} bare)` : ""}`);
