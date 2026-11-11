@@ -1,0 +1,19 @@
+{
+  "name": "businessappwithai-website",
+  "private": true,
+  "description": "The AppWithAI website, built with Docusaurus and deployed to GitHub Pages.",
+  "engines": {
+    "bun": ">=1.4.4"
+  },
+  "scripts": {
+    "build": "SKIP_HTML_MINIFICATION=true docusaurus build",
+    "serve": "docusaurus serve",
+    "start": "SKIP_HTML_MINIFICATION=true docusaurus build && docusaurus serve",
+    "clear": "docusaurus clear"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}

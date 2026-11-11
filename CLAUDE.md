@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is the **AppWithAI** marketing website — a static site promoting an AI-powered business application generator. The site is deployed via GitHub Pages with no build step required.
+This is the **AppWithAI** marketing website — a static site promoting an AI-powered business application generator. The site is built by **Docusaurus** and deployed to GitHub Pages by GitHub Actions — see **Docusaurus** below.
 
 ## Bun 1.4.4, and only Bun 1.4.4
 
@@ -37,8 +37,10 @@ Docker images and locally. There are no exceptions: the WASM build and the
   swaps bun for node — and that is about the *output*, not the toolchain that
   produced it.
 
-**Here:** this site runs on Node alone and installs nothing, so it has no Bun of
-its own to pin. But everything it vendors — `guide/checker.js`,
+**Here:** Bun 1.4.4 installs Docusaurus (`bun install --frozen-lockfile --ignore-scripts`,
+`bun.lock`) and runs the build (`bun run build`); `.bun-version`, `engines` in
+`package.json` and `bun-version: 1.4.4` in both workflows pin it. The site's own
+checks under `scripts/` stay Node-only with no dependencies. Everything it vendors — `guide/checker.js`,
 `guide/fixer.js`, `assets/js/appwithai-*.js`, `viewers/eml-model.js`,
 `assets/vendor/stack-templates.json` — is built upstream on Bun 1.4.4. Re-vendor
 those files from upstream rather than rebuilding them, and never rebuild one
@@ -48,6 +50,11 @@ no re-vendoring. The site has no linter; were one ever added, it would be
 `bun check`.
 
 ## Repository Structure
+
+Every page in the tree (each `.html` outside `guide/source/`) is a Docusaurus route at its
+own path; see **Docusaurus** below. Beside them sit the build's own files: `package.json`,
+`bun.lock`, `.bun-version`, `docusaurus.config.mjs`, `plugins/site-pages.mjs`,
+`src/components/SitePage.jsx` and `scripts/check-build.mjs`.
 
 ```
 businessappwithai.github.io/
@@ -157,33 +164,68 @@ businessappwithai.github.io/
 
 ## Technology Stack
 
-**Pure static site — no build tools, no package manager, no framework.**
+**Docusaurus 3.10 (`@docusaurus/core`, React 19), installed with Bun 1.4.4, over pages
+that are still hand-written HTML.**
 
-- HTML5 (semantic markup)
+- HTML5 (semantic markup) — every page is a complete document, where it has always been
 - CSS3 with custom properties (CSS variables)
 - Vanilla JavaScript (ES6+)
-- GitHub Actions for CI/CD deployment to GitHub Pages
+- Docusaurus builds `build/`; GitHub Actions deploys it to GitHub Pages
 
-No Node.js, npm, webpack, or bundler of any kind. There is no `package.json`.
+No webpack config, no framework code in the pages, and no theme: Docusaurus core
+and one local plugin. `package.json` pins `@docusaurus/core`, `react` and
+`react-dom` exactly; it has no script named `check`.
+
+## Docusaurus
+
+| File | What it does |
+|---|---|
+| `*.html`, `guide/*.html`, `viewers/index.html`, `demo/index.html` | **The pages.** Complete HTML documents, edited as HTML, in the same places as before. Every `.html` outside `guide/source/` is a page; `guide/source/` is a generated artifact and is copied as is |
+| `plugins/site-pages.mjs` | Gives each page a route at its old path (plus every other spelling Pages answers with it: `/guide/` and `/guide/index.html`, `/features.html` and `/features`), and after the build copies every other file at the repository root into `build/` unchanged |
+| `src/components/SitePage.jsx` | Renders one page: its `<head>` through Docusaurus's `<Head>`, its `<body>` verbatim |
+| `docusaurus.config.mjs` | `trailingSlash: false`, so pages keep their `.html` names; `BASE_URL` for a fork served under a sub-path |
+| `scripts/check-build.mjs` | Holds the build to the site: every page body unchanged at its old path, every other published file byte for byte, no stray `guide.html` |
+
+Five things to keep true:
+
+- **The body is not rewritten as JSX, on purpose.** The interactive chapters, the viewers and the
+  Model Assistant drive their markup by id; the scripts at the end of each body run as the browser
+  parses the built page, exactly as before. The checks read the page files and `check-build.mjs` proves
+  the build serves those same bytes.
+- **HTML minification is off** (`SKIP_HTML_MINIFICATION=true` in the `build` script). Docusaurus
+  minifies built pages by default, including the pages' inline scripts; with it on, the deployed
+  body is no longer the source.
+- **Every URL Pages serves a page at must be a route.** Docusaurus's client router draws "Page Not
+  Found" over a page whose path it does not know — that is what `/guide/` did before it was an
+  alias. Add a page (any new `.html`) and its routes follow; add a new URL form and add it to
+  `routesFor`.
+- **Links between pages are plain `<a>`, so every click is a full page load.** Nothing here uses
+  Docusaurus's `<Link>`; a client-side navigation would skip the scripts at the end of the body.
+- **Everything at the root that is not tooling is published**, as when the workflow uploaded the
+  whole repository. The tooling is listed once, in `NOT_PUBLISHED` in the plugin, which
+  `check-build.mjs` imports — add a new tooling file there, or it will be served.
 
 ## Development Workflow
 
 ### Local Development
 
-Open any `.html` file directly in a browser. No server required for basic viewing.
-
-For a local dev server (avoids CORS issues with relative links):
 ```bash
-python3 -m http.server 8080
-# then open http://localhost:8080
+bun install          # once — Bun 1.4.4
+bun run build        # Docusaurus → build/
+bun run serve        # serve build/ at http://localhost:3000
+node scripts/check-build.mjs   # the build serves the site unchanged
 ```
+
+Edit the pages in place, then rebuild. `python3 -m http.server` inside `build/` works too (it
+does not answer extension-less URLs the way Pages does).
 
 ### Deployment
 
 Deployment is fully automatic:
 - Push to `main` branch → GitHub Actions runs → site deploys to GitHub Pages
 - No manual steps required
-- The workflow uploads the entire repository as the static artifact
+- The workflow builds with Docusaurus (`bun install --frozen-lockfile --ignore-scripts && bun run build`), runs
+  `scripts/check-build.mjs`, and uploads `build/` as the Pages artifact
 
 ### Branching
 
@@ -426,7 +468,7 @@ prompt**, for a new model and for a change to an existing one.
 
 ## Key Conventions for AI Assistants
 
-1. **No build step** — changes to HTML/CSS/JS are applied directly. Do not introduce npm, bundlers, or frameworks.
+1. **Docusaurus builds the site, and the pages stay HTML** — edit the page, rebuild, run `scripts/check-build.mjs`. Do not add npm, yarn or pnpm, a theme, or JSX versions of the pages; Bun installs.
 2. **Reuse existing CSS classes** — the design system is comprehensive. Avoid adding new CSS unless absolutely necessary.
 3. **Keep pages consistent** — navigation, footer, and meta structure must match existing pages exactly.
 4. **No external JS dependencies** — do not add CDN script tags or npm packages.
