@@ -698,6 +698,11 @@ brings up PostgreSQL, the API and the web front end.
   `stack-templates.json` — which is why those two must be re-vendored together: a bundle naming
   `025_log_level_overrides` beside a payload without it fails the zip with `ENOENT`. Upstream's
   `docs/errorhandlingandlogging.md` is the design.
+- **The archive carries the chat assistant's side, and that is upstream's too.** `assistant-skills/`
+  beside `manual.html` (one Markdown skill per record type, read by the orchestrator's chat through
+  `read_skill`), the backend's `common/chat-bridge.ts` (chat-only mode) and the front end's embed mode.
+  None of it is authored here; it arrived with the re-vendor of `appwithai-fullstack.js` and
+  `stack-templates.json` at upstream `274046b`, which is when the zip stopped lagging the generator.
 - **The zip has no `bun.lock` and no `frontend/src/routeTree.gen.ts`**, because
   the CLI writes those by installing and running the router generator, and a
   browser can do neither. Both are produced by the Docker build:
