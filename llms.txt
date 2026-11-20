@@ -61,3 +61,20 @@ S5. Every validator route exhausted: deliver labelled not validated (checker-rul
 
 OUTPUT
 Original inventory and verdict. Research findings and objections. Applied changes. Before/after counts. Per-role report and dashboard counts (§7.2.6). Checker and audit verdicts, verbatim. One complete downloadable `.mmd`.
+
+DEMO ACCOUNTS
+The CLI writes `password_list.txt` at the generated project root alongside every other generated file. The sign-in pages of both the application and the Enterprise Reporting platform read it at runtime — dynamically, never from source code — so deleting the file before a real deployment removes the accounts from the sign-in screen without any code change.
+
+Format (JSON):
+  app          — array of application accounts: { "email", "role", "isAdmin", "entities" }
+  appPassword  — shared password for every app account: "admin123"
+  report       — array of reporting-platform accounts: { "email", "role", "isAdmin", "tables" }
+  reportPassword — shared password for every reporting account: "admin"
+
+One account per `%%rbac` role declared in the model, plus the generated administrator. The administrator bypasses every restriction, so signing in as any other role is the only way to see the access control the model wrote. The entity count beside each address is the number of entities that role may read; if `ACCESS_IS_SCOPED` is false every role sees everything.
+
+Application sign-in: `GET /api/sys/demo-accounts` (public, no session required) reads `password_list.txt` and returns the `app` array.
+Reporting sign-in: `GET /api/sys/demo-accounts` on the reporting service reads the same file from its own working directory and returns the `report` array.
+Both endpoints return `{ accounts: [], password: "" }` when the file is absent — no hardcoded fallback.
+
+Production cleanup: delete `password_list.txt` from the project root (and `reporting/password_list.txt`) before deploying anywhere real.
