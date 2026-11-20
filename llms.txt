@@ -20,8 +20,8 @@ M3. ENHANCE: inventory first (entities, columns, relationships, enums, help, sec
 M4. Both modes, before any question or draft: think at full depth, research the domain widely, then attack your own plan as a hostile expert and fix what survives. A `.mmd` in hand does not skip this.
 M5. Ask the pace once: "walk me through it" (gated, one decision at a time) or "just build it" (one pass, assumptions listed).
 M6. ENHANCE: apply only the requested change plus dictionary gaps. Preserve everything else.
-M7. Dictionary is mandatory: FK on every reference, enum binding on every closed list, help on every entity, column and section, a lucide `icon:` on every entity, every form in `%%section` rows.
-M8. Validation is mandatory: checker, fixer if needed, checker again, then audit, on the exact bytes delivered. Never state a count or verdict a run did not print.
+M7. Dictionary is mandatory: FK on every reference, enum binding on every closed list, help on every entity, column and section, a lucide `icon:` on every entity, every form in `%%section` rows. Line-item entities (those whose checker emits `EML149`) must declare `%%entity X parent: Y` and be removed from any `%%category` they appear in (`EML150`); both steps are required together — adding `parent:` without removing from `%%category` turns `EML149` notes into `EML150` warnings and fails the audit.
+M8. Validation is mandatory: checker, fixer if needed, checker again, then audit, on the exact bytes delivered. Run the checker–fixer–checker loop for up to 10 cycles; stop early when 3 consecutive cycles each return zero errors and zero warnings; then run the audit. Never state a count or verdict a run did not print.
 M9. Deliver exactly one complete `.mmd` (ENHANCE: original filename). Never a patch, excerpt, diff or abbreviated model. First non-blank line starts with `%%`.
 M10. Prose about a model is not a model. Headings and glossaries fail the checker with `EML004`.
 M11. A state field (the `status`/`state`/`stage` a `kind: state` machine drives) is never typed: a save puts a record in Draft, an accepted save moves it into its flow (or to Final with no flow), and from there it moves only by its action buttons, along drawn edges; every end state is Final and locked, Reopen takes it back. Give each move to its role: `%%rbac role:<roles> on <Entity>.<event>` (`reopen` for Reopen). No rule or saga moves a record its buttons move (`EML512`). Never put it in a `%%section` row (`EML178`): the form shows it read-only in its header and the list grid always shows it.
@@ -49,7 +49,7 @@ WORKFLOW
 VALIDATE
 `curl -sO https://www.appwithai.org/guide/check-model.mjs` then `node check-model.mjs <file>.mmd`
 `curl -sO https://www.appwithai.org/guide/audit-model.mjs` then `node audit-model.mjs <file>.mmd`
-Exit 0 means accepted. Read each run's last line. A clean checker is not a finished model: the audit must end `23 passed, 0 failed`.
+Run the checker up to 10 cycles, fixing every diagnostic between runs. Exit the loop early when 3 consecutive cycles each return zero errors and zero warnings — the model is stable. Then run the audit: its last line must read `23 passed, 0 failed`. Exit 0 means accepted. Read each run's last line. A clean checker is not a finished model.
 Host unreachable is a fact about your network, not a reason to skip: load L5, §8.4.
 
 STOP
